@@ -1,0 +1,16 @@
+<div class="form-group ng-selector-cliente">
+    <select
+        selector
+        model="model[options.key]"
+        multi="false"
+        label-attr="nome"
+        value-attr="id"
+        remote="doSearch(search)"
+        debounce="500"
+        require="true"
+        placeholder="Informe iniciais do nome ou cpf/cnpj para pesquisar..."
+        change="changed(newValue,oldValue)"
+        options="clientes"
+        disable="isDisabled()"
+    ></select>
+</div>

@@ -1,0 +1,55 @@
+<section class="content conteudo">
+
+    <search-filter></search-filter>
+
+    <wait-overlay
+        ready="user"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionConteudo.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum registro encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="sigla">Sigla</th>
+                                    <th class="descricao">Descrição</th>
+                                    <th class="publico center">Público</th>
+                                    <th style="width:30%;" class="id right">ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionConteudo.collection.data">
+                                    <td class="sigla">
+                                        <a href="#" ng-click="edit(c)">
+                                            {{c.sigla}}
+                                        </a>
+                                    </td>
+                                    <td class="descricao">
+                                            {{c.descricao}}
+                                    </td>
+                                    <td class="publico center">
+                                        <badge-true-false value="c.publico"></badge-true-false>
+                                    </td>
+                                    <td class="id right">
+                                        <span class="monospace">
+                                            {{c.id}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

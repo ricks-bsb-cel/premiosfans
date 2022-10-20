@@ -1,0 +1,54 @@
+<div class="form-group price-options">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Descrição*</th>
+                <th class="actions"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="o in model[options.key] | orderBy:'order'">
+                <td class="p-1">
+                    <input
+                        class="form-control form-control-sm"
+                        type="text"
+                        ng-model="o.descricao"
+                    >
+                </td>
+                <td class="p-1 actions">
+                    <a
+                        href="#"
+                        class="mr-3"
+                        ng-disabled="model[options.key].length==1"
+                        ng-click="delete(o)"
+                    >
+                        <i class="far fa-trash-alt"></i>
+                    </a>
+                    <a
+                        href="#"
+                        class="mr-2"
+                        ng-disabled="$first"
+                        ng-click="changeOrder(model[options.key][$index],model[options.key][$index-1])"
+                    >
+                        <i class="fas fa-arrow-up"></i>
+                    </a>
+        
+                    <a
+                        href="#"
+                        ng-disabled="$last"
+                        ng-click="changeOrder(model[options.key][$index],model[options.key][$index+1])"
+                    >
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button ng-click="add()" type="button" class="btn btn-primary btn-block">
+        <i class="far fa-images mr-1"></i>
+        Adicionar
+    </button>
+
+</div>

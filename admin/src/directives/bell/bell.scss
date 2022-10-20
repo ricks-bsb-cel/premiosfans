@@ -1,0 +1,29 @@
+.bell {
+    display: block;
+    width: 30px;
+    height: auto;
+}
+
+.bell.bell-animate{
+    animation: ring 1.5s infinite ease-in-out;
+    .st1{
+        animation: ring-clapper 1.5s infinite linear;
+    }
+}
+
+.bell .clapper-group {
+    transform-origin: top center;
+}
+  
+@keyframes ring {
+    0% { transform: rotate(-30deg) }
+    50% { transform: rotate(30deg) }
+    100% { transform: rotate(-30deg) }
+}
+  
+@keyframes ring-clapper {
+    0% { transform: rotate(0deg) }
+    20% { transform: rotate(20deg) }
+    70% { transform: rotate(-20deg) }
+    100% { transform: rotate(0deg) }
+}

@@ -1,0 +1,22 @@
+<section class="content-header" title="Global Whatsapp">
+</section>
+
+<section class="content global-whatsapp">
+    <div class="row">
+        <z-api-whatsapp-qr-code class="col-md-6" ng-if="!status.connected"></z-api-whatsapp-qr-code>
+        <z-api-whatsapp-status class="col-md-6" status="status"></z-api-whatsapp-status>
+        <z-api-whatsapp-disconnect ng-if="status.connected" class="col-md-6"></z-api-whatsapp-disconnect>
+        <z-api-whatsapp-send-text-message ng-if="status.connected" class="col-md-12"></z-api-whatsapp-send-text-message>
+
+    </div>
+
+    <div class="card direct-chat direct-chat-primary">
+        <div class="card-header ui-sortable-handle" style="cursor: move;">
+            <h3 class="card-title">Web Hooks</h3>
+        </div>
+        <div class="card-body mr-3 ml-3">
+            <z-api-whatsapp-set-webhooks id-empresa="idEmpresa" class="col-md-12"></z-api-whatsapp-set-webhooks>
+        </div>
+    </div>
+
+</section>

@@ -1,0 +1,29 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        {{$ctrl.data.nome || 'Inclusão de Conteúdo'}}
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+
+    <wait-overlay ready="$ctrl.ready">
+        
+        <form novalidate>
+            <formly-form
+                class="row"
+                model="$ctrl.data"
+                fields="$ctrl.fields"
+                form="$ctrl.form"
+                novalidate
+            >
+            </formly-form>
+        </form>
+
+        <div class="monaco-editor" id="monaco-editor-html"></div>
+
+    </wait-overlay>
+
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok(true)" ng-if="!$ctrl.error">Salvar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
+</div>

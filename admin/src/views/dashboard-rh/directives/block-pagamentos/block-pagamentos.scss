@@ -1,0 +1,30 @@
+.dashboard-rh{
+    .block-pagamentos{
+        .card-footer{
+
+            .info-box-icon{
+                height: 40px;
+                width: 40px;
+                display: block;
+                position: absolute;
+                left: 5px;
+                border-radius: 5px;
+
+                i{
+                    font-size: 1.7em;
+                    padding: 7px;
+                }
+            }
+
+            a{
+                padding-left: 37px;
+                font-weight: bold;
+            }
+
+            small{
+                display: block;
+                padding: 0 5px 5px 55px;
+            }
+        }
+    }
+} 

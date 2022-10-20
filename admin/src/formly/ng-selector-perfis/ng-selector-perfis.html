@@ -1,0 +1,13 @@
+<div class="form-group ng-selector-perfis">
+    <select
+        selector
+        ng-if="admConfigProfiles.collection.ready"
+        model="model[options.key]"
+        multi="false"
+        label-Attr="titulo"
+        value-attr="id"
+        require="true"
+        options="admConfigProfiles.collection.data"
+        placeholder="Selecione um perfil"
+    ></select>
+</div>

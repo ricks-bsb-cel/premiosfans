@@ -1,0 +1,19 @@
+<div class="google-auto-complete">
+    <div class="form-group" style="position: relative;">
+
+        <angucomplete-alt
+            id="angucomplete-alt-{{options.key}}"
+            placeholder="Pesquise informando as iniciais do local ou endereço"
+            initial-value="initialData"
+            selected-object="selected"
+            title-field="description"
+            text-searching="Pesquisando..."
+            pause="1000"
+            minlength="3"
+            input-class="form-control"
+            remote-api-handler="searchPlace"
+            remote-url-data-field="data.predictions"
+        />
+
+    </div>
+</div>

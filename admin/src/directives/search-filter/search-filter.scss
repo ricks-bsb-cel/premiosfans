@@ -1,0 +1,25 @@
+search-filter{
+
+    padding: 15px 0px 0px 5px;
+    display: block;
+    
+    .search-filter{    
+        form.invalid{
+            button{
+                border-color: #dc3545;
+            }
+        }
+        p{
+            margin: 0 5px;
+            small{
+                color:#dc3545;
+            }
+        }
+        h3{
+            margin-top: 10px;
+            i{
+                margin-right: 5px;
+            }
+        }
+    }
+}

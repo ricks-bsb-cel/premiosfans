@@ -1,0 +1,155 @@
+<div class="card produtos-selector">
+    <div class="card-header">
+        <h3 class="card-title mt-1">
+            <i class="{{titles.produtos.icon}} mr-1"></i>
+            Produtos/Serviços
+        </h3>
+        <div
+            ng-if="!disabled"
+            class="card-tools"
+        >
+            <button
+                ng-if="!disable"
+                ng-click="add()"
+                type="button"
+                class="btn btn-block btn-primary btn-sm"
+            >
+                <i class="fas fa-plus mr-1"></i>
+                Adicionar
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-3">
+        <table
+            class="table produtos-selector table-striped"
+        >
+            <thead>
+                <tr>
+                    <th class="center" style="width:30px;">#</th>
+                    <th>Código/Produto ou Serviço</th>
+                    <th class="tipo right">Tipo</th>
+                    <th class="qtd right">Qtd</th>
+                    <th class="vl-unitario right">Vl.Unidade</th>
+                    <th class="vl-total right">Vl.Total</th>
+                    <th ng-if="!disable" class="actions right"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="p in produtos">
+                    <td class="center pt-3 pb-3">
+                        {{$index + 1}}
+                    </td>
+                    <td class="pt-3 pb-3">
+                        <span ng-style="{'text-decoration':(!p.ativo ? 'line-through' : 'initial')}">
+                            {{p.nome}}
+                            <small>({{p.codigo}})</small>
+                        </span>
+                    </td>
+                    <td class="p-2 tipo">
+                        <select 
+                            ng-model="p.tipo"
+                            class="custom-select form-control rounded-0"
+                            ng-change="valueChanged(p)"
+                            ng-disabled="disable"
+                            ng-style="{'text-decoration':(!p.ativo ? 'line-through' : 'initial')}"
+                        >
+                            <option value="pa">Parcela(s)</option>
+                            <option value="am">Assinatura Mensal</option>
+                        </select>
+                    </td>
+                    <td class="p-2 qtd">
+                        <span
+                            ng-if="p.tipo==='pa' && disable"                        
+                            class="form-control right"
+                            style="background-color: #e9ecef;"
+                        >
+                            {{p.qtd}}
+                        </span>
+                        
+                        <input
+                            ng-if="p.tipo==='pa' && !disable"
+                            ng-change="valueChanged(p)"
+                            ng-model="p.qtd"
+                            class="form-control right"
+                            type="tel"
+                            integer-mask
+                            select-on-click
+                        >
+                    </td>
+                    <td class="p-2 vl-unitario">
+                        <span
+                            ng-if="disable"
+                            class="form-control right"
+                            style="background-color: #e9ecef;"
+                        >
+                            {{p.valor | currency: "" : 2 }}
+                        </span>
+
+                        <input
+                            ng-if="!disable"
+                            type="tel"
+                            ng-change="valueChanged(p)"
+                            ng-model="p.valor"
+                            class="form-control right"
+                            money-mask
+                            select-on-click
+                        >
+                    </td>
+                    <td class="p-2 vl-total">
+                        <input
+                            type="tel"
+                            ng-model="p.vlTotal"
+                            class="form-control right"
+                            ng-style="{'text-decoration':(!p.ativo ? 'line-through' : 'initial')}"
+                            money-mask
+                            readonly
+                        >
+                    </td>
+                    <td
+                        ng-if="!disable"
+                        class="actions right"
+                    >
+                        <a 
+                            href="#"
+                            ng-click="up($index)"
+                            uib-popover="Mover para cima"
+                            ng-class="{
+                                'disabled':$first || disabled,
+                                'pointer-events':$first || disabled ? 'none' : 'initial',
+                                'cursor':$first || disabled ? 'not-allowed' : 'pointer'
+                            }"
+                        >
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
+
+                        <a
+                            href="#"
+                            ng-click="down($index)"
+                            uib-popover="Mover para baixo"
+                            ng-class="{
+                                'disabled':$last || disabled,
+                                'pointer-events':$last || disabled ? 'none' : 'initial',
+                                'cursor':$last || disabled ? 'not-allowed' : 'pointer'
+                            }"
+                        >
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </a>
+
+                        <a
+                            href="#"
+                            ng-click="delete($index)"
+                            uib-popover="Excluir"
+                            ng-class="{
+                                'disabled':disabled,
+                                'pointer-events':disabled ? 'none' : 'initial',
+                                'cursor':disabled ? 'not-allowed' : 'pointer'
+                            }"
+                        >
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

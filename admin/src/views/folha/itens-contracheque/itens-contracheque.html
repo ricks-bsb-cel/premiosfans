@@ -1,0 +1,51 @@
+<section class="content itens-contracheque">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay ready="collectionItensContraCheque.collection.isReady()" class="container-fluid">
+        <div class="row">
+
+            <folha-block-contra-cheque
+                titulo="Chave de Localização do Funcionário"
+                data="collectionItensContraCheque.collection.data"
+				tipo="chave"
+				show-referencia="false"
+                obs="A coluna <strong>Valor</strong> deve conter a chave de localização do Funcionário. Ex: CPF."
+            ></folha-block-contra-cheque>
+
+            <folha-block-contra-cheque
+                titulo="Vencimentos (Créditos)"
+                data="collectionItensContraCheque.collection.data"
+                tipo="vencimento"
+                show-referencia="true"
+                obs="A coluna de <strong>Referência</strong> pode conter qualquer conteúdo. A coluna <strong>Valor</strong> deve conter necessáriamente um valor monetário."
+            ></folha-block-contra-cheque>
+
+            <folha-block-contra-cheque
+                titulo="Descontos (Débitos)"
+                data="collectionItensContraCheque.collection.data"
+                tipo="desconto"
+                show-referencia="true"
+                obs="A coluna de <strong>Referência</strong> pode conter qualquer conteúdo. A coluna <strong>Valor</strong> deve conter necessáriamente um valor monetário."
+            ></folha-block-contra-cheque>
+
+            <folha-block-contra-cheque
+                titulo="Valores Informativos"
+                data="collectionItensContraCheque.collection.data"
+                tipo="info_valor"
+                show-referencia="false"
+                obs="A coluna <strong>Valor</strong> deve conter necessáriamente um valor monetário."
+            ></folha-block-contra-cheque>
+
+            <folha-block-contra-cheque
+                titulo="Dados Informativos"
+                data="collectionItensContraCheque.collection.data"
+                tipo="info_dados"
+                show-referencia="false"
+                obs="A coluna <strong>Valor</strong> pode conte qualquer conteúdo."
+            ></folha-block-contra-cheque>
+
+        </div>
+    </wait-overlay>
+
+</section>

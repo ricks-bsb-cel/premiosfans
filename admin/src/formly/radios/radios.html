@@ -1,0 +1,25 @@
+<div class="form-group radios">
+    <div class="form-check mb-1" ng-repeat="o in to.options">
+
+        <input
+            class="form-check-input"
+            type="radio"
+            name="{{to.inputName}}"
+            ng-model="model[options.key]"
+            id="{{to.inputName}}-{{o.id}}"
+            value="{{o.value}}"
+        >
+
+        <label
+            class="form-check-label"
+            for="{{to.inputName}}-{{o.id}}"
+            ng-class="{bold:model[options.key]==o.value}"
+        >
+            {{o.label}}
+        </label>
+
+        <small style="line-height: 15px;" ng-if="o.msg" ng-bind-html="o.msg | unsafe"></small>
+
+    </div>
+</div>
+

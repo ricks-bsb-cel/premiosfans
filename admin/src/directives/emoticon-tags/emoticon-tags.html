@@ -1,0 +1,13 @@
+<div class="emoticon-tags">
+    <div class="row mt-2">
+        <button
+            ng-repeat="t in aTags track by $index"
+            ng-click="select(t)"
+            type="button"
+            class="btn btn-sm"
+            ng-class="{selected:model.includes(t)}"
+        >
+            {{t}}
+        </button>
+    </div>
+</div>

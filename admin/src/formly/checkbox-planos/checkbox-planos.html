@@ -1,0 +1,14 @@
+<div class="form-group checkbox-plano">
+    <div class="row ml-2">
+        <div
+            ng-repeat="p in collectionPlanos.collection.data"
+            class="custom-control custom-checkbox m-1"
+        >
+            <input class="custom-control-input" type="checkbox" id="custom-checkbox-{{p.id}}">
+            <label for="custom-checkbox-{{p.id}}" class="custom-control-label">
+                {{p.nome}}            
+            </label>
+          </div>
+    </div>
+</div>
+

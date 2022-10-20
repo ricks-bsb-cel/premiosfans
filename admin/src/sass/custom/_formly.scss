@@ -1,0 +1,167 @@
+@media (min-width: 993px){
+	.formly-field.right{
+		label{
+			text-align: right;
+			display: block;
+		}
+		input{
+			right: 0;
+			position: absolute;
+			margin-right: 8px;
+		}
+	}
+}
+
+.formly-field{
+	
+	.fa-icon.form-group{
+		height: 220px;
+		overflow: hidden;
+		overflow-y: overlay;
+	}
+
+	.fa-icon.form-group i.fa {
+		height: 28px;
+		width: 28px;
+		font-size: 1.2em;
+		text-align: center;
+		padding-top: 4px;
+		opacity: 0.6;
+		cursor: pointer;
+		border-radius: 2px;
+		margin: 4px 2px;
+		border: 1px solid white;
+	}
+
+	.fa-icon.form-group i.fa.active{
+		opacity: 1;
+		border: 1px solid #007bff;
+		color: white;
+		background: #007bff;
+		border-radius: 5px;
+	}
+
+	.fa-icon.form-group i.fa:hover {
+		opacity: 0.8;
+		border: 1px solid silver;
+	}
+
+	.radios{
+		small{
+			display: block;
+		}
+	}
+
+	.color-picker{
+		.form-group{
+			display: block;
+			height: 40px;
+		}
+
+        .picker{
+			width: calc(2.25rem + 2px);
+			height: calc(2.25rem + 2px);
+			border: 1px solid #ced4da;
+			border-radius: .25rem;
+			box-shadow: inset 0 0 0 transparent;
+			transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+			position: absolute;
+		}
+		input{
+			height: calc(2.25rem + 2px);
+			border: 1px solid #ced4da;
+			border-radius: .25rem;
+			box-shadow: inset 0 0 0 transparent;
+			transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+			font-family: monospace;
+			font-size: 1.35em;
+			padding-left: 5px;
+			width: 90px;
+			position: absolute;
+			margin-left: 40px;
+		}
+		.btn-group{
+			position: absolute;
+			margin-left: 132px;
+		}
+	}
+	
+	.google-map-position .note-editable p{
+		margin-bottom: 0;
+	}
+
+	.data{
+		input{
+			width: 140px;
+		}
+	}
+
+	input.invalid{
+		background-color: #ffe6e6;
+	}
+
+}
+
+.formly-field.inline{
+	.form-group{
+		margin-bottom: 10px;
+		label.control-label{
+			padding-top: 6px;
+			width: 39%;
+			text-align: right;
+		}
+		.form-group{
+			width: 60%;
+			float: right;
+		}	
+	}
+}
+
+.formly-field.input-format-date{
+	input{
+		width: 120px;
+	}
+}
+
+.form-group{
+
+    .image-upload{
+        .slim{
+            img{
+                width: 100%;
+            }
+            .slim-btn-remove{
+                display: none;
+            }
+        }
+	}
+
+	.price-options{
+		.table{
+			th.actions,
+			td.actions{
+				width: 85px;
+				text-align: right;
+				a{
+					padding-top: 3px;
+    				display: inline-block;
+				}
+			}
+			th.valor,
+			td.valor{
+				width: 100px;
+			}
+			input.valor{
+				text-align: right;
+			}
+		}
+		
+	}
+
+}
+
+#colorPick {
+	background: rgb(255, 255, 255);
+	width: 208px;
+}
+

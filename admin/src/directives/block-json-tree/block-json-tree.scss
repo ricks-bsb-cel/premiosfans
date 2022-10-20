@@ -1,0 +1,102 @@
+.block-json-tree{
+    json-tree{
+
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+
+        .empty{
+            display: none;
+        }
+
+        ul{
+            list-style: none;
+            margin: initial;
+            padding-inline-start: 20px;
+            
+            li{
+                div{
+                    margin: 1px;
+                }
+            }
+        }
+
+        span.comma{
+            display: none;
+        }
+
+        span.key{
+            cursor: pointer;
+            font-family: monospace;
+            display: inline-block;
+            margin-right: 3px;
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        span.key:hover{
+            opacity: 1;
+        }
+
+        input[type=text]{
+            width: 50%;
+            border: none;
+            background: no-repeat;
+            font-family: monospace;
+            color: black;
+        }
+
+        input[type=number]{
+            width: 120px;
+            border: none;
+            background: no-repeat;
+            font-family: monospace;
+            color: black;
+        }
+
+        input[type=checkbox]{
+            margin-right: 2px;
+            position: relative;
+            top: 2px;
+        }
+
+        span.reset{
+            display: none;
+        }
+        
+        span.remove{
+            color: #dc3545;
+            position: relative;
+            bottom: 2px;
+            right: 3px;
+        }
+
+        span.remove:before {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            content: "\f068";
+            color: #dc3545;
+            left: 8px;
+            top: 2px;
+            position: relative;
+            font-size: 0.9em;
+        }
+
+        span.add{
+            color: #28a745;
+        }
+
+        span.add:before {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            content: "\f067";
+            color: #28a745;
+            left: 15px;
+            top: 0px;
+            position: relative;
+            font-size: 0.9em;
+        }
+
+    }
+}

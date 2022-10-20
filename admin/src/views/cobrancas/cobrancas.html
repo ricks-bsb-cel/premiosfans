@@ -1,0 +1,98 @@
+<section class="content cobrancas">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay 
+        ready="collectionCobrancas.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionCobrancas.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhuma cobrança encontrada...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionCobrancas.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="id">ID Cobrança</th>
+                                    <th class="cpf-cnpj">CPF/CNPJ</th>
+                                    <th class="cliente">Cliente</th>
+                                    <!--
+                                    <th class="id">ID Contrato</th>
+                                    -->
+                                    <th class="plano">Plano</th>
+                                    <th class="valor right">Valor</th>
+                                    <th class="vencimento right">Vencimento</th>
+                                    <!--
+                                    <th class="tipo right">Tipo</th>
+                                    -->
+                                    <th class="status right">Situação</th>
+                                    <!--
+                                    <th class="commands"></th>
+                                    -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionCobrancas.collection.data">
+                                    <td class="id">
+                                        <a href="#" ng-click="edit(c)">
+                                            <small class="monospace">
+                                                {{c.id}}
+                                            </small>
+                                        </a>
+                                    </td>
+                                    <td class="cpf-cnpj firestore-reference monospace" ref="c.idCliente_reference" field="cpfcnpj_formatted">
+                                    </td>
+                                    <td class="cliente firestore-reference" ref="c.idCliente_reference" field="nome">
+                                    </td>
+                                    <!--
+                                    <td class="id">
+                                        <small class="monospace">
+                                            {{c.idContrato}}
+                                        </small>
+                                    </td>
+                                    -->
+                                    <td class="plano firestore-reference" ref="c.idPlano_reference" field="nome">
+                                    </td>
+                                    <td class="valor right">
+                                        {{c.valor | currency : "R$ " : 2}}
+                                    </td>
+                                    <td class="dt-vencimento right">
+                                        {{c.dtVencimento_timestamp | ddmmyyyy}}
+                                    </td>
+                                    <!--
+                                    <td class="tipo right">
+                                        <span class="badge badge-danger" ng-if="c.tipoCobranca==='auto'">Automática</span>
+                                        <span class="badge badge-info" ng-if="c.tipoCobranca==='avulsa'">Avulsa</span>
+                                    </td>
+                                    -->
+                                    <td class="status right">
+                                        <span class="badge badge-info">
+                                            {{c.status}}
+                                        </span>
+                                        <span ng-if="c.boletoGerado" class="badge badge-primary">
+                                            Boleto
+                                        </span>
+                                    </td>
+                                    <!--
+                                    <td class="commands pr-3">
+                                        <a  class="nav-link" uib-popover="Excluir cobrança">
+                                            <i class="far fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                    -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

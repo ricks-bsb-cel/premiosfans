@@ -1,0 +1,17 @@
+<div
+	ng-class="{
+		'input-group': to.icon,
+		'form-group': !to.icon
+	}"
+>
+	<formly-transclude></formly-transclude>
+	<div ng-if="to.icon" class="input-group-append">
+		<div class="input-group-text">
+			<span class="{{to.icon}}"></span>
+		</div>
+	</div>
+</div>
+
+<p ng-if="to.hint" class="input-hint">
+	{{to.hint}}
+</p>

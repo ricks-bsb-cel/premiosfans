@@ -1,0 +1,76 @@
+<div  class="card block-contracheque">
+    <div class="card-header">
+        <h3 class="card-title">{{titulo}}</h3>
+        <div class="card-tools">
+            <a ng-click="newItem()" class="btn btn-tool btn-sm">
+                <i class="fas fa-plus pr-1"></i>
+                Adicionar Item
+            </a>
+            <a href="#" class="btn btn-tool btn-sm" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body table-responsive p-0">
+        <div class="card-body table-responsive p-0">
+            <table class="table table-hover text-nowrap">
+                <thead>
+                    <tr>
+                        <th class="pos center" style="width: 30px">#</th>
+                        <th class="descricao">Descrição</th>
+                        <th ng-if="showReferencia" class="coluna-referencia">Coluna Referência <small>/Obrigatória</small></th>
+                        <th class="coluna-valor">Coluna Valor <small>/Obrigatória</small></th>
+                        <th class="commands right"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="c in data | filter : {'tipo':tipo}">
+
+                        <td class="pos center">
+                            {{$index + 1}}
+                        </td>
+
+                        <td class="descricao">
+                            <input type="text" class="form-control" ng-model="c.descricao" placeholder="Descrição">
+                        </td>
+
+                        <td ng-if="showReferencia" class="coluna coluna-referencia">
+                            <input type="text" class="form-control monospace" ng-model="c.coluna_referencia" placeholder="Coluna do Excel">
+
+                            <div class="custom-control custom-switch custom-switch-on-danger obrigatorio coluna-referencia-obrigatorio">
+                                <input type="checkbox" class="custom-control-input" id="{{c.id}}-coluna-referencia-obrigatorio">
+                                <label class="custom-control-label" for="{{c.id}}-coluna-referencia-obrigatorio"></label>
+                            </div>
+                        </td>
+
+                        <td class="coluna coluna-valor">
+                            <input type="text" class="form-control monospace" ng-model="c.coluna_valor" placeholder="Coluna do Excel">
+
+                            <div class="custom-control custom-switch custom-switch-on-danger obrigatorio coluna-valor-obrigatorio">
+                                <input type="checkbox" class="custom-control-input" id="{{c.id}}-coluna-valor-obrigatorio">
+                                <label class="custom-control-label" for="{{c.id}}-coluna-valor-obrigatorio"></label>
+                            </div>
+                        </td>
+
+                        <td class="commands right pr-3">
+                            <a href="#" class="nav-link mr-2" uib-popover="Linha para Cima">
+                                <i class="fas fa-arrow-up"></i>
+                            </a>
+                            <a href="#" class="nav-link mr-2" uib-popover="Linha para Baixo">
+                                <i class="fas fa-arrow-down"></i>
+                            </a>
+                            <a href="#" class="nav-link mr-2" uib-popover="Remover">
+                                <i class="fa fa-trash-o"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div ng-if="obs" class="card-footer">
+            <p class="mb-0" ng-bind-html="obs | unsafe"></p>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,11 @@
+<div class="fa-icon form-group icons" style="position: relative;">
+
+    <i  
+        ng-repeat="i in iconList"
+        class="{{i}}"
+        ng-class="{active:model[options.key]==i}"
+        ng-click="select(i)"
+        aria-hidden="true"
+    ></i>
+
+</div>

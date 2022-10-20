@@ -1,0 +1,30 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Selecionar Empresa
+    </h3>
+</div>
+<div class="modal-body pb-0" id="modal-body">
+    <table class="table table-hover text-nowrap">
+        <tbody>
+            <tr
+                ng-repeat="e in $ctrl.empresas"
+                ng-if="e.id !== $ctrl.idEmpresaAtual"
+                ng-click="$ctrl.selectEmpresa(e.id)"
+                style="cursor:pointer;"
+            >
+                <td>
+                    {{e.nome}}
+                </td>
+                <td>
+                    {{e.representante_cpf_formatted}}
+                </td>
+                <td class="right monospace">
+                    {{e.id}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Voltar</button>
+</div>

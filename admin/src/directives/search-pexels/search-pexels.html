@@ -1,0 +1,96 @@
+<div class="search-pexels">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xs-3 mb-4">
+            <form ng-submit="search()" novalidate>
+                <formly-form model="searchModel" fields="searchFields" form="searchForm" novalidate>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-block">Procurar</button>
+                    </div>
+                </formly-form>
+            </form>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-9 col-xs-9">
+            <div class="card card-success">
+                <div class="card-body">
+
+                    <div ng-if="unused" class="callout callout-success">
+                        <h5>
+                            Pesquise mais de 1.000.000 de imagens no Pexels!
+                        </h5>
+                        <p>
+                            Informe um termo para pesquisa. Você também pode pesquisar em inglês.
+                            Exemplos: <i>carros esportivos, navios, maquilagem, hamburguer, pizza, etc.</i>
+                        </p>
+                    </div>
+
+                    <div
+                        ng-if="!unused && pexelsResult.total_results==0" 
+                        class="alert alert-danger alert-dismissible"
+                    >
+                        <h5>
+                            <i class="icon fas fa-ban"></i>
+                            Nenhuma imagem encontrada
+                        </h5>
+                        O termo
+                        <strong>{{searchModel.termo}}</strong>
+                        não retornou nenhum resultado. Altere o termo de pesquisa.
+                        Você pode pesquisar em português e inglês.
+                    </div>
+
+                    <wait-overlay ready="!loading">
+
+                        <div class="row">
+                            <div
+                                class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-4"
+                                ng-repeat="p in pexelsResult.photos"
+                            >
+                                <div class="card mb-2 bg-gradient-dark">
+                                    <img
+                                        class="card-img-top"
+                                        ng-src="{{p.src.medium}}"
+                                        alt="{{p.photographer}}"
+                                    >
+                                    <div
+                                        ng-click="select(p)"
+                                        class="card-img-overlay d-flex flex-column justify-content-end"
+                                    >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" ng-if="pexelsResult.photos.length">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-info btn-block btn-flat" ng-disabled="!pexelsResult.prev_page" ng-click="search(pexelsResult.prev_page)">
+                                    <i class="fas fa-chevron-left"></i>
+                                    Anterior
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-info btn-block btn-flat" ng-disabled="!pexelsResult.next_page" ng-click="search(pexelsResult.next_page)">
+                                    Próxima
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row" ng-if="pexelsResult.total_results">
+                            <div class="m-2">
+                                <span>
+                                    Página:
+                                    {{pexelsResult.page}}
+                                </span>
+                                |
+                                <span>
+                                    {{pexelsResult.total_results}}
+                                    resultado(s)
+                                </span>
+                            </div>
+                        </div>
+
+                    </wait-overlay>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

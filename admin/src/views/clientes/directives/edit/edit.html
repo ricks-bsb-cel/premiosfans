@@ -1,0 +1,83 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        {{$ctrl.data.nome || 'Inclusão de Clientes'}}
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+
+    <wait-overlay ready="$ctrl.ready">
+
+        <form novalidate>
+            <formly-form class="row" model="$ctrl.data" fields="$ctrl.fields" form="$ctrl.form" novalidate>
+            </formly-form>
+        </form>
+
+        <ul
+            class="nav nav-tabs"
+            id="tab-cliente"
+            role="tablist"
+        >
+
+            <li class="nav-item">
+                <a
+                    id="tab-content-contato-tab"
+                    data-bs-target="#tab-content-contato"
+                    aria-controls="tab-content-contato-tab"
+                    class="nav-link active" data-bs-toggle="tab" role="tab" aria-selected="true"
+                >
+                    Contatos
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a
+                    id="tab-content-endereco-tab"
+                    data-bs-target="#tab-content-endereco"
+                    aria-controls="tab-content-endereco-tab"
+                    class="nav-link" data-bs-toggle="tab" role="tab" aria-selected="true"
+                >
+                Endereço
+                </a>
+            </li>
+
+        </ul>
+
+        <div class="tab-content" id="tab-cliente-content">
+            <div
+                id="tab-content-contato"
+                role="tabpanel"
+                aria-labelledby="tab-content-contato-tab"
+                class="tab-pane fade show active pt-2"
+            >
+                <form novalidate>
+                    <formly-form
+                        class="row"
+                        model="$ctrl.data"
+                        fields="$ctrl.contatos"
+                        form="$ctrl.formContatos"
+                        novalidate
+                    >
+                    </formly-form>
+                </form>
+            </div>
+            
+            <div
+                id="tab-content-endereco"
+                role="tabpanel"
+                aria-labelledby="tab-content-endereco-tab"
+                class="tab-pane fade show pt-2"
+            >
+                <block-endereco
+                    ng-model="$ctrl.data"
+                    prefixo="endereco_cliente_"
+                ></block-endereco>
+            </div>
+        </div>
+
+    </wait-overlay>
+
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Salvar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
+</div>

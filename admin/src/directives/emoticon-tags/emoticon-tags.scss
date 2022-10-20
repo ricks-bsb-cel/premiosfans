@@ -1,0 +1,17 @@
+.emoticon-tags {
+
+    button.btn-sm{
+        display: inline-block;
+        border: 1px solid silver;
+        padding: 0;
+        height: 36px;
+        width: 36px;
+        margin: 4px;
+        font-size: 1.2em;
+    }
+
+    button.btn-sm.selected{
+        background-color: #28a745;
+    }
+
+}

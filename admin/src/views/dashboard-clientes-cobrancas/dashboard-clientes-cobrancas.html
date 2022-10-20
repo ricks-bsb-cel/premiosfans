@@ -1,0 +1,146 @@
+<section class="content dashboard-clientes-cobrancas">
+
+	<section class="content mt-3">
+		<div class="row">
+			<div ng-if="empresa" class="col-md-4">
+				<div class="card card-primary card-outline">
+					<div class="card-body box-profile pb-0">
+						<h3 class="profile-username text-center">
+							{{empresa.nome}}
+						</h3>
+						<p class="text-muted text-center">
+							{{plano.nome}}
+						</p>
+						<ul class="list-group list-group-unbordered mb-3 mr-2 ml-2">
+							<li class="list-group-item">
+								<b>Parcelas pendentes</b>
+								<a class="float-right">{{collectionCobrancas.collection.data.length}}</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-8">
+
+				<div class="row">
+					<div 
+						class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6" 
+						ng-repeat="cobranca in collectionCobrancas.collection.data"
+					>
+						<div
+							class="small-box"
+							ng-class="getClassInfoBox(cobranca)"
+						>
+							<div class="inner">
+								<h3>{{cobranca.valor | currency : "R$ " : 2 }}</h3>
+								<h5 class="m-0">
+									{{cobranca.dtVencimento_timestamp | ddmmyyyy}}
+								</h5>
+								<p ng-if="cobranca.diasRestantesParaPagamento>0">
+									Vencimento em {{cobranca.diasRestantesParaPagamento}} dia(s)
+								</p>
+								<p ng-if="cobranca.diasRestantesParaPagamento==0">
+									Hoje!
+								</p>
+								<p ng-if="cobranca.diasRestantesParaPagamento<0">
+									Em atraso a {{cobranca.diasEmAtraso}} dia(s)
+								</p>
+							</div>
+							<div class="icon">
+								<i ng-class="getIconInfoBox(cobranca)"></i>
+							</div>
+							<a href="#" class="small-box-footer">
+								Ver Boleto <i class="fas fa-arrow-circle-right"></i>
+							</a>
+						</div>
+					</div>
+
+					<div 
+						ng-if="collectionCobrancas.collection.data.length"
+						class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 mt-2 mr-2 ml-2"
+					>
+						<a href="#!/dashboard-clientes-cobrancas" type="button" class="btn btn-block bg-gradient-primary">
+							Voltar
+						</a>
+					</div>
+
+				</div>
+
+				<!--
+				<div class="card card-primary card-outline">
+
+					<div class="card-header">
+						<h3 class="card-title">
+							Cobranças
+						</h3>
+					</div>
+
+					<div class="card-body p-0">
+
+						<div class="table-responsive mailbox-messages">
+							<table class="table table-hover table-striped">
+								<tbody>
+									<tr ng-repeat-start="cobranca in collectionCobrancas.collection.data">
+										<td class="mailbox-name">
+											<strong>
+												{{cobranca.dtVencimento_timestamp | ddmmyyyy}}
+											</strong>
+											<br />
+											{{cobranca.status}}
+											<br />
+											<small ng-if="cobranca.diasRestantesParaPagamento>0">
+												Vencimento em {{cobranca.diasRestantesParaPagamento}} dia(s)
+											</small>
+											<small ng-if="cobranca.diasRestantesParaPagamento==0">
+												Hoje!
+											</small>
+											<small ng-if="cobranca.diasRestantesParaPagamento<0">
+												Em atraso a {{cobranca.diasEmAtraso}} dia(s)
+											</small>
+										</td>
+										<td class="mailbox-date pr-2 right valor">
+											{{cobranca.valor | currency : "R$ " : 2 }}
+										</td>
+									</tr>
+									<tr ng-repeat-end>
+										<td colspan="2">
+											<a href="#" class="btn btn-primary btn-block">Ver Boleto</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+					</div>
+
+					<div class="card-footer p-0">
+						<div class="mailbox-controls">
+							<button type="button" class="btn btn-default btn-sm checkbox-toggle">
+								<i class="far fa-square"></i>
+							</button>
+							<div class="btn-group">
+								<button type="button" class="btn btn-default btn-sm">
+									<i class="far fa-trash-alt"></i>
+								</button>
+								<button type="button" class="btn btn-default btn-sm">
+									<i class="fas fa-reply"></i>
+								</button>
+								<button type="button" class="btn btn-default btn-sm">
+									<i class="fas fa-share"></i>
+								</button>
+							</div>
+							<button type="button" class="btn btn-default btn-sm">
+								<i class="fas fa-sync-alt"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				-->
+
+			</div>
+
+		</div>
+	</section>
+
+</section>

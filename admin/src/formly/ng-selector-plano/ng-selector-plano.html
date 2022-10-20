@@ -1,0 +1,25 @@
+<script type="text/ng-template" id="selector/plano/item-template">
+	{{option.nome}} 
+    <span class="badge bg-success" ng-if="option.ativo">Ativo</span>
+    <span class="badge bg-danger" ng-if="!option.ativo">Inativo</span>
+</span>
+</script>
+
+<div class="form-group ng-selector-plano">
+    <select
+        selector    
+        ng-if="collectionPlanos.collection.ready"
+        model="model[options.key]"
+        disable="options.templateOptions.disabled"
+        multi="false"
+        label-attr="nome"
+        value-attr="id"
+        require="true"
+        options="collectionPlanos.collection.data"
+        placeholder="Selecione um plano"
+        view-item-template="'selector/plano/item-template'"
+        dropdown-item-template="'selector/plano/item-template'"
+    ></select>
+</div>
+
+

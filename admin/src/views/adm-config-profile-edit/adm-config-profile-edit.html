@@ -1,0 +1,187 @@
+<section
+    ng-if="ready"
+    class="content-header"
+    title="Perfil de Acesso"
+>
+</section>
+
+<section class="content adm-config-profiles" class="container-fluid">
+    <wait-overlay ready="ready">
+        <div ng-if="ready" class="row">
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle"></i>
+                            Detalhes do Perfil de Acesso
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form novalidate>
+                            <formly-form class="row" model="profile" fields="fields" form="form" novalidate>
+                            </formly-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                <div ng-repeat="g in profile.groups" class="card" data-id="{{g.id}}">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="{{g.icon}} mr-1"></i>
+                            <small>Seção</small>
+                            {{g.titulo}}
+                        </h3>
+                        <div class="card-tools">
+
+                            <button
+                                type="button"
+                                class="btn btn-tool"
+                                ng-class="{
+                                    'link':!$first,
+                                    'disabled':$first,
+                                    'opacity-25':$first
+                                }"
+                                ng-click="upGroup($index)"
+                            >
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-tool"
+                                ng-class="{
+                                    'link':!$last,
+                                    'disabled':$last,
+                                    'opacity-25':$last
+                                }"
+                                ng-click="downGroup($index)"
+                            >
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+
+                            <button
+                                ng-click="edit(g)"
+                                type="button"
+                                class="btn btn-tool link"
+                            >
+                                <i class="far fa-edit"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-tool link"
+                                ng-click="deleteGroup(g.id)"
+                                ng-class="{
+                                    'disabled':profile.groups.length===1,
+                                    'opacity-25':profile.groups.length===1
+                                }"
+                                ng-disabled="profile.groups.length===1"
+                            >
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-tool link"
+                                data-card-widget="collapse"
+                            >
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="todo-list sortable" ui-sortable="sortableOptions" ng-model="g.options" data-widget="todo-list">
+                            <li ng-repeat="o in g.options | orderBy : order" class="path draggable">
+                                <span class="icon">
+                                    <i class="{{o.icon}} mr-1"></i>
+                                </span>
+
+                                <div class="label ml-1">
+                                    <span ng-bind="o.label"></span>
+                                    <small class="text ml-1" ng-bind="o.href"></small>
+                                </div>
+
+                                <i class="option far fa-trash-alt" ng-click="o.delete=!o.delete" ng-class="{
+                                    selected:o.delete,
+                                    link:o.delete
+                                }">
+                                </i>
+
+                                <i class="option far fa-edit" ng-click="o.update=!o.update" ng-class="{
+                                    selected:o.update,
+                                    link:o.update
+                                }">
+                                </i>
+
+                                <i class="option fas fa-plus" ng-click="o.create=!o.create" ng-class="{
+                                    selected:o.create,
+                                    link:o.create
+                                }">
+                                </i>
+
+                                <!--
+                            <div class="icheck icheck-primary d-inline ml-2">
+                                <input type="checkbox" value="" name="todo1" id="todoCheck1">
+                                <label for="todoCheck1"></label>
+                            </div>
+
+                            <div class="icheck icheck-primary d-inline ml-2">
+                                <input type="checkbox" value="" name="todo1" id="todoCheck2">
+                                <label for="todoCheck2"></label>
+                            </div>
+
+                            <div class="icheck icheck-danger d-inline ml-2">
+                                <input type="checkbox" value="" name="todo1" id="todoCheck3">
+                                <label for="todoCheck3"></label>
+                            </div>
+                            -->
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                <div class="card adm-config-path">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="ion ion-clipboard mr-1"></i>
+                            Opções
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <ul
+                            class="todo-list sortable"
+                            ui-sortable="sortableOptions"
+                            ng-model="notUsed"
+                            data-widget="todo-list"
+                        >
+                            <li
+                                ng-repeat="r in notUsed"
+                                class="path draggable"
+                            >
+                                <span class="icon">
+                                    <i class="{{r.icon}} mr-1"></i>
+                                </span>
+
+                                <div class="label ml-1">
+                                    <span ng-bind="r.label"></span>
+                                    <small class="text ml-1" ng-bind="r.href"></small>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="row">
+                            <div class="col-12 mt-3">
+                                * Opções exibidas aqui não estarão disponíveis para o perfil
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

@@ -1,0 +1,52 @@
+<ul class="navbar-nav">
+    <li
+        ng-repeat="m in options"
+        class="nav-item"
+    >
+
+        <a
+            ng-if="m.id==='back' && !m.route"
+            class="nav-link mr-2"
+            ng-click="nav.back()"
+        >
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <a
+            ng-if="m.id==='back' && m.route"
+            class="nav-link mr-2"
+            ng-href="#!{{m.route}}"
+        >
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <a
+            ng-if="m.route && m.id!=='back'"
+            ng-href="#!{{m.route}}"
+            class="nav-link {{m.class}}"
+        >
+            <i class="{{m.icon}} mr-1"></i>
+            <span class="hide-xs hide-sm">{{m.label}}</span>
+        </a>
+
+        <a
+            ng-if="m.onClick"
+            ng-click="m.onClick()"
+            class="nav-link {{m.class}}"
+        >
+            <i class="{{m.icon}} mr-1"></i>
+            <span class="hide-xs hide-sm">{{m.label}}</span>
+        </a>
+
+        <a
+            ng-if="m.href"
+            ng-href="{{m.href}}"
+            target="{{target}}"
+            class="nav-link {{m.class}}"
+        >
+            <i class="{{m.icon}} mr-1"></i>
+            <span class="hide-xs hide-sm">{{m.label}}</span>
+        </a>
+
+    </li>
+</ul>

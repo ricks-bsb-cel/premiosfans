@@ -1,0 +1,72 @@
+'use strict';
+
+
+
+const endPoints = _ => {
+	let result = {
+		apiConfig: '/api/v1/api-config',
+
+		collections: {
+			clientes: 'https://zoepay-57t7prxj.uc.gateway.dev/api/collections/v1/clientes'
+		},
+
+		clientes: {
+			get: 'https://zoepay-57t7prxj.uc.gateway.dev/api/clientes/v1/get',
+			findCliente: '/api/v1/clientes/find',
+			checkLogin: '/api/v1/clientes/check-login',
+			updateUserStats: '/api/v1/clientes/update-user-stats',
+			fakeData: 'https://randomuser.me/api/?nat=BR,ES,AU,US&inc=name,phone,email'  // https://randomuser.me/documentation#format
+		},
+
+		contratos: {
+			get: 'https://zoepay-57t7prxj.uc.gateway.dev/api/contratos/v1/get'
+		},
+
+		cobrancas: {
+			create: 'https://zoepay-57t7prxj.uc.gateway.dev/api/cobrancas/v1/create'
+		},
+
+		auth: {
+			getUserInfo: '/api/users/v1/user',
+			setEmpresaUsuario: '/api/users/v1/empresa'
+		},
+
+		google: {
+			autocomplete: '/api/v1/maps/place/autocomplete',
+			details: '/api/v1/maps/place/details'
+		},
+
+		pixKeys: {
+			refresh: 'https://zoepay-57t7prxj.uc.gateway.dev/api/services/v1/pixkeys/v1',
+			create: 'https://zoepay-57t7prxj.uc.gateway.dev/api/services/v1/pixkeys/v1'
+		},
+
+		contas: {
+			balance: 'https://zoepay-57t7prxj.uc.gateway.dev/api/services/v1/balance/v1',
+			account: 'https://zoepay-57t7prxj.uc.gateway.dev/api/services/v1/account/v1'
+		},
+
+		transaction: {
+			refresh: 'https://zoepay-57t7prxj.uc.gateway.dev/api/services/v1/transaction/v1'
+		},
+
+		folha: {
+			funcionario: {
+				set: 'https://zoepay-57t7prxj.uc.gateway.dev/api/collections/v1/funcionario/v1',
+				sendAsync: 'https://zoepay-57t7prxj.uc.gateway.dev/api/services/v1/folha/v1/funcionario/v1'
+			}
+		},
+
+		utils: {
+			cep: 'https://zoepay-57t7prxj.uc.gateway.dev/api/utils/v1/cep'
+		}
+
+	}
+
+	return result;
+}
+
+const ngModule = angular.module('config.api-urls', [])
+	.value('URLs', endPoints());
+
+export default ngModule;

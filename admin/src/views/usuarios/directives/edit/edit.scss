@@ -1,0 +1,24 @@
+.usuario-edit-modal{
+    
+    .uid, .api-key{
+        input{
+            font-family: monospace;
+        }
+    }
+
+    block-usuario-perfil-empresa{
+        .form-group{
+            margin-bottom: 5px;
+        }
+    }
+
+    .modal-footer{
+        .row{
+            width: 100%;
+            .col-7{
+                text-align: right;
+            }
+        }
+    }
+
+}

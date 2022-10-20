@@ -1,0 +1,62 @@
+<div class="row" class="image-gallery">
+
+    <div
+        ng-repeat="i in model"
+        class="col-6 col-xs-4 col-sm-6 col-md-6 col-lg-6 col-xl-4 image"
+    >
+        <a
+            ng-href="{{i.url}}"
+            data-toggle="lightbox"
+            data-title="{{i.original_filename}}"
+            data-gallery="gallery"
+            ng-click="preview($event)"    
+        >
+            <img
+                ng-src="{{i.url | thumb:250:250}}"
+                class="img-fluid mb-2 pointer-events-none"
+                alt="{{i.original_filename || 'Preview'}}"
+            />
+
+            <div class="actions">
+                <a
+                    href="#"
+                    ng-click="featured(i)"
+                    ng-class="{active:i.featured}"
+                >
+                    <i class="far fa-arrow-alt-circle-up"></i>
+                </a>    
+                <a
+                    href="#"
+                    ng-click="remove(i)"
+                >
+                    <i class="fas fa-trash"></i>
+                </a>    
+            </div>
+        </a>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mt-1">
+
+        <div
+            class="callout callout-info"
+            ng-if="!hideInfo && model.length==0"
+        >
+            <h5>Nenhuma imagem</h5>
+            <p>Não existe nenhuma imagem neste item da vitrine. Clique no botão abaixo para adicionar a primeira imagem.</p>
+        </div>
+
+        <button
+            type="button"
+            ng-click="imageChooser()"
+            class="btn btn-primary btn-block"
+        >
+            <i class="far fa-images mr-1"></i>
+            <span ng-bind="buttonTitle"></span>
+        </button>
+    </div>
+
+</div>
+
+
+
+

@@ -1,0 +1,68 @@
+<section class="content contratos">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay ready="collectionContratos.collection.isReady()" class="container-fluid">
+        <div class="row">
+
+            <div ng-if="collectionContratos.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum contrato encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionContratos.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="id">ID Contrato</th>
+                                    <th class="cliente">Nome do Cliente</th>
+                                    <th class="cpf-cnpj">CPF/CNPJ</th>
+                                    <th class="inicio">Início</th>
+                                    <th class="dia-mes right">Dia do Mês</th>
+                                    <th class="situacao right">Situação</th>
+                                    <th class="dt-criacao right">Criação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionContratos.collection.data | orderBy:'dtInclusao_js_desc'">
+                                    <td class="id">
+                                        <a ng-href="#!/contratos-edit/{{c.id}}">
+                                            <strong class="monospace">
+                                                {{c.codigoContrato}}-{{c.codigoContratoVersao}}
+                                            </strong>
+                                        </a>
+                                    </td>
+                                    <td class="cliente">
+                                        {{c.cliente_nome}}
+                                    </td>
+                                    <td class="cpf-cnpj">
+                                        {{c.cliente_cpfcnpj_formatted}}
+                                    </td>
+                                    <td class="início">
+                                        {{c.inicioContrato_mmyyyy}}
+                                    </td>
+                                    <td class="dia-mes right">
+                                        {{c.diaMesCobranca}}
+                                    </td>
+                                    <td class="situacao right">
+                                        <span ng-if="c.situacao==='preparacao'" class="badge bg-info">Em Preparação</span>
+                                        <span ng-if="c.situacao==='ativo'" class="badge bg-success">Ativo</span>
+                                        <span ng-if="c.situacao==='bloqueado'" class="badge bg-warning">Bloqueado</span>
+                                        <span ng-if="c.situacao==='cancelado'" class="badge bg-danger">Cancelado</span>
+                                        <span ng-if="c.situacao==='revisado'" class="badge bg-warning">Revisado</span>
+                                    </td>
+                                    <td class="dt-criacao right">
+                                        {{c.dtInclusao_timestamp | ddmmyyyyhhmm}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

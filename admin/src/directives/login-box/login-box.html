@@ -1,0 +1,75 @@
+<div
+    ng-bind-html="appProfile.loginTitleHtml | unsafe"
+    class="login-logo"
+    style="line-height: 1em;"
+>
+</div>
+
+<div class="card" ng-show="ready">
+    <div class="card-body login-card-body p-4">
+
+        <div
+            ng-show="login.permitirGoogle"
+            class="social-auth-links text-center mb-1"
+        >
+            <a
+                href="#"
+                ng-click="googleLogin()"
+                class="btn btn-block btn-danger mb-3"
+            >
+                <i class="fab fa-google mr-2"></i>
+                Acesse com o Google
+            </a>
+            <p ng-show="login.permitirEmailSenha || login.permitirSolicitarAcesso">- OU -</p>
+        </div>
+
+        <p
+            ng-show="login.permitirEmailSenha"
+            class="login-box-msg pb-1"
+        >
+            Acesse com Email e Senha
+        </p>
+
+        <form
+            ng-show="login.permitirEmailSenha"
+            ng-submit="emailLogin()"
+            novalidate
+        >
+            <formly-form
+                model="loginModel"
+                fields="loginFields"
+                form="loginForm"
+                novalidate
+            >
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-key mr-2"></i>
+                        Acessar
+                    </button>
+                </div>
+            </formly-form>
+        </form>
+        
+        <p
+            ng-show="login.permitirEmailSenha"
+            class="mb-1 mt-2 text-center"
+        >
+            <a href="#" ng-click="recoveryPassword()">
+                <i class="fas fa-unlock-alt mr-2"></i>
+                Esqueci minha senha
+            </a>
+        </p>
+
+        <div
+            ng-show="login.permitirSolicitarAcesso"
+            class="col-12 social-auth-links text-center mb-1"
+        >
+            <p ng-show="login.permitirEmailSenha">- OU -</p>
+            <a href="#" ng-click="newUser()" class="btn btn-block btn-info mb-3">
+                <i class="far fa-star mr-2"></i>
+                Solicitar acesso
+            </a>
+        </div>
+
+    </div>
+</div>

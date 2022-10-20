@@ -1,0 +1,9 @@
+<strong>
+    Zoepay
+    <small ng-if="userProfile" class="ml-1">{{userProfile.user.displayName}}</small>
+</strong>
+
+<div class="email float-right" ng-if="userProfile">
+    <small>{{userProfile.user.empresaAtual.nome}}</small>
+    <small style="font-style:italic;font-size:0.7em;" class="monospace hide-sm hide-xs hide-md ml-1">{{userProfile.user.empresaAtual.id}}</small>
+</div>

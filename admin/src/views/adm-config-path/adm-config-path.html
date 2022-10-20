@@ -1,0 +1,69 @@
+<section class="content adm-config-path">
+
+    <search-filter></search-filter>
+
+    <wait-overlay
+        ready="collectionAdmConfigPath.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="label">Label</th>
+                                    <th class="href">href</th>
+                                    <th class="collection">Collection</th>
+                                    <th class="id right">ID</th>
+                                    <!--
+                                    <th class="dt-alteracao">Alteração</th>
+                                    -->
+                                    <th class="ativo center">Ativo</th>
+                                    <th class="super-user center">SuperUser</th>
+                                    <th class="options right"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="r in collectionAdmConfigPath.collection.data">
+                                    <td class="label">
+                                        <a href="#" ng-click="edit(r)">
+                                            <i class="{{r.icon}} mr-1"></i>
+                                            {{r.label}}
+                                        </a>
+                                    </td>
+                                    <td class="href">
+                                        {{r.href}}
+                                    </td>
+                                    <td class="href">
+                                        {{r.collection}}
+                                    </td>
+                                    <td class="id monospace right">
+                                        {{r.id}}
+                                    </td>
+                                    <!--
+                                    <td class="dt-alteracao">
+                                        {{r.dtAlteracao | ddmmyyyyhhmm}}
+                                    </td>
+                                    -->
+                                    <td class="ativo center">
+                                        <badge-true-false value="r.ativo"></badge-true-false>
+                                    </td>
+                                    <td class="super-user center">
+                                        <badge-true-false value="r.superUserOnly"></badge-true-false>
+                                    </td>
+                                    <td class="options right">
+                                        <span ng-if="r.directRoute" class="badge bg-success">
+                                            Rota Direta
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

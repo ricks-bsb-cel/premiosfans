@@ -1,0 +1,51 @@
+<section class="content adm-config-profiles">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay
+        ready="collectionAdmConfigProfiles.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <!--
+            <div ng-if="collectionAdmConfigProfiles.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum registro encontrado...</h5>
+                </div>
+            </div>
+            -->
+            
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="id">ID</th>
+                                    <th class="titulo">Descrição</th>
+                                    <th class="dt-alteracao right">Última Alteração</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionAdmConfigProfiles.collection.data">
+                                    <td class="id monospace">
+                                        <a href="#" ng-click="edit(c)">
+                                            {{c.id}}
+                                        </a>
+                                    </td>
+                                    <td class="titulo">
+                                        {{c.titulo}}
+                                    </td>
+                                    <td class="dt-alteracao right">
+                                        {{c.dtAlteracao | ddmmyyyyhhmm}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

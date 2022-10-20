@@ -1,0 +1,35 @@
+<div class="google-map-position">
+    <div class="form-group" style="position: relative;">
+        <angucomplete-alt
+            id="angucomplete-alt-{{options.key}}"
+            placeholder="Pesquise informando as iniciais do local ou endereço"
+            selected-object="selected"
+            title-field="description"
+            text-searching="Pesquisando..."
+            pause="1500"
+            minlength="5"
+            input-class="form-control"
+            remote-api-handler="searchPlace"
+            remote-url-data-field="data.predictions"
+        />
+    </div>
+
+    <div class="form-group form-group-map"> 
+        <div class="map" id="google-maps-position-{{options.key}}">
+        </div>
+        <img
+            class="map-icon"
+            ng-if="model[options.key + '_details'].icon"
+            ng-src="{{model[options.key + '_details'].icon}}"
+        />
+    </div>
+
+    <div class="form-group">
+        <label>Endereço de exibição *</label>
+        <summernote
+            ng-model="model[options.key + '_exibicao']"
+            config="htmlEditorOptions"
+        ></summernote>
+    </div>
+
+</div>

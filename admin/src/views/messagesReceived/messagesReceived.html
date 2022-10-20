@@ -1,0 +1,73 @@
+<section class="content-header" title="Messages Received">
+</section>
+
+<section class="content messages-received">
+    <wait-overlay 
+        ng-if="collectionWebhook.collection.showTable()"
+        ready="collectionWebhook.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+            <div ng-if="collectionWebhook.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum contrato encontrado...</h5>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="image"></th>
+                                    <th class="sender-name">Enviada Por</th>
+                                    <th class="grupo">Grupo</th>
+                                    <th class="message">Mensagem</th>
+                                    <th class="status">Status</th>
+                                    <th class="recebida right">Recebimento</th>
+                                    <th class="evento">Evento</th>
+                                    <th class="message-id right">Message ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionWebhook.collection.data | orderBy: '-momment'">
+                                    <td class="image">
+                                        <img
+                                            ng-if="c.senderPhoto"
+                                            ng-src="{{c.senderPhoto}}"
+                                            class="img-circle elevation-2"
+                                        />
+                                    </td>
+                                    <td class="sender-name">
+                                        {{c.senderName}}
+                                    </td>
+                                    <td class="grupo">
+                                        <span ng-if="c.phone.contains('-')" class="badge badge-success">{{c.chatName}}</span>
+                                    </td>
+                                    <td class="message">
+                                        {{c.text.message}}
+                                        <i ng-if="c.image.imageUrl">Imagem</i>
+                                    </td>
+                                    <td class="status">
+                                        {{c.status}}
+                                    </td>
+                                    <td class="dt-alteracao right">
+                                        {{c._dtReceived | ddmmyyyyhhmm}}
+                                    </td>
+                                    <td class="evento">
+                                        {{c._evento}}
+                                    </td>
+                                    <td class="message-id monospace right">
+                                        <small>{{c.messageId}}</small>
+                                        <br ng-if="c.fromMe" />
+                                        <span ng-if="c.fromMe" class="badge badge-success">From Me</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

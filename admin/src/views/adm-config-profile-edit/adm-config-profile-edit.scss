@@ -1,0 +1,54 @@
+.adm-config-profiles{
+
+    .todo-list{
+        min-height: 80px;
+    }
+
+    .card{
+        .card-header .card-title i{
+            width: 24px;
+            text-align: center;
+        }
+        .adm-config-path{
+            .card-body{
+                min-height: 100px; 
+            }
+        }
+    }
+
+    ul li.path{
+        cursor: pointer;
+
+        span.icon{
+            width: 26px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .label{
+            display: inline-block;
+        }
+
+        .icheck{
+            float: right;
+            margin-top: 1px !important;
+        }
+
+        .option{
+            float: right;
+            opacity: 0.25;
+            margin: 4px 0px 4px 20px;
+            font-size: 1.1em;
+        }
+
+        .option.selected{
+            opacity: 1 !important;
+        }
+
+    }
+
+    ul li.draggable{
+        height: 44px;
+    }
+
+}

@@ -1,0 +1,44 @@
+image-gallery{
+
+    min-height: 80px;
+    
+    .pointer-events-none{
+        pointer-events: none;
+        width: 100%;
+    }
+    .border{
+        cursor: pointer;
+    }
+    .image{
+        position: relative;
+    }
+    .image .actions{
+        display: block;
+        position: absolute;
+        z-index: 1000;
+        bottom: 4px;
+        width: 92%;
+        padding: 8px 12px;
+        text-align: right;
+    }
+    .image .actions a{
+        color: white;
+        font-size: 1.4em;
+        width: 3vw;
+        cursor: pointer;
+        text-shadow: 3px 3px 3px #000000;
+        display: initial;
+        margin-left: 10px;
+    }
+
+    .image .actions a:hover{
+        color: #ffc107;
+    }
+
+    .image .actions a.active{
+        background-color: rgba(255,0,0,0.8);
+        color: #ffc107;
+        padding: 0px 0px 0px 2px;
+        border-radius: 50%;
+    }
+}

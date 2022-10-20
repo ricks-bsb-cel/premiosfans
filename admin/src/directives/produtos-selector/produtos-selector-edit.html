@@ -1,0 +1,33 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Adicionar Produtos/Serviços ao Contrato
+    </h3>
+</div>
+
+<div class="modal-body produtos-selector-edit" id="modal-body">
+    <wait-overlay ready="$ctrl.ready">
+        <ul class="todo-list" data-widget="todo-list">
+            <li ng-repeat="p in $ctrl.data">
+                <div class="icheck-primary d-inline ml-2">
+                    <input 
+                        ng-model="p.selected" 
+                        type="checkbox" 
+                        name="todo-{{p.id}}" 
+                        id="todo-check-{{p.id}}"
+                    >
+                    <label for="todo-check-{{p.id}}" style="margin-top:1px;">
+                        {{p.nome}}
+                    </label>
+                </div>
+                <span class="valor" style="float:right;margin-right:1em;">
+                    {{p.valor | currency : "R$ " : 2}}
+                </span>
+            </li>
+        </ul>
+    </wait-overlay>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Adicionar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Voltar</button>
+</div>

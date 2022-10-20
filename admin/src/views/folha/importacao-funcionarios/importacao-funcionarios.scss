@@ -1,0 +1,28 @@
+.folha.importacao-funcionarios{
+
+    tr.is-invalid{
+        td{
+            background-color: rgba(255, 0, 0, .2);
+        }
+    }
+
+    .invalid{
+        text-decoration: line-through;
+        color: #dc3545;
+    }
+
+    .progress{
+        width: calc(100% - 150px);
+    }
+
+    .custom-file-input{
+        position: initial; 
+        z-index: initial;
+    }        
+    a.input-group-append{
+        cursor: pointer !important;
+        .input-group-text{
+            cursor: pointer !important;
+        }
+    }
+}

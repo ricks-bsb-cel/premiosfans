@@ -1,0 +1,34 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Geração de Clientes/Contratos para testes
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+
+    <div class="alert alert-warning alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-exclamation-triangle"></i> Atenção!</h5>
+        Esta rotina gera dados fake de clientes e contratos para fins de testes!<br />
+        Os registros gerados serão marcados no banco de dados com isFakeData: true.
+    </div>
+
+    <wait-overlay ready="$ctrl.ready">
+        <form novalidate>
+            <formly-form 
+                class="row"
+                model="$ctrl.data"
+                fields="$ctrl.fields"
+                form="$ctrl.form"
+                novalidate
+            >
+            </formly-form>
+        </form>
+    </wait-overlay>
+
+    <p>{{$ctrl.msg}}</p>
+
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Gerar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
+</div>

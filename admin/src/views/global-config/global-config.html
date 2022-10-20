@@ -1,0 +1,48 @@
+<section class="content global-config">
+
+    <search-filter></search-filter>
+
+    <div class="row mt-5">
+        <div class="col-6">
+            <wait-overlay ready="readyGlobal" class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Configurações Globais
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <block-json-tree
+                        json-data="jsonDataGlobal"
+                        collapsed-level="1"
+                        edit-level="low"
+                    >
+                    </block-json-tree>
+                </div>
+                <div class="card-footer">
+                    <small>Configurações gerais, válidas para todas as empresas.</small>
+                </div>
+            </wait-overlay>
+        </div>
+        <div class="col-6">
+            <wait-overlay ready="readyEmpresa" class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        {{empresaAtual.nome}}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <block-json-tree
+                        json-data="jsonDataEmpresa"
+                        collapsed-level="2"
+                        edit-level="high"
+                    >
+                    </block-json-tree>
+                </div>
+                <div class="card-footer">
+                    <small>Chaves com o mesmo nome na configuração da empresa tem prioridade em relação à configuração global.<br />
+                    Configurações extras podem ser definidas.</small>
+                </div>
+            </wait-overlay>
+        </div>
+    </div>
+</section>

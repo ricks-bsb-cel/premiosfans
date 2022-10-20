@@ -1,0 +1,125 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Usuário
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+
+    <wait-overlay ready="$ctrl.ready">
+        <form novalidate>
+            <formly-form
+                class="row"
+                model="$ctrl.data"
+                fields="$ctrl.fields"
+                form="$ctrl.form"
+                novalidate
+            >
+            </formly-form>
+        </form>
+
+        <ul
+            class="nav nav-tabs"
+            id="tab-usuario"
+            role="tablist"
+            ng-if="$ctrl.data.perfilEmpresas.length > 0"
+        >
+            <li class="nav-item">
+                <a
+                    id="tab-content-empresas-tab"
+                    data-bs-target="#tab-content-empresas"
+                    aria-controls="tab-content-empresas-tab"
+                    class="nav-link active"
+                    data-bs-toggle="tab"
+                    role="tab"
+                    aria-selected="true"
+                >
+                    Empresas Vinculadas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a
+                    id="tab-content-apikey-tab"
+                    data-bs-target="#tab-content-apikey"
+                    aria-controls="tab-content-apikey-tab"
+                    class="nav-link"
+                    data-bs-toggle="tab"
+                    role="tab"
+                    aria-selected="true"
+                >
+                    API Key
+                </a>
+            </li>
+        </ul>
+        
+        <div
+            class="tab-content"
+            ng-if="$ctrl.data.perfilEmpresas.length > 0"
+        >
+            <div
+                id="tab-content-empresas"
+                aria-labelledby="tab-content-empresas-tab"
+                class="tab-pane fade pt-3 show active"
+                role="tabpanel"
+            >
+                <form class="m-1" novalidate>
+                    <div class="row">
+                        <div class="col-11">
+                            <label class="col-7 control-label">Empresa</label>
+                            <label class="col-4 control-label">Perfil</label>
+                        </div>
+                        <div class="col-1"></div>
+                    </div>
+                    
+                    <block-usuario-perfil-empresa
+                        ng-repeat="p in $ctrl.data.perfilEmpresas"
+                        delegate="$ctrl.blockUsuarioDelegate"
+                        pos="$index"
+                        model="p.data"
+                        id-empresa-atual="$ctrl.data.idEmpresaAtual"
+                    >
+                    </block-usuario-perfil-empresa>
+                </form>
+            </div>
+
+            <div
+                id="tab-content-apikey"
+                aria-labelledby="tab-content-apikey-tab"
+                class="tab-pane fade pt-3"
+                role="tabpanel"
+            >
+                <form class="m-1" novalidate>
+                    <formly-form
+                        class="row"
+                        model="$ctrl.data"
+                        fields="$ctrl.apiKeyFields"
+                        novalidate
+                    >
+                    </formly-form>
+                </form>
+                <p class="m-2">
+                    Zoepay API Keys must be generated <a target="_blank" href="https://console.cloud.google.com/apis/credentials?project=zoepaygateway">here</a>. Only GCP project onwers can do that!).
+                </p>
+            </div>
+        </div>
+
+    </wait-overlay>
+
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <div class="row">
+        <div class="col-5">
+            <button
+                class="btn btn-default"
+                ng-click="$ctrl.blockUsuarioDelegate.addEmpresa()"
+                type="button"
+                ng-if="!$ctrl.error"
+            >
+                Adicionar Perfil de Acesso
+            </button>
+        </div>
+        <div class="col-7">
+            <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Salvar</button>
+            <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>        
+        </div>
+    </div>
+</div>

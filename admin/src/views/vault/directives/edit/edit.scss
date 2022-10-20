@@ -1,0 +1,21 @@
+.vault-edit-modal{
+    .key{
+        input{
+            font-family: monospace;
+        }        
+    }
+    .tipo{
+        input{
+            font-family: monospace;
+        }        
+    }
+    .json{
+        textarea{
+            font-family: monospace;
+            height: 200px;
+            min-height: 200px;
+            max-height: 200px;
+            resize: none;
+        }
+    }
+}

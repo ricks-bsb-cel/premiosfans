@@ -1,0 +1,45 @@
+<div class="card dashboard-rh block-funcionarios">
+    <div class="card-header">
+        <h3 class="card-title">Funcionários</h3>
+        <div class="card-tools">
+            <ul class="nav nav-pills ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link mt-1 btn btn-block btn-xs active" href="#revenue-chart" data-toggle="tab">
+                        Situação
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="chart-responsive">
+                    <canvas id="pieChartFuncionarios" height="150"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <ul class="chart-legend clearfix">
+                    <li ng-repeat="p in pieData.labels">
+                        <i class="fas fa-circle" ng-style="{'color':pieData.datasets[0].backgroundColor[$index]}"></i>
+                        {{p}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer bg-light p-0">
+        <ul class="nav nav-pills flex-column">
+            <li 
+                ng-repeat="l in links"
+                class="nav-item pb-1 pt-2"
+            >
+                <a href="#!/dashboard-rh/" class="ml-3 pb-0">{{l.label}}</a>
+                <small>{{l.help}}</small>
+            </li>
+        </ul>
+    </div>
+
+</div>

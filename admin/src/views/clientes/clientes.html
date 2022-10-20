@@ -1,0 +1,72 @@
+<section class="content clientes">
+
+    <search-filter filter="filter"></search-filter>
+    
+    <wait-overlay 
+        ready="collectionClientes.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionClientes.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum registro encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionClientes.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="descricao">Nome</th>
+                                    <th class="cpfcnpj">CPF/CNPJ</th>
+                                    <th class="celular">Celular</th>
+                                    <th class="email">Email</th>
+                                    <th class="id">ID</th>
+                                    <th class="commands"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionClientes.collection.data">
+                                    <td class="nome">
+                                        <span ng-if="c.isFakeData" class="badge bg-danger">
+                                            Dummy
+                                        </span>
+                                        <a href="#" ng-click="edit(c)">
+                                            {{c.nome}}
+                                        </a>
+                                    </td>
+                                    <td class="cpf">
+                                        {{c.cpfcnpj_formatted || c.cpf_formatted}}
+                                    </td>
+                                    <td class="celular">
+                                        {{c.celular_formatted}}
+                                    </td>
+                                    <td class="email">
+                                        {{c.email}}
+                                    </td>
+                                    <td class="id monospace">
+                                        <small>
+                                            {{c.id}}
+                                        </small>
+                                    </td>
+                                    <td class="commands pr-3">
+                                        <a ng-href="#!/contratos/{{c.id}}" class="nav-link mr-2" uib-popover="Ver contratos do cliente {{c.nome}}">
+                                            <i class="fa fa-handshake-o"></i>
+                                        </a>
+                                        <a ng-href="#!/cobrancas/{{c.id}}" class="nav-link" uib-popover="Ver cobranças do cliente {{c.nome}}">
+                                            <i class="fa fa-usd"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+
+</section>

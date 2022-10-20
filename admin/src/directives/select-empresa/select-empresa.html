@@ -1,0 +1,24 @@
+<div class="form-group select-empresa" ng-show="ready">
+    <label class="label-empresa">Empresa:</label>
+    <h3
+        ng-click="selectEmpresa()"
+        ng-style="{cursor:empresas.length > 1 ? 'pointer' : 'default'}"
+    >
+        {{empresaAtual.nome}}
+    </h3>
+    <!--
+    <select
+        selector
+        model="idEmpresaAtual"
+        multi="false"
+        label-attr="nome"
+        value-attr="id"
+        require="true"
+        options="empresas"
+        change="changeEmpresaAtual(newValue,oldValue)"
+        remove-button="false"
+        close-after-selection="true"
+        placeholder="Selecione a Empresa"
+    ></select>
+    -->
+</div>

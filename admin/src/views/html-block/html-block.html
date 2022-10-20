@@ -1,0 +1,44 @@
+<section class="content html-block">
+
+    <search-filter></search-filter>
+
+    <wait-overlay ready="user" class="container-fluid">
+        <div class="row">
+
+            <div ng-if="collectionHtmlBlock.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum registro encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="sigla">Sigla</th>
+                                    <th class="id">ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionHtmlBlock.collection.data">
+                                    <td class="nome">
+                                        <a href="#" class="monospace" ng-click="edit(c)">
+                                            {{c.sigla}}
+                                        </a>
+                                    </td>
+                                    <td class="nome">
+                                        <span class="monospace">
+                                            {{c.id}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

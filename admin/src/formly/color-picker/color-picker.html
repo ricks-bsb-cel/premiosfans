@@ -1,0 +1,33 @@
+<div class="color-picker">
+
+    <label>{{to.label}}</label>
+
+    <div class="form-group">
+
+        <div
+            id="{{options.id}}-color-picker"
+            class="picker"
+            ng-style="{
+                'background-color':colorHex
+            }"
+        ></div>
+
+        <input type="text">
+
+        <div class="btn-group" ng-if="to.alpha">
+            
+            <button type="button" class="btn btn-default">
+                {{transp}}
+            </button>
+
+            <button type="button" class="btn btn-default dropdown-toggle dropdown-hover dropdown-icon" data-toggle="dropdown" aria-expanded="false">
+                <span class="sr-only">Transparência</span>
+            </button>
+
+            <div class="dropdown-menu" role="menu">
+                <a class="dropdown-item" ng-repeat="t in transpList" ng-click="setTransp(t)" href="#" ng-bind="t.label"></a>
+            </div>
+        </div>
+
+    </div>
+</div>  

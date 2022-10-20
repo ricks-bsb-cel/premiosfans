@@ -1,0 +1,32 @@
+.select-empresa{
+    .selector-input{
+        background-color: white !important;
+    }
+    .selector-dropdown{
+        font-size: 0.9em;
+        li span{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 200px;
+            display: block;
+        }
+    }
+    input{
+        caret-color: transparent;
+    }
+    h3{
+        font-size: 1.1em;
+        color: white;
+        opacity: 0.8;
+        font-weight: 600;
+        margin-left: 10px;
+        cursor: pointer;
+
+        display: inline-block;
+        width: 220px;
+        white-space: nowrap;
+        overflow: hidden !important;
+        text-overflow: ellipsis;
+    }
+}

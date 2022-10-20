@@ -1,0 +1,51 @@
+<div class="modal-body" id="modal-body">
+
+    <div class="row">
+        <div class="col-12 text-center">
+            <!-- https://www.manypixels.co/gallery/?color=17a2b8&page=1&s=password -->
+            <img class="m-5" src="../../../assets/imgs/profiling.svg" alt="Nova senha">
+            <h2>
+                Solicite seu acesso ao Zoepay
+            </h2>
+        </div>
+    </div>
+
+    <form ng-submit="$ctrl.createAccess()" novalidate>
+        <form novalidate>
+
+            <formly-form
+                model="$ctrl.model"
+                fields="$ctrl.fields"
+                form="$ctrl.form"
+                class="row m-1"
+                novalidate
+            >
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="callout callout-info">
+                            <p>
+                                Você deve informar duas vezes a sua nova senha.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button
+                            ng-disabled="$ctrl.form.$invalid"
+                            type="submit"
+                            class="btn btn-info btn-block btn-flat mt-1"
+                        >
+                            Registrar
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" ng-click="$ctrl.cancel()" class="btn btn-outline-info btn-block btn-flat mt-1">
+                            Voltar
+                        </button>
+                    </div>
+                </div>
+          </formly-form>
+        </form>
+    </form>
+
+</div>

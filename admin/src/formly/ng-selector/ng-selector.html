@@ -1,0 +1,12 @@
+<div class="form-group ng-selector" style="height: 45px;">
+    <select
+        selector
+        ng-if="ready"
+        id="{{id}}"
+        model="model[options.key]"
+        options="selectorOptions"
+        multi="multiselect"
+        create="createNewItem(input)"
+        value-attr="value"
+    ></select>
+</div>

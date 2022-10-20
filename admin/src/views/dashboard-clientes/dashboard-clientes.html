@@ -1,0 +1,72 @@
+<section class="content-header pb-0" title="Suas Cobranças">
+</section>
+
+<section class="content dashboard-clientes">
+
+	<section class="content">
+
+		<wait-overlay 
+			ng-if="collectionContratos.collection.showTable()"
+			ready="collectionContratos.collection.isReady()"
+		>
+			<div class="row">
+				<a 
+					ng-repeat="contrato in collectionContratos.collection.data"
+					ng-href="#!/dashboard-clientes-cobrancas/{{contrato.idEmpresa}}/{{contrato.id}}"
+					class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 nav-link"
+				>
+				
+					<div
+						class="info-box m-0"
+						ng-class="getClassInfoBox(contrato)"
+					>
+
+						<span
+							class="info-box-icon"
+							ng-class="getIconInfoBox(contrato)"	
+						>
+						</span>
+
+						<div class="info-box-content">
+
+							<h5 class="info-box-text mb-0">
+								{{contrato.idEmpresa_reference_data.nome}}
+							</h5>
+
+							<small>{{contrato.idPlano_reference_data.nome}}</small>
+							
+							<span ng-if="!hasCobranca(contrato)" class="info-box-number">
+								Nenhuma cobrança localizada...
+							</span>						
+
+							<div ng-repeat="cobranca in getCobrancas(contrato) | orderBy : 'diasRestantesParaPagamento'"> 
+								<span class="info-box-number">
+									{{cobranca.valor | currency : "R$ " : 2 }}
+									<small class="ml-1">em {{cobranca.dtVencimento_timestamp | ddmmyyyy}}</small>
+								</span>
+
+								<div class="progress">
+									<div
+										class="progress-bar"
+										ng-style="{width: cobranca.percentualDiasDisponiveisParaPagamento + '%'}"
+									></div>
+								</div>
+
+								<span class="progress-description mb-2">
+									<small ng-if="cobranca.diasRestantesParaPagamento>0">
+										Vencimento em {{cobranca.diasRestantesParaPagamento}} dia(s)
+									</small>
+									<span ng-if="cobranca.diasRestantesParaPagamento==0">Hoje!</span>
+									<span ng-if="cobranca.diasRestantesParaPagamento<0">
+										Em atraso a {{cobranca.diasEmAtraso}} dia(s)
+									</span>
+								</span>
+							</div>
+						</div>
+					</div>
+				</a>
+			</div>
+		</wait-overlay>
+	</section>
+
+</section>

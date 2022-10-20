@@ -1,0 +1,43 @@
+produtos-selector{
+
+    table{
+        td.qtd{
+            width: 70px;
+            text-align: right;
+        }
+        td.vl-unitario{
+            width: 120px;
+            text-align: right;
+        }
+        td.vl-total{
+            width: 120px;
+            text-align: right;
+            padding: .5rem;
+        }
+        td.actions{
+            width: 125px;
+            padding-right: 5px;
+            padding-top: 15px;
+
+            a{
+                margin-right: 10px;
+                font-size: 1.2em;
+            }
+
+            a.disabled{
+                color: gray;
+                opacity: 0.5;
+            }
+        }
+
+        input.right{
+            text-align: right;
+        }
+
+        .tipo select{
+            min-width: 175px;
+        }
+
+    }
+
+}

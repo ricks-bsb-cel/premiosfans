@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{>partial-head}}
+
+<body class="hold-transition lockscreen">
+
+    <div class="lockscreen-wrapper">
+        <div class="lockscreen-logo">
+            <img src="/logos/svg/full-blue.svg" width="75%">
+        </div>
+
+        <h4 class="text-center">
+            {{user.email}}
+        </h4>
+
+        <div class="lockscreen-name">
+            Seu acesso não está autorizado
+            {{#if error}}
+            <br />
+            <strong class="m-2" style="text-decoration: underline;color:red;">{{error}}</strong>
+            {{/if}}
+        </div>
+
+        <div class="help-block text-center mt-2">
+            Verifique suas permissões com o<br />administrador da sua empresa ou com nossa equipe de Suporte ao Usuário.
+            <br/><br/><code>{{user.uid}}</code>
+        </div>
+
+        <div class="lockscreen-footer text-center">
+            <a href="/adm/login?clear" class="text-black">
+                Efetuar Logout e tentar novamente
+            </a>
+        </div>
+    </div>
+
+    {{>partial-scripts}}
+</body>
+
+</html>

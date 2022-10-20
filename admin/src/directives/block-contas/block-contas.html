@@ -1,0 +1,21 @@
+<div class="col-12 row">
+    <div 
+        ng-if="collectionContas.collection.ready"
+        ng-repeat="c in collectionContas.collection.data"
+        class="mb-3 col-xs-6 col-sm-4 col-md-12 col-lg-12 col-xs-12 custom-control custom-checkbox"
+    >
+        <input
+            class="custom-control-input"
+            type="checkbox"
+            id="conta-{{c.id}}"
+            checked
+        >
+        <label
+            for="conta-{{c.id}}"
+            class="custom-control-label monospace"
+        >
+            {{c.conta}}
+            <span class="badge bg-info">{{c.tipoPessoa}}</span>
+        </label>
+    </div>
+</div>

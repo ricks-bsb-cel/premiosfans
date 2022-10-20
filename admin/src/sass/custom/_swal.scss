@@ -1,0 +1,19 @@
+.swal2-container.block-ui{
+	.swal2-popup{
+		background-color: transparent;
+	}
+	.swal2-loader{
+		border-color: white transparent white transparent;
+		border-width: 0.5em;
+		height: 4em;
+		width: 4em;
+	}
+}
+
+.swal2-shown.login-page{
+	position: absolute;
+    margin: 0 auto;
+    right: 0;
+    left: 0;
+    min-height: 100% !important;
+}

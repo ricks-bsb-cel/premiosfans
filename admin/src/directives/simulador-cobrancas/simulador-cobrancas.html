@@ -1,0 +1,91 @@
+<div class="card simulador-cobrancas">
+    <div class="card-header">
+        <h3 class="card-title mt-1">
+            <i class="{{titles.icon}} mr-1"></i>
+            Simulação das Cobranças
+        </h3>
+
+        <div class="card-tools pt-1">
+            <label class="mr-1 m-0">Meses:</label>
+            <ul class="pagination pagination-sm float-right">
+                <li class="page-item" ng-class="{selected:meses===6}"><a ng-click="meses=6" class="page-link" href="#">6</a></li>
+                <li class="page-item" ng-class="{selected:meses===12}"><a ng-click="meses=12" class="page-link" href="#">12</a></li>
+                <li class="page-item" ng-class="{selected:meses===24}"><a ng-click="meses=24" class="page-link" href="#">24</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-3">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="number">#</th>
+                    <th class="vencimento">Vencimento</th>
+                    <th class="valor-total">Valor Total</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr
+                    ng-repeat-start="c in cobrancas"
+                    data-widget="expandable-table"
+                    aria-expanded="{{c.isExpanded.toString()}}"
+                    data-master-index="{{$index}}"
+                >
+                    <td class="number">
+                        <strong>
+                            {{$index + 1}}
+                        </strong>
+                    </td>
+                    <td class="vencimento">
+                        <strong>
+                            {{c.dtVencimento_dmy}}
+                        </strong>
+                    </td>
+                    <td class="valor-total">
+                        <strong>
+                            {{c.valor | currency:"R$ " : 2 }}
+                        </strong>
+                    </td>
+                </tr>
+
+                <tr 
+                    ng-repeat-end
+                    class="expandable-body"
+                    ng-class="{'d-none':!c.isExpanded}"
+                    data-detail-index="{{$index}}"
+                >
+                    <td colspan="3">
+                        <table
+                            class="table table-sm produtos"
+                            ng-style="{display:(c.isExpanded?'inline-table':'none')}"
+                        >
+                            <tbody>
+                                <tr ng-repeat="p in c.produtos">
+                                    <td class="descricao-produto">
+                                        <small>
+                                            {{p.nome}}
+                                        </small>
+                                        <span ng-if="p.tipo==='pa'" class="badge bg-primary">
+                                            <strong>{{c.parcela}}ª</strong>
+                                            Parcela
+                                        </span>
+                                        <span ng-if="p.tipo==='am'" class="badge bg-primary">
+                                            Assinatura Mensal
+                                        </span>
+                                    </td>
+                                    <td class="valor-produto">
+                                        <small>
+                                            {{p.valor | currency:"R$ " : 2}}
+                                        </small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>

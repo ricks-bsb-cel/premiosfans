@@ -1,0 +1,17 @@
+.conteudo-edit-modal{
+
+    @media (min-width:1300px){
+        .modal-dialog{
+            max-width: 1200px;
+        }
+    }
+
+    .monaco-editor{
+        height: 520px; 
+    }
+
+    .publico{
+        margin-top: 40px;
+        padding-left: 15px;
+    }
+}

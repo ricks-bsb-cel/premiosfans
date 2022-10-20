@@ -1,0 +1,57 @@
+<section class="content produtos">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay
+        ready="user"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionProdutos.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum registro encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="descricao">Nome</th>
+                                    <th class="codigo">Código</th>
+                                    <th class="valor right">Valor</th>
+                                    <th class="ativo">Ativo</th>
+                                    <th class="dt-alteracao right">Última Alteração</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionProdutos.collection.data">
+                                    <td class="nome">
+                                        <a href="#" ng-click="edit(c)">
+                                            {{c.nome}}
+                                        </a>
+                                    </td>
+                                    <td class="codigo">
+                                        {{c.codigo}}
+                                    </td>
+                                    <td class="valor right">
+                                        {{c.valor | currency : "R$ " : 2}}
+                                    </td>
+                                    <td class="ativo">
+                                        <badge-true-false value="c.ativo"></badge-true-false>
+                                    </td>
+                                    <td class="dt-alteracao right">
+                                        {{c.dtAlteracao | ddmmyyyyhhmm}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

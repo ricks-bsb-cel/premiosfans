@@ -1,0 +1,17 @@
+.clientes{
+	table{
+		.dt-alteracao{
+			text-align: right;
+		}
+		.commands{
+			width: 100px;
+			text-align: right;
+			a{
+				width: 30px;
+				padding: 0;
+				margin-left: 10px;
+				display: initial;
+			}
+		}
+	}
+}

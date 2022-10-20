@@ -1,0 +1,65 @@
+<section class="content usuarios">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay ready="ready" class="container-fluid">
+        <div class="row">
+
+            <div ng-if="collectionUserProfile.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum usuário encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionUserProfile.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="id">ID Usuário</th>
+                                    <th class="email">Email</th>
+                                    <th class="nome">Nome</th>
+                                    <th class="empresa">Empresa</th>
+                                    <th class="status">Situação</th>
+                                    <th class="providers">Providers</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionUserProfile.collection.data">
+                                    <td class="id">
+                                        <a href="#" ng-click="edit(c)">
+                                            <small class="monospace">
+                                                {{c.id}}
+                                            </small>
+                                        </a>
+                                    </td>
+                                    <td class="email">
+                                        {{c.email}}
+                                    </td>
+                                    <td class="nome">
+                                        {{c.displayName}}
+                                    </td>
+                                    <td class="empresa">
+                                        {{c.empresaAtual}}
+                                        <span ng-if="c.qtdEmpresas>1" class="badge bg-info ml-1">+{{c.qtdEmpresas-1}}</span>
+                                    </td>
+                                    <td class="status">
+                                        <span ng-if="c.ativo" class="badge bg-success">Ativo</span>
+                                        <span ng-if="!c.ativo" class="badge bg-danger">Inativo</span>
+                                        <span ng-if="c.apikey" class="badge bg-info">ApiKey</span>
+                                    </td>
+                                    <td class="providers right">
+                                        <span ng-repeat="p in c.provider" class="badge bg-info">{{p}}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </wait-overlay>
+
+</section>

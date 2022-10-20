@@ -1,0 +1,47 @@
+<section class="content-header" title="Vault">
+</section>
+
+<section class="content vault">
+    <wait-overlay 
+        ng-if="collectionVault.collection.showTable()"
+        ready="collectionVault.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="key">Key</th>
+                                    <th class="tipo">Tipo</th>
+                                    <th class="obs">Observações</th>
+                                    <th class="dt-alteracao">Última Alteração</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="r in collectionVault.collection.data">
+                                    <td class="key">
+                                        <a href="#" ng-click="edit(r)">
+                                            {{r.key}}
+                                        </a>
+                                    </td>
+                                    <td class="tipo">
+                                        {{r.tipo}}
+                                    </td>
+                                    <td class="obs">
+                                        {{r.obs}}
+                                    </td>
+                                    <td class="dt-alteracao">
+                                        {{r.dtAlteracao | ddmmyyyyhhmm}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

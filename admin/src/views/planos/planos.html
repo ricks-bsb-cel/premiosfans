@@ -1,0 +1,77 @@
+<section class="content planos">
+
+    <search-filter></search-filter>
+
+    <wait-overlay
+        ready="user"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionPlanos.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum registro encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="descricao">Plano</th>
+                                    <th class="sigla">Sigla</th>
+                                    <th class="valor">Valor</th>
+                                    <th class="ativo">Ativo</th>
+                                    <!--
+                                    <th class="id right">ID</th>
+                                    -->
+                                    <th class="dt-alteracao right">Última Alteração</th>
+                                    <th ng-if="user.superUser" class="commands"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionPlanos.collection.data">
+                                    <td class="nome">
+                                        <a href="#" ng-click="edit(c)">
+                                            {{c.nome}}
+                                        </a>
+                                    </td>
+                                    <td class="sigla">
+                                        {{c.sigla}}
+                                    </td>
+                                    <td class="valor">
+                                        <small>de</small>
+                                        {{c.valorMinimo | currency : "R$ " : 2}}
+                                        <small>a</small>
+                                        {{c.valorMaximo | currency : "R$ " : 2}}
+                                    </td>
+                                    <td class="ativo">
+                                        <badge-true-false value="c.ativo"></badge-true-false>
+                                    </td>
+                                    <!--
+                                    <td class="id right monospace">
+                                        {{c.id}}
+                                    </td>
+                                    -->
+                                    <td class="dt-alteracao right">
+                                        {{c.dtAlteracao | ddmmyyyyhhmm}}
+                                    </td>
+                                    <td ng-if="user.superUser" class="commands pr-3 right">
+                                        <a
+                                            ng-click="generateFakeData(c)"
+                                            class="nav-link p-0"
+                                            uib-popover="Configurar o gerador de base de teste de Clientes e Contratos para este plano.">
+                                            <i class="fab fa-creative-commons-pd"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

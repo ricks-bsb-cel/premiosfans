@@ -1,0 +1,67 @@
+.lancamentos-contrato{
+
+    .timeline{
+
+        .time-label{
+            span{
+                width: 100px;
+                text-align: center;
+            }
+        }
+
+        .dia{
+            height: 30px;
+            width: 30px;
+            display: inline-block;
+            top: 4px;
+            position: absolute;
+            left: 18px;
+            text-align: center;
+            border-radius: 50%;
+            padding-top: 4px;
+            padding-right: 3px;
+            cursor: default;
+        }
+        
+        span.badge.situacao{
+            width: 80px;
+            font-size: 13px;
+            bottom: 2px;
+            position: relative;
+        }
+
+        .time{
+
+            strong.valor{
+                font-size: 16px;
+                width: 80px;
+                text-align: right;
+                color: initial;
+            }
+
+            span.badge{
+                width: 80px;
+            }
+
+            .situacao{
+                width: 90px;
+            }
+
+            .dropdown{
+                .dropdown-toggle{
+                    font-size: 20px;
+                    margin-left: 2px;
+                    line-height: 0;
+                }
+                .dropdown-menu{
+                    left: initial;
+                    right: -12px;
+                    top: 20px;
+                }
+            }
+
+        }
+    
+    }
+
+}
