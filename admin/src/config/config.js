@@ -5,8 +5,8 @@ const ngModule = angular.module('config', [apiUrls.name])
 	.run(run)
 
 	.value('globalParms', {
-		appName: 'Zoepay Admin',
-		appUrl: 'https://zoepay.app',
+		appName: 'Premios Fans Admin',
+		appUrl: 'https://premiosfans.app',
 		appVersion: '0.1.0',
 		logoImg: '/adm/img/logo.png',
 		initDelay: 10, // In seconds...

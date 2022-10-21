@@ -1,7 +1,7 @@
 const admin = require("firebase-admin");
 const secret = require("./secretManager");
 
-let app = null;
+var app = null;
 
 exports.call = (f, request, response, parm) => {
 	parm = parm || {};
@@ -16,10 +16,9 @@ exports.call = (f, request, response, parm) => {
 		})
 }
 
-
 const init = _ => {
 	return new Promise(resolve => {
-		try{
+		try {
 
 			if (app) {
 				// console.info('App já está instanciado...');
@@ -37,19 +36,25 @@ const init = _ => {
 				return Promise.all(getSecrets)
 					.then(secrets => {
 
-						var serviceAccount = secrets[0];
-						var initFirebase = secrets[1];
+						// var serviceAccount = secrets[0] || null;
+						// var initFirebase = secrets[1] || null;
 
 						// Inicializa o App
-						initFirebase.credential = admin.credential.cert(serviceAccount);
+						// initFirebase.credential = admin.credential.cert(serviceAccount);
 
-						app = admin.initializeApp(initFirebase);
+						// console.info(initFirebase);
+						// app = admin.initializeApp({}serviceAccount);
+
+						// initFirebase.credential = admin.credential.cert(serviceAccount);
+
+						// app = admin.initializeApp(initFirebase);
+						app = admin.initializeApp();
 
 						return resolve(app);
 					})
 
 					.catch(e => {
-						console.error("getSecrets error", e);
+						console.error(e);
 						return resolve(admin);
 					})
 

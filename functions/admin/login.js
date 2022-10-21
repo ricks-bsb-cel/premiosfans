@@ -6,8 +6,8 @@ const adminController = require('./adminController');
 const users = require('../api/users/users');
 
 const hbsPath = path.join(__dirname, '/hbs');
-const hbsFile = hbsPath + '/login.hbs';
-const hbsPartials = hbsPath + '/partials/login';
+const hbsFile = path.join(hbsPath, 'login.hbs');
+const hbsPartials = path.join(hbsPath, 'partials/login');
 
 exports.get = (request, response) => {
 

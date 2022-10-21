@@ -5,13 +5,14 @@ import { initializeApp } from 'firebase/app';
 const ngModule = angular.module('services.firebase.config', [])
 
 	.constant('firebaseConfig', {
-		apiKey: "AIzaSyDs5zG6hxdlEEtxz-7YMKFLAjlyZEWVCY4",
-		authDomain: "zoepaygateway.firebaseapp.com",
-		databaseURL: "https://zoepaygateway-default-rtdb.firebaseio.com",
-		projectId: "zoepaygateway",
-		storageBucket: "zoepaygateway.appspot.com",
-		messagingSenderId: "408824775847",
-		appId: "1:408824775847:web:5db114351e8cc1e849c782"
+		apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
+		authDomain: "premios-fans.firebaseapp.com",
+		databaseURL: "https://premios-fans-default-rtdb.firebaseio.com",
+		projectId: "premios-fans",
+		storageBucket: "premios-fans.appspot.com",
+		messagingSenderId: "801994869227",
+		appId: "1:801994869227:web:188d640a390d22aa4831ae",
+		measurementId: "G-XTRQ740MSL"
 	})
 
 	.constant('firebaseErrorCodes',

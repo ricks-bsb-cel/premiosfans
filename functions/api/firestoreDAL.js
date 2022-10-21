@@ -1,0 +1,359 @@
+"use strict";
+
+const admin = require("firebase-admin");
+const global = require("../global");
+const _ = require("lodash");
+
+class collectionClass {
+
+    constructor(c) {
+        this.collectionName = c;
+    }
+
+    merge(id, data) {
+        return new Promise((resolve, reject) => {
+            delete data.id;
+            return admin.firestore().collection(this.collectionName).doc(id).set(data, { merge: true })
+                .then(_ => {
+                    data.id = id;
+                    return resolve(data);
+                })
+                .catch(e => {
+                    console.error(e);
+                    return reject(e);
+                })
+        })
+    }
+
+    set(id, data, merge) {
+        return new Promise((resolve, reject) => {
+
+            let doc;
+
+            if (id) {
+                doc = admin.firestore().collection(this.collectionName).doc(id);
+            } else {
+                doc = admin.firestore().collection(this.collectionName).doc();
+            }
+
+            delete data.id;
+
+            doc.set(data, { merge: typeof merge === 'boolean' ? merge : false })
+                .then(_ => {
+                    data.id = doc.id;
+                    return resolve(data);
+                })
+                .catch(e => {
+                    console.error(e);
+                    return reject(e);
+                })
+
+        })
+    }
+
+    add(data) {
+        return new Promise((resolve, reject) => {
+
+            let doc = admin.firestore().collection(this.collectionName).doc();
+
+            delete data.id;
+            global.setDateTime(data, 'dtInclusao');
+
+            doc.set(data)
+
+                .then(_ => {
+                    data.id = doc.id;
+                    return resolve(data);
+                })
+
+                .catch(e => {
+                    console.error(e);
+                    return reject(e);
+                })
+
+        })
+    }
+
+    delete(id) {
+        return new Promise((resolve, reject) => {
+
+            let doc = admin.firestore().collection(this.collectionName).doc(id);
+
+            doc.delete()
+                .then(_ => {
+                    return resolve();
+                })
+
+                .catch(e => {
+                    return reject(e);
+                })
+
+        })
+    }
+
+    insertUpdate(id, data) {
+
+        global.setDateTime(data, 'dtAlteracao');
+
+        if (id) {
+            return this.set(id, data, true);
+        } else {
+            global.setDateTime(data, 'dtInclusao');
+            return this.add(data);
+        }
+    }
+
+    get(attrs) {
+        var self = this;
+
+        if (!this.collection) {
+            this.collection = admin.firestore().collection(this.collectionName);
+        }
+
+        attrs = attrs || {};
+
+        return new Promise((resolve, reject) => {
+
+            var query = self.collection;
+
+            if (attrs.filter) {
+                if (Array.isArray(attrs.filter)) {
+                    attrs.filter.forEach(f => {
+                        query = query.where(f.field, f.condition || '==', f.value);
+                    })
+                } else {
+                    Object.keys(attrs.filter).forEach(f => {
+                        query = query.where(f, '==', attrs.filter[f]);
+                    })
+                }
+            }
+
+            if (attrs.limit) {
+                query = query.limit(attrs.limit);
+            }
+
+            query.get().then(rows => {
+                var result = [];
+
+                rows.forEach(r => {
+                    var toPush = Object.assign(r.data(), { id: r.id });
+                    delete toPush.keywords;
+                    result.push(toPush);
+                })
+
+                if (attrs.order) {
+                    result = orderArray(result, attrs.order);
+                }
+
+                return resolve(result);
+            }).catch(e => {
+                return reject(new Error(e));
+            })
+        })
+    }
+
+    getReference(id) {
+        return admin.firestore().collection(this.collectionName).doc(id);
+    }
+
+    getDoc(id, notFoundError) {
+        var self = this;
+
+        if (!this.collection) {
+            this.collection = admin.firestore().collection(this.collectionName);
+        }
+
+        notFoundError = (typeof notFoundError === 'boolean' ? notFoundError : true);
+
+        return new Promise((resolve, reject) => {
+            self.collection.doc(id).get().then(doc => {
+                if (doc.exists) {
+                    return resolve(
+                        Object.assign(doc.data(), { id: id })
+                    );
+                } else {
+                    if (notFoundError) {
+                        throw new Error(`O documento ${id} não existe na coleção ${self.collectionName}...`);
+                    } else {
+                        return resolve(null);
+                    }
+                }
+            }).catch(e => {
+                return reject(e);
+            })
+        })
+    }
+
+}
+
+const orderArray = (data, order) => {
+    if (typeof order === 'string') {
+        return _.orderBy(data, [order], ['asc']);
+    } else {
+        return data;
+    }
+}
+
+exports.empresas = () => {
+    return new collectionClass('empresas');
+}
+
+exports.contas = () => {
+    return new collectionClass('contas');
+}
+
+exports.emailBox = () => {
+    return new collectionClass('emailBox');
+}
+
+exports.emailMessage = () => {
+    return new collectionClass('emailMessage');
+}
+
+exports.contasPixKeys = () => {
+    return new collectionClass('contasPixKeys');
+}
+
+exports.contasTransactions = () => {
+    return new collectionClass('contasTransactions');
+}
+
+exports.clientes = () => {
+    return new collectionClass('clientes');
+}
+
+exports._superUsers = () => {
+    return new collectionClass('_superUsers');
+}
+
+exports._vault = () => {
+    return new collectionClass('_vault');
+}
+
+exports._webHookReceived = () => {
+    return new collectionClass('_webHookReceived');
+}
+
+exports.admInterface = () => {
+    return new collectionClass('admInterface');
+}
+
+exports.zoeAccount = () => {
+    return new collectionClass('zoeAccount');
+}
+
+exports.admConfigPath = () => {
+    return new collectionClass('admConfigPath');
+}
+
+exports.admConfigProfiles = () => {
+    return new collectionClass('admConfigProfiles');
+}
+
+exports.userProfile = () => {
+    return new collectionClass('userProfile');
+}
+
+exports.cobrancas = () => {
+    return new collectionClass('cobrancas');
+}
+
+exports.contratos = () => {
+    return new collectionClass('contratos');
+}
+
+exports.lancamentos = () => {
+    return new collectionClass('lancamentos');
+}
+
+exports.contratosProdutos = () => {
+    return new collectionClass('contratosProdutos');
+}
+
+exports.funcionarios = () => {
+    return new collectionClass('funcionarios');
+}
+
+exports.simpleSignInUrls = () => {
+    return new collectionClass('simpleSignInUrls');
+}
+
+exports.boletos = () => {
+    return new collectionClass('boletos');
+}
+
+exports.planos = () => {
+    return new collectionClass('planos');
+}
+
+exports.produtos = () => {
+    return new collectionClass('produtos');
+}
+
+/*
+exports.clientesCelularCpf = () => {
+    return new collectionClass('clientesCelularCpf');
+}
+*/
+
+exports.apiConfig = () => {
+    return new collectionClass('apiConfig');
+}
+
+exports.log = () => {
+    return new collectionClass('_log');
+}
+
+exports.cep = () => {
+    return new collectionClass('_cep');
+}
+
+/*
+exports.workflowCalls = () => {
+    return new collectionClass('workflowCalls');
+}
+*/
+
+
+exports.appUsers = () => {
+    return new collectionClass('appUsers');
+}
+
+exports.cartosUsers = () => {
+    return new collectionClass('cartosUsers');
+}
+
+exports.bancos = () => {
+    return new collectionClass('bancos');
+}
+
+exports.serviceError = () => {
+    return new collectionClass('_serviceError');
+}
+
+exports.serviceUserCredential = () => {
+    return new collectionClass('serviceUserCredential');
+}
+
+exports.deadLettering = _ => {
+    return new collectionClass('_eebDeadLettering');
+}
+
+exports.eebTest = _ => {
+    return new collectionClass('_eebTest');
+}
+
+
+
+/*
+exports.usuarioApp = () => {
+    return new collectionClass('userApp');
+}
+
+
+exports.totaisCobrancas = () => {
+    return new collectionClass('totaisCobrancas');
+}
+*/
+
+

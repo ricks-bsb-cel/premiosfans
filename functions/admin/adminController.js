@@ -12,7 +12,7 @@ exports.getPermissions = (user, request) => {
         const version = global.getVersionId();
         const host = global.getHost(request);
 
-        var result = {
+        let result = {
             redirect: '/adm/unauthorized',
             dalAdmInterface: 'empresaDefault',
             user: user,
@@ -33,6 +33,7 @@ exports.getPermissions = (user, request) => {
 
                 .then(appProfile => {
                     result.appProfile = Object.assign(result.appProfile, appProfile || {});
+
                     return resolve(result);
                 })
 
