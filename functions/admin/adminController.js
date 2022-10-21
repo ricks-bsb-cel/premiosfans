@@ -1,9 +1,9 @@
-/* eslint-disable consistent-return */
 "use strict";
 
 // const admin = require("firebase-admin");
 const global = require('../global');
 const users = require('../api/users/users');
+const secret = require('../secretManager');
 
 exports.getPermissions = (user, request) => {
 
@@ -32,7 +32,15 @@ exports.getPermissions = (user, request) => {
                 })
 
                 .then(appProfile => {
-                    result.appProfile = Object.assign(result.appProfile, appProfile || {});
+                    appProfile = appProfile || {};
+
+                    result.appProfile = { ...result.appProfile, appProfile };
+
+                    return secret.get("premios-fans-firebase-init");
+                })
+                .then(firebaseInit => {
+                    result.firebaseInit = JSON.stringify(firebaseInit);
+                    result.firebaseInit = global.toBase64(result.firebaseInit);
 
                     return resolve(result);
                 })
@@ -66,7 +74,7 @@ exports.getPermissions = (user, request) => {
                     } else {
                         result.error = "Usuário não vinculado a nenhuma empresa...";
                         return resolve(result);
-                    }
+                    };
                 }
 
                 return global.config.get('/appProfile/default');
@@ -82,6 +90,12 @@ exports.getPermissions = (user, request) => {
             .then(appProfile => {
                 result.appProfile = Object.assign(result.appProfile, appProfile || {});
 
+                return secret.get("premios-fans-firebase-init");
+            })
+
+            .then(firebaseInit => {
+                console.info('***', firebaseInit);
+
                 return resolve(result);
             })
 
@@ -92,92 +106,5 @@ exports.getPermissions = (user, request) => {
             })
 
     })
+
 }
-
-/*
-const getEmpresas = (user) => {
-    return new Promise((resolve, reject) => {
-
-        var query = dalEmpresas.collection;
-        var empresas = [];
-
-        console.info(user);
-
-        if (!user.superUser) {
-            if (user.idEmpresas.length) {
-                query = query
-                    .where(admin.firestore.FieldPath.documentId(), 'in', (user.idEmpresas || []))
-                    .where('ativa', '==', true);
-            } else {
-                return reject(new Error('Usuário sem nenhuma empresa vinculada'));
-            }
-        }
-
-        query
-            .get()
-            .then(docs => {
-                docs.forEach(d => {
-                    empresas.push(Object.assign(d.data(), { id: d.id }));
-                })
-                return dalUserProfile.getDoc(user.uid);
-            })
-            .then(userProfile => {
-                var i = empresas.findIndex(f => { return f.id === userProfile.idEmpresaAtual; });
-                if (i >= 0) {
-                    empresas[i].selected = true;
-                } else {
-                    console.error('Profile error', userProfile);
-                }
-                return resolve(empresas);
-            })
-            .catch(e => {
-                console.error(e);
-                return reject(e);
-            })
-
-    });
-}
-*/
-
-/*
-// Substitui o getPermissions
-exports.getPerfil = user => {
-    return new Promise(resolve => {
-
-        var result = {
-            user: {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName || null,
-                photoURL: user.photoURL || null,
-                phoneNumber: user.phoneNumber || null,
-                superUser: user.superUser
-            }
-        }
-
-        // Verifica se não é superusuario
-        dalSuperUser.getDoc(user.uid, false)
-            .then(resultSuperUser => {
-
-                throw new Error('Not implemented...');
-
-                if (resultSuperUser) {
-
-                } else {
-
-                }
-
-            })
-
-            .then(result => {
-                return resolve(result);
-            })
-
-            .catch(e => {
-                result.error = e;
-                return reject(result);
-            })
-
-    })
-}
-*/

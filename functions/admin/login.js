@@ -23,7 +23,7 @@ exports.get = (request, response) => {
 
         .then(result => {
             if (clearLogin || result.redirect === '/adm/login') {
-                return response.render(hbsFile, response.data);
+                return response.render(hbsFile, result);
             } else {
                 return response.redirect(result.redirect);
             }

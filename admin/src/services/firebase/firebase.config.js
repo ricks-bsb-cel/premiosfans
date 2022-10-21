@@ -4,16 +4,7 @@ import { initializeApp } from 'firebase/app';
 
 const ngModule = angular.module('services.firebase.config', [])
 
-	.constant('firebaseConfig', {
-		apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
-		authDomain: "premios-fans.firebaseapp.com",
-		databaseURL: "https://premios-fans-default-rtdb.firebaseio.com",
-		projectId: "premios-fans",
-		storageBucket: "premios-fans.appspot.com",
-		messagingSenderId: "801994869227",
-		appId: "1:801994869227:web:188d640a390d22aa4831ae",
-		measurementId: "G-XTRQ740MSL"
-	})
+	.constant('firebaseConfig', JSON.parse(window.atob('eyJhcGlLZXkiOiJBSXphU3lDQVdsSlh6RXB0bDJUSjhKNENXZUJVYUExNW8taFNxU3MiLCJhdXRoRG9tYWluIjoicHJlbWlvcy1mYW5zLmZpcmViYXNlYXBwLmNvbSIsImRhdGFiYXNlVVJMIjoiaHR0cHM6Ly9wcmVtaW9zLWZhbnMtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tIiwicHJvamVjdElkIjoicHJlbWlvcy1mYW5zIiwic3RvcmFnZUJ1Y2tldCI6InByZW1pb3MtZmFucy5hcHBzcG90LmNvbSIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiODAxOTk0ODY5MjI3IiwiYXBwSWQiOiIxOjgwMTk5NDg2OTIyNzp3ZWI6MTg4ZDY0MGEzOTBkMjJhYTQ4MzFhZSIsIm1lYXN1cmVtZW50SWQiOiJHLVhUUlE3NDBNU0wifQ')))
 
 	.constant('firebaseErrorCodes',
 		[

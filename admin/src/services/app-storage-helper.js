@@ -8,8 +8,6 @@ const ngModule = angular.module('services.app-storage-helper', [])
 
 		const uploadFile = file => {
 
-			debugger;
-
 			const storage = getStorage();
 			const storageRef = ref(storage, 'some-child');
 
