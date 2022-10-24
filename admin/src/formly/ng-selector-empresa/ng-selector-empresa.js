@@ -13,10 +13,11 @@ const ngModule = angular.module('admin.formly.ng-selector-empresa', [])
                 $scope.ready = false;
                 $scope.data = [];
 
-                appAuthHelper.ready().then(_ => {
-                    $scope.data = appAuthHelper.profile.user.empresas;
-                    $scope.ready = true;
-                })
+                appAuthHelper.ready()
+                    .then(_ => {
+                        $scope.data = appAuthHelper.profile.user.empresas;
+                        $scope.ready = true;
+                    })
 
             }
         };

@@ -3,13 +3,13 @@ const admin = require("firebase-admin");
 const toDoc = value => {
     if (!value) { return null; }
 
-    if (value instanceof admin.firestore.QueryDocumentSnapshot) { // Firestore Snapshot
+    try {   
         if (!value.exists) {
             return null;
         }
         return Object.assign(value.data(), { id: value.id });
-    } else {
-        console.info('fbHelper toDoc unknow class:', value.constructor.name);
+    } catch (e) {
+        console.info('fbHelper toDoc unknow class');
         return null;
     }
 }
@@ -36,8 +36,7 @@ exports.toList = value => {
         return null;
     }
 
-    if (value instanceof admin.firestore.QuerySnapshot) { // Firestore Snapshot
-
+    try {
         if (value.empty) {
             return [];
         }
@@ -49,8 +48,8 @@ exports.toList = value => {
         })
 
         return result;
-    } else {
-        console.info('fbHelper toList unknow class:', value.constructor.name);
+    } catch (e) {
+        console.info('fbHelper toList: value is not a QuerySnapshot');
         return null;
     }
 }

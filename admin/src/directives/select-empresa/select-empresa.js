@@ -98,18 +98,22 @@ const ngModule = angular.module('directives.select.empresa', [])
 				});
 			}
 
-			appAuthHelper.ready().then(_ => {
-				$scope.empresas = appAuthHelper.profile.user.empresas;
-				$scope.idEmpresaAtual = appAuthHelper.profile.user.empresaAtual.id;
-				$scope.empresaAtual = $scope.empresas.filter(f => { return f.id === $scope.idEmpresaAtual });
+			appAuthHelper.ready()
+				.then(_ => {
+					$scope.empresas = appAuthHelper.profile.user.empresas || [];
+					$scope.idEmpresaAtual = appAuthHelper.profile.user.empresaAtual ? appAuthHelper.profile.user.empresaAtual.id : null;
 
-				if ($scope.empresaAtual.length) { $scope.empresaAtual = $scope.empresaAtual[0]; }
+					$scope.empresaAtual = $scope.empresas.filter(f => {
+						return f.id === $scope.idEmpresaAtual
+					});
 
-				angular.element(document.querySelector('#sidebar-content-wait')).hide();
-				angular.element(document.querySelector('#sidebar-content')).show();
+					if ($scope.empresaAtual.length) $scope.empresaAtual = $scope.empresaAtual[0];
 
-				$scope.ready = true;
-			})
+					angular.element(document.querySelector('#sidebar-content-wait')).hide();
+					angular.element(document.querySelector('#sidebar-content')).show();
+
+					$scope.ready = true;
+				})
 
 		})
 

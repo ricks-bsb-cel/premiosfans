@@ -15,7 +15,7 @@ exports.get = (request, response) => {
 
     const clearLogin = Object.keys(request.query).includes('clear');
 
-    users.getCurrentUserFromCookie(request, response)
+    return users.checkUserProfile(request, response)
 
         .then(user => {
             return adminController.getPermissions(user, request);

@@ -147,7 +147,6 @@ let ngModule = angular.module('factories.global', [])
 			}
 
 			const getSearchParams = function () {
-
 				var params = new $window.URLSearchParams($window.location.search);
 				var result = {};
 

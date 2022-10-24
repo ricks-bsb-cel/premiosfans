@@ -102,12 +102,15 @@ ngModule = angular.module('providers.path', [])
 				return self;
 			};
 
+			/*
 			if (!window.location.hash) {
 				if (window.location.pathname.startsWith('/adm/home')) {
 					const first = $("aside.main-sidebar .sidebar .nav li.nav-item:first a").attr('href');
+					debugger;
 					window.location.href = first;
 				}
 			}
+			*/
 
 		});
 

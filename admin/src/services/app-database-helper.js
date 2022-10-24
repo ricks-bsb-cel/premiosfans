@@ -40,20 +40,6 @@ const ngModule = angular.module('services.app-database-helper', [])
 						return reject(e);
 					});
 
-
-
-				/*
-				const db = appDatabase.database;
-				const ref = appDatabase.ref(db, path);
-
-				return appDatabase
-					.onValue(ref, data => {
-						return resolve(data.val());
-					}, {
-						onlyOnce: true
-					});
-				*/
-
 			})
 		}
 

@@ -2,6 +2,8 @@
 /* eslint-disable no-control-regex */
 /* eslint-disable no-extend-native */
 
+const { Timestamp } = require('firebase-admin/firestore');
+
 const admin = require("firebase-admin");
 const Handlebars = require("handlebars");
 const functions = require("firebase-functions");
@@ -207,7 +209,7 @@ const defaultResult = (parm, ignoreIdEmpresa) => {
 
         if (parm.error) { ignoreIdEmpresa = true; }
 
-        const dtHoje = admin.firestore.Timestamp.now();
+        const dtHoje = Timestamp.now();
 
         if (!parm.idEmpresa && !ignoreIdEmpresa) {
             throw new Error('O result deve ter idEmpresa na resposta...');
@@ -591,7 +593,7 @@ exports.setDateTime = (obj, prefixo, addValue, addType) => {
 
     obj[(prefixo || "inclusao") + "_js"] = hoje.unix();
     obj[(prefixo || "inclusao") + "_js_desc"] = 0 - hoje.unix();
-    obj[(prefixo || "inclusao") + "_timestamp"] = admin.firestore.Timestamp.fromDate(hoje.toDate());
+    obj[(prefixo || "inclusao") + "_timestamp"] = Timestamp.fromDate(hoje.toDate());
 }
 
 // End of Time... 
@@ -602,7 +604,7 @@ exports.setEndOfTime = (obj, prefixo) => {
 
     obj[prefixo + '_js'] = m.unix();
     obj[prefixo + '_js_desc'] = 0 - m.unix();
-    obj[prefixo + '_timestamp'] = admin.firestore.Timestamp.fromDate(m.toDate());
+    obj[prefixo + '_timestamp'] = Timestamp.fromDate(m.toDate());
 }
 
 
@@ -670,7 +672,7 @@ exports.asTimestampData = (unixValue, br) => {
 
     const momentDate = dateToMoment(unixValue, br);
 
-    return admin.firestore.Timestamp.fromDate(momentDate.toDate());
+    return Timestamp.fromDate(momentDate.toDate());
 }
 
 
@@ -1480,12 +1482,12 @@ exports.config = {
 
 
 exports.now = _ => {
-    return admin.firestore.Timestamp.now();
+    return Timestamp.now();
 }
 
 
 exports.nowMilliseconds = (addValue, addType) => {
-    let hoje = moment(admin.firestore.Timestamp.now().toDate());
+    let hoje = moment(Timestamp.now().toDate());
 
     if (addValue && addType) {
         hoje.add(addValue, addType || 'minutes');

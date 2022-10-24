@@ -23,22 +23,14 @@ const ngModule = angular.module('directives.loginBox', [])
 			$scope.login = null;
 
 			if (location.search.contains('clear')) {
-
 				appAuthHelper.signOut();
 
-				var redirect = window.location.origin + window.location.pathname;
-				
-				history.replaceState(null, document.title, redirect);
-				
-				$timeout(function () {
-					location.href = redirect;
-				}, 2000)
-				
 				return;
 			}
 
 			$scope.loginModel = {};
 			$scope.loginForm = null;
+
 			$scope.loginFields = [
 				{
 					key: 'email',

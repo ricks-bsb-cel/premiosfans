@@ -13,15 +13,16 @@ const ngModule = angular.module('directives.user-panel', [])
 			$scope.superUser = false;
 			$scope.ready = false;
 
-			appAuthHelper.ready().then(_ => {
-				$scope.userImg = appAuthHelper.user.photoURL || globalParms.logoImg;
-				$scope.userName = appAuthHelper.user.displayName || appAuthHelper.user.email;
-				$scope.email = appAuthHelper.user.email;
-				if (appAuthHelper.profile.user.superUser) {
-					$scope.superUser = true;
-				}
-				$scope.ready = true;
-			})
+			appAuthHelper.ready()
+				.then(_ => {
+					$scope.userImg = appAuthHelper.user.photoURL || globalParms.logoImg;
+					$scope.userName = appAuthHelper.user.displayName || appAuthHelper.user.email;
+					$scope.email = appAuthHelper.user.email;
+					if (appAuthHelper.profile.user.superUser) {
+						$scope.superUser = true;
+					}
+					$scope.ready = true;
+				})
 
 		}
 	)

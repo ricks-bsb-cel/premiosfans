@@ -7,10 +7,11 @@ const ngModule = angular.module('directives.main-footer', [])
 			appAuthHelper
 		) {
 			$scope.userProfile = null;
-			
-			appAuthHelper.ready().then(_ => {
-				$scope.userProfile = appAuthHelper.profile;
-			})
+
+			appAuthHelper.ready()
+				.then(_ => {
+					$scope.userProfile = appAuthHelper.profile;
+				})
 		}
 	)
 

@@ -137,18 +137,6 @@ const ngModule = angular.module('config', [apiUrls.name])
 		}
 	})
 
-	/*
-	.config(
-		function (
-			$routeProvider
-		) {
-			$routeProvider.otherwise({
-				// redirectTo: pathProvider.default().path
-			});
-		}
-	)
-	*/
-
 	.config( // https://morgul.github.io/ui-bootstrap4/#!#tooltip
 		function (
 			$uibTooltipProvider
@@ -165,15 +153,5 @@ const ngModule = angular.module('config', [apiUrls.name])
 	.config(['$qProvider', function ($qProvider) {
 		$qProvider.errorOnUnhandledRejections(false);
 	}]);
-
-/*
-.config(['$httpProvider', function ($httpProvider) {
-	debugger;
-	$httpProvider.defaults.useXDomain = true;
-	delete $httpProvider.defaults.headers.common['X-Requested-With'];
-}]);
-*/
-
-
 
 export default ngModule;

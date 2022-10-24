@@ -12,6 +12,7 @@ var run = function (
 
 	$rootScope.$on('$routeChangeStart', function (event, next) {
 		if (next.controller && window.location.pathname == '/adm/pages') {
+			debugger;
 			$location.path('/default');
 			event.preventDefault();
 		}

@@ -13,17 +13,13 @@ exports.get = (request, response) => {
 
     global.mapHandlebarDir(hbsPartials);
 
-    users.getCurrentUserFromCookie(request, response)
+    return users.checkUserProfile(request, response)
 
         .then(user => {
-            // Atualiza os dados do usuário em userProfile
-            users.checkUserProfile(user);
-
             return adminController.getPermissions(user, request);
         })
 
         .then(result => {
-
             if (result.redirect === '/adm/home') {
                 return response.render(hbsFile, result);
             } else {

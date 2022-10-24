@@ -45,44 +45,6 @@ api.post("/v1/empresa", (request, response) => {
     return initFirebase.call(require('./users').setEmpresaToUser, request, response);
 })
 
-// Novas API de contas
-
-api.get("/v1/account/user", (request, response) => {
-    const cartosRequests = require('../cartos/cartos.users.request');
-    return initFirebase.call(cartosRequests.requestGetCartosUser, request, response);
-})
-
-api.get("/v1/account/user/request-pubsub/refresh", (request, response) => {
-    const cartosRequests = require('../cartos/cartos.users.request');
-    return initFirebase.call(cartosRequests.requestGetCartosUser, request, response, { refresh: true });
-})
-
-api.post("/v1/account/user/init", (request, response) => {
-    const cartosRequests = require('../cartos/cartos.users.request');
-    return initFirebase.call(cartosRequests.requestInitCartosUser, request, response);
-})
-
-api.get("/v1/account/user/resend-email-code", (request, response) => {
-    const cartosRequests = require('../cartos/cartos.users.request');
-    return initFirebase.call(cartosRequests.requestResendEmailCode, request, response);
-})
-
-api.post("/v1/account/user/confirm-email-code", (request, response) => {
-    const cartosRequests = require('../cartos/cartos.users.request');
-    return initFirebase.call(cartosRequests.requestConfirmEmailCode, request, response);
-})
-
-
-api.post("/v1/account/pix/create", (request, response) => {
-    const requestsCall = require('../cartos/pix/pix.request');
-    return initFirebase.call(requestsCall.requestCreatePixKey, request, response);
-})
-
-api.get("/v1/account/pix/list/:idConta", (request, response) => {
-    const requestsCall = require('./users');
-    return initFirebase.call(requestsCall.account.getPixKeys, request, response);
-})
-
 
 // -- simple-signin ----------------
 api.post("/v1/ssin/check", (request, response) => {
@@ -101,13 +63,6 @@ api.post("/v1/ssin/validateToken", (request, response) => {
     return initFirebase.call(requestsCall.requestValidateSimpleSignData, request, response);
 })
 */
-
-
-// Atualizador de contas da Cartos no Zoepay
-api.get("/v1/account/user/check-cartos/:uid", (request, response) => {
-    const cartosRequests = require('../cartos/cartos.users.request');
-    return initFirebase.call(cartosRequests.requestCheckCartos, request, response);
-})
 
 // Chamado pelo pubsub!
 api.post("/v1/account/user/refresh/rtdb", (request, response) => {

@@ -49,7 +49,9 @@
             }
         ],
         "rewrites":[
-			{ "source": "/adm/**", "function": "mainAdm" }
+			{ "source": "/adm/**", "function": "mainAdm" },
+            { "source": "/api/auth/**", "function": "auth" },
+            { "source": "/api/users/**", "function": "users" }
         ]
     },
     "storage":{

@@ -1,6 +1,6 @@
 'use strict';
 
-import { Timestamp, getFirestore, FieldPath, query, collection, where, onSnapshot, limit, doc, getDoc, setDoc, addDoc, getDocs, orderBy, deleteDoc } from "firebase/firestore";
+import { Timestamp, getFirestore, query, collection, where, onSnapshot, limit, doc, getDoc, setDoc, addDoc, getDocs, orderBy, deleteDoc } from "firebase/firestore";
 
 const ngModule = angular.module('services.app-firestore', [])
 

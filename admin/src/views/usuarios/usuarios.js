@@ -28,7 +28,9 @@ const ngModule = angular.module('views.usuarios', [
 		$scope.showSearch = false;
 
 		$scope.edit = function (doc) {
+
 			collectionUserProfile.getEmpresas(doc.id, false)
+			
 				.then(perfis => {
 					doc.perfilEmpresas = [];
 
@@ -51,7 +53,6 @@ const ngModule = angular.module('views.usuarios', [
 
 				let attrFilter = {
 					filter: [
-						{ field: "canUseZoepayAdmin", operator: "==", value: true }
 					]
 				};
 				
@@ -71,12 +72,12 @@ const ngModule = angular.module('views.usuarios', [
 			.then(_ => {
 				if (!appAuthHelper.profile.user.superUser) {
 					$scope.collectionUserProfile.collection.startSnapshot({
-						filter: `idsEmpresas array-contains ${appAuthHelper.profile.user.idEmpresa}`,
 						orderBy: "displayName"
 					})
 				} else {
 					$scope.showSearch = true;
 				}
+
 				$scope.ready = true;
 			})
 

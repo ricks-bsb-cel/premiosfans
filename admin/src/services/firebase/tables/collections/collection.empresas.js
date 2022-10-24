@@ -4,11 +4,10 @@ const ngModule = angular.module('collection.empresas', [])
 
     .factory('collectionEmpresas', function (
         $q,
-        globalFactory,
         appAuthHelper,
-        appErrors,
         appFirestoreHelper,
-        appCollection
+        appCollection,
+        globalFactory
     ) {
 
         const attr = {
@@ -18,22 +17,37 @@ const ngModule = angular.module('collection.empresas', [])
 
         const firebaseCollection = new appCollection(attr);
 
-        const save = function (data) {
+        const save = data => {
 
-            debugger;
+            return $q((resolve, reject) => {
 
-            return $q(function (resolve, reject) {
+                let update = null, id = data.id || 'new';
 
                 appAuthHelper.ready()
+
                     .then(_ => {
 
-                        console.info(data);
+                        update = {
+                            ...data,
+                            keywords: globalFactory.generateKeywords(data.nome, data.cpfcnpj, data.celular, data.email)
+                        };
 
-                        return reject();
+                        if (id === 'new') update.dtInclusao = appFirestoreHelper.currentTimestamp();
 
+                        return firebaseCollection.addOrUpdateDoc(id, update);
+                    })
+
+                    .then(data => {
+                        return resolve(data);
+                    })
+
+                    .catch(e => {
+                        console.error(e);
+                        return reject(e);
                     })
 
             })
+
         }
 
         return {

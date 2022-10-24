@@ -1,6 +1,5 @@
 "use strict";
 
-// const admin = require("firebase-admin");
 const global = require('../global');
 const users = require('../api/users/users');
 const secret = require('../secretManager');
@@ -19,6 +18,7 @@ exports.getPermissions = (user, request) => {
             _config: {
                 v: version
             },
+            version: version
         };
 
         if (!user || !user.uid) {
@@ -58,15 +58,23 @@ exports.getPermissions = (user, request) => {
 
             .then(user => {
 
-                result = Object.assign(result, user);
+                result = {
+                    ...result,
+                    user: user.user,
+                    perfil: user.perfil
+                };
 
                 result._config.u = result.user.uid;
-                result._config.e = result.user.idEmpresa;
+                result._config.e = result.user.idEmpresa || null;
+
+                if (result.user.uid === users.idSuperUser) result.user.superUser = true;
 
                 if (result.user.superUser) {
                     result.redirect = '/adm/home';
                     result.dalAdmInterface = 'adm';
                 } else {
+                    result.redirect = '/adm/unauthorized';
+                    result.dalAdmInterface = 'empresaDefault';
 
                     if (result.user.idEmpresa || result.user.superUser) {
                         result.redirect = '/adm/home';
@@ -81,7 +89,6 @@ exports.getPermissions = (user, request) => {
             })
 
             .then(appProfile => {
-
                 result.appProfile = appProfile || {};
 
                 return global.config.get('/appProfile/' + host);
@@ -89,12 +96,6 @@ exports.getPermissions = (user, request) => {
 
             .then(appProfile => {
                 result.appProfile = Object.assign(result.appProfile, appProfile || {});
-
-                return secret.get("premios-fans-firebase-init");
-            })
-
-            .then(firebaseInit => {
-                console.info('***', firebaseInit);
 
                 return resolve(result);
             })

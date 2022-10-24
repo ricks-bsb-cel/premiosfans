@@ -21,15 +21,15 @@ ngModule = angular.module('view.empresas.edit', [])
 
             $ctrl.fields = [
                 {
-                    key: 'representante_cpf',
-                    type: 'cpf',
+                    key: 'cpfcnpj',
+                    type: 'cpfcnpj',
                     className: 'col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7',
                     templateOptions: {
-                        label: 'CPF',
+                        label: 'CPF/CNPJ',
                         type: 'text',
                         required: true
                     },
-                    ngModelElAttrs: { disabled: 'true' }
+                    // ngModelElAttrs: { disabled: 'true' }
                 },
                 {
                     key: 'nome',
@@ -44,9 +44,9 @@ ngModule = angular.module('view.empresas.edit', [])
                     className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
                 },
                 {
-                    key: 'nomeFantasia',
+                    key: 'nomeExibicao',
                     templateOptions: {
-                        label: 'Nome de Fantasia',
+                        label: 'Nome de Exibição',
                         type: 'text',
                         required: true,
                         minlength: 3,
@@ -77,8 +77,7 @@ ngModule = angular.module('view.empresas.edit', [])
                         required: true,
                         type: 'email'
                     },
-                    type: 'input',
-                    ngModelElAttrs: { disabled: 'true' }
+                    type: 'input'
                 },
                 {
                     key: 'celular',
@@ -87,15 +86,15 @@ ngModule = angular.module('view.empresas.edit', [])
                     templateOptions: {
                         label: 'Celular',
                         required: true
-                    },
-                    ngModelElAttrs: { disabled: 'true' }
+                    }
                 }
             ];
 
             $ctrl.ok = function () {
-                collectionEmpresas.save($ctrl.data).then(function () {
-                    $uibModalInstance.close($ctrl.data);
-                });
+                collectionEmpresas.save($ctrl.data)
+                    .then(function () {
+                        $uibModalInstance.close($ctrl.data);
+                    });
             };
 
             $ctrl.cancel = function () {

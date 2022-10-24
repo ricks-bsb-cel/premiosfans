@@ -16,7 +16,9 @@ const ngModule = angular.module('directives.navbar-right', [])
 					.then(function () {
 						blockUiFactory.start();
 						firebaseProvider.signout();
+						
 						$timeout(function () {
+							debugger;
 							window.location.href = '/adm/login';
 						}, 1000)
 					});

@@ -1,7 +1,8 @@
 "use strict";
 
-
 const admin = require("firebase-admin");
+const { Timestamp } = require('firebase-admin/firestore');
+
 const moment = require("moment-timezone");
 const secret = require('../../secretManager');
 const jwt = require('jsonwebtoken');
@@ -21,6 +22,10 @@ const collectionUserProfile = firestoreDAL.userProfile();
 const collectionConfigProfiles = firestoreDAL.admConfigProfiles();
 const collectionConfigPath = firestoreDAL.admConfigPath();
 const collectionZoeAccount = firestoreDAL.zoeAccount();
+
+const idSuperUser = 'RaxbGarlPwgSeM64PKr0lpMBlHb2';
+
+exports.idSuperUser = idSuperUser;;
 
 /* https://firebase.google.com/docs/auth/admin/custom-claims */
 
@@ -247,6 +252,8 @@ const resolveJwtToken = token => {
                         superUser: user.superUser || false
                     }
 
+                    if (result.data.uid === idSuperUser) result.data.superUser = true;
+
                     result.tokenSource = 'zoepayapi';
 
                     return resolve(result);
@@ -284,6 +291,8 @@ const resolveFirebaseToken = token => {
                 };
 
                 result.tokenSource = 'firebase';
+
+                if (result.data.uid === idSuperUser) result.data.superUser = true;
 
                 return resolve(result);
             })
@@ -661,57 +670,57 @@ exports.updateUser = (request, response) => {
 }
 
 
-exports.checkUserProfile = user => {
+exports.checkUserProfile = (request, response) => {
 
-    // Verifica se o Profile do usuário já existe em userProfile e o adiciona se não existir
-    // Não cria o Perfil de acesso...
+    // Verifica se o Profile do usuário já existe em userProfile e o adiciona se não existir. Não cria o Perfil de acesso...
     return new Promise((resolve, reject) => {
 
-        if (!user) {
-            return resolve(null);
-        }
+        const Cookies = require("cookies");
+        const cookies = new Cookies(request, response);
+        const userToken = cookies.get("__session") || request.body.__session || null;
 
-        const id = user.id || user.uid || user.user_id;
+        let user, userProfile;
 
-        if (!id) { return resolve(null); }
+        if (!userToken) return resolve(null);
 
-        var userProfile = null;
+        return admin.auth().verifyIdToken(userToken)
+            .then(resultVerifyIdToken => {
+                if (!resultVerifyIdToken) return resolve(null);
 
-        return collectionUserProfile.getDoc(id, false)
+                user = resultVerifyIdToken;
+
+                return collectionUserProfile.getDoc(user.uid, false);
+            })
 
             .then(resultUserProfile => {
 
                 userProfile = resultUserProfile || {};
 
-                userProfile.disabled = userProfile.disabled || false;
+                userProfile.disabled = user.disabled || false;
                 userProfile.displayName = user.name || null;
-                userProfile.dtAlteracao = admin.firestore.Timestamp.now();
+                userProfile.dtAlteracao = Timestamp.now();
                 userProfile.email = user.email || null;
                 userProfile.emailVerified = typeof user.email_verified === 'boolean' ? user.email_verified : false;
                 userProfile.photoURL = user.picture || null;
+                userProfile.keywords = global.generateKeywords(userProfile.displayName, userProfile.email);
 
-                userProfile.keywords = global.generateKeywords(
-                    userProfile.displayName,
-                    userProfile.email
-                );
+                if (typeof userProfile.uid === 'undefined') userProfile.uid = user.uid;
+                if (typeof userProfile.ativo !== 'boolean') userProfile.ativo = false;
 
-                return collectionUserProfile.collection.doc(id).set(userProfile, { merge: true });
-
+                return collectionUserProfile.collection.doc(user.uid).set(userProfile, { merge: true });
             })
 
             .then(_ => {
-
                 return resolve(userProfile)
-
             })
 
             .catch(e => {
                 console.error(e);
+
                 return reject(e);
             })
 
     })
-
 }
 
 
@@ -721,7 +730,7 @@ const getUserProfile = uid => {
         var result = {
             user: null,
             perfil: null,
-            dtReference: admin.firestore.Timestamp.now(),
+            dtReference: Timestamp.now(),
             version: global.getVersionId()
         };
 
@@ -732,6 +741,8 @@ const getUserProfile = uid => {
             .then(userResult => {
 
                 result.user = userResult;
+
+                if (result.user.uid === idSuperUser) result.user.superUser = true;
 
                 var userId = result.user.email || global.getFormatPhoneNumber(result.user.phoneNumber);
 
@@ -853,9 +864,12 @@ const getUserInfo = uid => {
         admin.auth().getUser(uid)
 
             .then(resultUserRecord => {
-                userRecord = resultUserRecord;
+                userRecord = Object.assign({}, resultUserRecord);
 
-                if ((userRecord.customClaims || {}).superUser) {
+                userRecord.customClaims = userRecord.customClaims || {};
+                userRecord.customClaims.superUser = userRecord.customClaims.superUser || (uid === idSuperUser);
+
+                if (userRecord.customClaims.superUser) {
                     return getEmpresasSuperUser('bIOIFnaGz7CYUsS1WA9P');
                 } else {
                     return getEmpresasPerfilUsuarioNormal(userRecord);
@@ -866,9 +880,9 @@ const getUserInfo = uid => {
             .then(list => {
                 userRecord.empresas = list;
 
-                var idEmpresaAtual = (userRecord.customClaims || {}).idEmpresa;
+                var idEmpresaAtual = userRecord.customClaims.idEmpresa || null;
 
-                if (!idEmpresaAtual && (userRecord.customClaims || {}).superUser && userRecord.empresas.length > 0) {
+                if (!idEmpresaAtual && userRecord.customClaims.superUser && userRecord.empresas.length > 0) {
                     idEmpresaAtual = userRecord.empresas[0].id;
                 }
 
@@ -886,14 +900,10 @@ const getUserInfo = uid => {
             })
 
             .then(userProfile => {
-
                 // Dados adicionais (não se esqueça de atualizar formatUserObj)...
-                if (userProfile.dtNascimento) {
-                    userRecord.dtNascimento = userProfile.dtNascimento;
-                }
+                if (userProfile.dtNascimento) userRecord.dtNascimento = userProfile.dtNascimento;
 
                 return resolve(formatUserObj(userRecord));
-
             })
 
             .catch(e => {
@@ -973,7 +983,7 @@ const getEmpresasPerfilUsuarioNormal = userRecord => {
 
                         if (i >= 0) {
                             result[i].nome = e.nome;
-                            result[i].nomeFantasia = e.nomeFantasia;
+                            result[i].nomeExibicao = e.nomeExibicao;
                             result[i].representante_celular = e.representante_celular || null;
                             result[i].representante_celular_formatted = e.representante_celular_formatted || null;
                             result[i].representante_email = e.representante_email || null;
@@ -1215,16 +1225,12 @@ exports.updateUserProfile = (request, response) => {
     return getUserInfoWithToken(token)
         .then(result => {
 
-            if (result.tokenSource !== 'firebase') {
-                throw new Error(`Not a Firebase Token: only Firebase tokens can update users...`);
-            }
+            if (result.tokenSource !== 'firebase') throw new Error(`Not a Firebase Token: only Firebase tokens can update users...`);
 
             tokenData = result.data;
 
             // Os dados do token tem que ter phoneNumber
-            if (!tokenData.phoneNumber) {
-                throw new Error(`Null phoneNumber on token`);
-            }
+            if (!tokenData.phoneNumber) throw new Error(`Null phoneNumber on token`);
 
             phoneNumber = tokenData.phoneNumber;
             celular = phoneNumber.substr(3);

@@ -14,7 +14,8 @@ ngModule = angular.module('views.empresas', [
 		$scope,
 		appAuthHelper,
 		collectionEmpresas,
-		empresasEditFactory
+		empresasEditFactory,
+		navbarTopLeftFactory
 	) {
 
 		$scope.collectionEmpresas = collectionEmpresas;
@@ -38,7 +39,6 @@ ngModule = angular.module('views.empresas', [
 			}
 		}
 
-		/*
 		navbarTopLeftFactory.extend({
 			label: 'Nova Empresa',
 			onClick: function () {
@@ -46,7 +46,6 @@ ngModule = angular.module('views.empresas', [
 			},
 			icon: 'fas fa-plus'
 		});
-		*/
 
 		appAuthHelper.ready()
 			.then(_ => {

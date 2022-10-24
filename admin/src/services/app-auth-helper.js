@@ -63,9 +63,10 @@ const ngModule = angular.module('services.app-auth-helper', [])
 						userProfile.user.empresaAtual.nome = globalFactory.capitalize(userProfile.user.empresaAtual.nome);
 					}
 
-					userProfile.user.empresas.forEach(e => {
-						e.nome = globalFactory.capitalize(e.nome);
-					})
+					if (userProfile.user.empresas)
+						userProfile.user.empresas.forEach(e => {
+							e.nome = globalFactory.capitalize(e.nome);
+						});
 
 					appConfig.initEmpresa(userProfile.user.idEmpresa);
 
@@ -171,7 +172,6 @@ const ngModule = angular.module('services.app-auth-helper', [])
 			appConfig.init(_ => {
 
 				appAuth.onAuthStateChanged(auth, user => {
-
 					currentUser = user;
 
 					if (!currentUser) {
@@ -189,7 +189,6 @@ const ngModule = angular.module('services.app-auth-helper', [])
 
 					loadUserProfile(user);
 					checkTokenChange();
-
 				})
 
 			});
@@ -244,12 +243,19 @@ const ngModule = angular.module('services.app-auth-helper', [])
 
 			$rootScope.showPermissionErrorMsgs = false;
 
-			appAuth.signOut(auth).then(() => {
-				clearSessions();
-				$window.location.reload();
-			}).catch(e => {
-				console.error(e);
-			});
+			appAuth.signOut(auth)
+
+				.then(() => {
+					clearSessions();
+
+					window.history.replaceState(null, document.title, window.location.origin + window.location.pathname);
+
+					$window.location.reload();
+				})
+
+				.catch(e => {
+					console.error(e);
+				});
 		}
 
 		const _ready = () => {
@@ -282,7 +288,7 @@ const ngModule = angular.module('services.app-auth-helper', [])
 			get profile() {
 				return userProfile;
 			},
-			
+
 			get token() {
 				return token();
 			}

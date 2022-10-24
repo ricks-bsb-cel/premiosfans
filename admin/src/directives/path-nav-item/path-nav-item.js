@@ -11,7 +11,6 @@ const ngModule = angular.module('directives.path-nav-item', [])
 
 			$scope.href = '#!' + path.getPath($scope.path);
 			$scope.label = path.getLabel($scope.path);
-
 		}
 	)
 
