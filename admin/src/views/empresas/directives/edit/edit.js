@@ -28,8 +28,7 @@ ngModule = angular.module('view.empresas.edit', [])
                         label: 'CPF/CNPJ',
                         type: 'text',
                         required: true
-                    },
-                    // ngModelElAttrs: { disabled: 'true' }
+                    }
                 },
                 {
                     key: 'nome',

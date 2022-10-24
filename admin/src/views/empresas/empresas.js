@@ -40,7 +40,7 @@ ngModule = angular.module('views.empresas', [
 		}
 
 		navbarTopLeftFactory.extend({
-			label: 'Nova Empresa',
+			label: 'Novo Influencer',
 			onClick: function () {
 				$scope.edit(null);
 			},
@@ -58,26 +58,6 @@ ngModule = angular.module('views.empresas', [
 				}
 
 			})
-
-
-
-
-		/*
-		firebaseService.registerListenersAuthStateChanged(profile => {
-			if (profile.user) {
-
-				$scope.user = profile.user;
-
-				if ($scope.user.superUser) {
-					$scope.collectionEmpresas.collection.getSnapshot();
-				} else {
-					$scope.collectionEmpresas.loadEmpresas(user);
-				}
-			}
-		})
-
-		firebaseService.init();
-		*/
 
 		$scope.$on('$destroy', function () {
 			$scope.collectionEmpresas.collection.destroySnapshot();

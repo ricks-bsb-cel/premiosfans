@@ -1,6 +1,6 @@
 <div class="modal-header">
     <h3 class="modal-title" id="modal-title">
-        {{$ctrl.data.nome || 'Inclusão de Empresa'}}
+        {{$ctrl.data.nome || 'Inclusão de Influencer'}}
     </h3>
 </div>
 <div class="modal-body" id="modal-body">
@@ -25,13 +25,6 @@
                     Contatos
                 </a>
             </li>
-            <!--
-            <li class="nav-item">
-                <a class="nav-link" id="tab-content-endereco-tab" data-toggle="pill" href="#tab-content-endereco" role="tab" aria-controls="tab-content-endereco" aria-selected="true">
-                    Endereço
-                </a>
-            </li>
-            -->
         </ul>
 
         <div class="tab-content" id="tab-cliente-content">
@@ -41,23 +34,8 @@
                     </formly-form>
                 </form>
             </div>
-            <!--
-            <div class="tab-pane fade show pt-2" id="tab-content-endereco" role="tabpanel" aria-labelledby="tab-content-endereco-tab">
-                <block-endereco
-                    model="$ctrl.data"
-                    prefixo="endereco_">
-                </block-endereco>
-            </div>
-            -->
         </div>
 
-        <!--
-        <hr />
-        
-        <block-transportadora-pagamento model="$ctrl.data"></block-transportadora-pagamento>
-        
-        <p style="line-height: 1em;"><small>* As chaves de acesso das transportadoras de pagamento são configuradas apenas pelo Super-Adm.</small></p>
-        -->
     </wait-overlay>
 
 </div>

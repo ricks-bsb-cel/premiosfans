@@ -5298,10 +5298,6 @@ search-filter {
 .adm-config-profiles .id-perfil input {
   font-family: monospace; }
 
-
-.api-config-edit-modal .id-api input {
-  font-family: monospace; }
-
 .clientes table .dt-alteracao {
   text-align: right; }
 
@@ -5383,55 +5379,6 @@ search-filter {
   padding: 0 5px 5px 55px; }
 
 
-
-
-.folha.importacao-funcionarios tr.is-invalid td {
-  background-color: rgba(255, 0, 0, 0.2); }
-
-.folha.importacao-funcionarios .invalid {
-  text-decoration: line-through;
-  color: #dc3545; }
-
-.folha.importacao-funcionarios .progress {
-  width: calc(100% - 150px); }
-
-.folha.importacao-funcionarios .custom-file-input {
-  position: initial;
-  z-index: initial; }
-
-.folha.importacao-funcionarios a.input-group-append {
-  cursor: pointer !important; }
-  .folha.importacao-funcionarios a.input-group-append .input-group-text {
-    cursor: pointer !important; }
-
-
-.block-contracheque table .coluna {
-  position: relative; }
-
-.block-contracheque table .descricao {
-  width: 280px; }
-
-.block-contracheque table .pos {
-  padding-top: 20px !important; }
-
-.block-contracheque table .custom-switch.obrigatorio {
-  zoom: 1.2;
-  position: absolute;
-  right: 10px;
-  top: 14px; }
-
-.block-contracheque table td.commands {
-  width: 120px;
-  text-align: right !important;
-  padding-top: 20px; }
-  .block-contracheque table td.commands a {
-    width: 30px;
-    padding: 0;
-    margin-left: 10px;
-    display: initial; }
-
-
-
 .global-config .card-footer {
   line-height: 16px; }
 
@@ -5466,17 +5413,6 @@ search-filter {
   height: 130px; }
 
 
-.transacoes .account-number {
-  font-size: 1.2em; }
-
-@media (min-width: 768px) {
-  .transacoes div.contas {
-    max-width: 240px !important;
-    min-width: 240px !important; }
-  .transacoes div.collection-data {
-    min-width: calc(100% - 240px) !important;
-    max-width: calc(100% - 240px) !important; } }
-
 .usuario-edit-modal .uid input, .usuario-edit-modal .api-key input {
   font-family: monospace; }
 
@@ -5498,22 +5434,6 @@ section.usuarios table .id {
 
 section.usuarios table .providers .badge {
   margin-right: 2px; }
-
-.vault-edit-modal .key input {
-  font-family: monospace; }
-
-.vault-edit-modal .tipo input {
-  font-family: monospace; }
-
-.vault-edit-modal .json textarea {
-  font-family: monospace;
-  height: 200px;
-  min-height: 200px;
-  max-height: 200px;
-  resize: none; }
-
-.zoe-accounts table .dt-alteracao {
-  text-align: right; }
 
 
 /*# sourceMappingURL=bundle.css.map*/
