@@ -1,0 +1,59 @@
+<section class="content influencers">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay ready="collectionEmpresas.collection.isReady()" class="container-fluid">
+        <div class="row" ng-if="collectionEmpresas.collection.data.length">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="nome">Nome</th>
+                                    <th class="nome-exibicao">Nome Exibição</th>
+                                    <th class="celular">Celular</th>
+                                    <th class="email">eMail</th>
+                                    <th class="ativa center">Ativa</th>
+                                    <th class="id right">ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="r in collectionEmpresas.collection.data">
+
+                                    <td class="nome-fantasia">
+                                        <a href="#" ng-click="edit(r)">
+                                            {{r.nome}}
+                                        </a>
+                                    </td>
+
+                                    <td class="celular">
+                                        {{r.nomeExibicao}}
+                                    </td>
+
+                                    <td class="celular">
+                                        {{r.celular_formatted}}
+                                    </td>
+
+                                    <td class="email">
+                                        {{r.email}}
+                                    </td>
+
+                                    <td class="ativa center">
+                                        <badge-true-false value="r.ativo"></badge-true-false>
+                                    </td>
+
+                                    <td class="id monospace right">
+                                        <small>
+                                            {{r.id}}
+                                        </small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

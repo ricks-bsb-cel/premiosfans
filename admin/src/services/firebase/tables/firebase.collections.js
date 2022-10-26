@@ -8,8 +8,12 @@ import collectionAdmConfigProfiles from './collections/collection.admConfigProfi
 import collectionsFormlySelector from './collections/collection.formlySelector';
 import collectionsPlanos from './collections/collection.planos';
 import collectionsUserProfile from './collections/collection.userProfile';
-import collectionsContratos from './collections/collection.contratos';
-import collectionsContratosProdutos from './collections/collection.contratosProdutos';
+
+import collectionsEmpresas from './collections/collection.empresas'; // Influencers
+
+import collectionsCampanhas from './collections/collection.campanhas';
+import collectionsCampanhasPremios from './collections/collection.campanhasPremios';
+
 import collectionsCobrancas from './collections/collection.cobrancas';
 import collectionsVault from './collections/collection.vault';
 import collectionsWebhooks from './collections/collection.webHook';
@@ -25,8 +29,6 @@ import collectionLancamentos from './collections/collection.lancamentos';
 
 import collectionEntidades from './collections/collection.entidades';
 
-// Substitui o:
-import collectionsEmpresas from './collections/collection.empresas';
 import collectionsClientes from './collections/collection.clientes';
 import collectionFuncionarios from './collections/collection.funcionarios';
 import collectionZoeAccounts from './collections/collection.zoeAccounts';
@@ -39,12 +41,14 @@ let ngModule = angular.module('firebase.collections', [
 	collectionAdmConfigProfiles.name,
 
 	collectionsEmpresas.name,
+
+	collectionsCampanhas.name,
+	collectionsCampanhasPremios.name,
+
 	collectionsClientes.name,
 	collectionsFormlySelector.name,
 	collectionsPlanos.name,
 	collectionsUserProfile.name,
-	collectionsContratos.name,
-	collectionsContratosProdutos.name,
 	collectionsCobrancas.name,
 	collectionsVault.name,
 	collectionsWebhooks.name,

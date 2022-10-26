@@ -5054,6 +5054,7 @@ image-gallery {
     padding: 0px 0px 0px 2px;
     border-radius: 50%; }
 
+
 .lancamentos-contrato .timeline .time-label span {
   width: 100px;
   text-align: center; }
@@ -5117,6 +5118,24 @@ footer.main-footer .email {
   font-size: 1.1em; }
 
 
+
+premios-campanha table td.vl-liquido {
+  width: 150px;
+  text-align: right; }
+
+premios-campanha table td.actions {
+  width: 125px;
+  padding-right: 5px;
+  padding-top: 22px; }
+  premios-campanha table td.actions a {
+    margin-right: 10px;
+    font-size: 1.2em; }
+  premios-campanha table td.actions a.disabled {
+    color: gray;
+    opacity: 0.5; }
+
+premios-campanha table input.right {
+  text-align: right; }
 
 produtos-selector table td.qtd {
   width: 70px;
@@ -5190,44 +5209,6 @@ search-filter {
   overflow: hidden !important;
   text-overflow: ellipsis; }
 
-.simulador-cobrancas table.produtos {
-  margin: 0px 0px 15px 59px;
-  width: calc(100% - 58px); }
-
-.simulador-cobrancas table {
-  table-layout: fixed; }
-  .simulador-cobrancas table td.number,
-  .simulador-cobrancas table th.number {
-    width: 60px;
-    text-align: center; }
-  .simulador-cobrancas table td.vencimento,
-  .simulador-cobrancas table th.vencimento {
-    text-align: right;
-    width: auto; }
-  .simulador-cobrancas table td.valor-total,
-  .simulador-cobrancas table th.valor-total {
-    width: 120px;
-    text-align: right;
-    min-width: 50px; }
-  .simulador-cobrancas table td.valor-produto,
-  .simulador-cobrancas table th.valor-produto {
-    width: 120px;
-    text-align: right;
-    padding-right: 12px; }
-  .simulador-cobrancas table td.descricao-produto,
-  .simulador-cobrancas table th.descricao-produto {
-    width: auto; }
-
-.simulador-cobrancas .pagination li {
-  width: 40px; }
-
-.simulador-cobrancas .pagination li a {
-  text-align: center; }
-
-.simulador-cobrancas .pagination li.selected a {
-  background-color: #007bff;
-  color: white; }
-
 .image-chooser-modal .slim {
   height: 1px;
   width: 1px;
@@ -5298,6 +5279,13 @@ search-filter {
 .adm-config-profiles .id-perfil input {
   font-family: monospace; }
 
+.campanhas-edit .obs textarea {
+  height: 124px;
+  resize: none; }
+
+.campanhas table .valor {
+  text-align: right; }
+
 .clientes table .dt-alteracao {
   text-align: right; }
 
@@ -5333,17 +5321,6 @@ search-filter {
 .conteudo-edit-modal .publico {
   margin-top: 40px;
   padding-left: 15px; }
-
-.contratos-edit .obs textarea {
-  height: 124px;
-  resize: none; }
-
-.contratos table .valor {
-  text-align: right; }
-
-.contratos-edit-modal .dt-vencimento {
-  width: 120px;
-  display: inline; }
 
 .dashboard-clientes-cobrancas td.valor {
   width: 100px; }

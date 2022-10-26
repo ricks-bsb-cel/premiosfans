@@ -29,7 +29,7 @@ const ngModule = angular.module('collection.empresas', [])
 
                         update = {
                             ...data,
-                            keywords: globalFactory.generateKeywords(data.nome, data.cpfcnpj, data.celular, data.email)
+                            keywords: globalFactory.generateKeywords(data.nome, data.cpfcnpj, data.celular, data.email, data.url)
                         };
 
                         if (id === 'new') update.dtInclusao = appFirestoreHelper.currentTimestamp();

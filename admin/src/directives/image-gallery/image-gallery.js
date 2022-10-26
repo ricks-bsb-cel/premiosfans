@@ -41,15 +41,19 @@ const ngModule = angular.module('directives.image-gallery', [])
 				if ($scope.ratio) { attrs.slimOptions.ratio = $scope.ratio; }
 				if ($scope.minSize) { attrs.slimOptions.minSize = $scope.minSize; }
 
-				imageChooserFactory.show(attrs).then(function (data) {
-					if (!$scope.model || $scope.model.constructor !== Array) {
-						$scope.model = [];
-					}
-					data.featured = $scope.model.length == 0;
-					$scope.model.push(data);
-				}).catch(function (e) {
-					console.error(e);
-				})
+				imageChooserFactory.show(attrs)
+				
+					.then(function (data) {
+						if (!$scope.model || $scope.model.constructor !== Array) {
+							$scope.model = [];
+						}
+						data.featured = $scope.model.length == 0;
+						$scope.model.push(data);
+					})
+					
+					.catch(function (e) {
+						console.error(e);
+					})
 			}
 
 		}

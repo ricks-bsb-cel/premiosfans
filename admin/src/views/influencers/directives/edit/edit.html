@@ -1,0 +1,45 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        {{$ctrl.data.nome || 'Inclusão de Influencer'}}
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+
+    <wait-overlay ready="$ctrl.ready">
+
+        <form novalidate>
+            <formly-form
+                class="row"
+                model="$ctrl.data"
+                fields="$ctrl.fields"
+                form="form"
+                novalidate
+            >
+            </formly-form>
+        </form>
+        
+
+        <ul class="nav nav-tabs" id="tab-cliente" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tab-content-contato-tab" data-toggle="pill" href="#tab-content-contato" role="tab" aria-controls="tab-content-contato" aria-selected="true">
+                    Contatos
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="tab-cliente-content">
+            <div class="tab-pane fade show active pt-2" id="tab-content-contato" role="tabpanel" aria-labelledby="tab-content-contato-tab">
+                <form novalidate>
+                    <formly-form class="row" model="$ctrl.data" fields="$ctrl.contatos" form="$ctrl.formContatos" novalidate>
+                    </formly-form>
+                </form>
+            </div>
+        </div>
+
+    </wait-overlay>
+
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Salvar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
+</div>

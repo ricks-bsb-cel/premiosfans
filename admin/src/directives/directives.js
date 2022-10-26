@@ -28,8 +28,8 @@ import blockTransportadoraPagamento from './block-transportadora-pagamento/block
 import firestoreReference from './firestore-reference/firestore-reference';
 import selectEmpresa from './select-empresa/select-empresa';
 import moeda from './moeda/moeda';
-import produtosSelector from './produtos-selector/produtos-selector';
-import simuladorCobrancas from './simulador-cobrancas/simulador-cobrancas';
+import premiosCampanha from './premios-campanha/premios-campanha';
+import influencersCampanha from './influencers-campanha/influencers-campanha';
 
 const ngModule = angular.module('directives', [
     loginBox.name,
@@ -62,8 +62,8 @@ const ngModule = angular.module('directives', [
     firestoreReference.name,
     selectEmpresa.name,
     moeda.name,
-    produtosSelector.name,
-    simuladorCobrancas.name
+    premiosCampanha.name,
+    influencersCampanha.name
 ]);
 
 export default ngModule;

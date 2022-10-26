@@ -21,14 +21,27 @@
 
         <ul class="nav nav-tabs" id="tab-cliente" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="tab-content-contato-tab" data-toggle="pill" href="#tab-content-contato" role="tab" aria-controls="tab-content-contato" aria-selected="true">
+                <a 
+                    class="nav-link active"
+                    id="tab-content-contato-tab"
+                    data-toggle="pill"
+                    href="#tab-content-contato"
+                    role="tab"
+                    aria-controls="tab-content-contato"
+                    aria-selected="true"
+                >
                     Contatos
                 </a>
             </li>
         </ul>
 
         <div class="tab-content" id="tab-cliente-content">
-            <div class="tab-pane fade show active pt-2" id="tab-content-contato" role="tabpanel" aria-labelledby="tab-content-contato-tab">
+            <div 
+                class="tab-pane fade show active pt-2"
+                id="tab-content-contato"
+                role="tabpanel"
+                aria-labelledby="tab-content-contato-tab"
+            >
                 <form novalidate>
                     <formly-form class="row" model="$ctrl.data" fields="$ctrl.contatos" form="$ctrl.formContatos" novalidate>
                     </formly-form>

@@ -1,0 +1,63 @@
+<section class="content campanhas-edit">
+
+    <search-filter title="title"></search-filter>
+
+    <wait-overlay ready="ready" class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="mr-1 {{titles.clientes.icon}}"></i>
+                            Dados Principais
+                        </h3>
+                    </div>
+
+                    <div class="card-body p-3">
+                        <form novalidate>
+                            <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.main.fields" form="forms.main.form" novalidate>
+                            </formly-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Faixa de Numeração
+                        </h3>
+                    </div>
+
+                    <div class="card-body p-3">
+                        <form novalidate>
+                            <formly-form ng-if="forms.faixa" class="row" model="campanha" fields="forms.faixa.fields" form="forms.faixa.form" novalidate>
+                            </formly-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <premios-campanha premios="campanha.premios">
+            </premios-campanha>
+
+            <influencers-campanha influencers="campanha.influencers">
+            </influencers-campanha>
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Imagens da Campanha
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <image-gallery model="campanha.images" ratio="0:0" size="0,0" min-size="512,512"></image-gallery>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </wait-overlay>
+</section>

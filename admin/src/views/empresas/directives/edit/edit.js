@@ -55,6 +55,18 @@ ngModule = angular.module('view.empresas.edit', [])
                     className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
                 },
                 {
+                    key: 'url',
+                    templateOptions: {
+                        label: 'URL',
+                        type: 'text',
+                        required: true,
+                        minlength: 3,
+                        maxlength: 64
+                    },
+                    type: 'input',
+                    className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
+                },
+                {
                     key: 'ativo',
                     className: 'col-12',
                     defaultValue: true,

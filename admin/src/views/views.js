@@ -5,8 +5,8 @@ import viewAdmConfigProfileEdit from './adm-config-profile-edit/adm-config-profi
 import viewDashboard from './dashboard/dashboard';
 import viewGlobalDashboard from './global-dashboard/global-dashboard';
 import viewPlanos from './planos/planos';
-import viewContratos from './contratos/contratos';
-import viewContratosEdit from './contratos-edit/contratos-edit';
+import viewCampanhas from './campanhas/campanhas';
+import viewCampanhasEdit from './campanhas-edit/campanhas-edit';
 import viewCobrancas from './cobrancas/cobrancas';
 import viewGlobalWhatsapp from './global-whatsapp/global-whatsapp';
 import viewMessagesReceived from './messagesReceived/messagesReceived';
@@ -20,6 +20,7 @@ import viewConteudo from './conteudo/conteudo';
 import viewProdutos from './produtos/produtos';
 
 import viewEmpresas from './empresas/empresas';
+import viewInfluencers from './influencers/influencers';	// Cópia da viewEmpresas
 import viewUsuarios from './usuarios/usuarios';
 import viewClientes from './clientes/clientes';
 
@@ -28,13 +29,20 @@ let ngModule = angular.module('views', [
 	viewAdmConfigProfiles.name,
 	viewAdmConfigProfileEdit.name,
 
+	viewEmpresas.name,
+	viewInfluencers.name,	// Cópia da viewEmpresas
+	viewUsuarios.name,
+
 	viewDashboard.name,
 	viewDashbardRH.name,
 	viewGlobalDashboard.name,
+
+	viewCampanhas.name,
+	viewCampanhasEdit.name,
+
+
 	viewPlanos.name,
-	viewContratos.name,
 	viewCobrancas.name,
-	viewContratosEdit.name,
 	viewGlobalWhatsapp.name,
 	viewMessagesReceived.name,
 	viewDashboardClientesCobrancas.name,
@@ -44,8 +52,6 @@ let ngModule = angular.module('views', [
 	viewConteudo.name,
 	viewProdutos.name,
 
-	viewEmpresas.name,
-	viewUsuarios.name,
 	viewClientes.name,
 	viewDashboardClientes.name
 ]);

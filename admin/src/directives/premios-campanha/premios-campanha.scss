@@ -1,0 +1,32 @@
+premios-campanha{
+
+    table{
+
+        td.vl-liquido{
+            width: 150px;
+            text-align: right;
+        }
+
+        td.actions{
+            width: 125px;
+            padding-right: 5px;
+            padding-top: 22px;
+
+            a{
+                margin-right: 10px;
+                font-size: 1.2em;
+            }
+
+            a.disabled{
+                color: gray;
+                opacity: 0.5;
+            }
+        }
+
+        input.right{
+            text-align: right;
+        }
+
+    }
+
+}

@@ -1,0 +1,96 @@
+<div class="card premios-campanha">
+    <div class="card-header">
+        <h3 class="card-title mt-1">
+            Prêmios da Campanha
+        </h3>
+        <div
+            class="card-tools"
+        >
+            <button
+                ng-click="add()"
+                type="button"
+                class="btn btn-block btn-primary btn-sm"
+            >
+                <i class="fas fa-plus mr-1"></i>
+                Adicionar
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-3">
+        <table
+            class="table produtos-selector table-striped"
+        >
+            <thead>
+                <tr>
+                    <th class="center" style="width:50px;">#</th>
+                    <th class="vl-liquido">Valor Líquido</th>
+                    <th class="descricao">Descrição</th>
+                    <th class="actions right"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="p in premios">
+                    <td class="center pt-4">
+                        {{$index + 1}}
+                    </td>
+
+                    <td class="pt-3 pb-3 vl-liquido">
+                        <input
+                            type="tel"
+                            ng-model="p.valor"
+                            class="form-control right"
+                            money-mask
+                            select-on-click
+                        >
+                    </td>
+
+                    <td class="pt-3 pb-3">
+                        <input
+                            ng-model="p.descricao"
+                            class="form-control"
+                            type="text"
+                        >
+                    </td>
+
+                    <td
+                        class="actions right"
+                    >
+                        <a 
+                            href="#"
+                            ng-click="up($index)"
+                            uib-popover="Mover para cima"
+                            ng-class="{
+                                'disabled':$first,
+                                'pointer-events':$first  ? 'none' : 'initial',
+                                'cursor':$first ? 'not-allowed' : 'pointer'
+                            }"
+                        >
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
+
+                        <a
+                            href="#"
+                            ng-click="down($index)"
+                            uib-popover="Mover para baixo"
+                            ng-class="{
+                                'disabled':$last,
+                                'pointer-events':$last ? 'none' : 'initial',
+                                'cursor':$last ? 'not-allowed' : 'pointer'
+                            }"
+                        >
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </a>
+
+                        <a
+                            href="#"
+                            ng-click="delete($index)"
+                            uib-popover="Excluir"
+                        >
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

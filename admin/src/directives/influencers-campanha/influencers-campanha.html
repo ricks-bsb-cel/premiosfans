@@ -1,0 +1,38 @@
+<div class="card influencers-campanha">
+    <div class="card-header">
+        <h3 class="card-title mt-1">
+            Influencers da Campanha
+        </h3>
+    </div>
+    <div class="card-body p-3">
+        <table class="table produtos-selector table-striped">
+            <thead>
+                <tr>
+                    <th class="center" style="width:50px;"></th>
+                    <th class="nome">Nome</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="influencers.length" ng-repeat="i in influencers">
+                    <td class="center pt-4">
+                        <div class="custom-control custom-checkbox pl-5">
+                            <input
+                                class="custom-control-input"
+                                type="checkbox"
+                                id="select-empresa-{{i.idInfluencer}}"
+                                ng-model="i.selected"
+                            >
+                            <label for="select-empresa-{{i.idInfluencer}}" class="custom-control-label"></label>
+                        </div>
+                    </td>
+
+                    <td class="nome pt-3 pb-3">
+                        <span class="form-control" style="background-color: #e9ecef;">
+                            {{i.nome}}
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
