@@ -19,7 +19,7 @@ import viewHtmlBlock from './html-block/html-block';
 import viewConteudo from './conteudo/conteudo';
 import viewProdutos from './produtos/produtos';
 
-import viewEmpresas from './empresas/empresas';
+// import viewEmpresas from './empresas/empresas';
 import viewInfluencers from './influencers/influencers';	// Cópia da viewEmpresas
 import viewUsuarios from './usuarios/usuarios';
 import viewClientes from './clientes/clientes';
@@ -29,7 +29,7 @@ let ngModule = angular.module('views', [
 	viewAdmConfigProfiles.name,
 	viewAdmConfigProfileEdit.name,
 
-	viewEmpresas.name,
+	// viewEmpresas.name,
 	viewInfluencers.name,	// Cópia da viewEmpresas
 	viewUsuarios.name,
 

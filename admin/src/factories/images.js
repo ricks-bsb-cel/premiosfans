@@ -9,9 +9,10 @@ ngModule = angular.module('factories.images', [])
 	.factory('imagesFactory',	// cloudinaryFactory
 
 		function (
+			cloudinaryConfig
 		) {
 
-			var cloudinaryUrl = 'https://res.cloudinary.com/ycard-app/image/upload/';
+			var cloudinaryUrl = cloudinaryConfig.imageUrl;
 
 			var process = function (imgUrl, type, height, width) {
 

@@ -110,7 +110,7 @@ const ngModule = angular.module('view.influencers.edit', [])
                     const modal = $uibModal.open({
                         windowClass: 'influencers-edit-modal',
                         templateUrl: 'influencers/directives/edit/edit.html',
-                        controller: 'influencers',
+                        controller: 'influencersEditController',
                         controllerAs: '$ctrl',
                         backdrop: false,
                         size: 'lg',

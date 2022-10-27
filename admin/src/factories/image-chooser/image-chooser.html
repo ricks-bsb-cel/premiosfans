@@ -1,16 +1,10 @@
 <div class="modal-header">
-    <h3 class="modal-title" id="modal-title">
-        Seleção de Imagens
-    </h3>
+    <h4 class="modal-title" id="modal-title">
+        Pesquise no Pexels ou faça upload da sua própria imagem
+    </h4>
 </div>
 
 <div class="modal-body" id="modal-body">
-
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-3">
-            <h4>Pesquise no Pexels ou faça upload da sua própria imagem!</h4>
-        </div>
-    </div>
 
     <div
         class="slim"
@@ -20,67 +14,20 @@
         <input type="file" name="slim[]" accept="image/*" style="display: none;" />
     </div>
 
-    <ul
-        class="nav nav-tabs"
-        id="tab-source"
-        role="tablist"
-    >
-        <li class="nav-item">
-            <a 
-                class="nav-link active"
-                id="tab-content-pexels-tab"
-                data-toggle="pill"
-                href="#tab-content-pexels"
-                role="tab"
-                aria-controls="tab-content-pexels"
-                aria-selected="true"
-            >
-                Pexels
-            </a>
-        </li>
-        <li class="nav-item">
-            <a
-                class="nav-link"
-                id="tab-content-upload-tab"
-                data-toggle="pill"
-                href="#tab-content-upload"
-                role="tab"
-                aria-controls="tab-content-upload"
-                aria-selected="true"
-            >
-                Upload
-            </a>
-        </li>
-    </ul>
-
-    <div class="tab-content" id="tab-source-content">
-
-        <div
-            class="tab-pane fade show active pt-2"
-            id="tab-content-pexels"
-            role="tabpanel"
-            aria-labelledby="tab-content-pexels-tab"
-        >
+    <uib-tabset active="activeJustified">
+        <uib-tab index="0" heading="Pexels">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mt-3">
                     <search-pexels delegate='$ctrl.searchPexelsDelegate'>
                     </search-pexels>
                 </div>
-            </div>	
-        </div>
-
-        <div
-            class="tab-pane fade pt-2"
-            id="tab-content-upload"
-            role="tabpanel"
-            aria-labelledby="tab-content-upload-tab"
-        >
+            </div>
+        </uib-tab>
+        <uib-tab index="1" heading="Upload">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mt-3">
                     <h3 class="my-3">Faça upload da sua própria imagem</h3>
-                    <p>
-                        Clique no botão abaixo para fazer upload da sua própria imagem ou tirar uma foto com sua camera.
-                    </p>
+                    <p>Clique no botão abaixo para fazer upload da sua própria imagem ou tirar uma foto com sua camera.</p>
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 mt-3">
                     <button ng-click="$ctrl.upload()" type="button" class="btn btn-primary btn-block">
@@ -88,10 +35,9 @@
                         Escolher Imagem
                     </button>
                 </div>
-            </div>	
-        </div>
-
-    </div>
+            </div>
+        </uib-tab>
+    </uib-tabset>
 
 </div>
 

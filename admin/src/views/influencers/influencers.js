@@ -14,7 +14,7 @@ ngModule = angular.module('views.influencers', [
 		$scope,
 		appAuthHelper,
 		collectionEmpresas,
-		empresasEditFactory,
+		influencersEditFactory,
 		navbarTopLeftFactory
 	) {
 
@@ -22,7 +22,7 @@ ngModule = angular.module('views.influencers', [
 		$scope.isSuperUser = false;
 
 		$scope.edit = function (e) {
-			empresasEditFactory.edit(e);
+			influencersEditFactory.edit(e);
 		}
 
 		$scope.filter = {

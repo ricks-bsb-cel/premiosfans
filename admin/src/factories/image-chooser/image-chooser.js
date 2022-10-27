@@ -26,7 +26,10 @@ let ngModule;
                 $ctrl.imageSrc = null;
 
                 $ctrl.parms.slimOptions = $ctrl.parms.slimOptions || {};
-                if (!$ctrl.parms.slimOptions.uploadPreset) { $ctrl.parms.slimOptions.uploadPreset = cloudinaryConfig.defaultUploadPreset };
+                
+                if (!$ctrl.parms.slimOptions.uploadPreset) {
+                    $ctrl.parms.slimOptions.uploadPreset = cloudinaryConfig.defaultUploadPreset;
+                };
 
                 $ctrl.searchPexelsDelegate = {
                     selected: function (img) {
@@ -49,7 +52,7 @@ let ngModule;
 
                     }
                 }
- 
+
                 $ctrl.cancel = function () {
                     $uibModalInstance.dismiss();
                 };

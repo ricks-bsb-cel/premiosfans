@@ -28,8 +28,10 @@ const ngModule = angular.module('config', [apiUrls.name])
 	})
 
 	.value('cloudinaryConfig', {
-		url: 'https://api.cloudinary.com/v1_1/ycard-app/upload',
-		defaultUploadPreset: 'zoepay'
+		url: 'https://api.cloudinary.com/v1_1/dckw5m2ep/upload',
+		imageUrl: 'https://res.cloudinary.com/dckw5m2ep/image/upload/',
+		defaultUploadPreset: 'premiosfans',
+		cloudName: 'dckw5m2ep'
 	})
 
 	.filter('unsafe', function ($sce) {

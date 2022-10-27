@@ -99,6 +99,7 @@ const ngModule = angular
 	)
 
 	.factory('formlyFactory', function (
+		cloudinaryConfig,
 		$timeout
 	) {
 
@@ -182,7 +183,7 @@ const ngModule = angular
 
 					// block.start();
 
-					var url = "https://api.cloudinary.com/v1_1/ycard-app/upload";
+					var url = cloudinaryConfig.url;
 					var xhr = new XMLHttpRequest();
 					var fd = new FormData();
 
