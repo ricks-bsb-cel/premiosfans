@@ -20,7 +20,9 @@ const init = _ => {
 		if (app) {
 			return resolve(app);
 		} else {
-			app = admin.initializeApp();
+			app = admin.initializeApp({
+				databaseURL: "https://premios-fans-default-rtdb.firebaseio.com"
+			});
 
 			return resolve(app);
 		}
