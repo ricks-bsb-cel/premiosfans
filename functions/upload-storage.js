@@ -20,8 +20,7 @@ let
     interval = null,
     lineTyping = null,
     running = false,
-    prodPathVersion,
-    prodPathId,
+    prodVersionConfig,
     totalUploaded,
     rl = readline.createInterface({
         input: process.stdin,
@@ -78,18 +77,11 @@ const uploadTemplates = env => {
     if (running) return;
 
     running = true;
-    prodPathId = prodVersion();
-    prodPathVersion = `storage/prod/${prodPathId}`
-
-    const storageConfig = {
-        id: prodPathId,
-        bucket: bucketName,
-        path: prodPathVersion
-    };
+    prodVersionConfig = getProdVersionConfig();
 
     if (env === 'prod') {
         console.clear();
-        console.info(`Uploading to Prod ~ Bucket ${bucketName} ~ Path: ${prodPathVersion}}`);
+        console.info(`Uploading to Prod ~ Bucket ${bucketName} ~ Path: ${prodVersionConfig.path}}`);
     }
 
     getFiles(env)
@@ -101,7 +93,10 @@ const uploadTemplates = env => {
             if (env === 'dev') {
                 return null;
             } else {
-                return admin.database().ref(`storageConfig`).set({ ...storageConfig, totalFiles: totalUploaded });
+                return admin.database().ref(`storageConfig/${prodVersionConfig.id}`).set({
+                    ...prodVersionConfig,
+                    totalFiles: totalUploaded
+                });
             }
         })
         .catch(e => {
@@ -179,7 +174,7 @@ const getFiles = env => {
                 ctimeMs: fileStat.ctimeMs
             };
 
-            file.destination = env === 'dev' ? `storage/dev/${d}` : `${prodPathVersion}/${d}`;
+            file.destination = env === 'dev' ? `storage/dev/${d}` : `${prodVersionConfig.path}/${d}`;
             file.upload = env === 'prod' || checkUpload(file);
 
             result.push(file);
@@ -211,7 +206,6 @@ const initInterval = _ => {
 
     interval = setInterval(function () {
         if (lineTyping != rl.line) {
-            // Evita que o builder seja disparado enquanto um comando está sendo digitado
             lineTyping = rl.line;
 
             if (interval) { clearInterval(interval); }
@@ -227,9 +221,16 @@ const initInterval = _ => {
     }, tInterval);
 }
 
-const prodVersion = _ => {
+const getProdVersionConfig = _ => {
     const hoje = moment().tz("America/Sao_Paulo");
-    return hoje.format("YYYY-MM-DD-HH-mm-ss");
+    const id = hoje.format("YYYY-MM-DD-HH-mm-ss");
+
+    return {
+        name: 'v ' + hoje.format("YYYY-MM-DD HH-mm-ss"),
+        id: id,
+        bucket: bucketName,
+        path: `storage/prod/${id}`
+    };
 }
 
 const showHelp = () => {

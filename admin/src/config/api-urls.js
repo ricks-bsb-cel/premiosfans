@@ -4,8 +4,6 @@ const endPoints = _ => {
 
 	let host = '';
 	
-	// host = 'https://zoepay-57t7prxj.uc.gateway.dev';
-
 	let result = {
 		apiConfig: host + '/api/v1/api-config',
 

@@ -1346,7 +1346,7 @@ exports.sendEmail = (emailDestino, idEmail, render, request) => {
                         'Content-Type': "application/json"
                     },
                     body: {
-                        fromAddress: 'Zoepay <' + config.fromAddress + '>',
+                        fromAddress: 'Premios Fans <' + config.fromAddress + '>',
                         toAddress: emailDestino,
                         bccAddress: 'ricks.bsb.cel@gmail.com',
                         subject: this.compile(content.assunto, render),

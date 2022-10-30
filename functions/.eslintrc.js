@@ -12,6 +12,6 @@ module.exports = {
 		"quotes": ["error", "double"],
 		"indent": [1, "tab"],
 		"no-tabs": 0,
-		"allowIndentationTabs": true,
+		"allowIndentationTabs": 0
 	},
 };

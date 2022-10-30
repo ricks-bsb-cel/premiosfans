@@ -6,7 +6,7 @@ const initFirebase = require('../initFirebase');
 
 // const serviceAccount = require("../zoepaygateway-firebase-adminsdk-70x9g-68bccb0435.json");
 
-const handlebarsRegisterHelpers = require('../handlebars/handlebarsRegisterHelpers');
+const handlebarsRegisterHelpers = require('../handlebarsRegisterHelpers');
 
 handlebarsRegisterHelpers.run();
 
