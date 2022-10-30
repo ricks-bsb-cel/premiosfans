@@ -15,7 +15,7 @@ const ngModule = angular.module('directives.dashboard-rh.block-funcionarios', []
 				},
 				{
 					label: "Importar Planilha",
-					help: "Autorize seus funcionários à abrir contas no Zoepay importando um planilhas do Excel."
+					help: "Autorize seus funcionários à abrir contas no Premios Fans importando um planilhas do Excel."
 				},
 				{
 					label: "Cadastrar Manualmente",

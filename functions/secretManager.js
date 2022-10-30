@@ -9,7 +9,6 @@ const parent = 'projects/801994869227';
 // https://www.npmjs.com/package/@google-cloud/secret-manager
 // https://github.com/googleapis/nodejs-secret-manager
 
-
 const get = (name, notFoundException) => {
     return new Promise((resolve, reject) => {
         try {
