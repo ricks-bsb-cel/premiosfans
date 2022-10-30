@@ -8,6 +8,14 @@ var production = false;
 
 console.info(`on ${production ? 'Production' : 'Dev'}...`);
 
+let sassOptions = {sourceMap: !production};
+
+if(production){
+	sassOptions.sassOptions= {
+		outputStyle: production ? 'compressed' : 'none'
+	};
+}
+
 const rules = [
 	{
 		test: /\.js$/,
@@ -82,12 +90,7 @@ const rules = [
 			},
 			{
 				loader: 'sass-loader',
-				options: {
-					sourceMap: !production,
-					sassOptions: {
-						outputStyle: production ? 'compressed' : 'nested'
-					}
-				}
+				options: sassOptions
 			}
 		]
 	},
