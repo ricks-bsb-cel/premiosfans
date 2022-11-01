@@ -715,9 +715,13 @@ exports.checkUserProfile = (request, response) => {
             })
 
             .catch(e => {
-                console.error(e);
+                if (e.code === 'auth/id-token-expired') {
+                    return resolve(null)
+                } else {
+                    console.error(e.code, e);
 
-                return reject(e);
+                    return reject(e);
+                }
             })
 
     })

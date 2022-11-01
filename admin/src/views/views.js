@@ -16,7 +16,6 @@ import viewDashbardRH from './dashboard-rh/dashboard-rh';
 import viewTemplates from './_templates_/_templates_';
 import viewGlobalConfig from './global-config/global-config';
 import viewHtmlBlock from './html-block/html-block';
-import viewConteudo from './conteudo/conteudo';
 import viewProdutos from './produtos/produtos';
 
 // import viewEmpresas from './empresas/empresas';
@@ -40,7 +39,6 @@ let ngModule = angular.module('views', [
 	viewCampanhas.name,
 	viewCampanhasEdit.name,
 
-
 	viewPlanos.name,
 	viewCobrancas.name,
 	viewGlobalWhatsapp.name,
@@ -49,7 +47,6 @@ let ngModule = angular.module('views', [
 	viewTemplates.name,
 	viewGlobalConfig.name,
 	viewHtmlBlock.name,
-	viewConteudo.name,
 	viewProdutos.name,
 
 	viewClientes.name,

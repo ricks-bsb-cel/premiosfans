@@ -4,13 +4,13 @@ const ngModule = angular.module('services.app-config', [])
 
 	.factory('appConfig', function (
 		globalFactory,
-		appDatabase
+		appDatabase,
+		appDatabaseHelper
 	) {
-
 		let globalConfig = null;
 
 		const _get = path => {
-			if (path.startsWith('/')) { 
+			if (path.startsWith('/')) {
 				path = path.substr(1);
 			}
 			path = globalFactory.replace(path, '.', '_');
@@ -19,38 +19,42 @@ const ngModule = angular.module('services.app-config', [])
 		}
 
 		const _init = callback => {
-			const db = appDatabase.database;
-			var ref = appDatabase.ref(db, 'globalConfig');
 
-			appDatabase.onValue(ref, data => {
-				globalConfig = data.val() || {};
-				callback();
-			}, {
-				onlyOnce: true
-			});
+			appDatabaseHelper.get('globalConfig')
+				.then(data => {
+					globalConfig = data;
+					callback();
+				})
+				.catch(e => {
+					console.error(e);
+				})
 		}
 
 		const _initEmpresa = idEmpresa => {
 
-			if (!idEmpresa) {
-				return;
-			}
+			if (!idEmpresa) return;
 
-			const db = appDatabase.database;
-			var ref = appDatabase.ref(db, 'configEmpresa/' + idEmpresa);
 
-			appDatabase.onValue(ref, data => {
-				globalConfig = angular.merge(globalConfig, data.val() || {});
-			}, {
-				onlyOnce: true
-			});
-
+			appDatabaseHelper.get('configEmpresa/' + idEmpresa)
+				.then(data => {
+					globalConfig = {
+						...globalConfig,
+						...data
+					}
+				})
+				.catch(e => {
+					console.error(e)
+				})
 		}
 
 		const appProfile = _ => {
-			var result = _get("/appProfile/default");
-			var host = _get("/appProfile/" + location.hostname);
-			return angular.merge(result, host);
+			const result = _get("/appProfile/default");
+			const host = _get("/appProfile/" + location.hostname);
+
+			return {
+				...result,
+				...host
+			}
 		}
 
 		return {
@@ -60,6 +64,6 @@ const ngModule = angular.module('services.app-config', [])
 			appProfile: appProfile
 		}
 
-	})
+	});
 
 export default ngModule;

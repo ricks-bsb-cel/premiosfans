@@ -28,8 +28,20 @@ app.use(minifyHTML({
 app.engine('hbs', engines.handlebars);
 app.set('view engine', 'hbs');
 
+// Busca por Template
+// Template main, que está em functions/storage/templates/main
+// Todo HTML do template fica em index.html
 app.get('/', (request, response) => {
-    initFirebase.call(require('./home').get, request, response);
+    request.params.dirFile1 = 'templates';
+    request.params.dirFile2 = 'main';
+    request.params.dirFile3 = 'index.html';
+
+    initFirebase.call(require('./home').getStorageFile, request, response);
+});
+
+
+app.get('/:dirFile1?/:dirFile2?/:dirFile3?/:dirFile4?/:dirFile5?', (request, response) => {
+    initFirebase.call(require('./home').getStorageFile, request, response);
 });
 
 exports.mainApp = app;

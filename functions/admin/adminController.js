@@ -41,6 +41,7 @@ exports.getPermissions = (user, request) => {
                 .then(firebaseInit => {
                     result.firebaseInit = JSON.stringify(firebaseInit);
                     result.firebaseInit = global.toBase64(result.firebaseInit);
+                    result.version = version;
 
                     return resolve(result);
                 })

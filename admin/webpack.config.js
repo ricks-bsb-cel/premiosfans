@@ -1,7 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const webpack = require('webpack');
 
 var production = false;
@@ -145,9 +144,6 @@ module.exports = [
 			}),
 			new MiniCssExtractPlugin({
 				filename: 'bundle.css'
-			}),
-			new MonacoWebpackPlugin({
-				languages: ['html']
 			})
 		],
 		module: {

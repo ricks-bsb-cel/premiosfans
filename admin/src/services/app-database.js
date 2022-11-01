@@ -9,7 +9,7 @@ const ngModule = angular.module('services.app-database', [])
 		let _database = null;
 
 		const init = app => {
-			_database = getDatabase(app);
+			_database = getDatabase();
 		}
 
 		return {

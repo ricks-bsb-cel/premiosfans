@@ -1,6 +1,5 @@
 const admin = require("firebase-admin");
-const { Storage } = require('@google-cloud/storage');
-const initFirebase = require("./initFirebase");
+
 const glob = require('glob')
 const path = require('path');
 const readline = require('readline');
@@ -10,9 +9,23 @@ const moment = require("moment-timezone");
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
+const serviceAccount = require("./premios-fans-firebase-adminsdk-ga8ql-fed7f24f67.json");
+
 const storagePath = path.join(__dirname, 'storage');
-const storage = new Storage();
 const bucketName = 'premios-fans.appspot.com';
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+
+    apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
+    authDomain: "premios-fans.firebaseapp.com",
+    databaseURL: "https://premios-fans-default-rtdb.firebaseio.com",
+    projectId: "premios-fans",
+    storageBucket: "premios-fans.appspot.com",
+    messagingSenderId: "801994869227",
+    appId: "1:801994869227:web:188d640a390d22aa4831ae",
+    measurementId: "G-XTRQ740MSL"
+});
 
 let
     lastResult,
@@ -69,7 +82,6 @@ const init = _ => {
 
     initInterval();
 }
-
 
 const uploadTemplates = env => {
     env = env || 'dev';
@@ -136,7 +148,7 @@ const uploadAllFiles = files => {
 
             console.info(`Uploading ${nextFile.destination}`);
 
-            storage.bucket(bucketName).upload(nextFile.source, options)
+            admin.storage().bucket(bucketName).upload(nextFile.source, options)
                 .then(_ => {
                     totalUploaded++;
 
@@ -243,4 +255,4 @@ const showHelp = () => {
     console.info();
 }
 
-initFirebase.call(init);
+init();

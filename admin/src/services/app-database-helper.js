@@ -7,14 +7,18 @@ const ngModule = angular.module('services.app-database-helper', [])
 		$q
 	) {
 
-		const _get = (path) => {
-			return $q(resolve => {
+		const _get = path => {
+			return $q((resolve, reject) => {
 				const db = appDatabase.database;
-				const ref = appDatabase.ref(db, path);
+				const ref = appDatabase.ref(db);
+				const query = appDatabase.child(ref, path);
 
-				appDatabase.get(ref)
+				appDatabase.get(query)
 					.then(data => {
-						resolve(data.val());
+						return resolve(data.val() || null);
+					})
+					.catch(e => {
+						return reject(e);
 					})
 			})
 		}

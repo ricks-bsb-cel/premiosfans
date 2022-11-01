@@ -1098,12 +1098,6 @@ exports.renderText = (text, data) => {
     return hbText(data);
 }
 
-
-exports.getHost = request => {
-    return getHost(request);
-}
-
-
 const getHost = request => {
     if (!request) return null;
     let result = null;
@@ -1121,6 +1115,7 @@ const getHost = request => {
     return result ? result.toLowerCase() : null;
 }
 
+exports.getHost = getHost;
 
 exports.localConsole = {
     info: function (request, msg) {
