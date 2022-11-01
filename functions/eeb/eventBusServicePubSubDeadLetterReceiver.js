@@ -15,15 +15,14 @@ const pubSubDeadLetterReceiver = (request, response) => {
             });
         }
 
-        let data = helper.base64ToJson(request.body.message.data) || {};
-        let attributes = request.body.message.attributes;
-
-        let parm = {
-            data: data,
-            attributes: attributes,
-            serviceId: attributes.serviceId,
-            method: attributes.method
-        };
+        const data = helper.base64ToJson(request.body.message.data) || {},
+            attributes = request.body.message.attributes,
+            parm = {
+                data: data,
+                attributes: attributes,
+                serviceId: attributes.serviceId,
+                method: attributes.method
+            };
 
         return collectionDeadLettering.add(parm)
             .then(_ => {

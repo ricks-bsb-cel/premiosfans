@@ -36,7 +36,8 @@ const getHost = request => {
 }
 
 const base64ToJson = data => {
-    var result = {}, messageData;
+    const result = {};
+    let messageData;
 
     if (!data) {
         return result;
@@ -56,7 +57,7 @@ const base64ToJson = data => {
 
 function writeLog(text, type, labels) {
 
-    let metadata = {
+    const metadata = {
         resource: { type: 'global' },
         severity: type || logType.info,
         labels: {
@@ -93,7 +94,7 @@ const getUserTokenFromRequest = (request, response) => {
     const Cookies = require("cookies");
     const cookies = new Cookies(request, response);
 
-    var token =
+    let token =
         request.headers['x-forwarded-authorization'] ||
         request.headers['authorization'] ||
         request.headers['token'] ||

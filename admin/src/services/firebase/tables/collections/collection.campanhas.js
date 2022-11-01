@@ -5,7 +5,6 @@ const ngModule = angular.module('collection.campanhas', [])
     .factory('collectionCampanhas', function (
         appCollection,
         appFirestoreHelper,
-        alertFactory,
         appAuthHelper,
         URLs,
         $http,
@@ -23,65 +22,58 @@ const ngModule = angular.module('collection.campanhas', [])
             return appFirestoreHelper.getDoc(attr.collection, id);
         }
 
-        const save = contrato => {
+        const save = campanha => {
 
             return $q((resolve, reject) => {
 
-                if (!contrato.idCliente) {
-                    alertFactory.error('Os dados do cliente devem ser informados.')
-                    return reject();
-                }
+                campanha = sanitizeCampanha(campanha);
 
-                // O código da empresa e userId serão carregados do token
-                let payload = {
-                    idCliente: contrato.idCliente,
-                    inicioContrato_mes: contrato.inicioContrato_mes,
-                    inicioContrato_ano: contrato.inicioContrato_ano,
-                    diaMesCobranca: contrato.diaMesCobranca,
-                    obs: contrato.obs,
-                    guidContrato: contrato.guidContrato,
-                    produtos: []
-                };
+                let id = campanha.id || 'new';
 
-                if (contrato.idContrato) payload.idContrato = contrato.idContrato;
-                if (contrato.codigoContrato) payload.codigoContrato = contrato.codigoContrato;
-                if (contrato.codigoContratoVersao) payload.codigoContratoVersao = contrato.codigoContratoVersao;
+                delete campanha.id;
 
+                firebaseCollection.addOrUpdateDoc(id, campanha)
 
-                contrato.produtos.forEach(p => {
-                    let produto = {
-                        guidProduto: p.guidProduto,
-                        idProduto: p.idProduto,
-                        tipoCobranca: p.tipo,
-                        valor: p.valor
-                    };
+                    .then(data => {
+                        return resolve(data);
+                    })
 
-                    if (p.tipo === 'pa') {
-                        produto.qtdParcelas = p.qtd;
-                    }
-
-                    payload.produtos.push(produto);
-                });
-
-                $http({
-                    url: URLs.contratos.save,
-                    method: 'post',
-                    data: payload,
-                    headers: {
-                        'Authorization': 'Bearer ' + appAuthHelper.token
-                    }
-                }).then(
-                    function (response) {
-                        return resolve(response);
-                    },
-                    function (e) {
-                        console.error(e);
+                    .catch(function (e) {
+                        appErrors.showError(e);
                         return reject(e);
-                    }
-                );
+                    })
 
             })
 
+        }
+
+        const sanitizeCampanha = campanha => {
+            campanha.influencers = campanha.influencers
+                .filter(f => { return f.selected; })
+                .map(i => {
+                    return {
+                        idInfluencer: i.idInfluencer
+                    }
+                });
+
+            campanha.premios = campanha.premios
+                .map(p => {
+                    return {
+                        guidPremio: p.guidPremio,
+                        descricao: p.descricao,
+                        valor: parseFloat(p.valor)
+                    }
+                });
+
+            if (campanha.id === 'new') {
+                campanha.uidInclusao = appAuthHelper.profile.user.uid;
+                campanha.dtInclusao = appFirestoreHelper.currentTimestamp();
+            }
+
+            campanha.uidAlteracao = appAuthHelper.profile.user.uid;
+            campanha.dtAlteracao = appFirestoreHelper.currentTimestamp();
+
+            return campanha;
         }
 
         return {

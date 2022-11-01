@@ -4,9 +4,6 @@ const admin = require('firebase-admin');
 const path = require('path');
 const global = require('../global');
 
-const hbsPath = path.join(__dirname, '/hbs');
-const hbsFile = path.join(hbsPath, '/home.hbs');
-
 const bucketName = 'premios-fans.appspot.com';
 
 exports.getStorageFile = (request, response) => {
@@ -78,8 +75,9 @@ exports.getStorageFile = (request, response) => {
 }
 
 const getParam = (request, name) => {
-    if (request.params && request.params[name])
+    if (request.params && request.params[name]) {
         return '/' + request.params[name];
-    else
+    } else {
         return '';
+    }
 }

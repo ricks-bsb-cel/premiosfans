@@ -1,7 +1,3 @@
-/* eslint-disable no-useless-escape */
-/* eslint-disable no-control-regex */
-/* eslint-disable no-extend-native */
-
 const { Timestamp } = require('firebase-admin/firestore');
 
 const admin = require("firebase-admin");
@@ -13,40 +9,37 @@ const path = require('path');
 const _ = require("lodash");
 const fs = require("fs");
 
+/*
 String.prototype.splitReplace = function (search, replacement) {
-    var target = this;
+    let target = this;
     return target.split(search).join(replacement);
 }
 
-
 String.prototype.replaceAll = function (search, replacement) {
-    var target = this;
+    let target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
-
 String.prototype.onlyNumbers = function () {
-    var target = this;
+    let target = this;
     if (target) { target = target.replace(/\D/g, ""); }
     return target;
 };
-
 
 String.prototype.isNumber = function () {
     return /^\d+$/.test(this);
 }
 
-
 String.prototype.between = function (min, max) {
-    var target = this;
+    let target = this;
     if (!target && min > 0) { return false; }
     target = target.trim();
     return target.length >= min && target.length <= max;
 }
-
+*/
 
 const newError = (msg, code, details) => {
-    let e = new Error(msg);
+    const e = new Error(msg);
     if (code) { e.code = code; }
     if (details) { e.details = details; }
     return e;
@@ -84,9 +77,10 @@ exports.verifyTokenFromRequest = request => {
 
     return new Promise((resolve, reject) => {
 
-        var apiConfig,
-            host = _.kebabCase(getHost(request) || null),
-            isGatewayCall = typeof request.headers['x-request-id'] !== 'undefined',
+        const host = _.kebabCase(getHost(request) || null),
+            isGatewayCall = typeof request.headers['x-request-id'] !== 'undefined';
+
+        let apiConfig,
             token = request.headers['x-forwarded-authorization'] ||
                 request.headers['authorization'] ||
                 request.headers['token'] ||
@@ -182,7 +176,7 @@ exports.getUserTokenFromRequest = (request, response) => {
     const Cookies = require("cookies");
     const cookies = new Cookies(request, response);
 
-    var token =
+    let token =
         request.headers['x-forwarded-authorization'] ||
         request.headers['authorization'] ||
         request.headers['token'] ||
@@ -215,7 +209,7 @@ const defaultResult = (parm, ignoreIdEmpresa) => {
             throw new Error('O result deve ter idEmpresa na resposta...');
         }
 
-        var result = {};
+        let result = {};
 
         if (parm.id) { result.id = parm.id; }
         if (parm.idEmpresa) { result.idEmpresa = parm.idEmpresa; }
@@ -327,11 +321,11 @@ exports.fromBase64 = value => {
 
 exports.getFrontRoutes = (version, fileVersion) => {
 
-    const f7Routes = require('./frontRoutes.json');
-    var result = [];
+    const f7Routes = require('./frontRoutes.json'),
+        result = [];
 
     f7Routes.forEach(route => {
-        var f = route;
+        const f = route;
 
         if (f.componentUrl) {
             f.componentUrl = f.componentUrl.replace('{{fileVersion}}', fileVersion);
@@ -404,7 +398,7 @@ exports.tryParseInt = (v, d) => {
 
     if (!v) { return d; }
 
-    var result;
+    let result;
 
     try {
         result = parseInt(v);
@@ -418,7 +412,7 @@ exports.tryParseInt = (v, d) => {
 
 
 const generatePassword = (attr) => {
-    var parms = {
+    let parms = {
         length: 7,
         capitalization: "lowercase",
         readable: true
@@ -443,71 +437,42 @@ const getVersionId = () => {
 
 const firstName = name => {
     if (!name) { return null; }
-    var pos = name.indexOf(' ');
+    const pos = name.indexOf(' ');
     if (pos < 0) { return name; }
     return name.substr(0, pos);
 }
 
-
 exports.firstName = name => { return firstName(name); }
+
 exports.primeiroNome = name => { return firstName(name); }
-
-
-exports.logError = (v1, v2, v3) => {
-
-    const logLineDetails = ((new Error().stack).split("at ")[2]).trim();
-    const fs = require('fs');
-    const file = path.join(__dirname, '/error.log');
-
-    var msg;
-
-    if (v1 && v2 && v3)
-        msg = ">>> ERROR ~ " + v1 + v2 + v3 + "\r\nfrom" + logLineDetails + "\r\n" + ("^ ").repeat(60) + "\r\n";
-    else if (v1 && v2)
-        msg = ">>> ERROR ~ " + v1 + v2 + "\r\nfrom" + logLineDetails + "\r\n" + ("^ ").repeat(60) + "\r\n";
-    else if (v1)
-        cmsg = ">>> ERROR ~ " + v1 + "\r\nfrom" + logLineDetails + "\r\n" + ("^ ").repeat(60) + "\r\n";
-    else
-        msg = ">>> ERROR ~ from" + logLineDetails + "\r\n" + ("^ ").repeat(60) + "\r\n";
-
-    console.error(msg);
-
-    fs.writeFile(file, msg, e => {
-        if (e) {
-            console.error(file, e);
-        } else {
-            console.info('Error writed to file ' + file);
-        }
-    });
-}
-
 
 const logInfo = (v1, v2, v3) => {
     // O LogInfo não lanca mensagens no log em produção
     if (!functions.config().version) {
         const logLineDetails = ((new Error().stack).split("at ")[2]).trim();
-        if (v1 && v2 && v3)
+        if (v1 && v2 && v3) {
             console.error("\r\n>>> info ~ ", v1, v2, v3, "\r\nfrom", logLineDetails, "\r\n");
-        else if (v1 && v2)
+        } else if (v1 && v2) {
             console.error("\r\n>>> info ~ ", v1, v2, "\r\nfrom", logLineDetails, "\r\n");
-        else if (v1)
+        } else if (v1) {
             console.error("\r\n>>> info ~ ", v1, "\r\nfrom", logLineDetails, "\r\n");
-        else
+        } else {
             console.error("\r\n>>> info ~ ", "\r\nfrom", logLineDetails, "\r\n");
+        }
     }
 }
-exports.logInfo = (v1, v2, v3) => { logInfo(v1, v2, v3); }
+
+exports.logInfo = logInfo;
 
 
-exports.hash = value => { return hash(value); }
 const hash = value => {
     const crypto = require("crypto");
     return crypto.createHash("md5").update(value).digest("hex");
 }
 
+exports.hash = hash;
 
 exports.booleanOrString = value => {
-    let result = value || null;
     if (value && typeof value === 'string' && value.toLowerCase() === 'true') { value = true; }
     if (value && typeof value === 'string' && value.toLowerCase() === 'false') { value = false; }
     return value;
@@ -515,7 +480,7 @@ exports.booleanOrString = value => {
 
 exports.shuffle = word => { return shuffle(word); }
 const shuffle = word => {
-    var shuffledWord = "";
+    let shuffledWord = "";
     word = word.split("");
     while (word.length > 0) {
         shuffledWord += word.splice(word.length * Math.random() << 0, 1);
@@ -539,28 +504,46 @@ exports.getContentTypeByExtension = pathFile => {
     const fileName = path.basename(pathFile)
     const extension = path.extname(fileName);
 
-    if (extension === ".ico")
-        result = "image/x-icon";
-    else if (extension === ".png")
-        result = "image/png";
-    else if (extension === ".svg")
-        result = "image/svg+xml";
-    else if (extension === ".jpg")
-        result = "image/jpeg";
-    else if (extension === ".js")
-        result = "application/javascript; charset=utf-8";
-    else if (extension === ".html")
-        result = "text/html; charset=utf-8";
-    else if (extension === ".css")
-        result = "text/css; charset=utf-8";
-    else if (extension === ".json")
-        result = "application/json; charset=utf-8";
+    switch (extension) {
+        case '.ico':
+            result = "image/x-icon";
+            break;
+
+        case '.png':
+            result = "image/png";
+            break;
+
+        case '.svg':
+            result = "image/svg+xml";
+            break;
+
+        case '.jpg':
+            result = "image/jpeg";
+            break;
+
+        case '.js':
+            result = "application/javascript; charset=utf-8";
+            break;
+
+        case '.html':
+            result = "text/html; charset=utf-8";
+            break;
+
+        case '.css':
+            result = "text/css; charset=utf-8";
+            break;
+
+        default:
+            result = null;
+
+    }
+
     return result;
 }
 
 
 exports.currentIp = request => {
-    let ips = request.headers['x-forwarded-for'] || request.connection.remoteAddress || request.socket.remoteAddress || (request.connection.socket ? request.connection.socket.remoteAddress : null);
+    const ips = request.headers['x-forwarded-for'] || request.connection.remoteAddress || request.socket.remoteAddress || (request.connection.socket ? request.connection.socket.remoteAddress : null);
     return (ips ? ips.split(",")[0] : null);
 }
 
@@ -596,7 +579,7 @@ exports.setDateTime = (obj, prefixo, addValue, addType) => {
     obj[(prefixo || "inclusao") + "_timestamp"] = Timestamp.fromDate(hoje.toDate());
 }
 
-// End of Time... 
+// End of Time...
 exports.setEndOfTime = (obj, prefixo) => {
     const m = moment({ year: 2222, month: 5, day: 29, hour: 18, minute: 15, second: 15 }).tz("America/Sao_Paulo");
 
@@ -615,7 +598,7 @@ const isValidDate = unixDate => {
         return false;
     }
 
-    let momentDate = moment(unixDate, 'YYYY-MM-DD'); // .tz("America/Sao_Paulo");
+    const momentDate = moment(unixDate, 'YYYY-MM-DD'); // .tz("America/Sao_Paulo");
     momentDate.hour(0).minute(0).second(0).millisecond(0);
 
     return momentDate.isValid() && momentDate.format("YYYY-MM-DD") === unixDate;
@@ -624,7 +607,7 @@ exports.isValidDate = isValidDate;
 
 
 const todayMoment = _ => {
-    let result = moment(); //.tz("America/Sao_Paulo");
+    const result = moment();
     result.hour(0).minute(0).second(0).millisecond(0);
     return result;
 }
@@ -639,7 +622,7 @@ const dateToMoment = (value, br) => {
         result = moment(value, 'YYYY-MM-DD').tz("America/Sao_Paulo");
         result.add('day', 1);
     } else {
-        result = moment(value, 'YYYY-MM-DD'); // .tz("America/Sao_Paulo");
+        result = moment(value, 'YYYY-MM-DD');
     }
 
     result.hour(0).minute(0).second(0).millisecond(0);
@@ -677,7 +660,7 @@ exports.asTimestampData = (unixValue, br) => {
 
 
 const getDtHoje = (prefixo) => {
-    let result = {};
+    const result = {};
     const hoje = moment().tz("America/Sao_Paulo");
     result[prefixo + "_js"] = hoje.unix();
     result[prefixo + "_js_desc"] = 0 - hoje.unix();
@@ -761,19 +744,19 @@ exports.isBoolean = value => {
 
 
 exports.compile = (txt, obj) => {
-    let template = Handlebars.compile(txt);
+    const template = Handlebars.compile(txt);
     return template(obj);
 }
 
 
 exports.imgUrlToWebp = imgUrl => {
-    var dot = imgUrl.lastIndexOf(".");
+    const dot = imgUrl.lastIndexOf(".");
     return imgUrl.substr(0, dot) + ".webp";
 }
 
 
 exports.imgUrlToJpeg = imgUrl => {
-    var dot = imgUrl.lastIndexOf(".");
+    const dot = imgUrl.lastIndexOf(".");
     return imgUrl.substr(0, dot) + ".jpeg";
 }
 
@@ -820,12 +803,12 @@ exports.convert = {
  * Retorna apenas os números de uma string
  */
 const numbersOnly = value => { if (!value) return null; return value.replace(/\D/g, ""); }
-exports.numbersOnly = value => { return numbersOnly(value); }
+exports.numbersOnly = numbersOnly;
 
 
 const hideEmail = value => {
     if (!value || value.indexOf("@") < 0) return null;
-    let parts = value.split("@");
+    const parts = value.split("@");
     return parts[0].substr(0, 1) + "*".repeat(parts[0].length - 2) + parts[0].substr(parts[0].length - 1) + "@" + parts[1];
 }
 exports.hideEmail = hideEmail;
@@ -860,7 +843,7 @@ exports.emailIsValid = emailIsValid;
 
 
 exports.urlIsValid = url => {
-    var r = new RegExp(/^(ftp|http|https):\/\/[^ "]+$/);
+    const r = new RegExp(/^(ftp|http|https):\/\/[^ "]+$/);
     return r.test(url);
 }
 
@@ -869,48 +852,20 @@ exports.urlIsValid = url => {
  */
 const isMobileNumber = value => {
     value = numbersOnly(value);
-    if (!value)
-        return false
-    else
+    if (!value) {
+        return false;
+    } else {
         return value.length === 11;
+    }
 }
 exports.isMobileNumber = value => { return isMobileNumber(value); }
-
-
-/**
- * Imagem aleatória de usuário
- */
-const randomUserImageUrl = (style) => {
-    const parms = {
-        "avatarStyle": ["Transparent"],
-        "topType": ["NoHair", "Eyepatch", "Hat", "Hijab", "Turban", "WinterHat1", "WinterHat2", "WinterHat3", "WinterHat4", "LongHairBigHair", "LongHairBob", "LongHairBun", "LongHairCurly", "LongHairCurvy", "LongHairDreads", "LongHairFrida", "LongHairFro", "LongHairFroBand", "LongHairNotTooLong", "LongHairShavedSides", "LongHairMiaWallace", "LongHairStraight", "LongHairStraight2", "LongHairStraightStrand", "ShortHairDreads01", "ShortHairDreads02", "ShortHairFrizzle", "ShortHairShaggyMullet", "ShortHairShortCurly", "ShortHairShortFlat", "ShortHairShortRound", "ShortHairShortWaved", "ShortHairSides", "ShortHairTheCaesar", "ShortHairTheCaesarSidePart"],
-        "accessoriesType": ["Blank", "Kurt", "Prescription01", "Prescription02", "Round", "Sunglasses", "Wayfarers"],
-        "hairColor": ["Auburn", "Black", "Blonde", "BlondeGolden", "Brown", "BrownDark", "PastelPink", "Platinum", "Red", "SilverGray"],
-        "facialHairType": ["Blank", "BeardMedium", "BeardLight", "BeardMagestic", "MoustacheFancy", "MoustacheMagnum"],
-        "facialHairColor": ["Auburn", "Black", "Blonde", "BlondeGolden", "Brown", "BrownDark", "Platinum", "Red"],
-        "clotheType": ["BlazerShirt", "BlazerSweater", "CollarSweater", "GraphicShirt", "Hoodie", "Overall", "ShirtCrewNeck", "ShirtScoopNeck", "ShirtVNeck"],
-        "clotheColor": ["Black", "Blue01", "Blue02", "Blue03", "Gray01", "Gray02", "Heather", "PastelBlue", "PastelGreen", "PastelOrange", "PastelRed", "PastelYellow", "Pink", "Red", "White"],
-        "eyeType": ["Close", "Cry", "Default", "Dizzy", "EyeRoll", "Happy", "Hearts", "Side", "Squint", "Surprised", "Wink", "WinkWacky"],
-        "eyebrowType": ["Default", "DefaultNatural", "FlatNatural", "RaisedExcited", "RaisedExcitedNatural", "SadConcerned", "SadConcernedNatural", "UnibrowNatural", "UpDown", "UpDownNatural"],
-        "mouthType": ["Default", "Eating", "Smile", "Tongue", "Twinkle"],
-        "skinColor": ["Tanned", "Yellow", "Pale", "Light", "Brown", "DarkBrown", "Black"]
-    }
-
-    if (style) parms.avatarStyle = [style];
-
-    let url = "https://avataaars.io/?";
-    _.forEach(parms, (p, t) => { url += t + "=" + p[Math.floor(Math.random() * p.length)] + "&"; })
-    return url;
-}
-exports.randomUserImageUrl = (style) => { return randomUserImageUrl(style); }
-
 
 /**
  * Formatador de número de telefone
  */
 const formatPhoneNumber = (value, ddd) => {
 
-    let result = { "success": true, "original": null, "number": null, "formated": null };
+    const result = { "success": true, "original": null, "number": null, "formated": null };
     if (!value) return result;
 
     if (value.substr(0, 1) === "+") value = value.substr(3);
@@ -962,7 +917,7 @@ exports.getFormatPhoneNumber = (value, ddd) => {
 
 
 const createEmailFromPhone = (phone, domain) => {
-    var phoneFormatted = formatPhoneNumber(phone).celularFormated;
+    const phoneFormatted = formatPhoneNumber(phone).celularFormated;
     return '55' + numbersOnly(phoneFormatted) + '@' + domain;
 }
 
@@ -970,7 +925,7 @@ exports.createEmailFromPhone = (phone, domain) => { return createEmailFromPhone(
 
 
 const createEmailFromCPFPhone = (cpf, phone, domain) => {
-    var phoneFormatted = formatPhoneNumber(phone).celularFormated;
+    const phoneFormatted = formatPhoneNumber(phone).celularFormated;
     return cpf + '-' + '55' + numbersOnly(phoneFormatted) + '@' + domain;
 }
 exports.createEmailFromCPFPhone = (cpf, phone, domain) => {
@@ -1183,8 +1138,7 @@ exports.leftZeros = (number, width) => {
     return String(number);
 }
 
-
-var defaultDiacriticsRemovalMap = [
+const defaultDiacriticsRemovalMap = [
     { 'base': 'A', 'letters': /[\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F]/g },
     { 'base': 'AA', 'letters': /[\uA732]/g },
     { 'base': 'AE', 'letters': /[\u00C6\u01FC\u01E2]/g },
@@ -1270,14 +1224,14 @@ var defaultDiacriticsRemovalMap = [
     { 'base': 'y', 'letters': /[\u0079\u24E8\uFF59\u1EF3\u00FD\u0177\u1EF9\u0233\u1E8F\u00FF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF]/g },
     { 'base': 'z', 'letters': /[\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763]/g }
 ];
-var changes;
+let changes;
 
 
 const removeDiacritics = str => {
     if (!changes) {
         changes = defaultDiacriticsRemovalMap;
     }
-    for (var i = 0; i < changes.length; i++) {
+    for (let i = 0; i < changes.length; i++) {
         str = str.replace(changes[i].letters, changes[i].base);
     }
     return str.toLowerCase();
@@ -1301,86 +1255,6 @@ exports.addModelLog = (modelName, aKeys, data) => {
     return path;
 
 }
-
-exports.sendEmail = (emailDestino, idEmail, render, request) => {
-
-    const host = request ? this.getHost(request) : 'get.ycard.app';
-
-    render = render || {};
-
-    return new Promise(resolve => {
-
-        if (host === 'localhost') {
-            emailDestino = 'ricks.bsb.cel@gmail.com';
-        }
-
-        // Carrega a configuração do Zoho
-        return admin.database().ref("/_config/zoho").once("value", config => {
-
-            if (!config.exists()) {
-                console.error('Zoho config do not exists...');
-                return resolve('Zoho config do not exists...');
-            }
-
-            config = config.val();
-
-            return admin.firestore().collection('base_emails').doc(idEmail).get().then(content => {
-
-                if (!content.exists) {
-                    console.error('idEmail [' + idEmail + '] do not exitst...');
-                    return resolve('idEmail [' + idEmail + '] do not exitst...');
-                }
-
-                content = content.data();
-
-                var options = {
-                    url: 'https://mail.zoho.com/api/accounts/' + config.accountId + '/messages',
-                    method: 'POST',
-                    headers: {
-                        Authorization: config.authorizationToken,
-                        'Content-Type': "application/json"
-                    },
-                    body: {
-                        fromAddress: 'Premios Fans <' + config.fromAddress + '>',
-                        toAddress: emailDestino,
-                        bccAddress: 'ricks.bsb.cel@gmail.com',
-                        subject: this.compile(content.assunto, render),
-                        content: this.compile(content.conteudo, render)
-                    },
-                    json: true
-                };
-
-                if (host === 'localhost') {
-                    return resolve('sendEmail on localhost [' + options.body.toAddress + ']');
-                } else {
-
-                    const req = require("request");
-
-                    return req(options, (e, response, body) => {
-                        if (e) {
-                            console.error(e);
-                            return resolve(e);
-                        } else {
-                            return resolve('Email enviado para ' + emailDestino);
-                        }
-                    });
-                }
-
-            }).catch(e => {
-                console.error(e);
-                return resolve(e);
-            })
-
-        }).catch(e => {
-            console.error(e);
-            return resolve(e);
-        })
-
-    })
-}
-
-//  https://sms.comtele.com.br/
-//  ricks.bsb.cel@gmail.com:41a45d52
 
 exports.sendSms = (id, attr, request) => {
     const host = (typeof request === 'boolean' && request ? 'forcesend' : this.getHost(request));
@@ -1424,8 +1298,9 @@ exports.sendSms = (id, attr, request) => {
 
 exports.generateKeywords = function (v1, v2, v3, v4, v5, v6, v7) {
 
-    var results = [];
-    var values = [];
+    const results = [];
+
+    let values = [];
 
     const addValue = v => {
         if (v) {
@@ -1445,7 +1320,7 @@ exports.generateKeywords = function (v1, v2, v3, v4, v5, v6, v7) {
     values.forEach(v => {
         v = removeDiacritics(v);
         for (let i = 3; i <= v.length && i <= 12; i++) {
-            var value = v.substr(0, i).trim();
+            const value = v.substr(0, i).trim();
             if (!results.includes(value)) {
                 results.push(value);
             }
@@ -1482,7 +1357,7 @@ exports.now = _ => {
 
 
 exports.nowMilliseconds = (addValue, addType) => {
-    let hoje = moment(Timestamp.now().toDate());
+    const hoje = moment(Timestamp.now().toDate());
 
     if (addValue && addType) {
         hoje.add(addValue, addType || 'minutes');
@@ -1493,31 +1368,30 @@ exports.nowMilliseconds = (addValue, addType) => {
 
 
 exports.guid = _ => {
-    var d = new Date().getTime(); //Timestamp
-    var d2 = (performance && performance.now && (performance.now() * 1000)) || 0; //Time in microseconds since page-load or 0 if unsupported
+    let d = new Date().getTime(); // Timestamp
+    let d2 = (performance && performance.now && (performance.now() * 1000)) || 0; // Time in microseconds since page-load or 0 if unsupported
 
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        var r = Math.random() * 16; //random number between 0 and 16
-        if (d > 0) { //Use timestamp until depleted
+        let r = Math.random() * 16; // random number between 0 and 16
+        if (d > 0) { // Use timestamp until depleted
             r = (d + r) % 16 | 0;
             d = Math.floor(d / 16);
-        } else { //Use microseconds since page-load if supported
+        } else { // Use microseconds since page-load if supported
             r = (d2 + r) % 16 | 0;
             d2 = Math.floor(d2 / 16);
         }
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
-
 };
 
 
 exports.isCPFValido = cpf => {
 
-    if (typeof cpf !== "string") { return false; }
+    if (typeof cpf !== "string") return false;
 
     cpf = cpf.replace(/[\s.-]*/igm, '')
 
-    var invalid = [];
+    const invalid = [];
 
     for (let i = 0; i <= 9; i++) {
         invalid.push(i.toString().repeat(11));
@@ -1527,7 +1401,7 @@ exports.isCPFValido = cpf => {
         return false
     }
 
-    var soma = 0, resto, i;
+    let soma = 0, resto, i;
 
     for (i = 1; i <= 9; i++) {
         soma = soma + parseInt(cpf.substring(i - 1, i)) * (11 - i);
@@ -1561,10 +1435,13 @@ exports.isCNPJValido = cnpj => {
 
     cnpj = cnpj.replace(/[^\d]+/g, '');
 
-    if (cnpj === '') return false;
+    if (cnpj === '' || cnpj.length !== 14) return false;
 
-    if (cnpj.length !== 14)
-        return false;
+    let soma,
+        pos,
+        tamanho,
+        numeros,
+        resultado;
 
     // Elimina CNPJs invalidos conhecidos
     if (cnpj === "00000000000000" ||
@@ -1582,41 +1459,36 @@ exports.isCNPJValido = cnpj => {
     }
 
     // Valida DVs
+    const digitos = cnpj.substring(tamanho);
+
     tamanho = cnpj.length - 2;
     numeros = cnpj.substring(0, tamanho);
-    digitos = cnpj.substring(tamanho);
     soma = 0;
     pos = tamanho - 7;
 
-    for (i = tamanho; i >= 1; i--) {
+    for (let i = tamanho; i >= 1; i--) {
         soma += numeros.charAt(tamanho - i) * pos--;
-        if (pos < 2)
-            pos = 9;
+        if (pos < 2) pos = 9;
     }
 
     resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
 
-    if (parseInt(resultado) !== parseInt(digitos.charAt(0))) {
-        return false;
-    }
+    if (parseInt(resultado) !== parseInt(digitos.charAt(0))) return false;
 
     tamanho = tamanho + 1;
     numeros = cnpj.substring(0, tamanho);
     soma = 0;
     pos = tamanho - 7;
 
-    for (i = tamanho; i >= 1; i--) {
+    for (let i = tamanho; i >= 1; i--) {
         soma += numeros.charAt(tamanho - i) * pos--;
-        if (pos < 2) {
-            pos = 9;
-        }
+        if (pos < 2) pos = 9;
+
     }
 
     resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
 
-    if (parseInt(resultado) !== parseInt(digitos.charAt(1))) {
-        return false;
-    }
+    if (parseInt(resultado) !== parseInt(digitos.charAt(1))) return false;
 
     return true;
 
@@ -1624,11 +1496,10 @@ exports.isCNPJValido = cnpj => {
 
 
 exports.base64ToJson = data => {
-    var result = {}, messageData;
+    const result = {};
+    let messageData;
 
-    if (!data) {
-        return result;
-    }
+    if (!data) return result;
 
     try {
         messageData = Buffer.from(data, 'base64').toString('utf-8');
@@ -1644,9 +1515,10 @@ exports.base64ToJson = data => {
 
 exports.calcDtVencimento = (dia, mes, ano, addMonths) => {
 
+    const dtRef = moment({ year: ano, month: mes - 1, day: 1, hour: 3, minute: 0, second: 0, millisecond: 0 }).tz("America/Sao_Paulo");
+
     let dtVencimento,
-        d = parseInt(dia),
-        dtRef = moment({ year: ano, month: mes - 1, day: 1, hour: 3, minute: 0, second: 0, millisecond: 0 }).tz("America/Sao_Paulo");
+        d = parseInt(dia);
 
     dtRef.add(addMonths, 'month');
 
@@ -1670,7 +1542,7 @@ const log = logging.log('premiosfansbackend');
 
 async function writeLog(text, severity, labels) {
 
-    let metadata = {
+    const metadata = {
         resource: {
             type: 'global'
         },

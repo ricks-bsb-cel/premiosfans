@@ -17,7 +17,7 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let toAdd = {
+            const toAdd = {
                 data: this.parm.data,
                 attributes: this.parm.attributes,
                 method: this.parm.method,
@@ -44,7 +44,7 @@ exports.Service = Service;
 
 exports.call = (request, response) => {
 
-    let parm = {
+    const parm = {
         name: 'webhook',
         noAuth: true,
         async: request.query.async ? request.query.async === 'true' : true,

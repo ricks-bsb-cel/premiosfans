@@ -2,20 +2,6 @@
 
 import config from './campanhas-edit.config';
 
-/*
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-Everything everything everything everything everything everything everything everything everything everything everything everything 
-*/
-
 const ngModule = angular.module('views.contratos-edit', [
 ])
 
@@ -41,7 +27,9 @@ const ngModule = angular.module('views.contratos-edit', [
 		$scope.ready = false;
 		$scope.title = $scope.idCampanha ? "Edição de Campanha" : "Inclusão de Campanha";
 
-		$scope.campanha = {};
+		$scope.campanha = {
+			id: $scope.idCampanha
+		};
 
 		$scope.forms = {
 			main: null,
@@ -50,9 +38,10 @@ const ngModule = angular.module('views.contratos-edit', [
 
 		const save = _ => {
 
+			if (typeof $scope.campanha.ativo === 'undefined') $scope.campanha.ativo = false;
+
 			console.info($scope.campanha);
 
-			/*
 			blockUiFactory.start();
 
 			collectionCampanhas.save($scope.campanha)
@@ -64,7 +53,7 @@ const ngModule = angular.module('views.contratos-edit', [
 					blockUiFactory.stop();
 					toastrFactory.error(e.data.error);
 				})
-			*/
+
 		}
 
 		const showNavbar = _ => {
@@ -100,18 +89,7 @@ const ngModule = angular.module('views.contratos-edit', [
 								maxlength: 64
 							},
 							type: 'input',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-9 col-xl-9'
-						},
-						{
-							key: 'ativo',
-							className: 'col-12',
-							defaultValue: false,
-							templateOptions: {
-								title: 'Ativa',
-								required: true
-							},
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 pt-4 mt-3 pl-3',
-							type: 'custom-checkbox'
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
 						{
 							key: 'dtSorteio',
@@ -120,7 +98,7 @@ const ngModule = angular.module('views.contratos-edit', [
 								required: true
 							},
 							type: 'data',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3'
+							className: 'col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-8'
 						},
 						{
 							key: 'url',
@@ -129,7 +107,7 @@ const ngModule = angular.module('views.contratos-edit', [
 								required: true
 							},
 							type: 'input',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-9 col-xl-9'
+							className: 'col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8'
 						}
 					],
 					form: null
@@ -165,7 +143,7 @@ const ngModule = angular.module('views.contratos-edit', [
 		const loadCampanha = idCampanha => {
 			collectionCampanhas.getById(idCampanha)
 				.then(result => {
-					$scope.campanha = angular.copy(result);
+					$scope.campanha = { ...result };
 
 					showNavbar();
 

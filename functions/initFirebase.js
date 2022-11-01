@@ -1,6 +1,6 @@
 const admin = require("firebase-admin");
 
-var app = null;
+let app = null;
 
 exports.call = (f, request, response, parm) => {
 	parm = parm || {};

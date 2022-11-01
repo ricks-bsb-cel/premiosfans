@@ -8,6 +8,14 @@ let ngModule = angular.module('directives.influencers-campanha', [])
             appAuthHelper
         ) {
 
+            $scope.addAll = _ => {
+
+            }
+
+            $scope.removeAll = _ => {
+
+            }
+
             appAuthHelper.ready()
                 .then(_ => {
                     $scope.influencers = $scope.influencers || [];

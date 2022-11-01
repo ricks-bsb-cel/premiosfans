@@ -6,10 +6,10 @@ const users = require('./users');
 
 exports.requestMergeUserProfileWithUserData = (request, response) => {
 
-    var uid = request.params.uid || null;
+    const uid = request.params.uid || null;
 
     if (!uid) {
-        return response.status(e.code || 500).json(
+        return response.status(500).json(
             global.defaultResult({ code: 500, error: 'uid not found' }, true)
         );
     }

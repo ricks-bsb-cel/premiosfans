@@ -18,7 +18,7 @@ const pubSubClient = new PubSub({ apiEndpoint: pubSubRegion });
 */
 const pubSubClient = new PubSub();
 
-var topicsCache = [];
+const topicsCache = [];
 
 /*
 O eventBusService é um "envelope" de disparo de métodos utilizando o PubSub
@@ -139,9 +139,9 @@ class eventBusService {
                     }
 
                     // Dispara de acordo com o o tipo.
-                    if (this.parm.async) {  // Async... envia para o Pub/Sub
+                    if (this.parm.async) { // Async... envia para o Pub/Sub
                         return this._startPublish();
-                    } else {                // Sync... executa imediatamente
+                    } else { // Sync... executa imediatamente
                         return this._startRun();
                     }
 
@@ -176,8 +176,7 @@ class eventBusService {
     publish() {
         return new Promise((resolve, reject) => {
 
-            //#region * Payload preparation...
-            let publishData = {
+            const publishData = {
                 data: this.parm.data ? Buffer.from(JSON.stringify(this.parm.data), 'utf8') : null,
                 attributes: Object.assign(
                     {
@@ -200,11 +199,10 @@ class eventBusService {
                 }
             });
 
-            // Se houver idEmpresa em data, adiciona attributes 
+            // Se houver idEmpresa em data, adiciona attributes
             if (this.parm.data && this.parm.data.idEmpresa) {
                 publishData.attributes.idEmpresa = this.parm.data.idEmpresa;
             }
-            //#endregion
 
             const topic = this.getTopic();
 
@@ -229,10 +227,10 @@ class eventBusService {
                         console.info(`Topic ${this.parm.topic} not found. Creating...`);
 
                         return createTopic(
-                            this.parm.topic,                // Nome do tópico
-                            this.parm.topicSubscription,    // Nome da Subscrição do Tópico
-                            this.parm.method,               // Método (utilizado no post da Subscrição)
-                            this.parm.ordered               // Se está ordenado ou não
+                            this.parm.topic, // Nome do tópico
+                            this.parm.topicSubscription, // Nome da Subscrição do Tópico
+                            this.parm.method, // Método (utilizado no post da Subscrição)
+                            this.parm.ordered // Se está ordenado ou não
                         );
                     } else {
                         return reject(e);
@@ -278,7 +276,7 @@ class eventBusService {
 
             this.publish()
                 .then(result => {
-                    let r = { result: result, code: 200 }
+                    const r = { result: result, code: 200 }
 
                     if (this.parm.debug) {
                         r.debug = this.parm;
@@ -332,7 +330,7 @@ const createTopic = (topic, subscription, method, ordered) => {
             .then(_ => {
                 return resolve({
                     topicName: topic,
-                    message: `Topic ${topic} created. Don't forget to assign Subscriber Role and add Publisher Permission to zoepaygateway@appspot.gserviceaccount.com: https://console.cloud.google.com/cloudpubsub/subscription/detail/${subscription}?project=zoepaygateway`
+                    message: `Topic ${topic} created. Don't forget to assign Subscriber Role and add Publisher Permission`
                 })
             })
             .catch(e => {
@@ -349,7 +347,7 @@ const createSubscription = (topic, subscription, method, ordered) => {
         const options = {
             name: subscription,
             pushConfig: {
-                pushEndpoint: `https://us-central1-zoepaygateway.cloudfunctions.net/eeb/api/eeb/v1/receiver/${method}`
+                pushEndpoint: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/receiver/${method}`
             },
             topic: topic,
             messageRetentionDuration: { seconds: 7 * 24 * 60 * 60, nanos: 0 },
@@ -357,7 +355,7 @@ const createSubscription = (topic, subscription, method, ordered) => {
             ackDeadlineSeconds: 30,
             expirationPolicy: { seconds: 0, nanos: 0 },
             deadLetterPolicy: {
-                deadLetterTopic: 'projects/zoepaygateway/topics/eeb-dead-lettering',
+                deadLetterTopic: 'projects/premios-fans/topics/eeb-dead-lettering',
                 maxDeliveryAttempts: 5
             },
             retryPolicy: {

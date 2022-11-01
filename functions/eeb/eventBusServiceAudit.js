@@ -126,7 +126,7 @@ const addAuditMessageId = (messageId, field) => {
 const startAuditMessageId = messageId => { return addAuditMessageId(messageId, 'start'); }
 const endAuditMessageId = messageId => { return addAuditMessageId(messageId, 'end'); }
 
-const AuditMessageIdExists = messageId => {
+const auditMessageIdExists = messageId => {
     return new Promise((resolve, reject) => {
         const path = `${auditPath()}/${messageId}/start`;
 
@@ -236,7 +236,7 @@ const createAuditTable = _ => {
 
 exports.startAuditMessageId = startAuditMessageId;
 exports.endAuditMessageId = endAuditMessageId;
-exports.AuditMessageIdExists = AuditMessageIdExists;
+exports.auditMessageIdExists = auditMessageIdExists;
 
 exports.savePayload = savePayload;
 

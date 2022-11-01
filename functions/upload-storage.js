@@ -1,4 +1,4 @@
-const admin = require("firebase-admin");
+const admin = require('firebase-admin');
 
 const glob = require('glob')
 const path = require('path');
@@ -9,7 +9,7 @@ const moment = require("moment-timezone");
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
-const serviceAccount = require("./premios-fans-firebase-adminsdk-ga8ql-fed7f24f67.json");
+const serviceAccount = require('./premios-fans-firebase-adminsdk-ga8ql-fed7f24f67.json');
 
 const storagePath = path.join(__dirname, 'storage');
 const bucketName = 'premios-fans.appspot.com';
@@ -27,18 +27,21 @@ admin.initializeApp({
     measurementId: "G-XTRQ740MSL"
 });
 
-let
-    lastResult,
+const
     tInterval = 5000,
-    interval = null,
-    lineTyping = null,
-    running = false,
-    prodVersionConfig,
-    totalUploaded,
     rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
     });
+
+let
+    lastResult,
+    interval = null,
+    lineTyping = null,
+    running = false,
+    prodVersionConfig,
+    totalUploaded;
+
 
 console.clear();
 console.info("*** upload-storage - Premios Fans Storage Upload ***");
@@ -172,7 +175,7 @@ const getFiles = env => {
     return new Promise((resolve, reject) => {
         const files = glob.sync('storage/**/*.*');
 
-        let result = [];
+        const result = [];
 
         files.forEach(f => {
             const d = f.substring(8);
@@ -180,7 +183,7 @@ const getFiles = env => {
 
             const fileStat = fs.statSync(s);
 
-            let file = {
+            const file = {
                 source: s,
                 mtimeMs: fileStat.mtimeMs,
                 ctimeMs: fileStat.ctimeMs
@@ -215,14 +218,14 @@ const checkUpload = file => {
 }
 
 const initInterval = _ => {
-    var pauseTimer = null;
+    let pauseTimer = null;
 
     interval = setInterval(function () {
         if (lineTyping != rl.line) {
             lineTyping = rl.line;
 
-            if (interval) { clearInterval(interval); }
-            if (pauseTimer) { clearTimeout(pauseTimer); }
+            if (interval) clearInterval(interval);
+            if (pauseTimer) clearTimeout(pauseTimer);
 
             pauseTimer = setTimeout(function () {
                 initInterval();

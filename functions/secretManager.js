@@ -12,16 +12,14 @@ const parent = 'projects/801994869227';
 const get = (name, notFoundException) => {
     return new Promise((resolve, reject) => {
         try {
-
             notFoundException = typeof notFoundException === 'boolean' ? notFoundException : true;
 
             // Adiciona o código do projeto e a última versão
             name = `${parent}/secrets/${name}/versions/latest`;
 
-            var secret = null;
+            let secret = null;
 
             return client.accessSecretVersion({ name: name })
-
                 .then(secretResult => {
 
                     secret = secretResult[0].payload.data.toString();
@@ -29,7 +27,6 @@ const get = (name, notFoundException) => {
 
                     return resolve(secret);
                 })
-
                 .catch(e => {
                     if (secret) {
                         return resolve(secret);
@@ -46,9 +43,7 @@ const get = (name, notFoundException) => {
                         }
                     }
                 })
-
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
             return reject(e);
         }
@@ -62,7 +57,7 @@ exports.requestGet = (request, response) => {
         return response.status(500).json(global.defaultResult({ error: 'ERROR: 48452XX' }));
     }
 
-    let name = request.params.name || null;
+    const name = request.params.name || null;
 
     return get(name)
         .then(result => {
@@ -85,7 +80,6 @@ exports.requestGet = (request, response) => {
 }
 
 
-
 const exists = name => {
     return new Promise((resolve, reject) => {
         try {
@@ -106,8 +100,7 @@ const exists = name => {
                     }
                 })
 
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
             return reject(e);
         }
@@ -121,9 +114,10 @@ exports.requestExists = (request, response) => {
         return response.status(500).json(global.defaultResult({ error: 'ERROR: 48452XX' }));
     }
 
-    let name = request.params.name || null;
+    const name = request.params.name || null;
 
     return exists(name)
+
         .then(result => {
             return response.status(200).json(
                 global.defaultResult({
@@ -133,6 +127,7 @@ exports.requestExists = (request, response) => {
                 }, true)
             );
         })
+
         .catch(e => {
             return response.status(500).json(
                 global.defaultResult({
@@ -163,8 +158,7 @@ const kill = name => {
                     }
                 })
 
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
             return reject(e);
         }
@@ -223,7 +217,7 @@ const createSecret = secretId => {
 const createOrUpdate = (secretId, data) => {
     return new Promise((resolve, reject) => {
 
-        var doesSecretExists,
+        let doesSecretExists,
             secretName = null,
             secretNameCreated = null;
 
@@ -258,7 +252,7 @@ const createOrUpdate = (secretId, data) => {
                 try {
                     payload = Buffer.from(JSON.stringify(data), 'utf8');
                 } catch (e) {
-                    throw new e;
+                    throw new Error(e);
                 }
 
                 return client.addSecretVersion({
@@ -280,14 +274,17 @@ const createOrUpdate = (secretId, data) => {
 
             .then(resultListSecretVersions => {
 
-                let versions = (resultListSecretVersions[0] || []),
-                    promisses = [],
-                    lastEnabledVersion = 0,
+                const versions = (resultListSecretVersions[0] || []),
+                    promisses = [];
+
+                let lastEnabledVersion = 0,
                     id;
 
                 // Calcula a ultima versão desabilitada
                 versions
-                    .filter(f => { return f.state === 'ENABLED' })
+                    .filter(f => {
+                        return f.state === 'ENABLED'
+                    })
                     .forEach(v => {
                         id = parseInt(v.name.split('/').pop());
                         if (lastEnabledVersion < id) {
@@ -328,8 +325,8 @@ exports.requestCreateOrUpdate = (request, response) => {
         return response.status(500).json(global.defaultResult({ error: 'ERROR: 48452XX' }));
     }
 
-    let name = request.params.name || null;
-    let data = request.body || null;
+    const name = request.params.name || null,
+        data = request.body || null;
 
     if (!data) {
         return response.status(500).json(

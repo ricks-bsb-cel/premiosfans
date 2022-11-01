@@ -11,11 +11,12 @@ const pubSubReceiver = (request, response) => {
         });
     }
 
-    let data = helper.base64ToJson(request.body.message.data) || {};
-    let attributes = request.body.message.attributes;
+    const data = helper.base64ToJson(request.body.message.data) || {},
+        attributes = request.body.message.attributes;
+
     let msgAlreadyProcessed = false;
 
-    let parm = {
+    const parm = {
         async: false,
         debug: false,
         data: data,
@@ -26,7 +27,7 @@ const pubSubReceiver = (request, response) => {
         topic: 'eeb-' + attributes.method
     };
 
-    return audit.AuditMessageIdExists(parm.messageId)
+    return audit.auditMessageIdExists(parm.messageId)
 
         .then(eventMessageExistsResult => {
             msgAlreadyProcessed = eventMessageExistsResult;

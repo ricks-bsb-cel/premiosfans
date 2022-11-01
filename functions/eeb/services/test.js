@@ -17,7 +17,7 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let toAdd = {
+            const toAdd = {
                 async: this.parm.async,
                 attributes: this.parm.attributes,
                 data: this.parm.data,
