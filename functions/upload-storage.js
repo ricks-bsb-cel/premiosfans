@@ -210,7 +210,8 @@ const checkUpload = file => {
     // Se não encontrado, upload...
     if (i < 0) return true;
 
-    return lastResult[i].mtimeMs !== file.mtimeMs || lastResult[i].ctimeMs !== file.ctimeMs;
+    return lastResult[i].mtimeMs !== file.mtimeMs ||
+        lastResult[i].ctimeMs !== file.ctimeMs;
 }
 
 const initInterval = _ => {
