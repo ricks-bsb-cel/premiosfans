@@ -14,14 +14,11 @@ const firestoreDAL = require("../firestoreDAL");
 const global = require('../../global');
 const fbHelper = require('../../fbHelper');
 
-const toResult = require('../toResult');
-
 const collectionSuperUsers = firestoreDAL._superUsers();
 const collectionEmpresas = firestoreDAL.empresas();
 const collectionUserProfile = firestoreDAL.userProfile();
 const collectionConfigProfiles = firestoreDAL.admConfigProfiles();
 const collectionConfigPath = firestoreDAL.admConfigPath();
-const collectionZoeAccount = firestoreDAL.zoeAccount();
 
 const idSuperUser = 'RaxbGarlPwgSeM64PKr0lpMBlHb2';
 
@@ -81,6 +78,36 @@ exports.requestUserInfo = (request, response) => {
 
 };
 
+const toUserProfile = doc => {
+
+    const result = {
+        id: doc.id,
+        idEmpresa: doc.idEmpresa,
+        // Dados recebidos
+        doc: {
+            uid: doc.id,
+            nome: doc.displayName || null,
+            email: doc.email || null,
+            celular: doc.phoneNumber || null,
+            imagem: doc.photoURL || null,
+            ativo: doc.ativo
+        },
+        // Ações possíveis
+        actions: [
+        ],
+        // extendeds...
+        extend: {
+            usuario: `/api/users/v1/user/${doc.id}`
+        }
+    }
+
+    if (doc.dtInclusao) {
+        result.extrainfo = {
+            dtInclusao: moment(doc.dtInclusao.toDate()).format('YYYY-MM-DD HH:mm:ss.SSS')
+        }
+    }
+    return result;
+};
 
 const getUserInfoWithToken = (token, full, uid) => {
     return new Promise((resolve, reject) => {
@@ -94,6 +121,7 @@ const getUserInfoWithToken = (token, full, uid) => {
         ]
 
         Promise.all(checkToken)
+
 
             .then(solutions => {
 
@@ -253,7 +281,7 @@ const resolveJwtToken = token => {
 
                     if (result.data.uid === idSuperUser) result.data.superUser = true;
 
-                    result.tokenSource = 'zoepayapi';
+                    result.tokenSource = 'premiosfansapi';
 
                     return resolve(result);
 
@@ -355,7 +383,7 @@ exports.requestGetProfiles = (request, response) => {
                 rows = [];
 
             data.forEach(d => {
-                rows.push(toResult.userProfile(Object.assign(d.data(), { id: d.id })));
+                rows.push(toUserProfile(Object.assign(d.data(), { id: d.id })));
             })
 
             result.rows = rows;
@@ -594,7 +622,7 @@ exports.getUsers = (request, response) => {
             docs.forEach(d => {
                 d = Object.assign(d.data(), { id: d.id });
 
-                rows.push(toResult.userProfile(d));
+                rows.push(toUserProfile(d));
             });
 
             return response.json(
@@ -1406,136 +1434,6 @@ const getUserByUid = uid => {
 }
 
 
-const findAppUserByCpfCelular = (cpf, celular, idSnapshot, hash) => {
-    return new Promise((resolve, reject) => {
-
-        cpf = global.numbersOnly(cpf);
-        celular = global.numbersOnly(celular);
-
-        if (!cpf || !celular || !idSnapshot || !hash || cpf.length !== 11 || celular.length !== 11 || idSnapshot.length < 10 || hash < 10) {
-            return reject(new Error('Invalid data'));
-        }
-
-        const path = `/_ic/${idSnapshot}`;
-
-        const phoneNumber = '+55' + celular;
-
-        let zoeAccount;
-
-        const result = {
-            op: 'findAppUserByCpfCelular',
-            cpf: cpf,
-            phoneNumber: phoneNumber,
-            hash: hash,
-            error: true
-        };
-
-        return collectionZoeAccount.get({
-            filter: { cpf: cpf, celular: celular },
-            limit: 1
-        })
-
-            .then(collectionZoeAccountResult => {
-
-                // Se não encontrar
-                if (collectionZoeAccountResult.length === 0) {
-                    return result.msg = `Nenhuma conta foi localizada com o CPF e Celular informados.`;
-                }
-
-                zoeAccount = collectionZoeAccountResult[0];
-
-                if (!zoeAccount.accountSubmitted) {
-                    return result.msg = `Finalize a solicitação de abertura de conta.`;
-                }
-
-                return result.error = false;
-            })
-
-            .then(_ => {
-                return admin.database().ref(path).set(result);
-            })
-
-            .then(_ => {
-                return resolve(null);
-            })
-
-            .catch(e => {
-                return reject(e);
-            })
-
-    })
-}
-
-// Verifica um CPF na inicialização da abertura da conta
-const checkCpfInicioAberturaConta = (cpf, idSnapshot, hash) => {
-    return new Promise((resolve, reject) => {
-
-        const firestoreDAL = require('../firestoreDAL');
-        const collectionZoeAccount = firestoreDAL.zoeAccount();
-
-        cpf = global.numbersOnly(cpf);
-
-        if (!cpf || !idSnapshot || !hash || cpf.length !== 11 || idSnapshot.length < 10 || hash < 10) {
-            return reject(new Error('Invalid data'));
-        }
-
-        const path = `/_ic/${idSnapshot}`;
-
-        let zoeAccount;
-
-        const result = {
-            op: 'checkCpfInicioAberturaConta',
-            cpf: cpf,
-            hash: hash,
-            error: true
-        };
-
-        return collectionZoeAccount.get({
-            filter: {
-                cpf: cpf
-            },
-            limit: 1
-        })
-
-            .then(collectionZoeAccountResult => {
-
-                // Se não encontrar, tudo bem...
-                if (collectionZoeAccountResult.length === 0) {
-                    result.error = false;
-                    return result.msg = null;
-                }
-
-                zoeAccount = collectionZoeAccountResult[0];
-
-                // Se localizado e em andamento, tudo bem...
-                if (!zoeAccount.accountSubmitted) {
-                    result.error = false;
-                    return result.msg = null;
-                }
-
-                // Encontrada e já submetida... Informa que deve realizar login...
-                result.msg = `Uma conta com este CPF já foi cadastrada. Você pode entrar na aplicação através da opção Acesse sua Conta.`;
-                result.command = 'cpf-ja-cadastrado';
-                return null;
-
-            })
-
-            .then(_ => {
-                return admin.database().ref(path).set(result);
-            })
-
-            .then(_ => {
-                return resolve(null);
-            })
-
-            .catch(e => {
-                return reject(e);
-            })
-
-    })
-}
-
-
 const findUserProfileByCpfCelular = (cpf, celular, idSnapshot, hash) => {
     return new Promise((resolve, reject) => {
 
@@ -1685,308 +1583,10 @@ const findUserProfileByCpfCelular = (cpf, celular, idSnapshot, hash) => {
 }
 
 
-const requestInitAppUser = (request, response) => {
-
-    const parms = {
-        cpf: request.body.cpf || null,
-        accountSubmitted: request.body.accountSubmitted,
-        celular: request.body.celular || null
-    }
-
-    const token = global.getUserTokenFromRequest(request, response);
-
-    if (typeof parms.accountSubmitted !== 'boolean') { parms.accountSubmitted = false; }
-
-    if (!token || !parms.cpf || !global.isCPFValido(parms.cpf) || !parms.celular) {
-        return response.status(500).json(global.defaultResult({ code: 500, error: 'Invalid parms' }));
-    }
-
-    if (parms.celular.startsWith('+55')) { parms.celular = parms.celular.substr(3); }
-
-    parms.cpf = global.numbersOnly(parms.cpf);
-    parms.celular = global.numbersOnly(parms.celular);
-
-    return getUserInfoWithToken(token)
-
-        .then(getUserInfoWithTokenResult => {
-
-            if (getUserInfoWithTokenResult.tokenSource !== 'firebase') {
-                throw global.newError('invalid jwt source');
-            }
-
-            return initAppUser(getUserInfoWithTokenResult.data, parms);
-        })
-
-        .then(initAppUserResult => {
-
-            return response.status(200).json(
-                global.defaultResult({ data: initAppUserResult }, true)
-            );
-
-        })
-
-        .catch(e => {
-            return response.status(500).json(
-                global.defaultResult({ code: 500, error: e.message })
-            );
-        })
-
-}
-
-const initAppUser = (userData, parms) => {
-
-    // Inicializa os dados de um usuário novo do app
-    return new Promise((resolve, reject) => {
-
-        const phoneNumber = parms.celular.startsWith('+55') ? parms.celular : '+55' + parms.celular;
-
-        if (userData.phoneNumber !== phoneNumber) {
-            console.error(`invalid phoneNumber value ~ jwt:${userData.phoneNumber} !== payload:${phoneNumber}`);
-            throw global.newError(`invalid phoneNumber jwt value`)
-        }
-
-        const path = `/zoeAccount/${userData.uid}/pf`;
-
-        let rtdZoeAccount, zoeAccountData, custom, accountSubmitted = false;
-
-        // Busca o profile do usuário (que já deve existir, pois foi criado na abertura da conta)
-        return admin.database().ref(path).once("value")
-
-            .then(rtdZoeAccountResult => {
-
-                rtdZoeAccount = rtdZoeAccountResult.val() || null;
-
-                if (!rtdZoeAccount) {
-                    throw global.newError(`zoeAccount data not found for uid ${userData.uid} on rtdb`);
-                }
-
-                if (!rtdZoeAccount.cpf || !rtdZoeAccount.celular) {
-                    throw global.newError(`cpf & celular not found on zoeAccount data uid ${userData.uid} on rtdb`);
-                }
-
-                // Localiza os dados da zoeAccount no firestore
-                return collectionZoeAccount.get({
-                    filter: {
-                        cpf: rtdZoeAccount.cpf,
-                        celular: rtdZoeAccount.celular
-                    },
-                    limit: 1
-                });
-            })
-
-            .then(collectionZoeAccountResult => {
-
-                // Dados da conta no Firestore
-                zoeAccountData = collectionZoeAccountResult.length ? collectionZoeAccountResult[0] : null;
-                const id = zoeAccountData ? zoeAccountData.id : null;
-
-                if (zoeAccountData) {
-                    if (zoeAccountData.cpf !== rtdZoeAccount.cpf || zoeAccountData.uid !== userData.uid) {
-                        throw global.newError(`zoeAccount kidnapping error`);
-                    }
-                } else {
-                    rtdZoeAccount.uid = userData.uid;
-                    rtdZoeAccount.accountSubmitted = false;
-                }
-
-                // Garante que os flag de submissão de conta não sejam desativado se já ativado
-                if (!rtdZoeAccount.accountSubmitted && parms.accountSubmitted) {
-                    rtdZoeAccount.accountSubmitted = true;
-                    zoeAccountData.accountSubmitted = true;
-                }
-
-                if (zoeAccountData && typeof zoeAccountData.accountSubmitted === 'boolean') {
-                    accountSubmitted = zoeAccountData.accountSubmitted;
-                }
-
-                // Adiciona as chaves de busca
-                zoeAccountData.keywords = global.generateKeywords(
-                    zoeAccountData.cpf,
-                    zoeAccountData.nome,
-                    zoeAccountData.celular,
-                    zoeAccountData.email,
-                    zoeAccountData.uid
-                );
-
-                zoeAccountData.nome = global.capitalize(zoeAccountData.nome);
-
-                // Atualiza os dados do usuário no Firestore
-                return collectionZoeAccount.insertUpdate(id, rtdZoeAccount);
-            })
-
-            .then(updatedData => {
-
-                zoeAccountData = Object.assign(zoeAccountData || {}, updatedData);
-
-                // Atualiza o Custom Claims do Token
-                custom = {
-                    cpf: rtdZoeAccount.cpf,
-                    accountType: 'app',
-                    accountSubmitted: accountSubmitted
-                };
-
-                // Adiciona alguns dados no custom claims do Token
-                return setCustomUserClaims(userData.uid, custom);
-            })
-
-            .then(_ => {
-
-                if (userData.displayName !== rtdZoeAccount.nome) {
-                    return admin.auth().updateUser(userData.uid, {
-                        displayName: rtdZoeAccount.nome
-                    });
-                } else {
-                    return null;
-                }
-
-            })
-
-            .then(_ => {
-
-                return resolve({
-                    zoeAccount: zoeAccountData,
-                    custom: custom
-                });
-
-            })
-
-            .catch(e => {
-                console.error(e);
-                return reject(e);
-            })
-
-    });
-}
-
-
-const mergeAllUserProfileWithUserData = _ => {
-
-    const pubSubHelper = require('../pubsub/pubSubHelper');
-    let userProfile, lstUserProfile = [];
-
-    const queueCall = _ => {
-
-        if (lstUserProfile.length === 0) {
-            return;
-        }
-
-        userProfile = lstUserProfile.shift();
-
-        const parms = {
-            require: "../users/users",
-            run: "mergeUserProfileWithUserData",
-            data: {
-                uid: userProfile.id
-            }
-        };
-
-        pubSubHelper.roadRunnerPublish(parms)
-
-            .then(_ => {
-                return queueCall();
-            })
-
-            .catch(e => {
-                console.error(e);
-                return;
-            })
-
-    }
-
-    return new Promise((resolve, reject) => {
-        collectionUserProfile.get()
-            .then(resultUserProfile => {
-
-                const result = {
-                    total: resultUserProfile.length
-                };
-
-                lstUserProfile = resultUserProfile;
-
-                queueCall();
-
-                return resolve({ data: result });
-            })
-            .catch(e => {
-                console.error(e);
-                return reject(e);
-            })
-    })
-
-}
-
-
-const mergeUserProfileWithUserData = uid => {
-
-    // Busca os dados do usuário no firebase (pelo UID) e atualiza os dados do Profile (e vice versa!)
-
-    // Caso tenha sido chamada indireta via pubSub, será recebido {uid:"blablabla"}
-    if (typeof uid === 'object') { uid = uid.uid; }
-
-    return new Promise((resolve, reject) => {
-
-        let firebaseUserData,
-            userProfileData;
-
-        Promise.all([
-            getAuth().getUser(uid),
-            collectionUserProfile.getDoc(uid)
-        ])
-
-            .then(promiseResult => {
-
-                firebaseUserData = promiseResult[0];
-                userProfileData = promiseResult[1];
-
-                const dataMerge = {
-                    provider: userProfileData.provider || [],
-                    keywords: userProfileData.keywords || []
-                };
-
-                (firebaseUserData.providerData || []).forEach(p => {
-                    if (!dataMerge.provider.includes(p.providerId)) {
-                        dataMerge.provider.push(p.providerId);
-                    }
-                });
-
-                if (!dataMerge.keywords.includes(uid)) {
-                    dataMerge.keywords.push(uid);
-                }
-
-                dataMerge.canUseZoepayAdmin = dataMerge.provider.includes('google.com') || dataMerge.provider.includes('password');
-
-                return collectionUserProfile.merge(uid, dataMerge);
-            })
-
-            .then(_ => {
-
-                return resolve({
-                    data: {
-                        userProfileData: userProfileData,
-                        // firebaseUserData: firebaseUserData
-                    }
-                });
-
-            })
-
-            .catch(e => {
-                console.error(e);
-                return reject(e);
-            })
-
-    })
-}
-
-
 exports.getUserInfo = getUserInfo;
-exports.findAppUserByCpfCelular = findAppUserByCpfCelular;
-exports.checkCpfInicioAberturaConta = checkCpfInicioAberturaConta;
 exports.getUserInfoWithToken = getUserInfoWithToken;
 exports.getUserByUid = getUserByUid;
 exports.findUserProfileByCpfCelular = findUserProfileByCpfCelular;
-exports.requestInitAppUser = requestInitAppUser;
 exports.getCurrentUserFromCookie = getCurrentUserFromCookie;
 exports.getUserProfile = getUserProfile;
-exports.mergeUserProfileWithUserData = mergeUserProfileWithUserData;
-exports.mergeAllUserProfileWithUserData = mergeAllUserProfileWithUserData;
 

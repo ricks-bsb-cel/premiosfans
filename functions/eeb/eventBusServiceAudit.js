@@ -8,9 +8,9 @@ const bigquery = new BigQuery();
 const moment = require("moment-timezone");
 
 const location = 'southamerica-east1';
-const datasetId = 'zoepay';
+const datasetId = 'premiosfans';
 const auditTableName = 'eebAudit_v5';
-const fullTableName = `zoepaygateway.${datasetId}.${auditTableName}`;
+const fullTableName = `premiosfans.${datasetId}.${auditTableName}`;
 
 const schemaPayload = [
     {

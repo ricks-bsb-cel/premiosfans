@@ -47,11 +47,16 @@ const newError = (msg, code, details) => {
 exports.newError = newError;
 
 
+const splitReplace = function (value, search, replacement) {
+    return value.split(search).join(replacement);
+}
+
+
 exports.responseError = (response, e) => {
 
     let
         errorCode = 500,
-        errorMessage = 'Server error';
+        errorMessage = 'Server error'
 
     if (typeof e === 'object' && e.constructor.name === 'FirebaseAuthError') {
         errorCode = 401;
@@ -1334,7 +1339,7 @@ exports.generateKeywords = function (v1, v2, v3, v4, v5, v6, v7) {
 exports.config = {
     get: path => {
 
-        path = path.splitReplace('.', '_');
+        path = splitReplace(path, '.', '_');
 
         if (path.startsWith('/')) {
             path = path.substr(1);

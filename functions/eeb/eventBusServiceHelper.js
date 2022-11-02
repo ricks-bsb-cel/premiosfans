@@ -1,9 +1,9 @@
 "use strict";
 
 const { Logging } = require('@google-cloud/logging');
-const projectId = 'zoepaygateway';
+const projectId = 'premios-fans';
 const logging = new Logging({ projectId });
-const log = logging.log('zoepaybackend');
+const log = logging.log('premiosfansbackend');
 
 const logType = {
     default: 'DEFAULT',
