@@ -54,7 +54,7 @@ class collectionClass {
     add(data) {
         return new Promise((resolve, reject) => {
 
-            let doc = admin.firestore().collection(this.collectionName).doc();
+            const doc = admin.firestore().collection(this.collectionName).doc();
 
             delete data.id;
             global.setDateTime(data, 'dtInclusao');
@@ -77,7 +77,7 @@ class collectionClass {
     delete(id) {
         return new Promise((resolve, reject) => {
 
-            let doc = admin.firestore().collection(this.collectionName).doc(id);
+            const doc = admin.firestore().collection(this.collectionName).doc(id);
 
             doc.delete()
                 .then(_ => {
@@ -104,7 +104,7 @@ class collectionClass {
     }
 
     get(attrs) {
-        var self = this;
+        const self = this;
 
         if (!this.collection) {
             this.collection = admin.firestore().collection(this.collectionName);
@@ -114,7 +114,7 @@ class collectionClass {
 
         return new Promise((resolve, reject) => {
 
-            var query = self.collection;
+            let query = self.collection;
 
             if (attrs.filter) {
                 if (Array.isArray(attrs.filter)) {
@@ -133,10 +133,10 @@ class collectionClass {
             }
 
             query.get().then(rows => {
-                var result = [];
+                let result = [];
 
                 rows.forEach(r => {
-                    var toPush = Object.assign(r.data(), { id: r.id });
+                    const toPush = Object.assign(r.data(), { id: r.id });
                     delete toPush.keywords;
                     result.push(toPush);
                 })
@@ -157,7 +157,7 @@ class collectionClass {
     }
 
     getDoc(id, notFoundError) {
-        var self = this;
+        const self = this;
 
         if (!this.collection) {
             this.collection = admin.firestore().collection(this.collectionName);
@@ -342,18 +342,3 @@ exports.deadLettering = _ => {
 exports.eebTest = _ => {
     return new collectionClass('_eebTest');
 }
-
-
-
-/*
-exports.usuarioApp = () => {
-    return new collectionClass('userApp');
-}
-
-
-exports.totaisCobrancas = () => {
-    return new collectionClass('totaisCobrancas');
-}
-*/
-
-

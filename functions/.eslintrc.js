@@ -1,19 +1,18 @@
 module.exports = {
-	root: true,
+	"root": true,
 	"parserOptions": {
-        "ecmaVersion": 2018
-    },
-	env: {
-		es6: true,
-		node: true,
+		"ecmaVersion": 2018
 	},
-	extends: [
+	"env": {
+		"es6": true,
+		"node": true,
+	},
+	"extends": [
 		"eslint:recommended",
 		"google",
 	],
-	rules: {
+	"rules": {
 		"quotes": 0,
-		"indent": [1, "tab"],
 		"no-tabs": 0,
 		"allowIndentationTabs": 0,
 		"arraysInObjects": 0,
@@ -31,6 +30,8 @@ module.exports = {
 		"require-jsdoc": 0,
 		"valid-jsdoc": 0,
 		"no-useless-escape": 0,
-		"no-control-regex": 0
+		"no-control-regex": 0,
+		"new-cap": 0,
+		"camelcase": 0
 	},
 };

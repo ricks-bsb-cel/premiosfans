@@ -83,7 +83,7 @@ exports.getPermissions = (user, request) => {
                     } else {
                         result.error = "Usuário não vinculado a nenhuma empresa...";
                         return resolve(result);
-                    };
+                    }
                 }
 
                 return global.config.get('/appProfile/default');

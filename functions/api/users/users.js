@@ -25,7 +25,7 @@ const collectionZoeAccount = firestoreDAL.zoeAccount();
 
 const idSuperUser = 'RaxbGarlPwgSeM64PKr0lpMBlHb2';
 
-exports.idSuperUser = idSuperUser;;
+exports.idSuperUser = idSuperUser;
 
 /* https://firebase.google.com/docs/auth/admin/custom-claims */
 
@@ -33,7 +33,7 @@ exports.requestUserInfo = (request, response) => {
 
     const token = global.getUserTokenFromRequest(request, response);
     const full = request.query.full === 'true';
-    var uid = request.params.uid || null;
+    let uid = request.params.uid || null;
 
     if (uid && uid.toLowerCase() === 'current') { uid = null; }
 
@@ -86,7 +86,7 @@ const getUserInfoWithToken = (token, full, uid) => {
     return new Promise((resolve, reject) => {
 
         // Tenta resolver o token das duas formas... uma vai dar certo
-        var user, userRecord, result = {};
+        let user, userRecord, result;
 
         const checkToken = [
             resolveFirebaseToken(token),
@@ -116,7 +116,7 @@ const getUserInfoWithToken = (token, full, uid) => {
 
                 if (!user.data.idEmpresa && !user.data.superUser && !isPhoneProvider) {
 
-                    var userDetail = user.data.uid;
+                    let userDetail = user.data.uid;
 
                     if (userRecord.phoneNumber) { userDetail += ', ' + userRecord.phoneNumber; }
                     if (userRecord.email) { userDetail += ', ' + userRecord.email; }
@@ -233,7 +233,7 @@ const getUserInfoWithToken = (token, full, uid) => {
 const resolveJwtToken = token => {
     return new Promise(resolve => {
 
-        var result = {};
+        const result = {};
 
         return secret.get('api-default-certificate-public-key')
 
@@ -241,8 +241,7 @@ const resolveJwtToken = token => {
 
                 try {
 
-                    var user = jwt.verify(token, certificate.public_key);
-                    // var user = jwt.verify(token, _publicKey)
+                    const user = jwt.verify(token, certificate.public_key);
 
                     result.data = {
                         uid: user.uid,
@@ -277,7 +276,7 @@ const resolveJwtToken = token => {
 const resolveFirebaseToken = token => {
     return new Promise(resolve => {
 
-        var result = {};
+        const result = {};
 
         return admin.auth().verifyIdToken(token)
             .then(user => {
@@ -305,10 +304,10 @@ const resolveFirebaseToken = token => {
 
 
 const getIdsEmpresas = empresas => {
-    if (!Array.isArray(empresas)) {
-        empresas = empresas.val();
-    }
-    let result = [];
+    if (!Array.isArray(empresas)) empresas = empresas.val();
+
+    const result = [];
+
     if (empresas) {
         empresas.forEach(e => {
             result.push(e.id);
@@ -324,7 +323,7 @@ exports.requestGetProfiles = (request, response) => {
     let Usuario = null;
 
     if (!token) {
-        return response.status(e.code || 500).json(global.defaultResult({
+        return response.status(500).json(global.defaultResult({
             code: 500,
             error: 'empty token'
         }));
@@ -340,7 +339,7 @@ exports.requestGetProfiles = (request, response) => {
                 throw new Error('O usuário atual não está vinculado a uma empresa')
             }
 
-            collection = admin.firestore().collection('userProfile');
+            let collection = admin.firestore().collection('userProfile');
 
             if (!Usuario.superUser) {
                 collection = collection.where('idsEmpresa', 'array-contains', Usuario.idEmpresa);
@@ -352,8 +351,8 @@ exports.requestGetProfiles = (request, response) => {
 
         .then(data => {
 
-            var result = {};
-            var rows = [];
+            const result = {},
+                rows = [];
 
             data.forEach(d => {
                 rows.push(toResult.userProfile(Object.assign(d.data(), { id: d.id })));
@@ -391,12 +390,12 @@ exports.setEmpresaToUser = (request, response) => {
     const uid = request.body.uid || null;
     const idEmpresa = request.body.idEmpresa || null;
 
-    var userToken = null;
-    var user = null;
-    var empresa = null;
+    let userToken = null,
+        user = null,
+        empresa = null;
 
     if (!token || !uid || !idEmpresa) {
-        return response.status(e.code || 500).json(
+        return response.status(500).json(
             global.defaultResult({
                 error: 'Parâmetros inválidos...'
             })
@@ -449,7 +448,8 @@ exports.setEmpresaToUser = (request, response) => {
                 throw new Error(`A empresa [${empresa.nome}] não está cadastrada no perfil do usuário.`);
             }
 
-            var customClaims = user.customClaims || {};
+            const customClaims = user.customClaims || {};
+
             delete customClaims.idEmpresas
             customClaims.idEmpresa = idEmpresa;
 
@@ -480,6 +480,7 @@ exports.setEmpresaToUser = (request, response) => {
 
         .catch(e => {
             console.error(e);
+
             return response.status(e.code || 500).json(global.defaultResult({
                 code: e.code,
                 error: e.message
@@ -494,10 +495,10 @@ exports.setSuperUser = (request, response, setSuperUser) => {
     const token = global.getUserTokenFromRequest(request, response);
     const uid = request.body.uid || null;
 
-    var defaultErrorCode = 500;
+    let defaultErrorCode = 500;
 
     if (!token || !uid) {
-        return response.status(e.code || 500).json(
+        return response.status(500).json(
             global.defaultResult({
                 code: 500,
                 error: "Invalid parms..."
@@ -528,7 +529,7 @@ exports.setSuperUser = (request, response, setSuperUser) => {
         })
 
         .then(user => {
-            var customClaims = user.customClaims || {};
+            const customClaims = user.customClaims || {};
 
             if (setSuperUser) {
                 customClaims.superUser = setSuperUser;
@@ -564,10 +565,11 @@ exports.setSuperUser = (request, response, setSuperUser) => {
 exports.getUsers = (request, response) => {
 
     const token = global.getUserTokenFromRequest(request, response);
-    var query = admin.firestore().collection('userProfile');
+
+    let query = admin.firestore().collection('userProfile');
 
     if (!token) {
-        return response.status(e.code || 500).json(
+        return response.status(500).json(
             global.defaultResult({
                 error: 'invalid token'
             })
@@ -587,7 +589,7 @@ exports.getUsers = (request, response) => {
         })
 
         .then(docs => {
-            var rows = [];
+            const rows = [];
 
             docs.forEach(d => {
                 d = Object.assign(d.data(), { id: d.id });
@@ -619,13 +621,17 @@ exports.updateUser = (request, response) => {
     const idEmpresas = request.body.idEmpresas || [];
     const nome = request.body.nome || null;
 
+    let user;
+
     if (!token || !uid) {
-        return response.status(e.code || 500).json({ error: 'parm error' });
+        return response.status(500).json({ error: 'parm error' });
     }
 
     return admin.auth().verifyIdToken(token)
 
-        .then(user => {
+        .then(verifyIdTokenResult => {
+            user = verifyIdTokenResult;
+
             if (!user) {
                 throw new Error('Token inválido');
             } else {
@@ -646,7 +652,7 @@ exports.updateUser = (request, response) => {
         })
 
         .then(userToUpdate => {
-            var customClaims = userToUpdate.customClaims || {};
+            const customClaims = userToUpdate.customClaims || {};
             customClaims.idEmpresas = idEmpresas;
             return setCustomUserClaims(uid, customClaims);
         })
@@ -731,14 +737,14 @@ exports.checkUserProfile = (request, response) => {
 const getUserProfile = uid => {
     return new Promise((resolve, reject) => {
 
-        var result = {
+        const result = {
             user: null,
             perfil: null,
             dtReference: Timestamp.now(),
             version: global.getVersionId()
         };
 
-        var promissesPerfis = [];
+        const promissesPerfis = [];
 
         return getUserInfo(uid)
 
@@ -748,7 +754,7 @@ const getUserProfile = uid => {
 
                 if (result.user.uid === idSuperUser) result.user.superUser = true;
 
-                var userId = result.user.email || global.getFormatPhoneNumber(result.user.phoneNumber);
+                const userId = result.user.email || global.getFormatPhoneNumber(result.user.phoneNumber);
 
                 if (!result.user.empresas || result.user.empresas.length === 0 && !result.user.superUser) {
                     throw new Error(`O usuário ${userId} não tem perfil em nenhuma empresa.`);
@@ -759,7 +765,7 @@ const getUserProfile = uid => {
                 }
 
                 // Verifica o perfil que o usuário deve utilizar
-                var i = result.user.empresas.findIndex(f => {
+                const i = result.user.empresas.findIndex(f => {
                     return f.id === result.user.idEmpresa;
                 })
 
@@ -802,7 +808,8 @@ const getUserProfile = uid => {
                 if (result.perfil) {
                     result.perfil.groups.forEach(g => {
                         g.options.forEach(o => {
-                            var i = resultPromissesPerfis.findIndex(f => { return f.id === o.id; });
+                            const i = resultPromissesPerfis.findIndex(f => { return f.id === o.id; });
+
                             if (i >= 0) {
                                 o = Object.assign(o, {
                                     href: resultPromissesPerfis[i].href,
@@ -838,7 +845,7 @@ exports.requestUserProfile = (request, response) => {
     const token = global.getUserTokenFromRequest(request, response);
 
     if (!uid || !token) {
-        return response.status(e.code || 500).json(
+        return response.status(500).json(
             global.defaultResult({
                 error: 'parm error'
             })
@@ -863,7 +870,7 @@ exports.requestUserProfile = (request, response) => {
 const getUserInfo = uid => {
     return new Promise((resolve, reject) => {
 
-        var userRecord;
+        let userRecord;
 
         admin.auth().getUser(uid)
 
@@ -884,13 +891,13 @@ const getUserInfo = uid => {
             .then(list => {
                 userRecord.empresas = list;
 
-                var idEmpresaAtual = userRecord.customClaims.idEmpresa || null;
+                let idEmpresaAtual = userRecord.customClaims.idEmpresa || null;
 
                 if (!idEmpresaAtual && userRecord.customClaims.superUser && userRecord.empresas.length > 0) {
                     idEmpresaAtual = userRecord.empresas[0].id;
                 }
 
-                var i = userRecord.empresas.findIndex(f => { return f.id === idEmpresaAtual; });
+                const i = userRecord.empresas.findIndex(f => { return f.id === idEmpresaAtual; });
 
                 if (i >= 0) {
                     userRecord.empresas[i].selected = true;
@@ -920,7 +927,7 @@ const getUserInfo = uid => {
 
 const getEmpresasSuperUser = idPerfil => {
     return new Promise((resolve, reject) => {
-        var result = [];
+        const result = [];
 
         admin
             .firestore()
@@ -955,8 +962,8 @@ const getEmpresasSuperUser = idPerfil => {
 const getEmpresasPerfilUsuarioNormal = userRecord => {
     return new Promise((resolve, reject) => {
 
-        var result = [];
-        var promisseEmpresas = [];
+        const result = [],
+            promisseEmpresas = [];
 
         admin
             .firestore()
@@ -983,7 +990,7 @@ const getEmpresasPerfilUsuarioNormal = userRecord => {
 
                 empresas.forEach(e => {
                     if (e && e.ativo) {
-                        var i = result.findIndex(f => { return f.id === e.id; });
+                        const i = result.findIndex(f => { return f.id === e.id; });
 
                         if (i >= 0) {
                             result[i].nome = e.nome;
@@ -1009,7 +1016,7 @@ const getEmpresasPerfilUsuarioNormal = userRecord => {
 
 const formatUserObj = user => {
 
-    var result = {
+    const result = {
         uid: user.uid,
         email: user.email || null,
         emailVerified: user.emailVerified,
@@ -1051,7 +1058,7 @@ const setCpfOnCustomUserClaims = (uid, profileData) => {
 
     // O CPF só pode ser adicionado ao CustomClaim do usuário UMA VEZ!
     // A rotina já fez esta verificação...
-    var userData;
+    let userData;
 
     return new Promise((resolve, reject) => {
 
@@ -1061,7 +1068,7 @@ const setCpfOnCustomUserClaims = (uid, profileData) => {
 
                 userData = result;
 
-                var customClaims = userData.customClaims || {};
+                const customClaims = userData.customClaims || {};
 
                 // Se existir um CPF no CustomClaims mas não for o mesmo, retorna erro...
                 if (customClaims.cpf && customClaims.cpf !== profileData.cpf) {
@@ -1081,7 +1088,7 @@ const setCpfOnCustomUserClaims = (uid, profileData) => {
             .then(_ => {
 
                 // Atualiza outras informações do usuário
-                var updateUser = {
+                const updateUser = {
                     displayName: profileData.displayName || userData.displayName || null
                 }
 
@@ -1137,7 +1144,7 @@ const updateUserData = (uid, data) => {
 const validateIdEmpresas = idEmpresas => {
     return new Promise((resolve, reject) => {
 
-        var promisses = [];
+        const promisses = [];
 
         idEmpresas.forEach(id => {
             promisses.push(collectionEmpresas.getDoc(id));
@@ -1199,7 +1206,7 @@ exports.updateUserProfile = (request, response) => {
         email = request.body.email || null,
         dtNascimento = request.body.dtNascimento || null;
 
-    var tokenData,
+    let tokenData,
         userData,
         profileData,
         customClaims,
@@ -1208,21 +1215,21 @@ exports.updateUserProfile = (request, response) => {
         cpf = request.body.cpf || null;
 
     if (!cpf || !token) {
-        return response.status(e.code || 500).json(global.defaultResult({ code: 500, error: 'CPF e Token devem ser preenchidos...' }));
+        return response.status(500).json(global.defaultResult({ code: 500, error: 'CPF e Token devem ser preenchidos...' }));
     }
 
     if (email && !global.emailIsValid(email)) {
-        return response.status(e.code || 500).json(global.defaultResult({ code: 500, error: `Email invalido [${email}]` }));
+        return response.status(500).json(global.defaultResult({ code: 500, error: `Email invalido [${email}]` }));
     }
 
     if (dtNascimento && !global.isValidDtNascimento(dtNascimento)) {
-        return response.status(e.code || 500).json(global.defaultResult({ code: 500, error: 'Data de Nascimento inválida' }));
+        return response.status(500).json(global.defaultResult({ code: 500, error: 'Data de Nascimento inválida' }));
     }
 
     cpf = global.numbersOnly(cpf);
 
     if (!global.isCPFValido(cpf)) {
-        return response.status(e.code || 500).json(global.defaultResult({ code: 500, error: 'CPF Invalido' }));
+        return response.status(500).json(global.defaultResult({ code: 500, error: 'CPF Invalido' }));
     }
 
     // Carrega os dados do token.
@@ -1340,7 +1347,7 @@ exports.requestFindUserProfileByCpfCelular = (request, response) => {
         token = global.getUserTokenFromRequest(request, response);
 
     if (!cpf || !celular || !id || !token || !hash) {
-        return response.status(e.code || 500).json(global.defaultResult({
+        return response.status(500).json(global.defaultResult({
             code: 500,
             error: 'Requisição inválida'
         }));
@@ -1415,7 +1422,7 @@ const findAppUserByCpfCelular = (cpf, celular, idSnapshot, hash) => {
 
         let zoeAccount;
 
-        let result = {
+        const result = {
             op: 'findAppUserByCpfCelular',
             cpf: cpf,
             phoneNumber: phoneNumber,
@@ -1476,7 +1483,7 @@ const checkCpfInicioAberturaConta = (cpf, idSnapshot, hash) => {
 
         let zoeAccount;
 
-        let result = {
+        const result = {
             op: 'checkCpfInicioAberturaConta',
             cpf: cpf,
             hash: hash,
@@ -1544,11 +1551,12 @@ const findUserProfileByCpfCelular = (cpf, celular, idSnapshot, hash) => {
         const path = `/_ic/${idSnapshot}`;
         const phoneNumber = '+55' + celular;
 
-        var userData,
+        let userData,
             profileDataCpf,
             profileDataPhoneNumber,
-            cpfOnCustomClaim,
-            promisseProfileIds = [],
+            cpfOnCustomClaim;
+
+        const promisseProfileIds = [],
             result = {
                 op: 'findUserProfileByCpfCelular',
                 cpf: cpf,
@@ -1608,7 +1616,7 @@ const findUserProfileByCpfCelular = (cpf, celular, idSnapshot, hash) => {
             .then(resultProfileIds => {
 
                 // Deixa a consulta mais simples...
-                var providers = [];
+                const providers = [];
 
                 resultProfileIds.forEach(r => {
                     if (r && r.providerData) {
@@ -1673,48 +1681,13 @@ const findUserProfileByCpfCelular = (cpf, celular, idSnapshot, hash) => {
                 return reject(e);
             })
 
-
-        /*
-    return collectionUserProfile.get({ filter: { cpfcnpj: CpfCnpj } })
-     
-        .then(UserProfiles => {
-     
-            result.qtdFound = UserProfiles.length;
-     
-            if (UserProfiles.length === 0) {
-     
-                result.sameNumber = false;
-     
-            } else if (UserProfiles.length === 1) {
-     
-                result.sameNumber = UserProfiles[0].celular === celular;
-                result.celular = global.hideCelular(UserProfiles[0].celular);
-     
-            } else {
-     
-                result.sameNumber = false;
-            }
-     
-            return admin.database().ref(path).set(result);
-     
-        })
-     
-        .then(_ => {
-            return resolve(result);
-        })
-     
-        .catch(e => {
-            return reject(e);
-        })
-        */
-
     })
 }
 
 
 const requestInitAppUser = (request, response) => {
 
-    let parms = {
+    const parms = {
         cpf: request.body.cpf || null,
         accountSubmitted: request.body.accountSubmitted,
         celular: request.body.celular || null
@@ -1965,7 +1938,7 @@ const mergeUserProfileWithUserData = uid => {
                 firebaseUserData = promiseResult[0];
                 userProfileData = promiseResult[1];
 
-                let dataMerge = {
+                const dataMerge = {
                     provider: userProfileData.provider || [],
                     keywords: userProfileData.keywords || []
                 };

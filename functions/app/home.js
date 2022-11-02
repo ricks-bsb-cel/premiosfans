@@ -1,14 +1,13 @@
 "use strict";
 
 const admin = require('firebase-admin');
-const path = require('path');
 const global = require('../global');
 
 const bucketName = 'premios-fans.appspot.com';
 
 exports.getStorageFile = (request, response) => {
 
-    let render = {
+    const render = {
         version: global.getVersionId(),
         versionDate: global.getVersionDate(),
         host: global.getHost(request)
