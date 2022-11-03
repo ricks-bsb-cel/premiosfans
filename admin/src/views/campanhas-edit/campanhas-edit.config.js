@@ -30,7 +30,7 @@ config = function (
 
 	var path = pathObj.path;
 
-	$routeProvider.when(path + ':id/:edit?', route);
+	$routeProvider.when(path + ':id', route);
 };
 
 export default config;

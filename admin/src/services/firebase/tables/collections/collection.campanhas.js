@@ -6,20 +6,40 @@ const ngModule = angular.module('collection.campanhas', [])
         appCollection,
         appFirestoreHelper,
         appAuthHelper,
-        URLs,
-        $http,
+        globalFactory,
         $q
     ) {
 
         const attr = {
             collection: 'campanhas',
-            filterEmpresa: true
+            filterEmpresa: false
         };
 
         var firebaseCollection = new appCollection(attr);
 
         const getById = id => {
-            return appFirestoreHelper.getDoc(attr.collection, id);
+            return $q((resolve, reject) => {
+
+                return appFirestoreHelper.getDoc(attr.collection, id)
+                    .then(campanha => {
+                        campanha.influencers = campanha.influencers.map(influencer => {
+                            const pos = appAuthHelper.profile.user.empresas.findIndex(f => {
+                                return f.id === influencer.idInfluencer;
+                            });
+
+                            influencer.nome = pos < 0 ? '* Unauthorized *' : appAuthHelper.profile.user.empresas[pos].nome;
+                            influencer.selected = true;
+
+                            return influencer;
+                        })
+
+                        return resolve(campanha);
+                    })
+                    .catch(e => {
+                        return reject(e);
+                    })
+
+            })
         }
 
         const save = campanha => {
@@ -60,10 +80,19 @@ const ngModule = angular.module('collection.campanhas', [])
                 .map(p => {
                     return {
                         guidPremio: p.guidPremio,
-                        descricao: p.descricao,
+                        descricao: p.descricao || null,
                         valor: parseFloat(p.valor)
                     }
                 });
+
+            campanha.images = campanha.images
+                .map(i => {
+                    delete i.$$hashKey;
+                    delete i.created_at;
+                    delete i.featured;
+
+                    return i;
+                })
 
             if (campanha.id === 'new') {
                 campanha.uidInclusao = appAuthHelper.profile.user.uid;
@@ -72,6 +101,8 @@ const ngModule = angular.module('collection.campanhas', [])
 
             campanha.uidAlteracao = appAuthHelper.profile.user.uid;
             campanha.dtAlteracao = appFirestoreHelper.currentTimestamp();
+
+            campanha.keywords = globalFactory.generateKeywords(campanha.titulo, campanha.dtSorteio_ddmmyyyy, campanha.url);
 
             return campanha;
         }

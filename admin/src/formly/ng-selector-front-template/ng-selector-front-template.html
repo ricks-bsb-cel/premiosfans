@@ -1,0 +1,24 @@
+<script type="text/ng-template" id="selector/front-template/item-template">
+	{{option.nome}} 
+    <span class="badge bg-success">{{option.data}}</span>
+</span>
+</script>
+
+<div class="form-group ng-selector-front-template">
+    <select
+        selector    
+        ng-if="collectionFrontTemplates.collection.ready"
+        model="model[options.key]"
+        disable="options.templateOptions.disabled"
+        multi="false"
+        label-attr="nome"
+        value-attr="id"
+        require="true"
+        options="collectionFrontTemplates.collection.data"
+        placeholder="Selecione um Template do Front"
+        view-item-template="'selector/front-template/item-template'"
+        dropdown-item-template="'selector/front-template/item-template'"
+    ></select>
+</div>
+
+

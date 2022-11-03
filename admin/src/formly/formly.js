@@ -37,15 +37,11 @@ import checkboxPlanos from './checkbox-planos/checkbox-planos';
 import ngSelectorCliente from './ng-selector-cliente/ng-selector-cliente';
 import ngSelectorPlano from './ng-selector-plano/ng-selector-plano';
 import ngSelectorContrato from './ng-selector-contrato/ng-selector-contrato';
-import ngSelectorPeriodoParcela from './ng-selector-periodo-parcela/ng-selector-periodo-parcela';
 import ngSelectorEstado from './ng-selector-estado/ng-selector-estado';
 import ngSelectorEmpresa from './ng-selector-empresa/ng-selector-empresa';
 import ngSelectorPerfis from './ng-selector-perfis/ng-selector-perfis';
 import ngSelectorTipoPessoa from './ng-selector-tipo-pessoa/ng-selector-tipo-pessoa';
-import ngSelectorContas from './ng-selector-contas/ng-selector-contas';
-import ngSelectorTipoChavePix from './ng-selector-tipo-chave-pix/ng-selector-tipo-chave-pix';
-import ngSelectorTipoCobranca from './ng-selector-tipo-cobranca/ng-selector-tipo-cobranca';
-import ngSelectorSituacaoContrato from './ng-selector-situacao-contrato/ng-selector-situacao-contrato';
+import ngSelectorFrontTemplate from './ng-selector-front-template/ng-selector-front-template';
 
 const ngModule = angular
 	.module(
@@ -86,15 +82,11 @@ const ngModule = angular
 			ngSelectorCliente.name,
 			ngSelectorPlano.name,
 			ngSelectorContrato.name,
-			ngSelectorPeriodoParcela.name,
 			ngSelectorEstado.name,
 			ngSelectorEmpresa.name,
 			ngSelectorPerfis.name,
 			ngSelectorTipoPessoa.name,
-			ngSelectorContas.name,
-			ngSelectorTipoChavePix.name,
-			ngSelectorTipoCobranca.name,
-			ngSelectorSituacaoContrato.name
+			ngSelectorFrontTemplate.name
 		]
 	)
 

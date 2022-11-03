@@ -16,7 +16,7 @@ const ngModule = angular.module('views.campanhas', [
 
 		$scope.collectionCampanhas = collectionCampanhas;
 
-		let lastTermo, showAll = false;
+		let lastTermo;
 
 		const showMenu = function () {
 
@@ -44,8 +44,6 @@ const ngModule = angular.module('views.campanhas', [
 					attrFilter.limit = 20;
 					toastrFactory.info('Apenas os primeiros ' + attrFilter.limit + ' registros serão apresentados... Informe um termo de pesquisa para buscar dados mais específicos.');
 				}
-
-				if (!showAll) attrFilter.filter.push({ field: 'situacao', operator: '==', value: 'ativo' });
 
 				$scope.collectionCampanhas.collection.startSnapshot(attrFilter);
 			}

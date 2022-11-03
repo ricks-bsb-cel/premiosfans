@@ -12,7 +12,6 @@ const ngModule = angular.module('views.contratos-edit', [
 		$routeParams,
 		navbarTopLeftFactory,
 		collectionCampanhas,
-		collectionCampanhasPremios,
 		collectionEmpresas,
 		appAuthHelper,
 		toastrFactory,
@@ -108,6 +107,15 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							type: 'input',
 							className: 'col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8'
+						},
+						{
+							key: 'template',
+							templateOptions: {
+								label: 'Template',
+								required: true
+							},
+							type: 'ng-selector-front-template',
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						}
 					],
 					form: null
@@ -141,6 +149,7 @@ const ngModule = angular.module('views.contratos-edit', [
 		}
 
 		const loadCampanha = idCampanha => {
+
 			collectionCampanhas.getById(idCampanha)
 				.then(result => {
 					$scope.campanha = { ...result };
@@ -162,7 +171,7 @@ const ngModule = angular.module('views.contratos-edit', [
 					if ($scope.idCampanha && $scope.idCampanha !== 'new') {
 						initForms();
 
-						loadCampanha($scope.idContrato);
+						loadCampanha($scope.idCampanha);
 					} else {
 						$scope.campanha.guidCampanha = globalFactory.guid();
 

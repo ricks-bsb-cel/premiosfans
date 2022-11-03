@@ -18,9 +18,6 @@ import appStorage from './app-storage';
 import appCollection from './app-collection';
 import appConfig from './app-config';
 
-import cliente from './cliente/clientes';
-import contas from './contas/contas';
-import folha from './folha/folha';
 import utils from './utils';
 
 let ngModule = angular.module('services',
@@ -45,11 +42,7 @@ let ngModule = angular.module('services',
 		
 		firebaseCollections.name,
 
-		cliente.name,
-		contas.name,
-		folha.name,
 		utils.name
-
 	]
 );
 

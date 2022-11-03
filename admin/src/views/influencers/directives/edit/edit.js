@@ -27,6 +27,15 @@ const ngModule = angular.module('view.influencers.edit', [])
                     }
                 },
                 {
+                    key: 'url',
+                    templateOptions: {
+                        label: 'URL',
+                        required: true
+                    },
+                    type: 'input',
+                    className: 'col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-5'
+                },
+                {
                     key: 'nome',
                     templateOptions: {
                         label: 'Nome',

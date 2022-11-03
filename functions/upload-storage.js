@@ -27,6 +27,8 @@ admin.initializeApp({
     measurementId: "G-XTRQ740MSL"
 });
 
+const templatePath = 'storage/dev/templates/';
+
 const
     tInterval = 5000,
     rl = readline.createInterface({
@@ -46,7 +48,6 @@ let
 console.clear();
 console.info("*** upload-storage - Premios Fans Storage Upload ***");
 console.info(`Local Storage Path: ${storagePath}`);
-console.info();
 
 const init = _ => {
 
@@ -61,12 +62,13 @@ const init = _ => {
                 case 'q':
                     rl.close();
                     break;
-                case 'run dev':
+                case 'r':
                 case 'r dev':
+                case 'run dev':
                     uploadTemplates('dev');
                     break;
-                case 'run prod':
                 case 'r prod':
+                case 'run prod':
                     uploadTemplates('prod');
                     break;
                 default:
@@ -83,7 +85,8 @@ const init = _ => {
             process.exit(0);
         });
 
-    initInterval();
+    // initInterval();
+    showHelp();
 }
 
 const uploadTemplates = env => {
@@ -94,25 +97,55 @@ const uploadTemplates = env => {
     running = true;
     prodVersionConfig = getProdVersionConfig();
 
+    let files;
+
     if (env === 'prod') {
         console.clear();
         console.info(`Uploading to Prod ~ Bucket ${bucketName} ~ Path: ${prodVersionConfig.path}}`);
     }
 
     getFiles(env)
-        .then(files => {
-            running = false;
+        .then(getFilesResult => {
+            files = getFilesResult;
+
             return uploadAllFiles(files);
         })
+
         .then(_ => {
-            if (env === 'dev') {
-                return null;
-            } else {
-                return admin.database().ref(`storageConfig/${prodVersionConfig.id}`).set({
-                    ...prodVersionConfig,
-                    totalFiles: totalUploaded
-                });
-            }
+            let templates = [],
+                updatePromise = [];
+
+            files
+                .filter(f => {
+                    return f.source.endsWith('index.html');
+                })
+                .forEach(f => {
+                    const i = templates.findIndex(t => {
+                        return t.name === f.template;
+                    });
+
+                    if (i < 0) {
+                        let t = {
+                            nome: f.template,
+                            localPath: f.source,
+                            storagePathDev: f.destinationDev,
+                            data: f.data
+                        };
+
+                        if (env === 'prod') {
+                            t.storagePathProd = f.destinationProd;
+                            t.version = f.idProdVersion;
+                        }
+
+                        templates.push(t);
+                        updatePromise.push(admin.firestore().collection('frontTemplates').doc(t.nome).set(t, { merge: true }));
+                    }
+                })
+
+            return Promise.all(updatePromise);
+        })
+        .then(_ => {
+            running = false;
         })
         .catch(e => {
             console.error(e);
@@ -122,8 +155,9 @@ const uploadTemplates = env => {
 
 }
 
-const uploadAllFiles = files => {
+const uploadAllFiles = f => {
     return new Promise((resolve, reject) => {
+        let files = f.slice();
 
         totalUploaded = 0;
 
@@ -134,7 +168,6 @@ const uploadAllFiles = files => {
                     console.info(`${totalUploaded} file(s) uploaded`);
                     console.info();
                 }
-
                 return resolve();
             }
 
@@ -165,17 +198,19 @@ const uploadAllFiles = files => {
         }
 
         uploadNextFile();
-
     })
 }
 
 const getFiles = env => {
     env = env || 'dev';
 
+    const hoje = moment().tz("America/Sao_Paulo");
+    const idProdVersion = hoje.format("YYYY-MM-DD-HH-mm-ss");
+
     return new Promise((resolve, reject) => {
         const files = glob.sync('storage/**/*.*');
 
-        const result = [];
+        let result = [];
 
         files.forEach(f => {
             const d = f.substring(8);
@@ -189,10 +224,23 @@ const getFiles = env => {
                 ctimeMs: fileStat.ctimeMs
             };
 
+            file.destinationDev = `storage/dev/${d}`;
             file.destination = env === 'dev' ? `storage/dev/${d}` : `${prodVersionConfig.path}/${d}`;
             file.upload = env === 'prod' || checkUpload(file);
+            file.data = prodVersionConfig.data;
 
             result.push(file);
+        })
+
+        result = result.map(r => {
+            if (r.destinationDev.startsWith(templatePath)) {
+                r.template = r.destinationDev.substring(templatePath.length).split('/')[0];
+            }
+
+            r.destinationProd = r.destinationDev.replace('/dev/', `/prod/${idProdVersion}/`);
+            r.idProdVersion = idProdVersion;
+
+            return r;
         })
 
         lastResult = result.slice();
@@ -242,19 +290,20 @@ const getProdVersionConfig = _ => {
     const id = hoje.format("YYYY-MM-DD-HH-mm-ss");
 
     return {
-        name: 'v ' + hoje.format("YYYY-MM-DD HH-mm-ss"),
+        name: 'v ' + hoje.format('YYYY-MM-DD HH-mm-ss'),
         id: id,
         bucket: bucketName,
-        path: `storage/prod/${id}`
+        path: `storage/prod/${id}`,
+        data: hoje.format('DD/MM/YYYY HH:mm:ss')
     };
 }
 
 const showHelp = () => {
     console.info();
     console.info('upload-storage CLI Commands');
-    console.info('------------------------');
-    console.info('\trun dev || r: run dev immediately');
-    console.info('\trun prod || r: run prod immediately');
+    console.info('---------------------------');
+    console.info('\tr || r dev || run dev: run dev immediately');
+    console.info('\trun prod: run prod immediately');
     console.info('\tquit || q: quits ');
     console.info();
 }

@@ -17,45 +17,37 @@
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                    <th class="id">ID Contrato</th>
-                                    <th class="cliente">Nome do Cliente</th>
-                                    <th class="cpf-cnpj">CPF/CNPJ</th>
-                                    <th class="inicio">Início</th>
-                                    <th class="dia-mes right">Dia do Mês</th>
-                                    <th class="situacao right">Situação</th>
-                                    <th class="dt-criacao right">Criação</th>
+                                    <th class="id">ID Campanha</th>
+                                    <th class="titulo">Título</th>
+                                    <th class="url">URL</th>
+                                    <th class="data">Dt. Sorteio</th>
+                                    <th class="ativa right">Ativa</th>
+                                    <th class="dt-inclusao right">Criação</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="c in collectionCampanhas.collection.data | orderBy:'dtInclusao_js_desc'">
                                     <td class="id">
-                                        <a ng-href="#!/contratos-edit/{{c.id}}">
+                                        <a ng-href="#!/campanhas-edit/{{c.id}}">
                                             <strong class="monospace">
-                                                {{c.codigoContrato}}-{{c.codigoContratoVersao}}
+                                                {{c.id}}
                                             </strong>
                                         </a>
                                     </td>
-                                    <td class="cliente">
-                                        {{c.cliente_nome}}
+                                    <td class="titulo">
+                                        {{c.titulo}}
                                     </td>
-                                    <td class="cpf-cnpj">
-                                        {{c.cliente_cpfcnpj_formatted}}
+                                    <td class="url">
+                                        {{c.url}}
                                     </td>
-                                    <td class="início">
-                                        {{c.inicioContrato_mmyyyy}}
+                                    <td class="data">
+                                        {{c.dtSorteio_ddmmyyyy}}
                                     </td>
-                                    <td class="dia-mes right">
-                                        {{c.diaMesCobranca}}
-                                    </td>
-                                    <td class="situacao right">
-                                        <span ng-if="c.situacao==='preparacao'" class="badge bg-info">Em Preparação</span>
-                                        <span ng-if="c.situacao==='ativo'" class="badge bg-success">Ativo</span>
-                                        <span ng-if="c.situacao==='bloqueado'" class="badge bg-warning">Bloqueado</span>
-                                        <span ng-if="c.situacao==='cancelado'" class="badge bg-danger">Cancelado</span>
-                                        <span ng-if="c.situacao==='revisado'" class="badge bg-warning">Revisado</span>
+                                    <td class="ativa right">
+                                        <badge-true-false value="r.ativo"></badge-true-false>
                                     </td>
                                     <td class="dt-criacao right">
-                                        {{c.dtInclusao_timestamp | ddmmyyyyhhmm}}
+                                        {{c.dtInclusao | ddmmyyyyhhmm}}
                                     </td>
                                 </tr>
                             </tbody>
