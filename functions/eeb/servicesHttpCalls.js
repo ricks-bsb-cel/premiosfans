@@ -37,6 +37,10 @@ api.post("/v1/whr/:source/:type?", (request, response) => {
     initFirebase.call(require('./services/webhook').call, request, response);
 })
 
+api.post("/v1/generate-templates", (request, response) => {
+    initFirebase.call(require('./services/generateTemplates').call, request, response);
+})
+
 const eeb = express();
 
 eeb.use(cors());

@@ -198,28 +198,12 @@ exports.empresas = () => {
     return new collectionClass('empresas');
 }
 
-exports.contas = () => {
-    return new collectionClass('contas');
-}
-
 exports.emailBox = () => {
     return new collectionClass('emailBox');
 }
 
 exports.emailMessage = () => {
     return new collectionClass('emailMessage');
-}
-
-exports.contasPixKeys = () => {
-    return new collectionClass('contasPixKeys');
-}
-
-exports.contasTransactions = () => {
-    return new collectionClass('contasTransactions');
-}
-
-exports.clientes = () => {
-    return new collectionClass('clientes');
 }
 
 exports._superUsers = () => {
@@ -238,10 +222,6 @@ exports.admInterface = () => {
     return new collectionClass('admInterface');
 }
 
-exports.zoeAccount = () => {
-    return new collectionClass('zoeAccount');
-}
-
 exports.admConfigPath = () => {
     return new collectionClass('admConfigPath');
 }
@@ -258,44 +238,6 @@ exports.cobrancas = () => {
     return new collectionClass('cobrancas');
 }
 
-exports.contratos = () => {
-    return new collectionClass('contratos');
-}
-
-exports.lancamentos = () => {
-    return new collectionClass('lancamentos');
-}
-
-exports.contratosProdutos = () => {
-    return new collectionClass('contratosProdutos');
-}
-
-exports.funcionarios = () => {
-    return new collectionClass('funcionarios');
-}
-
-exports.simpleSignInUrls = () => {
-    return new collectionClass('simpleSignInUrls');
-}
-
-exports.boletos = () => {
-    return new collectionClass('boletos');
-}
-
-exports.planos = () => {
-    return new collectionClass('planos');
-}
-
-exports.produtos = () => {
-    return new collectionClass('produtos');
-}
-
-/*
-exports.clientesCelularCpf = () => {
-    return new collectionClass('clientesCelularCpf');
-}
-*/
-
 exports.apiConfig = () => {
     return new collectionClass('apiConfig');
 }
@@ -304,27 +246,8 @@ exports.log = () => {
     return new collectionClass('_log');
 }
 
-exports.cep = () => {
-    return new collectionClass('_cep');
-}
-
-/*
-exports.workflowCalls = () => {
-    return new collectionClass('workflowCalls');
-}
-*/
-
-
 exports.appUsers = () => {
     return new collectionClass('appUsers');
-}
-
-exports.cartosUsers = () => {
-    return new collectionClass('cartosUsers');
-}
-
-exports.bancos = () => {
-    return new collectionClass('bancos');
 }
 
 exports.serviceError = () => {
@@ -342,3 +265,16 @@ exports.deadLettering = _ => {
 exports.eebTest = _ => {
     return new collectionClass('_eebTest');
 }
+
+exports.frontTemplates = _ => {
+    return new collectionClass('frontTemplates');
+}
+
+exports.influencers = _ => {
+    return new collectionClass('empresas');
+}
+
+exports.campanhas = _ => {
+    return new collectionClass('campanhas');
+}
+
