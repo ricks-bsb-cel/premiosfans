@@ -42,7 +42,7 @@ class Service extends eebService {
 
 exports.Service = Service;
 
-exports.call = (request, response) => {
+exports.callRequest = (request, response) => {
 
     const parm = {
         name: 'webhook',

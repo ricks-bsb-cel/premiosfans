@@ -45,17 +45,21 @@ class Service extends eebService {
 
 exports.Service = Service;
 
-exports.call = (request, response) => {
-
+const call = (data, request, response) => {
     const service = new Service(request, response, {
         name: 'test',
         async: request.query.async ? request.query.async === 'true' : false,
         debug: request.query.debug ? request.query.debug === 'true' : false,
-        data: request.body || {},
+        data: data,
         attributes: {
             idEmpresa: 'all'
         }
     });
 
     return service.init();
+}
+
+exports.callRequest = (request, response) => {
+    return call(request.body || {}, request, response)
+
 }

@@ -11,18 +11,12 @@ https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
-const generateOneTemplate = require('./generateOneTemplate');
-
 const firestoreDAL = require('../../api/firestoreDAL');
 const global = require('../../global');
 
-const frontTemplates = firestoreDAL.frontTemplates();
-const influencers = firestoreDAL.influencers();
-const campanhas = firestoreDAL.campanhas();
-
-const _frontTemplates = 0;
-const _influencers = 1;
-const _campanhas = 2;
+const collectionFrontTemplates = firestoreDAL.frontTemplates();
+const collectionInfluencers = firestoreDAL.influencers();
+const collectionCampanhas = firestoreDAL.campanhas();
 
 const storage = new Storage();
 
@@ -46,54 +40,36 @@ class Service extends eebService {
                 host: this.parm.host
             };
 
-            if (!idTemplate) throw new Error(`idTemplate inválido. Informe id ou all`);
-            if (!idInfluencer) throw new Error(`idInfluencer inválido. Informe id ou all`);
-            if (!idCampanha) throw new Error(`idCampanha inválido. Informe id ou all`);
+            if (!idTemplate) throw new Error(`idTemplate inválido. Informe idTemplate`);
+            if (!idInfluencer) throw new Error(`idInfluencer inválido. Informe idInfluencer`);
+            if (!idCampanha) throw new Error(`idCampanha inválido. Informe idCampanha`);
 
             // Carga dos dados
-            let promises = [];
-
-            promises.push(idTemplate === 'all' ? frontTemplates.get() : frontTemplates.getDoc(idTemplate));
-            promises.push(idInfluencer === 'all' ? influencers.get() : influencers.getDoc(idInfluencer));
-            promises.push(idCampanha === 'all' ? campanhas.get() : campanhas.getDoc(idCampanha));
+            let promises = [
+                collectionFrontTemplates.getDoc(idTemplate),
+                collectionInfluencers.getDoc(idInfluencer),
+                collectionCampanhas.getDoc(idCampanha)
+            ];
 
             return Promise.all(promises)
                 .then(promisesResult => {
-                    result.templates = idTemplate === 'all' ? promisesResult[_frontTemplates] : [promisesResult[_frontTemplates]];
-                    result.influencers = idInfluencer === 'all' ? promisesResult[_influencers] : [promisesResult[_influencers]];
-                    result.campanhas = idCampanha === 'all' ? promisesResult[_campanhas] : [promisesResult[_campanhas]];
+                    result.template = promisesResult[0];
+                    result.influencer = promisesResult[1];
+                    result.campanha = promisesResult[2];
 
-                    if (!result.templates.length || !result.influencers.length || !result.campanhas.length) {
-                        throw new Error(`Nenhum registro encontrado em uma ou mais coleções de dados`);
-                    }
-
-                    return loadTemplateFiles(result.templates);
+                    return loadTemplateFiles(result.template);
                 })
 
-                .then(_ => {
-                    // Aqui já temos os dados das campanhas, dos influencers e dos templates (inclusive, com conteúdo do arquivo)
+                .then(files => {
+                    result.template.files = files;
 
-                    let generations = [];
-
-                    result.templates.forEach(template => {
-                        result.influencers.forEach(influencer => {
-                            result.campanhas.forEach(campanha => {
-                                generations.push({
-                                    template: { ...template },
-                                    influencer: { ...influencer },
-                                    campanha: { ...campanha }
-                                })
-                            })
-                        })
-                    })
-
-                    // Dispara as gerações... uma por uma...
-                    return generateAll(generations);
+                    return compileAndSendToStorage(result.template, result.influencer, result.campanha);
                 })
-                .then(generateResult => {
-                    result.generateResult = generateResult;
 
-                    return resolve(result)
+                .then(sendResult => {
+                    result.sendResult = sendResult;
+
+                    return resolve(this.parm.debug ? result : { success: true });
                 })
 
                 .catch(e => {
@@ -106,36 +82,7 @@ class Service extends eebService {
 
 }
 
-const generateAll = g => {
-    return new Promise((resolve, reject) => {
-        let result = [];
-
-        let generations = g.slice();
-
-        const generate = _ => {
-            if (!generations.length) {
-                return resolve(result);
-            }
-
-            const next = generations.shift();
-
-            sendTemplateToStorage(next.template, next.influencer, next.campanha)
-                .then(sendTemplateToStorageResult => {
-                    result.push(sendTemplateToStorageResult);
-
-                    generate();
-                })
-                .catch(e => {
-                    return reject(e);
-                })
-        }
-
-        generate();
-
-    })
-}
-
-const sendTemplateToStorage = (template, influencer, campanha) => {
+const compileAndSendToStorage = (template, influencer, campanha) => {
     return new Promise((resolve, reject) => {
 
         const storagePath = `app/${influencer.id}/${campanha.id}/${template.nome}`;
@@ -214,72 +161,56 @@ const saveContentOnStorage = (bucketName, fileName, content, idTemplate, idInflu
     })
 }
 
-const loadTemplateFiles = templates => { // Resposável por buscar os templates no Storage
-
-    const getFiles = template => {
-        return new Promise((resolve, reject) => {
-
-            storage.bucket(template.bucket).getFiles({
-                prefix: template.storagePathDev
-            })
-
-                .then(([files]) => {
-                    template.files = files.map(f => {
-                        return {
-                            name: f.name,
-                            file: f,
-                            metadata: {
-                                id: f.metadata.id,
-                                size: f.metadata.size
-                            }
-                        };
-                    });
-
-                    let promises = [];
-
-                    template.files.forEach(f => {
-                        promises.push(getFileContent(f.file));
-                    })
-
-                    return Promise.all(promises);
-                })
-
-                .then(filesContent => {
-
-                    filesContent.forEach((c, i) => {
-                        template.files[i].content = c;
-
-                        // Não preciso mais do objeto File
-                        delete template.files[i].file;
-                    })
-
-                    return resolve();
-                })
-
-                .catch(e => {
-                    return reject(e);
-                })
-
-        })
-    }
+const loadTemplateFiles = template => { // Resposável por buscar os templates no Storage
 
     return new Promise((resolve, reject) => {
 
-        let promises = [];
+        let files;
 
-        templates.forEach(t => {
-            promises.push(getFiles(t));
+        storage.bucket(template.bucket).getFiles({
+            prefix: template.storagePathDev
         })
 
-        return Promise.all(promises)
-            .then(_ => {
-                return resolve();
+            .then(([getFilesResult]) => {
+                files = getFilesResult;
+
+                files = files.map(f => {
+                    return {
+                        name: f.name,
+                        file: f,
+                        metadata: {
+                            id: f.metadata.id,
+                            size: f.metadata.size
+                        }
+                    };
+                });
+
+                let promises = [];
+
+                files.forEach(f => {
+                    promises.push(getFileContent(f.file));
+                })
+
+                return Promise.all(promises);
             })
+
+            .then(filesContent => {
+                filesContent.forEach((c, i) => {
+                    files[i].content = c;
+
+                    // Não preciso mais do objeto File
+                    delete files[i].file;
+                })
+
+                return resolve(files);
+            })
+
             .catch(e => {
                 return reject(e);
             })
 
     })
+
 }
 
 const getFileContent = file => { // Responsável por carregar o conteúdo do arquivo do Storage
@@ -317,7 +248,7 @@ exports.Service = Service;
 
 const call = (idTemplate, idInfluencer, idCampanha, request, response) => {
     const service = new Service(request, response, {
-        name: 'generate-templates',
+        name: 'generate-one-template',
         async: request.query.async ? request.query.async === 'true' : true,
         debug: request.query.debug ? request.query.debug === 'true' : false,
         requireIdEmpresa: false,
