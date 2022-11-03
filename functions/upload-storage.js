@@ -14,6 +14,10 @@ const serviceAccount = require('./premios-fans-firebase-adminsdk-ga8ql-fed7f24f6
 const storagePath = path.join(__dirname, 'storage');
 const bucketName = 'premios-fans.appspot.com';
 
+/*
+https://cloud.google.com/nodejs/docs/reference/storage/latest
+*/
+
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 
@@ -105,6 +109,7 @@ const uploadTemplates = env => {
     }
 
     getFiles(env)
+    
         .then(getFilesResult => {
             files = getFilesResult;
 
@@ -127,13 +132,14 @@ const uploadTemplates = env => {
                     if (i < 0) {
                         let t = {
                             nome: f.template,
+                            bucket: bucketName,
                             localPath: f.source,
-                            storagePathDev: f.destinationDev,
+                            storagePathDev: f.destinationDev.replace('/index.html', ''),
                             data: f.data
                         };
 
                         if (env === 'prod') {
-                            t.storagePathProd = f.destinationProd;
+                            t.storagePathProd = f.destinationProd.replace('/index.html', '');
                             t.version = f.idProdVersion;
                         }
 
@@ -144,9 +150,11 @@ const uploadTemplates = env => {
 
             return Promise.all(updatePromise);
         })
+
         .then(_ => {
             running = false;
         })
+
         .catch(e => {
             console.error(e);
 
