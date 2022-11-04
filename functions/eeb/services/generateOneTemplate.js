@@ -85,12 +85,16 @@ class Service extends eebService {
 const compileAndSendToStorage = (template, influencer, campanha) => {
     return new Promise((resolve, reject) => {
 
-        const storagePath = `app/${influencer.id}/${campanha.id}/${template.nome}`;
+        // app/<idInfluencer>/<idCampanha>
+        const storagePath = `app/${influencer.id}/${campanha.id}`;
 
         const obj = {
+            template: template,
             influencer: influencer,
             campanha: campanha
         };
+
+        campanha.imagePrincipal = campanha.images[0].secure_url;
 
         const promises = [];
 
@@ -162,7 +166,6 @@ const saveContentOnStorage = (bucketName, fileName, content, idTemplate, idInflu
 }
 
 const loadTemplateFiles = template => { // Resposável por buscar os templates no Storage
-
     return new Promise((resolve, reject) => {
 
         let files;
@@ -210,7 +213,6 @@ const loadTemplateFiles = template => { // Resposável por buscar os templates n
             })
 
     })
-
 }
 
 const getFileContent = file => { // Responsável por carregar o conteúdo do arquivo do Storage
