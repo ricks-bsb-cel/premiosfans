@@ -12,13 +12,9 @@ const generateOneTemplate = require('./generateOneTemplate');
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
-const frontTemplates = firestoreDAL.frontTemplates();
+// const frontTemplates = firestoreDAL.frontTemplates();
 const influencers = firestoreDAL.influencers();
 const campanhas = firestoreDAL.campanhas();
-
-const _frontTemplates = 0;
-const _influencers = 1;
-const _campanhas = 2;
 
 class Service extends eebService {
 
@@ -31,39 +27,41 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            const idTemplate = this.parm.data.idTemplate;
-            const idInfluencer = this.parm.data.idInfluencer;
+            // A campanha já tem o template a ser utilizado...
+
             const idCampanha = this.parm.data.idCampanha;
+            const idInfluencer = this.parm.data.idInfluencer;
+
+            // const idTemplate = this.parm.data.idTemplate;
 
             const result = {
                 success: true,
                 host: this.parm.host
             };
 
-            if (!idTemplate) throw new Error(`idTemplate inválido. Informe id ou all`);
-            if (!idInfluencer) throw new Error(`idInfluencer inválido. Informe id ou all`);
             if (!idCampanha) throw new Error(`idCampanha inválido. Informe id ou all`);
+            if (!idInfluencer) throw new Error(`idInfluencer inválido. Informe id ou all`);
+            // if (!idTemplate) throw new Error(`idTemplate inválido. Informe id ou all`);
 
             // Carga dos dados
             const promises = [];
 
-            promises.push(idTemplate === 'all' ? frontTemplates.get() : frontTemplates.getDoc(idTemplate));
-            promises.push(idInfluencer === 'all' ? influencers.get() : influencers.getDoc(idInfluencer));
             promises.push(idCampanha === 'all' ? campanhas.get() : campanhas.getDoc(idCampanha));
+            promises.push(idInfluencer === 'all' ? influencers.get() : influencers.getDoc(idInfluencer));
+            // promises.push(idTemplate === 'all' ? frontTemplates.get() : frontTemplates.getDoc(idTemplate));
 
             return Promise.all(promises)
 
                 .then(promisesResult => {
-                    result.templates = idTemplate === 'all' ? promisesResult[_frontTemplates] : [promisesResult[_frontTemplates]];
-                    result.influencers = idInfluencer === 'all' ? promisesResult[_influencers] : [promisesResult[_influencers]];
-                    result.campanhas = idCampanha === 'all' ? promisesResult[_campanhas] : [promisesResult[_campanhas]];
 
-                    if (!result.templates.length || !result.influencers.length || !result.campanhas.length) {
-                        throw new Error(`Nenhum registro encontrado em uma ou mais coleções de dados`);
-                    }
+                    result.campanhas = idCampanha === 'all' ? promisesResult[0] : [promisesResult[0]];
+                    result.influencers = idInfluencer === 'all' ? promisesResult[1] : [promisesResult[1]];
+
+                    // result.templates = idTemplate === 'all' ? promisesResult[_frontTemplates] : [promisesResult[_frontTemplates]];
 
                     const generate = [];
 
+                    /*
                     result.templates.forEach(template => {
                         result.influencers.forEach(influencer => {
                             result.campanhas.forEach(campanha => {
@@ -71,6 +69,15 @@ class Service extends eebService {
                                     generateOneTemplate.call(template.id, influencer.id, campanha.id)
                                 )
                             })
+                        })
+                    })
+                    */
+
+                    result.influencers.forEach(influencer => {
+                        result.campanhas.forEach(campanha => {
+                            generate.push(
+                                generateOneTemplate.call(campanha.template, influencer.id, campanha.id)
+                            )
                         })
                     })
 
@@ -96,14 +103,13 @@ class Service extends eebService {
 
 exports.Service = Service;
 
-const call = (idTemplate, idInfluencer, idCampanha, request, response) => {
+const call = (idInfluencer, idCampanha, request, response) => {
     const service = new Service(request, response, {
         name: 'generate-templates',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         requireIdEmpresa: false,
         data: {
-            idTemplate: idTemplate,
             idInfluencer: idInfluencer,
             idCampanha: idCampanha
         },
@@ -118,16 +124,15 @@ const call = (idTemplate, idInfluencer, idCampanha, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-    const idTemplate = request.body.idTemplate;
     const idInfluencer = request.body.idInfluencer; // Código da empresa
     const idCampanha = request.body.idCampanha;
 
-    if (!idTemplate || !idInfluencer || !idCampanha) {
+    if (!idInfluencer || !idCampanha) {
         return response.status(500).json({
             success: false,
             error: 'Invalid parms'
         })
     }
 
-    return call(idTemplate, idInfluencer, idCampanha, request, response);
+    return call(idInfluencer, idCampanha, request, response);
 }
