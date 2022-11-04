@@ -45,7 +45,7 @@ class Service extends eebService {
             if (!idCampanha) throw new Error(`idCampanha inválido. Informe idCampanha`);
 
             // Carga dos dados
-            let promises = [
+            const promises = [
                 collectionFrontTemplates.getDoc(idTemplate),
                 collectionInfluencers.getDoc(idInfluencer),
                 collectionCampanhas.getDoc(idCampanha)
@@ -69,7 +69,7 @@ class Service extends eebService {
                 .then(sendResult => {
                     result.sendResult = sendResult;
 
-                    return resolve(this.parm.debug ? result : { success: true });
+                    return resolve(this.parm.async ? { success: true } : result);
                 })
 
                 .catch(e => {
@@ -92,7 +92,7 @@ const compileAndSendToStorage = (template, influencer, campanha) => {
             campanha: campanha
         };
 
-        let promises = [];
+        const promises = [];
 
         template.files.forEach(file => {
             const storageDest = `${storagePath}/${path.basename(file.name)}`;
@@ -185,7 +185,7 @@ const loadTemplateFiles = template => { // Resposável por buscar os templates n
                     };
                 });
 
-                let promises = [];
+                const promises = [];
 
                 files.forEach(f => {
                     promises.push(getFileContent(f.file));
@@ -223,8 +223,8 @@ const getFileContent = file => { // Responsável por carregar o conteúdo do arq
         }
 
         const bufferToStream = buffer => {
-            var Readable = require('stream').Readable;
-            var stream = new Readable();
+            const Readable = require('stream').Readable;
+            const stream = new Readable();
             stream.push(buffer);
             stream.push(null);
             return stream;
@@ -232,7 +232,7 @@ const getFileContent = file => { // Responsável por carregar o conteúdo do arq
 
         return file.download(function (e, contents) {
             if (!e) {
-                var stream = bufferToStream(contents);
+                const stream = bufferToStream(contents);
                 streamToString(stream, result => {
                     return resolve(result);
                 })
@@ -247,10 +247,11 @@ const getFileContent = file => { // Responsável por carregar o conteúdo do arq
 exports.Service = Service;
 
 const call = (idTemplate, idInfluencer, idCampanha, request, response) => {
+
     const service = new Service(request, response, {
         name: 'generate-one-template',
-        async: request.query.async ? request.query.async === 'true' : true,
-        debug: request.query.debug ? request.query.debug === 'true' : false,
+        async: request && request.query.async ? request.query.async === 'true' : true,
+        debug: request && request.query.debug ? request.query.debug === 'true' : false,
         requireIdEmpresa: false,
         data: {
             idTemplate: idTemplate,

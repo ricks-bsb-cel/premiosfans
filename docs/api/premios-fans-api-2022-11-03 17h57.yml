@@ -1,0 +1,173 @@
+swagger: '2.0'
+
+info:
+  title: Premios Fans API
+  description: Premios Fans Authenticated API
+  version: "1.0.0"
+  contact:
+    email: dev@zoepay.com.br
+
+# https://stackoverflow.com/questions/64281334/cors-errors-when-trying-to-fetch-from-new-google-cloud-api-gateway
+
+host: "premios-fans-a8fj1dkb.uc.gateway.dev"
+x-google-endpoints:
+- name: "premios-fans-a8fj1dkb.uc.gateway.dev"
+  allowCors: True
+
+schemes:
+- https
+
+produces: 
+- application/json
+
+paths:
+
+  /api/eeb/v1/test:
+    get:
+      tags:
+      - EEB Test
+      summary: EEB Test Getter
+      operationId: eeb-test-get
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    post:
+      tags:
+      - EEB Test
+      summary: EEB Test Getter
+      operationId: eeb-test-post
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+
+  /api/users/v1/user:
+    get:
+      tags:
+      - Usuários
+      summary: Informações do Usuário
+      operationId: current-user-info
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/users
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+
+  /api/eeb/v1/generate-one-template:
+    post:
+      tags:
+      - EEB
+      summary: Gera um Template
+      operationId: eeb-generate-one-template
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+
+  /api/eeb/v1/generate-templates:
+    post:
+      tags:
+      - EEB
+      summary: Gera vários templates
+      operationId: eeb-generate-template
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+
+securityDefinitions:
+  firebase:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://securetoken.google.com/premios-fans"
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    x-google-audiences: "premios-fans"
+
+definitions:
+
+  ApiError:
+    properties:
+      error:
+        type: string
+      datetimeserver:
+        description: Data e hora do servidor
+        type: string
+      code:
+        description: HTTP Result
+        type: integer
+        format: int32
+      versionId:
+        description: Versão do aplicativo no backend
+        type: string
+

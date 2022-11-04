@@ -34,16 +34,19 @@ admin.initializeApp({
 const templatePath = 'storage/dev/templates/';
 
 const
-    tInterval = 5000,
+    // tInterval = 5000,
+
     rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
     });
 
+const
+    interval = null;
+
 let
     lastResult,
-    interval = null,
-    lineTyping = null,
+    // lineTyping = null,
     running = false,
     prodVersionConfig,
     totalUploaded;
@@ -109,15 +112,13 @@ const uploadTemplates = env => {
     }
 
     getFiles(env)
-    
         .then(getFilesResult => {
             files = getFilesResult;
 
             return uploadAllFiles(files);
         })
-
         .then(_ => {
-            let templates = [],
+            const templates = [],
                 updatePromise = [];
 
             files
@@ -130,7 +131,7 @@ const uploadTemplates = env => {
                     });
 
                     if (i < 0) {
-                        let t = {
+                        const t = {
                             nome: f.template,
                             bucket: bucketName,
                             localPath: f.source,
@@ -150,11 +151,9 @@ const uploadTemplates = env => {
 
             return Promise.all(updatePromise);
         })
-
         .then(_ => {
             running = false;
         })
-
         .catch(e => {
             console.error(e);
 
@@ -165,7 +164,7 @@ const uploadTemplates = env => {
 
 const uploadAllFiles = f => {
     return new Promise((resolve, reject) => {
-        let files = f.slice();
+        const files = f.slice();
 
         totalUploaded = 0;
 
@@ -273,8 +272,9 @@ const checkUpload = file => {
         lastResult[i].ctimeMs !== file.ctimeMs;
 }
 
+/*
 const initInterval = _ => {
-    let pauseTimer = null;
+    const pauseTimer = null;
 
     interval = setInterval(function () {
         if (lineTyping != rl.line) {
@@ -292,6 +292,7 @@ const initInterval = _ => {
         }
     }, tInterval);
 }
+*/
 
 const getProdVersionConfig = _ => {
     const hoje = moment().tz("America/Sao_Paulo");
