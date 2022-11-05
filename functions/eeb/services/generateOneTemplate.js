@@ -85,16 +85,30 @@ class Service extends eebService {
 const compileAndSendToStorage = (template, influencer, campanha) => {
     return new Promise((resolve, reject) => {
 
-        // app/<idInfluencer>/<idCampanha>
         const storagePath = `app/${influencer.id}/${campanha.id}`;
 
         const obj = {
             template: template,
             influencer: influencer,
-            campanha: campanha
+            campanha: campanha,
+            config: {
+                qtdMaximaCompraSugerida: 6,
+                qtdMaximaCompra: 12,
+                vlTitulo: 5,
+                sugestoes: []
+            }
         };
 
         campanha.imagePrincipal = campanha.images[0].secure_url;
+
+        for (let i = 1; i <= obj.config.qtdMaximaCompraSugerida; i++) {
+            obj.config.sugestoes.push({
+                qtd: i,
+                qtdExibicao: `${i} Título${i > 1 ? 's' : ''}`,
+                vlTotal: obj.config.vlTitulo * i,
+                vlTotalExibicao: `<strong>R$ ${obj.config.vlTitulo * i}</strong><small>,00</small>`
+            })
+        }
 
         const promises = [];
 

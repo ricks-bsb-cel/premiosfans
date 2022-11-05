@@ -15,25 +15,14 @@ const fakeData = {
         imagePrincipal: "https://res.cloudinary.com/dckw5m2ep/image/upload/v1667436396/premiosfans/jyhkd0e8zh3jythunvzs.jpg",
         titulo: "Campanha de Natal 2025",
         subTitulo: "Seu Natal cheio de Grana no Bolso!",
-        detalhes: "No entanto, não podemos esquecer que o novo modelo estruturalista aqui preconizado auxilia a preparação e a composição das posturas dos filósofos divergentes com relação às atribuições conceituais. Do mesmo modo, a indeterminação contínua de distintas formas de fenômeno garante a contribuição de um grupo importante na determinação das novas teorias propostas. Deste modo, acabei de refutar a tese segundo a qual a consolidação das estruturas psico-lógicas assume importantes posições no estabelecimento dos conhecimentos a priori.",
-        cotas: [
-            {
-                quantidade: 1,
-                texto: "Dúvido tú ganhar, mas pode ser que dê sorte!",
-                valor: "R$ 2,00"
-            },
-            {
-                quantidade: 2,
-                texto: "Ficando bom!",
-                valor: "R$ 4,00"
-            },
-            {
-                quantidade: 3,
-                texto: "Mais chances de Ganhar!",
-                valor: "R$ 6,00"
-            }
-        ]
+        detalhes: "No entanto, não podemos esquecer que o novo modelo estruturalista aqui preconizado auxilia a preparação e a composição das posturas dos filósofos divergentes com relação às atribuições conceituais. Do mesmo modo, a indeterminação contínua de distintas formas de fenômeno garante a contribuição de um grupo importante na determinação das novas teorias propostas. Deste modo, acabei de refutar a tese segundo a qual a consolidação das estruturas psico-lógicas assume importantes posições no estabelecimento dos conhecimentos a priori."
+    },
+    config: {
+        qtdMaximaCompraSugerida: 6,
+        qtdMaximaCompra: 12,
+        vlTitulo: 5
     }
+
 }
 
 
@@ -106,12 +95,32 @@ exports.getTemplate = (request, response) => {
 
     response.setHeader('content-type', 'text/html; charset=utf-8');
     response.setHeader('cache-control', 'public, max-age=0');
-    response.setHeader('connection', 'keep-alive');
+    response.setHeader('connection', 'keep-alive')
 
-    const data = fs.readFileSync(templateFile);
-    const compiled = global.compile(data, fakeData);
+    const render = { ...fakeData };
 
-    return response.status(200).send(compiled);
+    render.config.sugestoes = [];
+
+    for (let i = 1; i <= render.config.qtdMaximaCompraSugerida; i++) {
+        render.config.sugestoes.push({
+            qtd: i,
+            qtdExibicao: `${i} Título${i > 1 ? 's' : ''}`,
+            vlTotal: render.config.vlTitulo * i,
+            vlTotalExibicao: `<strong>R$ ${render.config.vlTitulo * i}</strong><small>,00</small>`
+        })
+    }
+
+    try {
+        const template = fs.readFileSync(templateFile).toString();
+        const compiled = global.compile(template, render);
+
+        return response.status(200).send(compiled);
+    }
+    catch (e) {
+        render.error = e.toString();
+        console.error(e);
+        return response.status(500).json(render);
+    }
 }
 
 
