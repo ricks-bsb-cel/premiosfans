@@ -19,40 +19,39 @@
 
     <!-- https://icons.getbootstrap.com/ -->
 
-    <link rel="stylesheet" href="/templates/default/custom.css?v=7">
+    <link rel="stylesheet" href="/templates/default/custom.css?v=12">
 </head>
 
 <body>
 
+    <nav class="container-fluid">
+        <ul>
+            <li><a href="./" class="contrast" onclick="event.preventDefault()">
+                <strong>Prêmios</strong> Fans
+            </a></li>
+        </ul>
+        <ul>
+            <li>
+                <a href="https://picocss.com#examples" class="primary">
+                    Resultados
+                </a>
+            </li>
+            <li>
+                <details role="list" dir="rtl">
+                    <summary aria-haspopup="listbox" role="link" class="primary hamburguer">
+                        <i class="bi bi-list"></i>
+                    </summary>
+                    <ul role="listbox">
+                        <li><a href="../preview/">Sobre a Empresa</a></li>
+                        <li><a href="../preview-rtl/">Regulamento</a></li>
+                        <li><a href="../classless/">Contato</a></li>
+                    </ul>
+                </details>
+            </li>
+        </ul>
+    </nav>
+
     <div class="hero" data-theme="dark" style="background-image: url({{campanha.imagePrincipal}});">
-        <nav class="container-fluid">
-            <ul>
-                <li>
-                    <a href="./" class="contrast" onclick="event.preventDefault()">
-                        <strong>Premios Fans</strong>
-                    </a>
-                </li>
-            </ul>
-            <ul>
-                <li>
-                    <a href="../preview/" role="button">
-                        Resultados
-                    </a>
-                </li>
-                <li>
-                    <details role="list" dir="rtl">
-                        <summary aria-haspopup="listbox" role="link" class="contrast">
-                            XXX
-                        </summary>
-                        <ul role="listbox">
-                            <li><a href="../preview/">Sobre a Empresa</a></li>
-                            <li><a href="../preview-rtl/">Regulamento</a></li>
-                            <li><a href="../classless/">Contato</a></li>
-                        </ul>
-                    </details>
-                </li>
-            </ul>
-        </nav>
         <header class="container">
             <p>
                 <a href="#" role="button" onclick="event.preventDefault()">
@@ -60,14 +59,8 @@
                 </a>
             </p>
         </header>
-        <footer>
-            <i class="bi bi-instagram"></i>
-            <i class="bi bi-facebook"></i>
-            <i class="bi bi-twitter"></i>
-            <i class="bi bi-whatsapp"></i>
-        </footer>
     </div>
-
+    
     <main class="container">
         <section>
             <hgroup>
@@ -87,31 +80,29 @@
 
                     <hgroup class="mt-10">
                         <h2>Compra Rápida</h2>
-                        <h3>Acredite em sua sorte e invista em sau vitória! Escolha quantos títulos você deseja e <strong>compre agora</strong>!</h3>
+                        <h3>Acredite em sua sorte e invista em sau vitória! Escolha quantos títulos você deseja e
+                            <strong>compre agora</strong>!
+                        </h3>
                     </hgroup>
-                    
+
                     <div class="row">
                         {{#each config.sugestoes}}
-                            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-2">
-                                <div class="col-example">
-                                    <article class="m-0 mb-20 p-10">
-                                        <a
-                                            href="#"
-                                            class="sugestao"
-                                            onclick="event.preventDefault()"
-                                        >
-                                            <h5 class="mb-10">
-                                                {{this.qtdExibicao}}
-                                            </h5>
-                                            <footer>
-                                                <h3 class="mb-5">
-                                                    {{{this.vlTotalExibicao}}}
-                                                </h3>
-                                            </footer>
-                                        </a>
-                                    </article>
-                                </div>
+                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-2">
+                            <div class="col-example">
+                                <article class="m-0 mb-20 p-10">
+                                    <a href="#" class="sugestao text-center" onclick="event.preventDefault()">
+                                        <h5 class="mb-10">
+                                            {{this.qtdExibicao}}
+                                        </h5>
+                                        <footer>
+                                            <h3 class="mb-5">
+                                                {{{this.vlTotalExibicao}}}
+                                            </h3>
+                                        </footer>
+                                    </a>
+                                </article>
                             </div>
+                        </div>
                         {{/each}}
                     </div>
 
@@ -122,7 +113,7 @@
                 </article>
             </div>
         </section>
-    
+
     </main>
 
     <!-- Subscribe -->

@@ -749,6 +749,7 @@ exports.isBoolean = value => {
 
 
 exports.compile = (txt, obj) => {
+    txt = txt.toString();
     const template = Handlebars.compile(txt);
     return template(obj);
 }

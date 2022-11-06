@@ -34,8 +34,6 @@ admin.initializeApp({
 const templatePath = 'storage/dev/templates/';
 
 const
-    // tInterval = 5000,
-
     rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -46,7 +44,6 @@ const
 
 let
     lastResult,
-    // lineTyping = null,
     running = false,
     prodVersionConfig,
     totalUploaded;
@@ -92,7 +89,6 @@ const init = _ => {
             process.exit(0);
         });
 
-    // initInterval();
     showHelp();
 }
 
@@ -271,28 +267,6 @@ const checkUpload = file => {
     return lastResult[i].mtimeMs !== file.mtimeMs ||
         lastResult[i].ctimeMs !== file.ctimeMs;
 }
-
-/*
-const initInterval = _ => {
-    const pauseTimer = null;
-
-    interval = setInterval(function () {
-        if (lineTyping != rl.line) {
-            lineTyping = rl.line;
-
-            if (interval) clearInterval(interval);
-            if (pauseTimer) clearTimeout(pauseTimer);
-
-            pauseTimer = setTimeout(function () {
-                initInterval();
-            }, 5000);
-
-        } else {
-            uploadTemplates('dev');
-        }
-    }, tInterval);
-}
-*/
 
 const getProdVersionConfig = _ => {
     const hoje = moment().tz("America/Sao_Paulo");

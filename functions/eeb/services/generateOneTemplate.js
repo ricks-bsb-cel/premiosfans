@@ -6,6 +6,8 @@ const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const eebService = require('../eventBusService').abstract;
 
+const app = require('../../app/home');
+
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
@@ -69,6 +71,10 @@ class Service extends eebService {
                 .then(sendResult => {
                     result.sendResult = sendResult;
 
+                    delete result.template;
+                    delete result.campanha;
+                    delete result.influencer;
+
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 
@@ -90,43 +96,14 @@ const compileAndSendToStorage = (template, influencer, campanha) => {
         const obj = {
             template: template,
             influencer: influencer,
-            campanha: campanha,
-            config: {
-                qtdMaximaCompraSugerida: 6,
-                qtdMaximaCompra: 12,
-                vlTitulo: 5,
-                sugestoes: []
-            }
+            campanha: campanha
         };
-
-        campanha.imagePrincipal = campanha.images[0].secure_url;
-
-        for (let i = 1; i <= obj.config.qtdMaximaCompraSugerida; i++) {
-            obj.config.sugestoes.push({
-                qtd: i,
-                qtdExibicao: `${i} Título${i > 1 ? 's' : ''}`,
-                vlTotal: obj.config.vlTitulo * i,
-                vlTotalExibicao: `<strong>R$ ${obj.config.vlTitulo * i}</strong><small>,00</small>`
-            })
-        }
 
         const promises = [];
 
         template.files.forEach(file => {
-            const storageDest = `${storagePath}/${path.basename(file.name)}`;
-            const content = global.compile(file.content, obj);
-
-            promises.push(
-                saveContentOnStorage(
-                    template.bucket,
-                    storageDest,
-                    content,
-                    template.nome,
-                    influencer.id,
-                    campanha.id
-                )
-            )
-        });
+            promises.push(compileAndSaveContentOnStorage(storagePath, file, obj));
+        })
 
         return Promise.all(promises)
 
@@ -135,7 +112,11 @@ const compileAndSendToStorage = (template, influencer, campanha) => {
                     saveFilesResults.map(f => {
                         return {
                             bucket: f.bucket.name,
-                            fileName: f.file.name
+                            file: {
+                                name: f.file.name,
+                                size: f.file.metadata.size,
+                                md5Hash: f.file.metadata.md5Hash
+                            }
                         }
                     })
                 );
@@ -148,33 +129,39 @@ const compileAndSendToStorage = (template, influencer, campanha) => {
     })
 }
 
-const saveContentOnStorage = (bucketName, fileName, content, idTemplate, idInfluencer, idCampanha) => {
+const compileAndSaveContentOnStorage = (storagePath, file, obj) => {
     return new Promise((resolve, reject) => {
+        const storageDest = `${storagePath}/${path.basename(file.name)}`;
 
         const fileOptions = {
             uploadType: { resumable: false },
-            contentType: global.getContentTypeByExtension(fileName)
+            contentType: global.getContentTypeByExtension(storageDest)
         };
 
-        const bucket = admin.storage().bucket(bucketName);
-        const storageFile = bucket.file(fileName, fileOptions);
+        app.compileApp(file.content, obj)
 
-        storageFile.save(content, e => {
-            if (e) {
-                console.error(e);
-                return reject(e);
-            } else {
-                return resolve(
-                    {
-                        bucket: bucket,
-                        file: storageFile,
-                        idTemplate: idTemplate,
-                        idInfluencer: idInfluencer,
-                        idCampanha: idCampanha
+            .then(compiledData => {
+                const bucket = admin.storage().bucket(obj.template.bucket);
+                const storageFile = bucket.file(storageDest, fileOptions);
+
+                storageFile.save(compiledData, e => {
+                    if (e) {
+                        console.error(e);
+                        return reject(e);
+                    } else {
+                        return resolve(
+                            {
+                                bucket: bucket,
+                                file: storageFile
+                            }
+                        );
                     }
-                );
-            }
-        });
+                });
+            })
+
+            .catch(e => {
+                return reject(e);
+            })
 
     })
 }

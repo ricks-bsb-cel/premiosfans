@@ -7,6 +7,13 @@ const fs = require('fs');
 
 const bucketName = 'premios-fans.appspot.com';
 
+const defaultTemplateConfig = {
+    qtdMaximaCompraSugerida: 6,
+    qtdMaximaCompra: 12,
+    vlTitulo: 5,
+    sugestoes: []
+};
+
 const fakeData = {
     influencer: {
         nomeExibicao: "João da Silva"
@@ -15,16 +22,15 @@ const fakeData = {
         imagePrincipal: "https://res.cloudinary.com/dckw5m2ep/image/upload/v1667436396/premiosfans/jyhkd0e8zh3jythunvzs.jpg",
         titulo: "Campanha de Natal 2025",
         subTitulo: "Seu Natal cheio de Grana no Bolso!",
-        detalhes: "No entanto, não podemos esquecer que o novo modelo estruturalista aqui preconizado auxilia a preparação e a composição das posturas dos filósofos divergentes com relação às atribuições conceituais. Do mesmo modo, a indeterminação contínua de distintas formas de fenômeno garante a contribuição de um grupo importante na determinação das novas teorias propostas. Deste modo, acabei de refutar a tese segundo a qual a consolidação das estruturas psico-lógicas assume importantes posições no estabelecimento dos conhecimentos a priori."
+        detalhes: "No entanto, não podemos esquecer que o novo modelo estruturalista aqui preconizado auxilia a preparação e a composição das posturas dos filósofos divergentes com relação às atribuições conceituais. Do mesmo modo, a indeterminação contínua de distintas formas de fenômeno garante a contribuição de um grupo importante na determinação das novas teorias propostas. Deste modo, acabei de refutar a tese segundo a qual a consolidação das estruturas psico-lógicas assume importantes posições no estabelecimento dos conhecimentos a priori.",
+        images: [
+            {
+                secure_url: "https://res.cloudinary.com/dckw5m2ep/image/upload/v1667436396/premiosfans/jyhkd0e8zh3jythunvzs.jpg"
+            }
+        ]
     },
-    config: {
-        qtdMaximaCompraSugerida: 6,
-        qtdMaximaCompra: 12,
-        vlTitulo: 5
-    }
-
+    config: defaultTemplateConfig
 }
-
 
 exports.getApp = (request, response) => {
     const idInfluencer = request.params.idInfluencer || null;
@@ -97,32 +103,30 @@ exports.getTemplate = (request, response) => {
     response.setHeader('cache-control', 'public, max-age=0');
     response.setHeader('connection', 'keep-alive')
 
-    const render = { ...fakeData };
+    fs.readFile(templateFile, (e, template) => {
 
-    render.config.sugestoes = [];
+        if (e) {
+            console.error(e);
 
-    for (let i = 1; i <= render.config.qtdMaximaCompraSugerida; i++) {
-        render.config.sugestoes.push({
-            qtd: i,
-            qtdExibicao: `${i} Título${i > 1 ? 's' : ''}`,
-            vlTotal: render.config.vlTitulo * i,
-            vlTotalExibicao: `<strong>R$ ${render.config.vlTitulo * i}</strong><small>,00</small>`
-        })
-    }
+            return response.status(500).json({
+                error: e.toString()
+            });
+        }
 
-    try {
-        const template = fs.readFileSync(templateFile).toString();
-        const compiled = global.compile(template, render);
+        return compileApp(template, fakeData)
 
-        return response.status(200).send(compiled);
-    }
-    catch (e) {
-        render.error = e.toString();
-        console.error(e);
-        return response.status(500).json(render);
-    }
+            .then(compiled => {
+                return response.status(200).send(compiled);
+            })
+
+            .catch(e => {
+                console.error(e);
+                return response.status(500).json({
+                    error: e.toString()
+                });
+            })
+    })
 }
-
 
 exports.getStorageFile = (request, response) => {
 
@@ -199,3 +203,37 @@ const getParam = (request, name) => {
         return '';
     }
 }
+
+const compileApp = (sourceData, obj) => {
+    return new Promise((resolve, reject) => {
+        const render = { ...obj };
+
+        try {
+            render.config = render.config || defaultTemplateConfig;
+
+            if (render.campanha.images && render.campanha.images.length) {
+                render.campanha.imagePrincipal = render.campanha.images[0].secure_url;
+            } else {
+                render.campanha.imagePrincipal = fakeData.campanha.image[0].secure_url
+            }
+
+            for (let i = 1; i <= render.config.qtdMaximaCompraSugerida; i++) {
+                render.config.sugestoes.push({
+                    qtd: i,
+                    qtdExibicao: `${i} Título${i > 1 ? 's' : ''}`,
+                    vlTotal: render.config.vlTitulo * i,
+                    vlTotalExibicao: `<strong>R$ ${render.config.vlTitulo * i}</strong><small>,00</small>`
+                })
+            }
+            const compiled = global.compile(sourceData, render);
+
+            return resolve(compiled);
+        } catch (e) {
+            console.error(e);
+            return reject(e);
+        }
+    })
+}
+
+exports.defaultTemplateConfig = defaultTemplateConfig;
+exports.compileApp = compileApp;
