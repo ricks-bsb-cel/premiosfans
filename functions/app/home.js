@@ -15,6 +15,7 @@ const defaultTemplateConfig = {
 };
 
 const fakeData = {
+    version: global.generateRandomId(7),
     influencer: {
         nomeExibicao: "João da Silva"
     },
@@ -26,6 +27,32 @@ const fakeData = {
         images: [
             {
                 secure_url: "https://res.cloudinary.com/dckw5m2ep/image/upload/v1667436396/premiosfans/jyhkd0e8zh3jythunvzs.jpg"
+            }
+        ],
+        premios: [
+            {
+                pos: 1,
+                titulo: "1º Prêmio",
+                descricao: "PIX de R$ 10.000,00",
+                valorDescricao: "R$ 10.000,00"
+            },
+            {
+                pos: 2,
+                titulo: "2º Prêmio",
+                descricao: "PIX de R$ 20.000,00",
+                valorDescricao: "R$ 20.000,00"
+            },
+            {
+                pos: 3,
+                titulo: "3º Prêmio",
+                descricao: "HONDA CR-V 2022",
+                valorDescricao: "R$ 80.000,00"
+            },
+            {
+                pos: 4,
+                titulo: "4º Prêmio",
+                descricao: "BMW X-25 Zero!",
+                valorDescricao: "R$ 250.000,00"
             }
         ]
     },
@@ -210,6 +237,7 @@ const compileApp = (sourceData, obj) => {
 
         try {
             render.config = render.config || defaultTemplateConfig;
+            render.config.sugestoes = [];
 
             if (render.campanha.images && render.campanha.images.length) {
                 render.campanha.imagePrincipal = render.campanha.images[0].secure_url;
@@ -225,6 +253,7 @@ const compileApp = (sourceData, obj) => {
                     vlTotalExibicao: `<strong>R$ ${render.config.vlTitulo * i}</strong><small>,00</small>`
                 })
             }
+
             const compiled = global.compile(sourceData, render);
 
             return resolve(compiled);

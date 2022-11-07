@@ -19,6 +19,7 @@ const global = require('../../global');
 const collectionFrontTemplates = firestoreDAL.frontTemplates();
 const collectionInfluencers = firestoreDAL.influencers();
 const collectionCampanhas = firestoreDAL.campanhas();
+const collectionAppLinks = firestoreDAL.appLinks();
 
 const storage = new Storage();
 
@@ -37,10 +38,14 @@ class Service extends eebService {
             const idInfluencer = this.parm.data.idInfluencer;
             const idCampanha = this.parm.data.idCampanha;
 
+            const version = global.generateRandomId(7);
+
             const result = {
                 success: true,
                 host: this.parm.host
             };
+
+            let saveLink;
 
             if (!idTemplate) throw new Error(`idTemplate inválido. Informe idTemplate`);
             if (!idInfluencer) throw new Error(`idInfluencer inválido. Informe idInfluencer`);
@@ -65,12 +70,51 @@ class Service extends eebService {
                 .then(files => {
                     result.template.files = files;
 
-                    return compileAndSendToStorage(result.template, result.influencer, result.campanha);
+                    return compileAndSendToStorage(result.template, result.influencer, result.campanha, version);
                 })
 
                 .then(sendResult => {
                     result.sendResult = sendResult;
 
+                    saveLink = {
+                        idTemplate: result.template.id,
+                        idInfluencer: result.influencer.id,
+                        idCampanha: result.campanha.id,
+                        link: `/app/${result.influencer.id}/${result.campanha.id}`,
+                        version: version,
+                        empresas_reference: collectionInfluencers.getReference(result.influencer.id),
+                        campanhas_reference: collectionCampanhas.getReference(result.campanha.id),
+                        keywords: global.generateKeywords(
+                            result.influencer.nome,
+                            result.influencer.nomeExibicao,
+                            result.influencer.email,
+                            result.influencer.celular,
+                            result.campanha.titulo,
+                            result.campanha.url
+                        )
+                    };
+
+                    global.setDateTime(saveLink, 'dtInclusao');
+
+                    return collectionAppLinks.get({
+                        filter: {
+                            idTemplate: saveLink.idTemplate,
+                            idInfluencer: saveLink.idInfluencer,
+                            idCampanha: saveLink.idCampanha
+                        },
+                        limit: 1
+                    });
+                })
+
+                .then(resultAppLinks => {
+
+                    return collectionAppLinks.insertUpdate(
+                        resultAppLinks.length ? resultAppLinks[0].id : null,
+                        saveLink
+                    )
+                })
+
+                .then(_ => {
                     delete result.template;
                     delete result.campanha;
                     delete result.influencer;
@@ -88,7 +132,7 @@ class Service extends eebService {
 
 }
 
-const compileAndSendToStorage = (template, influencer, campanha) => {
+const compileAndSendToStorage = (template, influencer, campanha, version) => {
     return new Promise((resolve, reject) => {
 
         const storagePath = `app/${influencer.id}/${campanha.id}`;
@@ -96,7 +140,8 @@ const compileAndSendToStorage = (template, influencer, campanha) => {
         const obj = {
             template: template,
             influencer: influencer,
-            campanha: campanha
+            campanha: campanha,
+            version: version
         };
 
         const promises = [];

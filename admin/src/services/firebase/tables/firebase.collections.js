@@ -24,6 +24,8 @@ import collectionsClientes from './collections/collection.clientes';
 
 import collectionFrontTemplates from './collections/collection.front-templates';
 
+import collectionAppLinks from './collections/collection.appLinks';
+
 let ngModule = angular.module('firebase.collections', [
 	collectionCrud.name,
 
@@ -44,7 +46,8 @@ let ngModule = angular.module('firebase.collections', [
 	collectionLancamentos.name,
 
 	collectionEntidades.name,
-	collectionFrontTemplates.name
+	collectionFrontTemplates.name,
+	collectionAppLinks.name
 ]);
 
 export default ngModule;

@@ -1,0 +1,51 @@
+<section class="content app-links">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay 
+        ready="collectionAppLinks.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionAppLinks.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum link encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionAppLinks.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="influencer">Influencer</th>
+                                    <th class="campanha">Campanha</th>
+                                    <th class="url">Link</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionAppLinks.collection.data">
+                                    <td class="influencer">
+                                        {{c.empresas_reference.nome}}
+                                    </td>
+                                    <td class="campanha">
+                                        {{c.campanhas_reference.titulo}}
+                                    </td>
+                                    <td class="url">
+                                        <a ng-href="{{c.link}}" target="_blank">
+                                            <small>
+                                                {{c.link}}
+                                            </small>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

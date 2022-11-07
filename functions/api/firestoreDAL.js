@@ -278,3 +278,7 @@ exports.campanhas = _ => {
     return new collectionClass('campanhas');
 }
 
+exports.appLinks = _ => {
+    return new collectionClass('appLinks');
+}
+

@@ -12,7 +12,6 @@ const ngModule = angular.module('views.contratos-edit', [
 		$routeParams,
 		navbarTopLeftFactory,
 		collectionCampanhas,
-		collectionEmpresas,
 		appAuthHelper,
 		toastrFactory,
 		blockUiFactory,
@@ -81,13 +80,37 @@ const ngModule = angular.module('views.contratos-edit', [
 						{
 							key: 'titulo',
 							templateOptions: {
-								label: 'Título da Campanha',
+								label: 'Título',
 								type: 'text',
 								required: true,
 								minlength: 3,
 								maxlength: 64
 							},
 							type: 'input',
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+						},
+						{
+							key: 'subTitulo',
+							templateOptions: {
+								label: 'SubTítulo',
+								type: 'text',
+								required: false,
+								minlength: 3,
+								maxlength: 64
+							},
+							type: 'input',
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+						},
+						{
+							key: 'detalhes',
+							templateOptions: {
+								label: 'Detalhes',
+								type: 'text',
+								required: false,
+								minlength: 3,
+								maxlength: 64
+							},
+							type: 'textarea',
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
 						{

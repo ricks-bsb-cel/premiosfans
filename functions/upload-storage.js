@@ -107,12 +107,18 @@ const uploadTemplates = env => {
         console.info(`Uploading to Prod ~ Bucket ${bucketName} ~ Path: ${prodVersionConfig.path}}`);
     }
 
-    getFiles(env)
+    return backupProdFiles(env) // Será ignorado se env !== prod
+
+        .then(_ => {
+            return getFiles(env);
+        })
+
         .then(getFilesResult => {
             files = getFilesResult;
 
             return uploadAllFiles(files);
         })
+
         .then(_ => {
             const templates = [],
                 updatePromise = [];
@@ -147,9 +153,11 @@ const uploadTemplates = env => {
 
             return Promise.all(updatePromise);
         })
+
         .then(_ => {
             running = false;
         })
+
         .catch(e => {
             console.error(e);
 
@@ -240,7 +248,7 @@ const getFiles = env => {
                 r.template = r.destinationDev.substring(templatePath.length).split('/')[0];
             }
 
-            r.destinationProd = r.destinationDev.replace('/dev/', `/prod/${idProdVersion}/`);
+            r.destinationProd = r.destinationDev.replace('/dev/', `/prod/`);
             r.idProdVersion = idProdVersion;
 
             return r;
@@ -276,9 +284,49 @@ const getProdVersionConfig = _ => {
         name: 'v ' + hoje.format('YYYY-MM-DD HH-mm-ss'),
         id: id,
         bucket: bucketName,
-        path: `storage/prod/${id}`,
+        path: `storage/prod`,
         data: hoje.format('DD/MM/YYYY HH:mm:ss')
     };
+}
+
+const backupProdFiles = env => {
+    return new Promise((resolve, reject) => {
+
+        if (env !== 'prod') {
+            return resolve();
+        }
+        const hoje = moment().tz("America/Sao_Paulo");
+        const backupId = hoje.format("YYYY-MM-DD-HH-mm-ss");
+
+        const promises = [];
+
+        const options = {
+            prefix: 'storage/prod'
+        }
+
+        admin.storage().bucket(bucketName).getFiles(options)
+
+            .then(([files]) => {
+
+                files.forEach(f => {
+                    promises.push(f.copy(f.name.replace('/prod/', `/prod-${backupId}/`)));
+                })
+
+                return Promise.all(promises);
+            })
+
+            .then(_ => {
+                console.info(`* Prod backup created: v ${backupId}`);
+
+                return resolve();
+            })
+
+            .catch(e => {
+                console.error(e);
+                return reject(e);
+            })
+
+    })
 }
 
 const showHelp = () => {

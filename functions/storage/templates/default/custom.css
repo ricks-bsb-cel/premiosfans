@@ -1,8 +1,18 @@
 /* Global CSS variables */
 :root {
-    --spacing-company: 8rem;
+    --spacing-company: 16rem;
     --font-weight: 400;
     --border-radius: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+@media (max-width: 420px) {
+    :root {
+        --spacing-company: 10rem;
+    }
 }
 
 /* Typography */
@@ -25,6 +35,26 @@ small {
     background-color: #394046;
     background-position: center;
     background-size: cover;
+}
+
+.hero header {
+    position: relative;
+}
+
+.hero header p {
+    position: absolute;
+    bottom: 0;
+}
+
+.hero header p a{
+    display: block;
+}
+
+@media (min-width: 575px) {
+    .hero header p {
+        display: block;
+        width: 100%;
+    }
 }
 
 .hero footer i.bi {
@@ -74,15 +104,15 @@ aside p {
     line-height: 1.25;
 }
 
-summary.hamburguer{
+summary.hamburguer {
     padding: 5px 10px 0 10px !important;
 }
 
-summary.hamburguer:after{
+summary.hamburguer:after {
     display: none !important;
 }
 
-summary.hamburguer i.bi{
+summary.hamburguer i.bi {
     font-size: 1.4em;
 }
 

@@ -19,16 +19,18 @@
 
     <!-- https://icons.getbootstrap.com/ -->
 
-    <link rel="stylesheet" href="/templates/default/custom.css?v=12">
+    <link rel="stylesheet" href="/templates/default/custom.css?v={{version}}">
 </head>
 
 <body>
 
-    <nav class="container-fluid">
+    <nav id="top" class="container-fluid">
         <ul>
-            <li><a href="./" class="contrast" onclick="event.preventDefault()">
-                <strong>Prêmios</strong> Fans
-            </a></li>
+            <li>
+                <a href="/" class="contrast" onclick="event.preventDefault()">
+                    <strong>Prêmios</strong> Fans
+                </a>
+            </li>
         </ul>
         <ul>
             <li>
@@ -42,8 +44,9 @@
                         <i class="bi bi-list"></i>
                     </summary>
                     <ul role="listbox">
-                        <li><a href="../preview/">Sobre a Empresa</a></li>
+                        <li><a href="../preview/">Seja um Revendedor</a></li>
                         <li><a href="../preview-rtl/">Regulamento</a></li>
+                        <li><a href="../preview-rtl/">Sobre a Empresa</a></li>
                         <li><a href="../classless/">Contato</a></li>
                     </ul>
                 </details>
@@ -54,15 +57,31 @@
     <div class="hero" data-theme="dark" style="background-image: url({{campanha.imagePrincipal}});">
         <header class="container">
             <p>
-                <a href="#" role="button" onclick="event.preventDefault()">
+                <a href="#compra-rapida" role="button">
                     Quero Participar!
                 </a>
             </p>
         </header>
     </div>
-    
-    <main class="container">
-        <section>
+
+    <nav class="container-fluid">
+        <ul>
+            <li>
+                <small>Edição:</small> <strong>78</strong> ~ <strong>29/12/2020</strong>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="/regulamento" class="primary">
+                    Regulamento
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="container pt-20">
+
+        <section id="campanha">
             <hgroup>
                 <h2>{{campanha.titulo}}</h2>
                 {{#if campanha.subTitulo}}
@@ -74,7 +93,7 @@
             {{/if}}
         </section>
 
-        <section>
+        <section id="compra-rapida">
             <div class="container">
                 <article class="pt-20 pb-20 mb-0">
 
@@ -114,35 +133,65 @@
             </div>
         </section>
 
+        <section id="premios">
+            <div class="container">
+                <article class="pt-20 pb-20 mb-0">
+
+                    <hgroup class="mt-10">
+                        <h2>Prêmios do próximo sorteio</h2>
+                        <h3>Confira os prêmios da próxima edicão do Prêmios Fans</h3>
+                    </hgroup>
+
+                    <div class="row">
+                        {{#each campanha.premios}}
+                            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-3">
+                                <div class="col-example">
+                                    <article class="m-0 mb-20 p-10">
+                                        <div class="sugestao text-center">
+                                            <h5 class="mb-10">
+                                                {{this.titulo}}
+                                            </h5>
+                                            <p class="mb-5">
+                                                {{this.descricao}}
+                                            </p>
+                                            <footer>
+                                                <h3 class="mb-5">
+                                                    {{{this.valorDescricao}}}
+                                                </h3>
+                                            </footer>
+                                        </div>
+                                    </article>
+                                </div>
+                            </div>
+                        {{/each}}
+                    </div>
+
+                    <a href="#compra-rapida" style="display: block;" class="mt-10" role="button">
+                        Garanta o SEU!
+                    </a>
+
+                </article>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Subscribe -->
-    <section aria-label="Subscribe example">
-        <div class="container">
-            <article>
-                <hgroup>
-                    <h2>Subscribe</h2>
-                    <h3>Litora torquent per conubia nostra</h3>
-                </hgroup>
-                <form class="grid">
-                    <input type="text" id="firstname" name="firstname" placeholder="First name" aria-label="First name"
-                        required>
-                    <input type="email" id="email" name="email" placeholder="Email address" aria-label="Email address"
-                        required>
-                    <button type="submit" onclick="event.preventDefault()">Subscribe</button>
-                </form>
-            </article>
-        </div>
-    </section><!-- ./ Subscribe -->
+    <footer class="container text-center">
+        <small>
+            <a href="#top">Seja um Revendedor</a>
+            • 
+            <a href="#top">Resultados</a>
+            • 
+            <a href="#top">Regulamento</a>
+            • 
+            <a href="#top">Sobre a Empresa</a>
+            • 
+            <a href="#top">Contato</a>
+            • 
+            <a href="#top">Topo</a>
+        </small>
+    </footer>
 
-    <!-- Footer -->
-    <footer class="container">
-        <small>Built with <a href="https://picocss.com">Pico</a> • <a
-                href="https://github.com/picocss/examples/tree/master/company/">Source code</a></small>
-    </footer><!-- ./ Footer -->
-
-    <!-- Minimal theme switcher -->
-    <script src="/assets/pico/minimal-theme-switcher.js"></script>
 
 </body>
 

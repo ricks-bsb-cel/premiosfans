@@ -13,7 +13,7 @@ const ngModule = angular.module('services.app-collection', [])
 		$q
 	) {
 
-		var instance = function (attr) {
+		const instance = function (attr) {
 
 			if (!attr || !attr.collection) {
 				throw new Error('appServiceCollection parm error');
@@ -90,8 +90,9 @@ const ngModule = angular.module('services.app-collection', [])
 				})
 			}
 
-			this.startSnapshot = (attrFilter) => {
-				attrFilter = attrFilter || {};
+			this.startSnapshot = (parms) => {
+				parms = parms || {};
+				parms.loadReferences = parms.loadReferences || [];
 
 				appAuthHelper.ready()
 
@@ -110,8 +111,8 @@ const ngModule = angular.module('services.app-collection', [])
 							const db = appFirestore.firestore;
 							const c = appFirestore.collection(db, attr.collection);
 
-							if (attrFilter.id) {
-								appFirestoreHelper.getDoc(attr.collection, attrFilter.id)
+							if (parms.id) {
+								appFirestoreHelper.getDoc(attr.collection, parms.id)
 									.then(d => {
 										this.data.push(d);
 										finishLoad();
@@ -129,22 +130,22 @@ const ngModule = angular.module('services.app-collection', [])
 								var q = appFirestore.query(q, appFirestore.where("idEmpresa", "==", appAuthHelper.profile.user.idEmpresa));
 							}
 
-							if (attrFilter.filter) {
-								if (Array.isArray(attrFilter.filter)) {
-									attrFilter.filter.forEach(f => {
+							if (parms.filter) {
+								if (Array.isArray(parms.filter)) {
+									parms.filter.forEach(f => {
 										q = addWhereAsString(q, f);
 									})
 								} else {
-									q = addWhereAsString(q, attrFilter.filter);
+									q = addWhereAsString(q, parms.filter);
 								}
 							}
 
-							if (attrFilter.orderBy || attr.orderBy) {
-								q = appFirestore.query(q, appFirestore.orderBy(attrFilter.orderBy || attr.orderBy));
+							if (parms.orderBy || attr.orderBy) {
+								q = appFirestore.query(q, appFirestore.orderBy(parms.orderBy || attr.orderBy));
 							}
 
-							if (attrFilter.limit) {
-								var q = appFirestore.query(q, appFirestore.limit(attrFilter.limit));
+							if (parms.limit) {
+								var q = appFirestore.query(q, appFirestore.limit(parms.limit));
 							}
 
 							this.unsubscribeSnapshot = appFirestore.onSnapshot(q, querySnapshot => {
@@ -155,11 +156,17 @@ const ngModule = angular.module('services.app-collection', [])
 
 									let doc = change.doc;
 									let d = angular.merge(doc.data(), { id: doc.id });
+									let references = [];
 
 									// Remove as referencias (dá problema no AngularJS)
 									// As references só podem ser usadas no BackEnd
 									Object.keys(d).forEach(k => {
-										if (k.includes('reference')) { delete d[k]; }
+										if (k.includes('reference')) {
+											if (parms.loadReferences.includes(k)) {
+												references.push(d[k]);
+											}
+											delete d[k];
+										}
 									})
 
 									if (change.type === 'removed') {
@@ -172,12 +179,18 @@ const ngModule = angular.module('services.app-collection', [])
 											d = attr.eachRow(d);
 										}
 
-										var i = this.data.findIndex(f => { return f.id === doc.id; });
+										let i = this.data.findIndex(f => {
+											return f.id === doc.id;
+										});
 
 										if (i < 0) {
-											this.data.push(d);
+											i = this.data.push(d) - 1;
 										} else {
 											this.data[i] = d;
+										}
+
+										if (references.length) {
+											this.loadReferenceOnDoc(this.data[i], references);
 										}
 
 									}
@@ -191,10 +204,27 @@ const ngModule = angular.module('services.app-collection', [])
 							})
 
 						} catch (e) {
-							debugger;
 							appErrors.showError(e, attr.collection);
 						}
 					})
+			}
+
+			this.loadReferenceOnDoc = (doc, references) => {
+				references.forEach(r => {
+					appFirestore.getDoc(r)
+
+						.then(d => {
+							if (d.exists()) {
+								$timeout(_ => {
+									doc[d.ref.parent.path + '_reference'] = { id: d.id, ...d.data() };
+								})
+							}
+						})
+
+						.catch(e => {
+							console.error(e);
+						})
+				})
 			}
 
 			this.onLoadFinish = (callback, loadFinishAttr) => {
@@ -211,69 +241,6 @@ const ngModule = angular.module('services.app-collection', [])
 
 			this.isEmpty = () => {
 				return this.empty;
-			}
-
-			this.removeFakeData = (idEmpresa, confirm, callback) => {
-				var self = this;
-
-				const deleteAll = function () {
-					toastrFactory.info('Removendo dados de teste da collection [' + self.collection + ']...');
-
-					const db = appFirestore.firestore;
-					const collection = appFirestore.collection(db, self.collection);
-
-					var total = 0;
-					var clientes = null;
-
-					const deleteNextFakeDocs = function () {
-
-						var query = appFirestoreHelper.query(collection, 'idEmpresa', '==', idEmpresa);
-						query = appFirestoreHelper.query(query, 'isFakeData', '==', true);
-						query = appFirestore.query(query, appFirestore.limit(10));
-
-						appFirestoreHelper.docs(query)
-
-							.then(docs => {
-								clientes = docs;
-								if (clientes.length === 0) {
-									return true;
-								} else {
-									var deleteClientes = [];
-									clientes.forEach(c => {
-										deleteClientes.push(appFirestore.deleteDoc(appFirestore.doc(firestore, self.collection, c.id)));
-										total++;
-									});
-									return Promise.all(deleteClientes);
-								}
-							})
-
-							.then(_ => {
-								if (clientes.length === 0) {
-									toastrFactory.success(total + " registros de teste foram removidos da collection [" + self.collection + "]");
-									if (typeof callback == 'function') {
-										callback();
-									}
-								} else {
-									deleteNextFakeDocs();
-								}
-							})
-
-							.catch(e => {
-								console.error(e);
-							})
-
-					}
-
-					deleteNextFakeDocs();
-				}
-
-				if (!confirm) {
-					deleteAll();
-				} else {
-					alertFactory.yesno('Tem certeza que deseja remover as informações de teste?').then(function () {
-						deleteAll();
-					})
-				}
 			}
 
 			this.removeDoc = id => {
@@ -309,5 +276,6 @@ const ngModule = angular.module('services.app-collection', [])
 
 		return instance;
 	})
+
 
 export default ngModule;

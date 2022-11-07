@@ -18,6 +18,8 @@ import viewGlobalConfig from './global-config/global-config';
 import viewHtmlBlock from './html-block/html-block';
 import viewProdutos from './produtos/produtos';
 
+import viewAppLinks from './app-links/app-links';
+
 // import viewEmpresas from './empresas/empresas';
 import viewInfluencers from './influencers/influencers';	// Cópia da viewEmpresas
 import viewUsuarios from './usuarios/usuarios';
@@ -48,6 +50,7 @@ let ngModule = angular.module('views', [
 	viewGlobalConfig.name,
 	viewHtmlBlock.name,
 	viewProdutos.name,
+	viewAppLinks.name,
 
 	viewClientes.name,
 	viewDashboardClientes.name
