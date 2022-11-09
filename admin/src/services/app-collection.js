@@ -51,6 +51,8 @@ const ngModule = angular.module('services.app-collection', [])
 					const db = appFirestore.firestore;
 					var command = null;
 
+					if (data.id) delete data.id;
+
 					if (id === 'new') {
 						command = appFirestore.addDoc(appFirestore.collection(db, attr.collection), data)
 					} else {
@@ -61,6 +63,8 @@ const ngModule = angular.module('services.app-collection', [])
 						.then(doc => {
 							if (id === 'new') {
 								data.id = doc.id;
+							} else {
+								data.id = id;
 							}
 							blockUiFactory.stop();
 							return resolve(data);

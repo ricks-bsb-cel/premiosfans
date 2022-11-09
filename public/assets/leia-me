@@ -1,0 +1,16 @@
+
+$('.number-normal .data').show();
+$('.number-normal .data').rollNumber({
+  number: 1 + Math.floor(Math.random() * 1000000),
+  speed: 2000,   
+  interval: 200, 
+  rooms: 6,      
+  space: 20,     
+  // symbol: ',',   
+  fontStyle: {
+    'font-size': 30,
+    'color': '#FF0000',
+    'font-family': 'monospace',
+    'font-weight': 500
+  }
+})

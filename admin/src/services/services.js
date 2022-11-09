@@ -19,6 +19,7 @@ import appCollection from './app-collection';
 import appConfig from './app-config';
 
 import utils from './utils';
+import premiosFansServices from './premios-fans';
 
 let ngModule = angular.module('services',
 	[
@@ -42,7 +43,8 @@ let ngModule = angular.module('services',
 		
 		firebaseCollections.name,
 
-		utils.name
+		utils.name,
+		premiosFansServices.name
 	]
 );
 

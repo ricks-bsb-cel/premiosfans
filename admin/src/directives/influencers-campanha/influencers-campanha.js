@@ -16,30 +16,41 @@ let ngModule = angular.module('directives.influencers-campanha', [])
 
             }
 
-            appAuthHelper.ready()
-                .then(_ => {
-                    $scope.influencers = $scope.influencers || [];
+            $scope.$watch('influencers', function (newValue, oldValue) {
+                if (newValue) {
+                    init();
+                }
+            })
 
-                    appAuthHelper.profile.user.empresas.forEach(e => {
-                        let i = $scope.influencers.findIndex(f => {
-                            return f.idInfluencer === e.id;
-                        });
+            const init = _ => {
+                appAuthHelper.ready()
+                    .then(_ => {
+                        $scope.influencers = $scope.influencers || [];
 
-                        if (i < 0) {
-                            $scope.influencers.push({
-                                idInfluencer: e.id,
-                                selected: false,
-                                nome: e.nome
-                            })
-                        } else {
-                            $scope.influencers[i] = {
-                                ...$scope.influencers[i],
-                                selected: true,
-                                nome: e.nome
+                        appAuthHelper.profile.user.empresas.forEach(e => {
+
+                            let i = $scope.influencers.findIndex(f => {
+                                return f.idInfluencer === e.id;
+                            });
+
+                            if (i < 0) {
+                                $scope.influencers.push({
+                                    idInfluencer: e.id,
+                                    selected: false,
+                                    nome: e.nome
+                                })
+                            } else {
+                                $scope.influencers[i] = {
+                                    ...$scope.influencers[i],
+                                    selected: true,
+                                    nome: e.nome
+                                }
                             }
-                        }
+                        })
                     })
-                })
+            }
+
+            init();
 
         })
 

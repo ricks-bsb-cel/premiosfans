@@ -11,12 +11,25 @@ const ngModule = angular.module('views.app-links', [
 		appAuthHelper,
 		navbarTopLeftFactory,
 		collectionAppLinks,
-		toastrFactory
+		toastrFactory,
+		premiosFansService
 	) {
 
 		$scope.collectionAppLinks = collectionAppLinks;
 
+		const generate = _ => {
+			premiosFansService.generateTemplates();
+		}
+
 		const showMenu = function () {
+			var menu = [
+				{
+					label: 'Gerar',
+					onClick: generate,
+					icon: 'fas fa-refresh'
+				}
+			];
+
 			navbarTopLeftFactory.extend(menu);
 		}
 

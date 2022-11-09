@@ -20,39 +20,29 @@ const fakeData = {
         nomeExibicao: "João da Silva"
     },
     campanha: {
-        imagePrincipal: "https://res.cloudinary.com/dckw5m2ep/image/upload/v1667436396/premiosfans/jyhkd0e8zh3jythunvzs.jpg",
+        imagePrincipal: "https://res.cloudinary.com/dckw5m2ep/image/upload/v1667942171/premiosfans/zg1fdq9nyc1otnkuwwlv.png",
         titulo: "Campanha de Natal 2025",
         subTitulo: "Seu Natal cheio de Grana no Bolso!",
         detalhes: "No entanto, não podemos esquecer que o novo modelo estruturalista aqui preconizado auxilia a preparação e a composição das posturas dos filósofos divergentes com relação às atribuições conceituais. Do mesmo modo, a indeterminação contínua de distintas formas de fenômeno garante a contribuição de um grupo importante na determinação das novas teorias propostas. Deste modo, acabei de refutar a tese segundo a qual a consolidação das estruturas psico-lógicas assume importantes posições no estabelecimento dos conhecimentos a priori.",
         images: [
             {
-                secure_url: "https://res.cloudinary.com/dckw5m2ep/image/upload/v1667436396/premiosfans/jyhkd0e8zh3jythunvzs.jpg"
+                secure_url: "https://res.cloudinary.com/dckw5m2ep/image/upload/v1667942171/premiosfans/zg1fdq9nyc1otnkuwwlv.png"
             }
         ],
         premios: [
             {
-                pos: 1,
-                titulo: "1º Prêmio",
-                descricao: "PIX de R$ 10.000,00",
-                valorDescricao: "R$ 10.000,00"
+                descricao: "PIX de R$ 10.000 Reais",
+                valor: 100000,
+                guidPremio: "3fd1babb-c180-46d1-af2d-eddb9f614e18"
             },
             {
-                pos: 2,
-                titulo: "2º Prêmio",
-                descricao: "PIX de R$ 20.000,00",
-                valorDescricao: "R$ 20.000,00"
-            },
-            {
-                pos: 3,
-                titulo: "3º Prêmio",
-                descricao: "HONDA CR-V 2022",
-                valorDescricao: "R$ 80.000,00"
-            },
-            {
-                pos: 4,
-                titulo: "4º Prêmio",
-                descricao: "BMW X-25 Zero!",
-                valorDescricao: "R$ 250.000,00"
+                descricao: "PIX de 10.000 Reais",
+                valor: 10000,
+                guidPremio: "9e3ecfb9-90ff-45fa-98c4-ce23ec029683"
+            }, {
+                descricao: "GM Tracker GLSI 2022 Zero!",
+                valor: 150000,
+                guidPremio: "61f3ca54-20c0-4e43-95c1-6a2f8ef29b14"
             }
         ]
     },
@@ -245,14 +235,32 @@ const compileApp = (sourceData, obj) => {
                 render.campanha.imagePrincipal = fakeData.campanha.image[0].secure_url
             }
 
+            render.campanha.thumb = render.campanha.imagePrincipal.replace('/upload/', '/upload/c_thumb,h_500,w_500/');
+
             for (let i = 1; i <= render.config.qtdMaximaCompraSugerida; i++) {
                 render.config.sugestoes.push({
+                    id: global.generateRandomId(7),
                     qtd: i,
                     qtdExibicao: `${i} Título${i > 1 ? 's' : ''}`,
                     vlTotal: render.config.vlTitulo * i,
                     vlTotalExibicao: `<strong>R$ ${render.config.vlTitulo * i}</strong><small>,00</small>`
                 })
             }
+
+            render.campanha.premios = render.campanha.premios.map((p, i) => {
+                const detalhes = {
+                    titulo: (i + 1) + 'º Prêmio',
+                    tituloHtml: `<strong>${i + 1}º</strong> <small>Prêmio</small>`,
+                    valorDescricao: global.formatMoney(p.valor)
+                };
+
+                return { ...p, ...detalhes };
+            });
+
+            render.campanha.description =
+                render.campanha.detalhes ||
+                render.campanha.subTitulo ||
+                render.campanha.titulo;
 
             const compiled = global.compile(sourceData, render);
 

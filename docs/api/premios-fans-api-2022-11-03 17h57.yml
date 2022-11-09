@@ -144,6 +144,17 @@ paths:
           description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
           schema:
             $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-generate-template
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
 
 securityDefinitions:
   firebase:

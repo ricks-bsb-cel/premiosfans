@@ -6,6 +6,7 @@ const ngModule = angular.module('view.influencers.edit', [])
         function (
             $uibModalInstance,
             collectionEmpresas,
+            premiosFansService,
             data
         ) {
 
@@ -96,7 +97,13 @@ const ngModule = angular.module('view.influencers.edit', [])
 
             $ctrl.ok = function () {
                 collectionEmpresas.save($ctrl.data)
-                    .then(function () {
+                    .then(_ => {
+                        
+                        premiosFansService.generateTemplates({
+                            data: { idInfluencer: $ctrl.data.id },
+                            blockUi: false
+                        });
+
                         $uibModalInstance.close($ctrl.data);
                     });
             };
@@ -151,7 +158,7 @@ const ngModule = angular.module('view.influencers.edit', [])
                             original = updated;
                             resolve(original);
                         })
-                        
+
                         .catch(e => {
                             reject(e);
                         })

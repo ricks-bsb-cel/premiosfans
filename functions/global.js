@@ -51,6 +51,12 @@ const splitReplace = function (value, search, replacement) {
     return value.split(search).join(replacement);
 }
 
+const formatMoney = (value, showMoeda) => {
+    showMoeda = typeof showMoeda === 'boolean' ? showMoeda : true;
+    const formato = { minimumFractionDigits: 2, style: 'currency', currency: showMoeda ? 'BRL' : null };
+    return value.toLocaleString('pt-BR', formato)
+}
+exports.formatMoney = formatMoney;
 
 exports.responseError = (response, e) => {
 

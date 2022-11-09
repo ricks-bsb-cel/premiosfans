@@ -19,7 +19,6 @@ const ngModule = angular.module('views.campanhas', [
 		let lastTermo;
 
 		const showMenu = function () {
-
 			var menu = [
 				{
 					label: 'Nova Campanha',

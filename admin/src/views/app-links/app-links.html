@@ -23,6 +23,7 @@
                                     <th class="influencer">Influencer</th>
                                     <th class="campanha">Campanha</th>
                                     <th class="url">Link</th>
+                                    <th class="ultima-alteracao right">Dt.Alteração</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,11 +35,12 @@
                                         {{c.campanhas_reference.titulo}}
                                     </td>
                                     <td class="url">
-                                        <a ng-href="{{c.link}}" target="_blank">
-                                            <small>
-                                                {{c.link}}
-                                            </small>
+                                        <a ng-href="https://premios-fans.web.app/{{c.link}}" target="_blank">
+                                            Abrir
                                         </a>
+                                    </td>
+                                    <td class="ultima-alteracao right">
+                                        {{c.dtAlteracao_timestamp | ddmmyyyyhhmmss}}
                                     </td>
                                 </tr>
                             </tbody>

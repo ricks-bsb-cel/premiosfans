@@ -16,6 +16,7 @@ const ngModule = angular.module('views.contratos-edit', [
 		toastrFactory,
 		blockUiFactory,
 		globalFactory,
+		premiosFansService,
 		$timeout,
 		$location
 	) {
@@ -38,12 +39,16 @@ const ngModule = angular.module('views.contratos-edit', [
 
 			if (typeof $scope.campanha.ativo === 'undefined') $scope.campanha.ativo = false;
 
-			console.info($scope.campanha);
-
 			blockUiFactory.start();
 
 			collectionCampanhas.save($scope.campanha)
-				.then(_ => {
+				.then(saveResult => {
+									
+					premiosFansService.generateTemplates({
+						data: { idCampanha: saveResult.id },
+						blockUi: false
+					});
+
 					$location.path('/campanhas');
 					blockUiFactory.stop();
 				})

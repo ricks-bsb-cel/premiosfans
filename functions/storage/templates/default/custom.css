@@ -19,7 +19,7 @@ html {
 h2,
 h3,
 hgroup> :last-child {
-    font-weight: 200;
+    font-weight: 500;
 }
 
 a.sugestao {
@@ -62,6 +62,32 @@ small {
     font-size: 1.1rem;
     margin-right: 0.4rem;
     cursor: pointer;
+}
+
+#top{
+    background: rgb(0,64,125);
+    background: linear-gradient(0deg, rgba(0,64,125,1) 0%, rgba(1,81,154,1) 38%, rgba(1,81,154,1) 100%);
+}
+
+#top .logo{
+    height: 45px;
+}
+
+#top .logo-text{
+    height: 22px;
+    margin-bottom: 5px;
+}
+
+#top .white{
+    color:white;
+}
+
+#compra-rapida .col-compra-rapida{
+    cursor: pointer;
+}
+
+#compra-rapida .col-compra-rapida.selected article{
+    background-color: var(--switch-background-color);
 }
 
 header {

@@ -32,6 +32,8 @@ module.exports = {
 		"no-useless-escape": 0,
 		"no-control-regex": 0,
 		"new-cap": 0,
-		"camelcase": 0
+		"camelcase": 0,
+		"no-undef": 0,
+		"no-trailing-space": 0
 	},
 };
