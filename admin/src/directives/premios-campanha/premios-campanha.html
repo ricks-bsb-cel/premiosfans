@@ -23,6 +23,8 @@
             <thead>
                 <tr>
                     <th class="center" style="width:50px;">#</th>
+                    <th class="dt-sorteio">Dt.Sorteio</th>
+                    <th class="qtd">Qtd</th>
                     <th class="vl-liquido">Valor Líquido</th>
                     <th class="descricao">Descrição</th>
                     <th class="actions right"></th>
@@ -32,6 +34,24 @@
                 <tr ng-repeat="p in premios">
                     <td class="center pt-4">
                         {{$index + 1}}
+                    </td>
+
+                    <td class="pt-3 pb-3">
+                        <input
+                            ng-model="p.dtSorteio"
+                            class="form-control"
+                            type="text"
+                            date-mask
+                        >
+                    </td>
+
+                    <td class="pt-3 pb-3 qtd">
+                        <input
+                            type="tel"
+                            ng-model="p.qtd"
+                            class="form-control right"
+                            integer
+                        >
                     </td>
 
                     <td class="pt-3 pb-3 vl-liquido">
@@ -51,10 +71,8 @@
                             type="text"
                         >
                     </td>
-
-                    <td
-                        class="actions right"
-                    >
+                    
+                    <td class="actions right">
                         <a 
                             href="#"
                             ng-click="up($index)"
@@ -83,7 +101,18 @@
 
                         <a
                             href="#"
-                            ng-click="delete($index)"
+                            ng-click="clone($index)"
+                            uib-popover="Clonar"
+                            ng-class="{
+                                'pointer-events':$last ? 'none' : 'initial'
+                            }"
+                        >
+                            <i class="fa fa-clone" aria-hidden="true"></i>
+                        </a>
+
+                        <a
+                            href="#"
+                            ng-click="remove(p)"
                             uib-popover="Excluir"
                         >
                             <i class="fa fa-trash-o" aria-hidden="true"></i>

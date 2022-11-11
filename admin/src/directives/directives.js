@@ -10,6 +10,7 @@ import qrCode from './qr-code/qr-code';
 import badgeTrueFalse from './badge-true-false/badge-true-false';
 import selectOnClick from './select-on-click/select-on-click';
 import moneyMask from './money-mask/money-mask';
+import dateMask from './date-mask/date-mask';
 import integerMask from './integer-mask/integer-mask';
 import imageGallery from './image-gallery/image-gallery';
 import topProgressBar from './top-progress-bar/top-progress-bar';
@@ -45,6 +46,7 @@ const ngModule = angular.module('directives', [
     badgeTrueFalse.name,
     selectOnClick.name,
     moneyMask.name,
+    dateMask.name,
     integerMask.name,
     imageGallery.name,
     topProgressBar.name,

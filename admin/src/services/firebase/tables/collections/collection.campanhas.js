@@ -78,10 +78,17 @@ const ngModule = angular.module('collection.campanhas', [])
 
             campanha.premios = campanha.premios
                 .map(p => {
+
+                    if (!p.dtSorteio) {
+                        throw new Error('A data do sorteio é obrigatória');
+                    }
+
                     return {
                         guidPremio: p.guidPremio,
                         descricao: p.descricao || null,
-                        valor: parseFloat(p.valor)
+                        valor: parseFloat(p.valor),
+                        qtd: p.qtd || 1,
+                        dtSorteio: p.dtSorteio
                     }
                 });
 

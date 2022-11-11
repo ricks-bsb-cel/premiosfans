@@ -118,6 +118,7 @@ const ngModule = angular.module('views.contratos-edit', [
 							type: 'textarea',
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
+						/*
 						{
 							key: 'dtSorteio',
 							templateOptions: {
@@ -127,6 +128,7 @@ const ngModule = angular.module('views.contratos-edit', [
 							type: 'data',
 							className: 'col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-8'
 						},
+						*/
 						{
 							key: 'url',
 							templateOptions: {

@@ -538,6 +538,7 @@ let ngModule = angular.module('factories.global', [])
 				rgbAlpha: rgbAlpha,
 				getSearchParams: getSearchParams,
 				trustAsHtml: trustAsHtml,
+				dateToMoment: dateToMoment,
 				removeDiacritics: removeDiacritics,
 				firstOrNull: firstOrNull,
 				onlyNumbers: onlyNumbers,

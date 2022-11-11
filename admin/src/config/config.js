@@ -110,7 +110,7 @@ const ngModule = angular.module('config', [apiUrls.name])
 
 	.filter('ddmmyyyyhhmmss', function (appConfig) {
 		return function (v) {
-			const displayMask = appConfig.get("DD/MM/YYYY HH:mm:ss");
+			const displayMask = "DD/MM/YYYY HH:mm:ss";
 			if (v) {
 				if (typeof v === 'object') {
 					return moment(v.toDate()).format(displayMask);

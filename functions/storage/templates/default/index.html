@@ -36,6 +36,7 @@
     <link rel="stylesheet" href="/assets/pico/bootstrap-grid/css/pico-bootstrap-grid.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.7/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"/>
 
     <!-- https://icons.getbootstrap.com/ -->
 
@@ -91,7 +92,8 @@
     <nav class="container-fluid">
         <ul>
             <li class="p-10">
-                <small>Edição:</small> <strong>78</strong> ~ <strong>29/12/2020</strong>
+                <small>Edição:</small>
+                <strong>2</strong> 
             </li>
         </ul>
         <ul>
@@ -174,30 +176,64 @@
                 <article class="pt-20 pb-20 mb-0">
 
                     <hgroup class="mt-10">
-                        <h2>Prêmios deste sorteio</h2>
-                        <h3>Confira os prêmios da desta edicão do Prêmios Fans</h3>
+                        <h2>Prêmios desta edição</h2>
+                        <h3>Confira as datas e prêmios desta edicão do Prêmios Fans.<br />
+                            São
+                            <strong style="color: var(--primary);font-size:1.2em;">{{campanha.qtdPremios}}</strong>
+                            chances de ganhar!</strong>
+                        </h3>
                     </hgroup>
 
                     <div class="row">
-                        {{#each campanha.premios}}
-                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-3">
-                            <div class="col-example">
+                        {{#each campanha.groupPremios}}
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                  
                                 <article class="m-0 mb-20 p-10">
                                     <div class="sugestao text-center">
-                                        <h5 class="mb-10">
-                                            {{{this.tituloHtml}}}
-                                        </h5>
+                                        {{#if this.showRibbon}}
+                                            <div class="ribbon ribbon-top-left">
+                                                <span>
+                                                    {{this.qtdPremios}}
+                                                    Sorteios
+                                                </span>
+                                            </div>
+                                        {{/if}}
+
                                         <p class="mb-5">
-                                            {{this.descricao}}
+                                            <small>Dia</small>
+                                            {{{this.dtSorteio}}}
                                         </p>
-                                        <footer>
-                                            <h3 class="mb-5">
-                                                {{{this.valorDescricao}}}
-                                            </h3>
-                                        </footer>
+
+                                        <h2 class="m-0">
+                                            {{{this.vlTotalGrupoDescricao}}}
+                                        </h2>
+
+                                        {{#if this.singleLine}}
+                                            {{#each this.premios}}
+                                                <footer class="pt-10">
+                                                    {{#if this.showRibbon}}
+                                                        <strong>{{this.qtd}}</strong>
+                                                        x
+                                                    {{/if}}
+                                                    {{this.descricao}}
+                                                </footer>
+                                            {{/each}}
+                                        {{/if}}
+
+                                        {{#unless this.singleLine}}
+                                            <footer>
+                                                {{#each this.premios}}
+                                                    <p class="m-0">
+                                                        <strong>{{this.qtd}}</strong>
+                                                        x
+                                                        {{{this.descricao}}}
+                                                    </p>
+                                                {{/each}}
+                                            </footer>
+                                        {{/unless}}
                                     </div>
                                 </article>
-                            </div>
+                            
                         </div>
                         {{/each}}
                     </div>
@@ -226,9 +262,13 @@
             •
             <a href="#top">Topo</a>
         </small>
+        <p>
+            v {{version}}
+        </p>
     </footer>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="/templates/default/index.js?v={{version}}"></script>

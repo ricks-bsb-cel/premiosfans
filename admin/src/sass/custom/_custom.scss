@@ -16,6 +16,10 @@
     font-family: monospace;
 }
 
+input.ng-invalid-date-mask{
+    background-color: lightsalmon;
+}
+
 body.no-menu .main-header, 
 body.no-menu .content-wrapper,
 body.no-menu .main-footer

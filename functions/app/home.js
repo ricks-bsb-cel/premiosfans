@@ -31,18 +31,40 @@ const fakeData = {
         ],
         premios: [
             {
+                qtd: 2,
                 descricao: "PIX de R$ 10.000 Reais",
-                valor: 100000,
-                guidPremio: "3fd1babb-c180-46d1-af2d-eddb9f614e18"
+                valor: 10000,
+                dtSorteio: "25/12/2022"
             },
             {
+                qtd: 2,
                 descricao: "PIX de 10.000 Reais",
                 valor: 10000,
-                guidPremio: "9e3ecfb9-90ff-45fa-98c4-ce23ec029683"
-            }, {
+                dtSorteio: "25/12/2022"
+            },
+            {
+                qtd: 1,
                 descricao: "GM Tracker GLSI 2022 Zero!",
                 valor: 150000,
-                guidPremio: "61f3ca54-20c0-4e43-95c1-6a2f8ef29b14"
+                dtSorteio: "25/12/2022"
+            },
+            {
+                qtd: 1,
+                descricao: "BMW GLSI 2022 Zero!",
+                valor: 200000,
+                dtSorteio: "31/12/2022"
+            },
+            {
+                qtd: 2,
+                descricao: "PIX de 10.000 Reais",
+                valor: 10000,
+                dtSorteio: "31/12/2022"
+            },
+            {
+                qtd: 2,
+                descricao: "PIX de 100.000 Reais",
+                valor: 100000,
+                dtSorteio: "05/01/2023"
             }
         ]
     },
@@ -236,6 +258,7 @@ const compileApp = (sourceData, obj) => {
             }
 
             render.campanha.thumb = render.campanha.imagePrincipal.replace('/upload/', '/upload/c_thumb,h_500,w_500/');
+            render.campanha.qtdPremios = 0;
 
             for (let i = 1; i <= render.config.qtdMaximaCompraSugerida; i++) {
                 render.config.sugestoes.push({
@@ -248,19 +271,52 @@ const compileApp = (sourceData, obj) => {
             }
 
             render.campanha.premios = render.campanha.premios.map((p, i) => {
+                render.campanha.qtdPremios += parseInt(p.qtd);
+
                 const detalhes = {
                     titulo: (i + 1) + 'º Prêmio',
                     tituloHtml: `<strong>${i + 1}º</strong> <small>Prêmio</small>`,
-                    valorDescricao: global.formatMoney(p.valor)
+                    valorDescricao: global.formatMoney(p.valor),
+                    showRibbon: p.qtd > 1
                 };
 
-                return { ...p, ...detalhes };
+                return {
+                    ...p,
+                    ...detalhes
+                };
             });
 
             render.campanha.description =
                 render.campanha.detalhes ||
                 render.campanha.subTitulo ||
                 render.campanha.titulo;
+
+            // Agrupa os premios por data do sorteio
+            render.campanha.groupPremios = [];
+            render.campanha.premios.forEach(p => {
+                let i = render.campanha.groupPremios.findIndex(f => {
+                    return f.dtSorteio === p.dtSorteio;
+                })
+
+                if (i < 0) {
+                    i = render.campanha.groupPremios.push({
+                        dtSorteio: p.dtSorteio,
+                        qtdPremios: 0,
+                        premios: [],
+                        showRibbon: false,
+                        vlTotalGrupo: 0
+                    }) - 1;
+                }
+
+                render.campanha.groupPremios[i].premios.push(p);
+                render.campanha.groupPremios[i].qtdPremios += parseInt(p.qtd);
+                render.campanha.groupPremios[i].vlTotalGrupo += (p.valor * p.qtd);
+
+                render.campanha.groupPremios[i].vlTotalGrupoDescricao = global.formatMoney(render.campanha.groupPremios[i].vlTotalGrupo);
+                render.campanha.groupPremios[i].showRibbon = render.campanha.groupPremios[i].qtdPremios > 1;
+
+                render.campanha.groupPremios[i].singleLine = render.campanha.groupPremios[i].premios.length === 1;
+            })
 
             const compiled = global.compile(sourceData, render);
 

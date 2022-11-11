@@ -2,13 +2,31 @@ premios-campanha{
 
     table{
 
+        th.qtd{
+            text-align: center;
+        }
+
+        td.qtd{
+            width: 80px;
+            input{
+                text-align: center;
+            }
+        }
+
+        th.dt-sorteio{
+            width: 140px;
+            input{
+                text-align: center;
+            }
+        }
+
         td.vl-liquido{
             width: 150px;
             text-align: right;
         }
 
         td.actions{
-            width: 125px;
+            width: 155px;
             padding-right: 5px;
             padding-top: 22px;
 

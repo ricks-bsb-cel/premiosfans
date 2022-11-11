@@ -15,6 +15,13 @@ html {
     }
 }
 
+@media (min-width: 768px) {
+    #premios article {
+        min-height: 200px;
+    }
+}
+
+
 /* Typography */
 h2,
 h3,
@@ -46,7 +53,7 @@ small {
     bottom: 0;
 }
 
-.hero header p a{
+.hero header p a {
     display: block;
 }
 
@@ -64,29 +71,35 @@ small {
     cursor: pointer;
 }
 
-#top{
-    background: rgb(0,64,125);
-    background: linear-gradient(0deg, rgba(0,64,125,1) 0%, rgba(1,81,154,1) 38%, rgba(1,81,154,1) 100%);
+#top {
+    background: rgb(0, 64, 125);
+    background: linear-gradient(0deg, rgba(0, 64, 125, 1) 0%, rgba(1, 81, 154, 1) 38%, rgba(1, 81, 154, 1) 100%);
 }
 
-#top .logo{
+#top .logo {
     height: 45px;
 }
 
-#top .logo-text{
+#top .logo-text {
     height: 22px;
     margin-bottom: 5px;
 }
 
-#top .white{
-    color:white;
+#top .white {
+    color: white;
 }
 
-#compra-rapida .col-compra-rapida{
+/* https://codepen.io/nxworld/pen/oLdoWb */
+
+#premios .sugestao {
+    position: relative;
+}
+
+#compra-rapida .col-compra-rapida {
     cursor: pointer;
 }
 
-#compra-rapida .col-compra-rapida.selected article{
+#compra-rapida .col-compra-rapida.selected article {
     background-color: var(--switch-background-color);
 }
 
@@ -265,4 +278,67 @@ summary.hamburguer i.bi {
 
 .pb-20 {
     padding-bottom: 20px;
+}
+
+.ribbon {
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    position: absolute;
+}
+
+.ribbon::before,
+.ribbon::after {
+    position: absolute;
+    z-index: -1;
+    content: '';
+    display: block;
+    border: 5px solid #2980b9;
+}
+
+.ribbon span {
+    position: absolute;
+    display: block;
+    width: 230px;
+    padding: 6px 0;
+    background-color: #3498db;
+    box-shadow: 0 5px 10px rgb(0 0 0 / 10%);
+    color: #fff;
+    font: 600 15px/1.7 'Lato', sans-serif;
+    text-shadow: 0 1px 1px rgb(0 0 0 / 20%);
+    text-align: center;
+    padding-left: 31px;
+}
+
+.ribbon-top-left {
+    top: -12px;
+    left: -12px;
+}
+
+.ribbon-top-left::before,
+.ribbon-top-left::after {
+    border-top-color: transparent;
+    border-left-color: transparent;
+}
+
+.ribbon-top-left::before {
+    top: 0;
+    right: 0;
+}
+
+.ribbon-top-left::after {
+    bottom: 0;
+    left: 0;
+}
+
+.ribbon-top-left span {
+    right: -25px;
+    top: 30px;
+    transform: rotate(-45deg);
+}
+
+
+[role=button], button, input[type=button], input[type=reset], input[type=submit] {
+    --background-color: green;
+    font-size: 1.2rem;
 }

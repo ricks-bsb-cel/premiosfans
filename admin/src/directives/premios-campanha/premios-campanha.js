@@ -16,19 +16,36 @@ let ngModule = angular.module('directives.premios-campanha', [])
 
             $scope.add = _ => {
                 $scope.premios.push({
-                    guidPremio: globalFactory.guid()
+                    guidPremio: globalFactory.guid(),
+                    qtd: 1,
+                    valor: 0
                 })
             }
 
-            $scope.up = (pos) => {
-                if (pos === 0) { return; }
+            $scope.remove = p => {
+                $scope.premios = $scope.premios.filter(f => {
+                    return f.guidPremio !== p.guidPremio;
+                })
+            }
+
+            $scope.up = pos => {
+                if (pos === 0) return;
 
                 const [p] = $scope.premios.splice(pos, 1);
                 $scope.premios.splice(pos - 1, 0, p);
             }
 
-            $scope.down = (pos) => {
-                if (pos === ($scope.premios.length - 1)) { return; }
+            $scope.clone = pos => {
+                let p = $scope.premios[pos];
+                p = { ...p };
+                p.guidPremio = globalFactory.guid();
+                delete p.$$hashKey;
+
+                $scope.premios.splice(pos, 0, p);
+            }
+
+            $scope.down = pos => {
+                if (pos === ($scope.premios.length - 1)) return;
 
                 const [p] = $scope.premios.splice(pos, 1);
                 $scope.premios.splice(pos + 1, 0, p);
