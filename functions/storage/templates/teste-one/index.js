@@ -35,7 +35,8 @@ angular.module('app', [
     ) {
         let qtdTitulos = 1,
             titulos = [],
-            visible = false;
+            visible = false,
+            delegate = {};
 
         const setTitulos = _ => {
             visible = false;
@@ -74,6 +75,7 @@ angular.module('app', [
                 visible = true;
 
                 $timeout(_ => {
+
                     titulos.forEach(t => {
                         // https://www.jqueryscript.net/animation/animating-roll-number.html
                         $(`.id-${t.id}`).rollNumber({
@@ -90,6 +92,9 @@ angular.module('app', [
                             }
                         })
                     })
+
+                    delegate.showFormCliente();
+
                 })
             })
         }
@@ -100,7 +105,8 @@ angular.module('app', [
             setQtdTitulos: setQtdTitulos,
             getTitulos: getTitulos,
             generateNumbers: generateNumbers,
-            isVisible: isVisible
+            isVisible: isVisible,
+            delegate: delegate
         }
     })
 
@@ -114,12 +120,42 @@ angular.module('app', [
                 $scope.generate = generateTitulosFactory;
             },
             template: `
-                <div ng-show="generate.isVisible()" class="row mb-20">
-                    <div ng-repeat="t in generate.getTitulos()" class="col-6 col-xs-6 col-sm-4 col-md-4 col-lg-4 col-xl-3 mb-20 mt-10">
-                        <div class="titulo titulo-number id-{{t.id}}"></div>
+                <article class="pt-20 pb-20 mb-0 mt-5" ng-show="generate.isVisible()">
+                    <hgroup class="mt-10">
+                        <h2>Seus números</h2>
+                        <h3>
+                            Veja os números que escolhemos para você.
+                        </h3>
+                    </hgroup>
+                    <div class="row mb-20">
+                        <div ng-repeat="t in generate.getTitulos()" class="col-6 col-xs-6 col-sm-4 col-md-4 col-lg-4 col-xl-3 mb-20 mt-10">
+                            <div class="titulo titulo-number id-{{t.id}}"></div>
+                        </div>
                     </div>
-                </div>`
+                </article>`
         };
+    })
+
+    .directive('formCliente', function (generateTitulosFactory) {
+        return {
+            restrict: 'E',
+            controller: function ($scope) {
+                $scope.initDelegates = _ => {
+                    generateTitulosFactory.delegate.showFormCliente = _ => {
+                        $("#form-cliente").show();
+                    }
+
+                    generateTitulosFactory.delegate.hideFormCliente = _ => {
+                        $("#form-cliente").hide();
+                    }
+                }
+            },
+            templateUrl: `/templates/teste-one/form-cliente.html?v=${version}`,
+            link: function (scope, element) {
+                scope.initDelegates();
+            }
+        };
+
     })
 
     .controller('mainController', function (
@@ -133,6 +169,9 @@ angular.module('app', [
         $scope.selectQtd = (id, vlTotal, qtd) => {
             $scope.selected = id;
             $scope.vlCompra = vlTotal;
+
+            $("#vl-total").show();
+
             generateTitulosFactory.setQtdTitulos(qtd);
         }
 

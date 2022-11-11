@@ -75,9 +75,7 @@
         </ul>
     </nav>
 
-    <div
-        class="hero" data-theme="light"
-        style="background-image: url({{campanha.imagePrincipal}});">
+    <div class="hero" data-theme="light" style="background-image: url({{campanha.imagePrincipal}});">
         <header class="container">
         </header>
     </div>
@@ -92,7 +90,7 @@
         <ul>
             <li class="p-10">
                 <small>Edição:</small>
-                <strong>2</strong> 
+                <strong>2</strong>
             </li>
         </ul>
         <ul>
@@ -119,32 +117,26 @@
         </section>
 
         <section id="compra-rapida">
+    
             <div class="container p-0">
-                <article class="pt-20 pb-20 mb-0">
+                <form>
+    
+                    <article class="pt-20 pb-20 mb-0">
 
-                    <hgroup class="mt-10">
-                        <h2>Compra Rápida</h2>
-                        <h3>Acredite em sua sorte e invista em sua vitória! Escolha quantos títulos você deseja e
-                            <strong>compre agora</strong>!
-                        </h3>
-                    </hgroup>
+                        <hgroup class="mt-10">
+                            <h2>Compra Rápida</h2>
+                            <h3>Acredite em sua sorte e invista em sua vitória! Escolha quantos títulos você deseja e
+                                <strong>compre agora</strong>!
+                            </h3>
+                        </hgroup>
 
-                    <div class="row">
-                        {{#each config.sugestoes}}
-                            <div
-                                data-id="{{this.id}}"
-                                class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2"
-                            >
-                                <div
-                                    class="col-compra-rapida"
-                                    ng-class="{selected:selected==='{{this.id}}'}"
-                                >
+                        <div class="row">
+                            {{#each config.sugestoes}}
+                            <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
+                                <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
                                     <article class="m-0 mb-20 p-10">
-                                        <a
-                                            data-id="{{this.id}}"
-                                            class="sugestao text-center"
-                                            ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
-                                        >
+                                        <a data-id="{{this.id}}" class="sugestao text-center"
+                                            ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})">
                                             <h5 class="mb-10">
                                                 {{this.qtdExibicao}}
                                             </h5>
@@ -157,19 +149,25 @@
                                     </article>
                                 </div>
                             </div>
-                        {{/each}}
-                    </div>
+                            {{/each}}
+                        </div>
 
-                    <h2 class="mb-20" ng-if="vlCompra">
-                        Total: R$ <strong ng-bind="vlCompra | currency : '': 2 "></strong>
-                    </h2>
+                        <h2 id="vl-total" class="mb-0" style="display: none;">
+                            Total: R$ <strong ng-bind="vlCompra | currency : '': 2 "></strong>
+                        </h2>
+                    </article>
 
                     <generate-titulos></generate-titulos>
 
+                    <form-cliente></form-cliente>
+
                     <button ng-click="openSell()" class="mt-10">Comprar</button>
 
-                </article>
+
+                </form>
+
             </div>
+    
         </section>
 
         <section id="premios">
@@ -187,55 +185,55 @@
 
                     <div class="row">
                         {{#each campanha.groupPremios}}
-                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-                    
-                                    <article class="m-0 mb-20 p-10">
-                                        <div class="sugestao text-center">
-                                            {{#if this.showRibbon}}
-                                                <div class="ribbon ribbon-top-left">
-                                                    <span>
-                                                        {{this.qtdPremios}}
-                                                        Sorteios
-                                                    </span>
-                                                </div>
-                                            {{/if}}
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
 
-                                            <p class="mb-5">
-                                                <small>Dia</small>
-                                                {{{this.dtSorteio}}}
-                                            </p>
+                            <article class="m-0 mb-20 p-10">
+                                <div class="sugestao text-center">
+                                    {{#if this.showRibbon}}
+                                    <div class="ribbon ribbon-top-left">
+                                        <span>
+                                            {{this.qtdPremios}}
+                                            Sorteios
+                                        </span>
+                                    </div>
+                                    {{/if}}
 
-                                            <h2 class="m-0">
-                                                {{{this.vlTotalGrupoDescricao}}}
-                                            </h2>
+                                    <p class="mb-5">
+                                        <small>Dia</small>
+                                        {{{this.dtSorteio}}}
+                                    </p>
 
-                                            {{#if this.singleLine}}
-                                                {{#each this.premios}}
-                                                    <footer class="pt-10">
-                                                        {{#if this.showRibbon}}
-                                                            <strong>{{this.qtd}}</strong>
-                                                            x
-                                                        {{/if}}
-                                                        {{this.descricao}}
-                                                    </footer>
-                                                {{/each}}
-                                            {{/if}}
+                                    <h2 class="m-0">
+                                        {{{this.vlTotalGrupoDescricao}}}
+                                    </h2>
 
-                                            {{#unless this.singleLine}}
-                                                <footer>
-                                                    {{#each this.premios}}
-                                                        <p class="m-0">
-                                                            <strong>{{this.qtd}}</strong>
-                                                            x
-                                                            {{{this.descricao}}}
-                                                        </p>
-                                                    {{/each}}
-                                                </footer>
-                                            {{/unless}}
-                                        </div>
-                                    </article>
-                                
-                            </div>
+                                    {{#if this.singleLine}}
+                                    {{#each this.premios}}
+                                    <footer class="pt-10">
+                                        {{#if this.showRibbon}}
+                                        <strong>{{this.qtd}}</strong>
+                                        x
+                                        {{/if}}
+                                        {{this.descricao}}
+                                    </footer>
+                                    {{/each}}
+                                    {{/if}}
+
+                                    {{#unless this.singleLine}}
+                                    <footer>
+                                        {{#each this.premios}}
+                                        <p class="m-0">
+                                            <strong>{{this.qtd}}</strong>
+                                            x
+                                            {{{this.descricao}}}
+                                        </p>
+                                        {{/each}}
+                                    </footer>
+                                    {{/unless}}
+                                </div>
+                            </article>
+
+                        </div>
                         {{/each}}
                     </div>
 
@@ -267,6 +265,10 @@
             v {{version}}
         </p>
     </footer>
+
+    <script>
+        var version="{{version}}";
+    </script>
 
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
