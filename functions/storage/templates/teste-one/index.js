@@ -63,6 +63,8 @@ angular.module('app', [
             if (qtdTitulos === qtd) return;
             qtdTitulos = qtd;
             setTitulos();
+
+            delegate.hideFormCliente();
         }
 
         const getTitulos = _ => {
