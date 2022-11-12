@@ -1,14 +1,71 @@
-window.odometerOptions = {
-    format: '(,ddd).ddd',
-    numberLength: 6,
-    duration: 500,
+'use strict';
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
+    authDomain: "premios-fans.firebaseapp.com",
+    databaseURL: "https://premios-fans-default-rtdb.firebaseio.com",
+    projectId: "premios-fans",
+    storageBucket: "premios-fans.appspot.com",
+    messagingSenderId: "801994869227",
+    appId: "1:801994869227:web:188d640a390d22aa4831ae",
+    measurementId: "G-XTRQ740MSL"
 };
 
 angular.module('app', [
 ])
-    .factory('global', function (
-    ) {
-        const guid = function () {
+
+    .run(function (init) {
+        init.init();
+    })
+
+    .factory('init', function () {
+        let app = null;
+
+        const init = _ => {
+            app = initializeApp(firebaseConfig);
+
+            stateChanged();
+        }
+
+        const getToken = _ => {
+            const auth = getAuth();
+            return auth.currentUser ? auth.currentUser.accessToken : null;
+        }
+
+        const stateChanged = _ => {
+            const auth = getAuth();
+            onAuthStateChanged(auth, user => {
+                if (!user) {
+                    return signIn();
+                }
+
+                console.info(getToken());
+            })
+        }
+
+        const signIn = _ => {
+            const auth = getAuth();
+
+            console.info('New user...');
+
+            signInAnonymously(auth)
+                .catch((e) => {
+                    console.info(e.code, e.message);
+                });
+        }
+
+        return {
+            init: init,
+            getToken: getToken
+        }
+
+    })
+
+    .factory('global', function () {
+        const guid = _ => {
             var d = new Date().getTime();
             var d2 = (performance && performance.now && (performance.now() * 1000)) || 0;
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -29,10 +86,7 @@ angular.module('app', [
         }
     })
 
-    .factory('generateTitulosFactory', function (
-        global,
-        $timeout
-    ) {
+    .factory('generateTitulosFactory', function (global, $timeout) {
         let qtdTitulos = 1,
             titulos = [],
             visible = false,
@@ -112,9 +166,7 @@ angular.module('app', [
         }
     })
 
-    .directive('generateTitulos', function (
-        generateTitulosFactory
-    ) {
+    .directive('generateTitulos', function (generateTitulosFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -122,7 +174,7 @@ angular.module('app', [
                 $scope.generate = generateTitulosFactory;
             },
             template: `
-                <article class="pt-20 pb-20 mb-0 mt-5" ng-show="generate.isVisible()">
+                <article class="pt-20 pb-5 mb-0 mt-5" ng-show="generate.isVisible()">
                     <hgroup class="mt-10">
                         <h2>Seus números</h2>
                         <h3>
@@ -160,10 +212,7 @@ angular.module('app', [
 
     })
 
-    .controller('mainController', function (
-        $scope,
-        generateTitulosFactory
-    ) {
+    .controller('mainController', function ($scope, generateTitulosFactory) {
         $scope.selected = null;
         $scope.vlCompra = null;
         $scope.swiperPremios = null;

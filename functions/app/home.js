@@ -264,7 +264,7 @@ const compileApp = (sourceData, obj) => {
                 render.config.sugestoes.push({
                     id: global.generateRandomId(7),
                     qtd: i,
-                    qtdExibicao: `${i} Título${i > 1 ? 's' : ''}`,
+                    qtdExibicao: `<strong>${i}</strong> <small>Título${i > 1 ? 's' : ''}</small>`,
                     vlTotal: render.config.vlTitulo * i,
                     vlTotalExibicao: `<strong>R$ ${render.config.vlTitulo * i}</strong><small>,00</small>`
                 })

@@ -117,10 +117,10 @@
         </section>
 
         <section id="compra-rapida">
-    
+
             <div class="container p-0">
                 <form>
-    
+
                     <article class="pt-20 pb-20 mb-0">
 
                         <hgroup class="mt-10">
@@ -134,18 +134,19 @@
                             {{#each config.sugestoes}}
                             <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
                                 <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
-                                    <article class="m-0 mb-20 p-10">
-                                        <a data-id="{{this.id}}" class="sugestao text-center"
-                                            ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})">
-                                            <h5 class="mb-10">
-                                                {{this.qtdExibicao}}
-                                            </h5>
+                                    <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})" class="m-0 mb-20 p-10">
+                                        <div class="sugestao text-center">
+                                            <h3 class="mb-10 mt-10">
+                                                {{{this.qtdExibicao}}}
+                                            </h3>
+                                            <!--
                                             <footer>
                                                 <h3 class="mb-5">
                                                     {{{this.vlTotalExibicao}}}
                                                 </h3>
                                             </footer>
-                                        </a>
+                                            -->
+                                        </div>
                                     </article>
                                 </div>
                             </div>
@@ -167,7 +168,7 @@
                 </form>
 
             </div>
-    
+
         </section>
 
         <section id="premios">
@@ -267,15 +268,16 @@
     </footer>
 
     <script>
-        var version="{{version}}";
+        var version = "{{version}}";
     </script>
 
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/assets/jquery.roll-number.min.js"></script>
 
-    <script src="/templates/teste-one/index.js?v={{version}}"></script>
+    <script type="module" src="/templates/teste-one/index.js?v={{version}}"></script>
 
 </body>
 
