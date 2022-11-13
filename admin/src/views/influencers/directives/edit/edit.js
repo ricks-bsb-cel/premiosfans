@@ -98,7 +98,6 @@ const ngModule = angular.module('view.influencers.edit', [])
             $ctrl.ok = function () {
                 collectionEmpresas.save($ctrl.data)
                     .then(_ => {
-                        
                         premiosFansService.generateTemplates({
                             data: { idInfluencer: $ctrl.data.id },
                             blockUi: false

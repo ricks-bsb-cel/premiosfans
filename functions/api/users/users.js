@@ -14,7 +14,6 @@ const firestoreDAL = require("../firestoreDAL");
 const global = require('../../global');
 const fbHelper = require('../../fbHelper');
 
-const collectionSuperUsers = firestoreDAL._superUsers();
 const collectionEmpresas = firestoreDAL.empresas();
 const collectionUserProfile = firestoreDAL.userProfile();
 const collectionConfigProfiles = firestoreDAL.admConfigProfiles();
@@ -57,9 +56,7 @@ exports.requestUserInfo = (request, response) => {
             delete result.extrainfo.idEmpresa;
             delete result.extrainfo.superUser;
 
-            if (!result.data.superUser) {
-                delete result.data.superUser;
-            }
+            if (!result.data.superUser) delete result.data.superUser;
 
             return response.status(200).json(
                 global.defaultResult(result, true)
@@ -68,12 +65,69 @@ exports.requestUserInfo = (request, response) => {
         })
 
         .catch(e => {
-            return response.status(e.code || 500).json(
-                global.defaultResult({
-                    code: e.code,
-                    error: e.message
-                }, true)
+            console.error(e);
+
+            return response.status(e.code || 500).json(global.defaultResult({ code: e.code, error: e.message }, true));
+        })
+
+};
+
+
+exports.requestSetSuperUser = (request, response) => {
+
+    const token = global.getUserTokenFromRequest(request, response);
+    const uid = request.params.uid;
+    const idConfigProfile = request.body.idConfigProfile || request.body.idProfile || null;
+
+    if (!token || !uid) {
+        return response.status(500).json(
+            global.defaultResult({ code: 500, error: 'invalid request' }, true)
+        );
+    }
+
+    let result = {}, customClaims;
+
+    return getUserInfoWithToken(token)
+
+        .then(currentUser => {
+            result.currentUser = currentUser;
+
+            if (!result.currentUser.data.superUser) throw new Error('Apenas super usuários podem conceder acessos para outros');
+
+            return admin.auth().getUser(uid);
+        })
+
+        .then(resultUserInfo => {
+            result.userToChange = resultUserInfo;
+
+            if (result.userToChange.providerData.length !== 1) throw new Error('Super usuários só podem ter um provedor de conexão');
+            if (result.userToChange.providerData[0].providerId !== 'google.com') throw new Error('O provedor de conexão de super usuários tem que ser google.com');
+
+            customClaims = result.userToChange.customClaims || {};
+
+            customClaims.superUser = true;
+
+            if (idConfigProfile) {
+                customClaims.idConfigProfile = idConfigProfile;
+            } else {
+                delete customClaims.idConfigProfile;
+            }
+
+            return admin.auth().setCustomUserClaims(uid, customClaims);
+        })
+
+        .then(_ => {
+            result = { success: true };
+
+            return response.status(200).json(
+                global.defaultResult({ data: customClaims }, true)
             );
+        })
+
+        .catch(e => {
+            console.error(e);
+
+            return response.status(500).json(global.defaultResult({ error: e.message }, true));
         })
 
 };
@@ -109,11 +163,14 @@ const toUserProfile = doc => {
     return result;
 };
 
+
 const getUserInfoWithToken = (token, full, uid) => {
     return new Promise((resolve, reject) => {
 
         // Tenta resolver o token das duas formas... uma vai dar certo
-        let user, userRecord, result;
+        let user,
+            userRecord,
+            result = {};
 
         const checkToken = [
             resolveFirebaseToken(token),
@@ -134,9 +191,9 @@ const getUserInfoWithToken = (token, full, uid) => {
                 return getAuth().getUser(user.data.uid);
             })
 
-            .then(result => {
+            .then(getUserResult => {
 
-                userRecord = result;
+                userRecord = getUserResult;
 
                 const isPhoneProvider = (userRecord.providerData || []).findIndex(f => {
                     return f.providerId === 'phone';
@@ -152,10 +209,7 @@ const getUserInfoWithToken = (token, full, uid) => {
                     throw new Error(`O usuário atual [${userDetail}] não pertence a nenhuma empresa`);
                 }
 
-                if (userRecord.customClaims && userRecord.customClaims.cpf) {
-                    user.data.cpf = userRecord.customClaims.cpf;
-                    user.data.custom = userRecord.customClaims;
-                }
+                if (userRecord.customClaims) user.data.customClaims = userRecord.customClaims;
 
                 // Carrega as empresas do token do usuário atual
                 return admin.database().ref(`/usuario/${user.data.uid}/user/empresas`).once("value");
@@ -195,6 +249,7 @@ const getUserInfoWithToken = (token, full, uid) => {
                         idEmpresa: userInfo.idEmpresa || null,
                         superUser: userInfo.superUser || false,
                         idsEmpresas: getIdsEmpresas(userInfo.empresas),
+                        customClaims: userRecord.customClaims,
                         providers: []
                     }
 
@@ -649,31 +704,11 @@ exports.updateUser = (request, response) => {
     const idEmpresas = request.body.idEmpresas || [];
     const nome = request.body.nome || null;
 
-    let user;
-
     if (!token || !uid) {
         return response.status(500).json({ error: 'parm error' });
     }
 
     return admin.auth().verifyIdToken(token)
-
-        .then(verifyIdTokenResult => {
-            user = verifyIdTokenResult;
-
-            if (!user) {
-                throw new Error('Token inválido');
-            } else {
-                return collectionSuperUsers.getDoc(user.email);
-            }
-        })
-
-        .then(superUser => {
-            if (superUser.ativo) {
-                return validateIdEmpresas(idEmpresas);
-            } else {
-                throw new Error('Access denied. SuperUser [' + user.email + '] is disabled...');
-            }
-        })
 
         .then(_ => {
             return getUserInfo(uid);
@@ -804,7 +839,7 @@ const getUserProfile = uid => {
 
                 if (result.user.superUser && i < 0) {
                     // Erro no perfil. Se superUser abre do SuperUser
-                    return collectionConfigProfiles.getDoc('bIOIFnaGz7CYUsS1WA9P');
+                    return collectionConfigProfiles.getDoc(result.user.customClaims.idConfigProfile || 'bIOIFnaGz7CYUsS1WA9P');
                 } else {
                     return collectionConfigProfiles.getDoc(result.user.empresas[i].idPerfil);
                 }
@@ -872,13 +907,7 @@ exports.requestUserProfile = (request, response) => {
     const uid = request.params.uid || request.query.uid || null;
     const token = global.getUserTokenFromRequest(request, response);
 
-    if (!uid || !token) {
-        return response.status(500).json(
-            global.defaultResult({
-                error: 'parm error'
-            })
-        );
-    }
+    if (!uid || !token) return response.status(500).json(global.defaultResult({ error: 'parm error' }));
 
     return getUserProfile(uid)
         .then(profile => {
@@ -907,9 +936,10 @@ const getUserInfo = uid => {
 
                 userRecord.customClaims = userRecord.customClaims || {};
                 userRecord.customClaims.superUser = userRecord.customClaims.superUser || (uid === idSuperUser);
+                userRecord.idConfigProfile = userRecord.customClaims.idConfigProfile || null;
 
                 if (userRecord.customClaims.superUser) {
-                    return getEmpresasSuperUser('bIOIFnaGz7CYUsS1WA9P');
+                    return getEmpresasSuperUser(userRecord.idConfigProfile || 'bIOIFnaGz7CYUsS1WA9P');
                 } else {
                     return getEmpresasPerfilUsuarioNormal(userRecord);
                 }
@@ -1056,7 +1086,8 @@ const formatUserObj = user => {
         lastSignInTime: (user.metadata && user.metadata.lastSignInTime ? moment(user.metadata.lastSignInTime).format("YYYY-MM-DD HH:MM:ss") : null),
         creationTime: (user.metadata && user.metadata.creationTime ? moment(user.metadata.creationTime).format("YYYY-MM-DD HH:MM:ss") : null),
         providerData: [],
-        empresas: user.empresas || []
+        empresas: user.empresas || [],
+        customClaims: user.customClaims
     };
 
     result.idEmpresa = (user.customClaims || {}).idEmpresa || null;
@@ -1164,25 +1195,6 @@ const updateUserData = (uid, data) => {
             .catch((error) => {
                 return reject(new Error("Erro atualizando dados do usuário..."));
             });
-
-    })
-}
-
-
-const validateIdEmpresas = idEmpresas => {
-    return new Promise((resolve, reject) => {
-
-        const promisses = [];
-
-        idEmpresas.forEach(id => {
-            promisses.push(collectionEmpresas.getDoc(id));
-        })
-
-        Promise.all(promisses).then(success => {
-            return resolve();
-        }).catch(e => {
-            return reject(new Error("Um ou mais IDs de empresas são inválidos " + JSON.stringify(idEmpresas) + "..."));
-        })
 
     })
 }

@@ -23,7 +23,8 @@
 
                                     <td class="nome-fantasia">
                                         <a href="#" ng-click="edit(r)">
-                                            {{r.nome}}
+                                            <img ng-if="r.images && r.images.length" ng-src="{{r.images[0].secure_url}}" />
+                                            <span>{{r.nome}}</span>
                                         </a>
                                     </td>
 

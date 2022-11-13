@@ -34,6 +34,8 @@ const ngModule = angular.module('collection.empresas', [])
 
                         if (id === 'new') update.dtInclusao = appFirestoreHelper.currentTimestamp();
 
+                        update = sanitize(update);
+
                         return firebaseCollection.addOrUpdateDoc(id, update);
                     })
 
@@ -48,6 +50,30 @@ const ngModule = angular.module('collection.empresas', [])
 
             })
 
+        }
+
+        const sanitize = empresa => {
+            empresa.images = empresa.images || [];
+
+            empresa.images = empresa.images.map(i => {
+                return {
+                    bytes: i.bytes,
+                    etag: i.etag,
+                    original_extension: i.original_extension,
+                    original_filename: i.original_filename,
+                    public_id: i.public_id,
+                    resource_type: i.resource_type,
+                    secure_url: i.secure_url,
+                    signature: i.signature,
+                    url: i.url,
+                    version: i.version,
+                    version_id: i.version_id,
+                    width: i.width,
+                    version_id: i.version_id
+                };
+            });
+
+            return empresa;
         }
 
         return {

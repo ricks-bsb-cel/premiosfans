@@ -33,6 +33,10 @@ api.get("/v1/user/:uid", (request, response) => {
     return initFirebase.call(require('./users').requestUserInfo, request, response);
 })
 
+api.post("/v1/setSuperUser/:uid", (request, response) => {
+    return initFirebase.call(require('./users').requestSetSuperUser, request, response);
+})
+
 api.post("/v1/empresa", (request, response) => {
     return initFirebase.call(require('./users').setEmpresaToUser, request, response);
 })
