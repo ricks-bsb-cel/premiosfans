@@ -3,7 +3,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
 const webpack = require('webpack');
 
-var production = true;
+var production = false;
 
 console.info(`on ${production ? 'Production' : 'Dev'}...`);
 

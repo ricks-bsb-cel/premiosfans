@@ -26,9 +26,7 @@ const ngModule = angular.module('views.contratos-edit', [
 		$scope.ready = false;
 		$scope.title = $scope.idCampanha ? "Edição de Campanha" : "Inclusão de Campanha";
 
-		$scope.campanha = {
-			id: $scope.idCampanha
-		};
+		$scope.campanha = {};
 
 		$scope.forms = {
 			main: null,
@@ -39,11 +37,14 @@ const ngModule = angular.module('views.contratos-edit', [
 
 			if (typeof $scope.campanha.ativo === 'undefined') $scope.campanha.ativo = false;
 
+			console.info($scope.campanha);
+			return;
+
 			blockUiFactory.start();
 
 			collectionCampanhas.save($scope.campanha)
 				.then(saveResult => {
-									
+
 					premiosFansService.generateTemplates({
 						data: { idCampanha: saveResult.id },
 						blockUi: false
@@ -92,7 +93,16 @@ const ngModule = angular.module('views.contratos-edit', [
 								maxlength: 64
 							},
 							type: 'input',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+							className: 'col-xs-12 col-sm-12 col-md-8 col-lg-9 col-xl-9'
+						},
+						{
+							key: 'url',
+							templateOptions: {
+								label: 'URL',
+								required: true
+							},
+							type: 'input',
+							className: 'col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3'
 						},
 						{
 							key: 'subTitulo',
@@ -129,15 +139,6 @@ const ngModule = angular.module('views.contratos-edit', [
 							className: 'col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-8'
 						},
 						*/
-						{
-							key: 'url',
-							templateOptions: {
-								label: 'URL',
-								required: true
-							},
-							type: 'input',
-							className: 'col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8'
-						},
 						{
 							key: 'template',
 							templateOptions: {
@@ -179,7 +180,6 @@ const ngModule = angular.module('views.contratos-edit', [
 		}
 
 		const loadCampanha = idCampanha => {
-
 			collectionCampanhas.getById(idCampanha)
 				.then(result => {
 					$scope.campanha = { ...result };

@@ -1,0 +1,161 @@
+<div class="card sorteio-campanha-premios">
+    <div class="card-header">
+        <h3 class="card-title mt-1">
+            Sorteio
+            ~
+            <small>Dia: </small>
+            
+            <input
+                ng-model="sorteio.dtSorteio"
+                parent-model="sorteio"
+                field-name="dtSorteio"
+                class="form-control dt-sorteio"
+                ng-required="true"
+                type="tel"
+                date-mask
+            >
+
+            <span ng-click="situacao()" ng-if="!sorteio.ativo" class="badge bg-danger">
+                Inativo
+            </span>
+
+            <span ng-click="situacao()" ng-if="sorteio.ativo" class="badge bg-success">
+                Ativo
+            </span>
+
+        </h3>
+        <div class="card-tools">
+
+            <!--
+            <button
+                ng-if="sorteio.premios.length < 5"
+                ng-click="add()"
+                type="button"
+                class="btn btn-block btn-primary btn-sm"
+            >
+                <i class="fas fa-plus mr-1"></i>
+                Adicionar Prêmio
+            </button>
+            -->
+
+            <button
+                ng-if="sorteio.premios.length < 5"
+                type="button"
+                ng-click="add()"
+                class="btn btn-tool"
+                uib-popover="Adicionar um novo prêmio"
+            >
+                <i class="fas fa-plus"></i>
+                Adicionar Prêmio
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-tool"
+                uib-popover="Ativar a Data do Sorteio"
+                ng-click="situacao()"
+            >
+                <i class="fas fa-toggle-on"></i>
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-tool"
+                uib-popover="Clonar o Sorteio"
+                ng-click="clonarSorteio()"
+            >
+                <i class="fas fa-clone"></i>
+            </button>
+
+        </div>
+    </div>
+    <div class="card-body p-3">
+        <table
+            class="table produtos-selector table-striped"
+        >
+            <thead>
+                <tr>
+                    <th class="center" style="width:50px;">#</th>
+                    <th class="vl-liquido">Valor Líquido</th>
+                    <th class="descricao">Descrição</th>
+                    <th class="actions right"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="p in sorteio.premios">
+                    <td class="center pt-2">
+                        {{$index + 1}}
+                    </td>
+
+                    <td class="vl-liquido">
+                        <input
+                            type="tel"
+                            ng-model="p.valor"
+                            class="form-control right"
+                            money-mask
+                            select-on-click
+                        >
+                    </td>
+
+                    <td class="">
+                        <input
+                            ng-model="p.descricao"
+                            class="form-control"
+                            type="text"
+                        >
+                    </td>
+                    
+                    <td class="actions right">
+                        <a 
+                            href="#"
+                            ng-click="up($index)"
+                            uib-popover="Mover para cima"
+                            ng-class="{
+                                'disabled':$first,
+                                'pointer-events':$first  ? 'none' : 'initial',
+                                'cursor':$first ? 'not-allowed' : 'pointer'
+                            }"
+                        >
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
+
+                        <a
+                            href="#"
+                            ng-click="down($index)"
+                            uib-popover="Mover para baixo"
+                            ng-class="{
+                                'disabled':$last,
+                                'pointer-events':$last ? 'none' : 'initial',
+                                'cursor':$last ? 'not-allowed' : 'pointer'
+                            }"
+                        >
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </a>
+
+                        <a
+                            href="#"
+                            ng-if="sorteio.premios.length < 5"
+                            ng-click="clone($index)"
+                            uib-popover="Clonar"
+                            ng-class="{
+                                'pointer-events':$last ? 'none' : 'initial'
+                            }"
+                        >
+                            <i class="fa fa-clone" aria-hidden="true"></i>
+                        </a>
+
+                        <!--
+                        <a
+                            href="#"
+                            ng-click="remove(p)"
+                            uib-popover="Excluir"
+                        >
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </a>
+                        -->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

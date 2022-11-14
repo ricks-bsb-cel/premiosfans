@@ -31,6 +31,8 @@ import selectEmpresa from './select-empresa/select-empresa';
 import moeda from './moeda/moeda';
 import premiosCampanha from './premios-campanha/premios-campanha';
 import influencersCampanha from './influencers-campanha/influencers-campanha';
+import sorteiosCampanha from './sorteios-campanha/sorteios-campanha';
+import sorteioCampanhaPremios from './sorteio-campanha-premios/sorteio-campanha-premios';
 
 const ngModule = angular.module('directives', [
     loginBox.name,
@@ -65,7 +67,9 @@ const ngModule = angular.module('directives', [
     selectEmpresa.name,
     moeda.name,
     premiosCampanha.name,
-    influencersCampanha.name
+    influencersCampanha.name,
+    sorteiosCampanha.name,
+    sorteioCampanhaPremios.name
 ]);
 
 export default ngModule;

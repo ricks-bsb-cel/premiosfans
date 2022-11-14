@@ -1,0 +1,62 @@
+sorteio-campanha-premios{
+    
+    .card-tools{
+        padding-top: 4px;
+
+        button i.fa-toggle-on{
+            font-size: 1.3em;
+        }
+    }
+
+    input.dt-sorteio{
+        padding: 5px;
+        height: 30px;
+        width: 110px;
+        display: inline-block;
+    }
+
+    h3{
+        span.badge{
+            display: inline-block;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    }
+
+    table{
+
+        input{
+            height: 32px !important;
+        }
+
+        td{
+            padding: 7px 5px 5px 5px !important;
+        }
+
+        td.vl-liquido{
+            width: 150px;
+            text-align: right;
+        }
+
+        td.actions{
+            width: 120px;
+            padding-top: 9px !important;
+
+            a{
+                margin-right: 10px;
+                font-size: 1.2em;
+            }
+
+            a.disabled{
+                color: gray;
+                opacity: 0.5;
+            }
+        }
+
+        input.right{
+            text-align: right;
+        }
+
+    }
+
+}

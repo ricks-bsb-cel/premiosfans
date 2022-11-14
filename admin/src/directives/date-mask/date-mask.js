@@ -3,20 +3,21 @@
 const ngModule = angular
 	.module('directives.date-mask', [])
 	.directive('dateMask',
-		function () {
+		function (appFirestoreHelper) {
 			return {
 				require: 'ngModel',
 				controller: function ($scope, appConfig, $timeout) {
 
 					$scope.applyMask = e => {
 						$timeout(_ => {
-							VMasker(e).maskPattern(appConfig.get("/masks/data/VMasker"));
+							VMasker(e).maskPattern("99/99/9999");
 						})
 					}
 
 				},
 				link: function link(scope, element, attrs, ngModelCtrl) {
-					var value;
+					var value,
+						fieldName = ngModelCtrl.$$attr.ngModel.split('.').slice(-1)[0];
 
 					scope.applyMask(element);
 
@@ -33,11 +34,10 @@ const ngModule = angular
 						var d = moment(value, 'DD/MM/YYYY');
 
 						if (d.isValid()) {
-							/*
-							$scope.model[scope.options.key] = d.format('YYYY-MM-DD');
-							$scope.model[scope.options.key + '_ddmmyyyy'] = d.format('DD/MM/YYYY');
-							$scope.model[$scope.options.key + '_timestamp'] = appFirestoreHelper.toTimestamp(d.toDate());
-							*/
+							scope.parentModel[fieldName] = d.format('DD/MM/YYYY');
+							scope.parentModel[fieldName + '_yyyymmdd'] = d.format('YYYY-MM-DD');
+							scope.parentModel[fieldName + '_timestamp'] = appFirestoreHelper.toTimestamp(d.toDate());
+
 							ngModelCtrl.$setValidity('date-mask', true);
 						} else {
 							ngModelCtrl.$setValidity('date-mask', false);
@@ -53,12 +53,12 @@ const ngModule = angular
 				},
 				restrict: 'A',
 				scope: {
-					model: '=ngModel'
+					model: '=ngModel',
+					parentModel: '='
 				}
 			}
 		}
 	);
 
 export default ngModule;
-
 
