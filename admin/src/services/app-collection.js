@@ -7,7 +7,6 @@ const ngModule = angular.module('services.app-collection', [])
 		appFirestoreHelper,
 		appAuthHelper,
 		$timeout,
-		blockUiFactory,
 		globalFactory,
 		appErrors,
 		$q
@@ -46,8 +45,6 @@ const ngModule = angular.module('services.app-collection', [])
 
 			this.addOrUpdateDoc = (id, data) => {
 				return $q((resolve, reject) => {
-					blockUiFactory.start();
-
 					const db = appFirestore.firestore;
 					var command = null;
 
@@ -66,13 +63,12 @@ const ngModule = angular.module('services.app-collection', [])
 							} else {
 								data.id = id;
 							}
-							blockUiFactory.stop();
 							return resolve(data);
 						})
-						
+
 						.catch(e => {
-							blockUiFactory.stop();
 							console.error(attr.collection, e);
+
 							return reject(e);
 						})
 
@@ -257,12 +253,14 @@ const ngModule = angular.module('services.app-collection', [])
 				const c = appFirestore.collection(db, attr.collection);
 				var q = appFirestore.query(c);
 
-				if (Array.isArray(filter)) {
-					filter.forEach(f => {
-						q = addWhereAsString(q, f);
-					})
-				} else {
-					q = addWhereAsString(q, filter);
+				if (filter) {
+					if (Array.isArray(filter)) {
+						filter.forEach(f => {
+							q = addWhereAsString(q, f);
+						})
+					} else {
+						q = addWhereAsString(q, filter);
+					}
 				}
 
 				return appFirestoreHelper.docs(q);

@@ -5,22 +5,24 @@ import collectionCrud from './collections/collection.crud';
 import collectionAdmConfigPath from './collections/collection.admConfigPath';
 import collectionAdmConfigProfiles from './collections/collection.admConfigProfiles';
 
-import collectionsFormlySelector from './collections/collection.formlySelector';
-import collectionsUserProfile from './collections/collection.userProfile';
+import collectionFormlySelector from './collections/collection.formlySelector';
+import collectionUserProfile from './collections/collection.userProfile';
 
-import collectionsEmpresas from './collections/collection.empresas'; // Influencers
+import collectionEmpresas from './collections/collection.empresas'; // Influencers
 
-import collectionsCampanhas from './collections/collection.campanhas';
-import collectionsCampanhasPremios from './collections/collection.campanhasPremios';
+import collectionCampanhas from './collections/collection.campanhas';
+import collectionCampanhasInfluencers from './collections/collection.campanhasInfluencers';
+import collectionCampanhasSorteios from './collections/collection.campanhasSorteios';
+import collectionCampanhasSorteiosPremios from './collections/collection.campanhasSorteiosPremios';
 
-import collectionsApiConfig from './collections/collection.apiConfig';
+import collectionApiConfig from './collections/collection.apiConfig';
 import collectionHtmlBlock from './collections/collection.htmlBlock';
 import collectionConteudo from './collections/collection.conteudo';
 import collectionLancamentos from './collections/collection.lancamentos';
 
 import collectionEntidades from './collections/collection.entidades';
 
-import collectionsClientes from './collections/collection.clientes';
+import collectionClientes from './collections/collection.clientes';
 
 import collectionFrontTemplates from './collections/collection.front-templates';
 
@@ -32,15 +34,17 @@ let ngModule = angular.module('firebase.collections', [
 	collectionAdmConfigPath.name,
 	collectionAdmConfigProfiles.name,
 
-	collectionsEmpresas.name,
+	collectionEmpresas.name,
 
-	collectionsCampanhas.name,
-	collectionsCampanhasPremios.name,
+	collectionCampanhas.name,
+	collectionCampanhasInfluencers.name,
+	collectionCampanhasSorteios.name,
+	collectionCampanhasSorteiosPremios.name,
 
-	collectionsClientes.name,
-	collectionsFormlySelector.name,
-	collectionsUserProfile.name,
-	collectionsApiConfig.name,
+	collectionClientes.name,
+	collectionFormlySelector.name,
+	collectionUserProfile.name,
+	collectionApiConfig.name,
 	collectionHtmlBlock.name,
 	collectionConteudo.name,
 	collectionLancamentos.name,

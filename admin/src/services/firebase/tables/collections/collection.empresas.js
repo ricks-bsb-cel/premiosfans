@@ -17,6 +17,27 @@ const ngModule = angular.module('collection.empresas', [])
 
         const firebaseCollection = new appCollection(attr);
 
+        const get = _ => {
+            return $q((resolve, reject) => {
+
+                return appAuthHelper.ready()
+
+                    .then(_ => {
+                        return firebaseCollection.query();
+                    })
+
+                    .then(queryResult => {
+                        return resolve(queryResult);
+                    })
+
+                    .catch(e => {
+                        console.error(e);
+
+                        return reject(e);
+                    })
+            })
+        }
+
         const save = data => {
 
             return $q((resolve, reject) => {
@@ -78,7 +99,8 @@ const ngModule = angular.module('collection.empresas', [])
 
         return {
             collection: firebaseCollection,
-            save: save
+            save: save,
+            get: get
         };
 
     });

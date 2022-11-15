@@ -20,6 +20,14 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                 })
             }
 
+            $scope.removerPremio = p => {
+                alertFactory.yesno('Tem certeza que deseja remover o prêmio?').then(_ => {
+                    $scope.sorteio.premios = $scope.sorteio.premios.filter(f => {
+                        return f.guidPremio !== p.guidPremio;
+                    })
+                })
+            }
+
             $scope.up = pos => {
                 if (pos === 0) return;
 
@@ -35,7 +43,7 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
 
                 $scope.sorteio.premios = $scope.sorteio.premios.map(p => {
                     p.guidPremio = globalFactory.guid();
-                    
+
                     return p;
                 })
 
@@ -66,6 +74,12 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                 $scope.delegate.clonarSorteio(sorteio);
             }
 
+            $scope.removerSorteio = sorteio => {
+                alertFactory.yesno('Tem certeza que deseja remover o Sorteio e TODOS os seus prêmios?').then(_ => {
+                    $scope.delegate.removerSorteio(sorteio);
+                })
+            }
+
             $scope.situacao = _ => {
                 $scope.sorteio.ativo = !$scope.sorteio.ativo;
             }
@@ -81,7 +95,8 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
             controller: 'sorteioCampanhaPremiosController',
             scope: {
                 sorteio: "=",
-                delegate: "="
+                delegate: "=",
+                posicao: "@"
             }
         };
     });

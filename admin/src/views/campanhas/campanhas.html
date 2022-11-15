@@ -20,10 +20,9 @@
                                     <th class="id">ID Campanha</th>
                                     <th class="titulo">Título</th>
                                     <th class="url">URL</th>
-                                    <th class="data">Dt. Sorteio</th>
                                     <th class="template">Template</th>
                                     <th class="ativa right">Ativa</th>
-                                    <th class="dt-inclusao right">Criação</th>
+                                    <th class="dt-inclusao right">Última Alteraçãp</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,9 +40,6 @@
                                     <td class="url">
                                         {{c.url}}
                                     </td>
-                                    <td class="data">
-                                        {{c.dtSorteio_ddmmyyyy}}
-                                    </td>
                                     <td class="template">
                                         {{c.template}}
                                     </td>
@@ -51,7 +47,7 @@
                                         <badge-true-false value="r.ativo"></badge-true-false>
                                     </td>
                                     <td class="dt-criacao right">
-                                        {{c.dtInclusao | ddmmyyyyhhmm}}
+                                        {{c.dtAlteracao | ddmmyyyyhhmm}}
                                     </td>
                                 </tr>
                             </tbody>

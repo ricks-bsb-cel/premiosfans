@@ -51,6 +51,11 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
                     })
 
                     $scope.sorteios.push(sorteio);
+                },
+                removerSorteio: sorteio => {
+                    $scope.sorteios = $scope.sorteios.filter(f => {
+                        return f.guidSorteio !== sorteio.guidSorteio;
+                    })
                 }
             }
 

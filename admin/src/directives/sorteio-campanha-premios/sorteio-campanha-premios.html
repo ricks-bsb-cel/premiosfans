@@ -2,6 +2,8 @@
     <div class="card-header">
         <h3 class="card-title">
             Sorteio
+            Nº
+            {{posicao}}
             ~
             <small>Dia: </small>
 
@@ -20,18 +22,6 @@
 
         </h3>
         <div class="card-tools">
-
-            <!--
-            <button
-                ng-if="sorteio.premios.length < 5"
-                ng-click="add()"
-                type="button"
-                class="btn btn-block btn-primary btn-sm"
-            >
-                <i class="fas fa-plus mr-1"></i>
-                Adicionar Prêmio
-            </button>
-            -->
 
             <button
                 ng-if="sorteio.premios.length < 5"
@@ -60,6 +50,15 @@
                 ng-click="clonarSorteio(sorteio)"
             >
                 <i class="fas fa-clone"></i>
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-tool"
+                uib-popover="Excluir o Sorteio"
+                ng-click="removerSorteio(sorteio)"
+            >
+                <i class="fas fa-trash"></i>
             </button>
 
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -143,15 +142,13 @@
                             <i class="fa fa-clone" aria-hidden="true"></i>
                         </a>
 
-                        <!--
                         <a
                             href="#"
-                            ng-click="remove(p)"
+                            ng-click="removerPremio(p)"
                             uib-popover="Excluir"
                         >
                             <i class="fa fa-trash-o" aria-hidden="true"></i>
                         </a>
-                        -->
                     </td>
                 </tr>
             </tbody>

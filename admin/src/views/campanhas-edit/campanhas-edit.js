@@ -179,7 +179,8 @@ const ngModule = angular.module('views.contratos-edit', [
 		}
 
 		const loadCampanha = idCampanha => {
-			collectionCampanhas.getById(idCampanha)
+			collectionCampanhas.get(idCampanha)
+			
 				.then(result => {
 					$scope.campanha = { ...result };
 

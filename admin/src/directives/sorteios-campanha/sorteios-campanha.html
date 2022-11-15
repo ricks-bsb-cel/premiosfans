@@ -1,6 +1,7 @@
 <sorteio-campanha-premios
     ng-repeat="s in sorteios track by s.guidSorteio"
     sorteio="s"
+    posicao="{{$index + 1}}"
     delegate="delegate"
     class="col-12"
 ></sorteio-campanha-premios>
