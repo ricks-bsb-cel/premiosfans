@@ -1,20 +1,15 @@
 <div class="card sorteio-campanha-premios">
     <div class="card-header">
-        <h3 class="card-title mt-1">
+        <h3 class="card-title">
             Sorteio
             ~
             <small>Dia: </small>
-            
-            <input
-                ng-model="sorteio.dtSorteio"
-                parent-model="sorteio"
-                field-name="dtSorteio"
-                class="form-control dt-sorteio"
-                ng-required="true"
-                type="tel"
-                date-mask
-            >
 
+            <input-date
+                model="sorteio"
+                field-name="dtSorteio"
+            ></input-date>
+            
             <span ng-click="situacao()" ng-if="!sorteio.ativo" class="badge bg-danger">
                 Inativo
             </span>
@@ -62,7 +57,7 @@
                 type="button"
                 class="btn btn-tool"
                 uib-popover="Clonar o Sorteio"
-                ng-click="clonarSorteio()"
+                ng-click="clonarSorteio(sorteio)"
             >
                 <i class="fas fa-clone"></i>
             </button>

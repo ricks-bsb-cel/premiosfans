@@ -1,5 +1,5 @@
 <div class="row sorteios-campanha">
-    <div class="col-12" ng-repeat="s in sorteios">
+    <div class="col-12" ng-repeat="s in sorteios track by s.guidSorteio">
         <sorteio-campanha-premios
             sorteio="s"
             delegate="delegate"

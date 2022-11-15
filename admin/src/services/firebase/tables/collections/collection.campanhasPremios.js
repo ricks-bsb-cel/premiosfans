@@ -19,8 +19,7 @@ const ngModule = angular.module('collection.campanhasPremios', [])
         const getPremiosCampanha = (idCampanha) => {
             return $q((resolve, reject) => {
 
-                let produtosContrato,
-                    idProdutos = [];
+                let produtosContrato;
 
                 return appAuthHelper.ready()
 

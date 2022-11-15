@@ -232,7 +232,7 @@
   font-family: monospace;
 }
 
-input.ng-invalid-date-mask {
+input.invalid {
   background-color: #F2D7D5;
 }
 
@@ -737,6 +737,17 @@ image-gallery .image .actions a.active {
   border-radius: 50%;
 }
 
+.input-date {
+  position: relative;
+}
+.input-date input {
+  width: 144px;
+}
+.input-date span.badge {
+  position: absolute;
+  right: 7px;
+  top: 9px;
+}
 .lancamentos-contrato .timeline .time-label span {
   width: 100px;
   text-align: center;
@@ -917,16 +928,20 @@ search-filter .search-filter h3 i {
   overflow: hidden !important;
   text-overflow: ellipsis;
 }
+sorteio-campanha-premios .card-header {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+sorteio-campanha-premios .card-header .card-tools {
+  margin-top: 1px;
+}
 sorteio-campanha-premios .card-tools {
   padding-top: 4px;
 }
 sorteio-campanha-premios .card-tools button i.fa-toggle-on {
   font-size: 1.3em;
 }
-sorteio-campanha-premios input.dt-sorteio {
-  padding: 5px;
-  height: 30px;
-  width: 110px;
+sorteio-campanha-premios div.input-date {
   display: inline-block;
 }
 sorteio-campanha-premios h3 span.badge {

@@ -1,0 +1,13 @@
+.input-date {
+    position: relative;
+
+    input {
+        width: 144px;
+    }
+
+    span.badge{
+        position: absolute;
+        right: 7px;
+        top: 9px;
+    }
+}

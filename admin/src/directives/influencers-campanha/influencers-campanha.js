@@ -27,6 +27,8 @@ let ngModule = angular.module('directives.influencers-campanha', [])
                     .then(_ => {
                         $scope.influencers = $scope.influencers || [];
 
+
+                    
                         appAuthHelper.profile.user.empresas.forEach(e => {
 
                             let i = $scope.influencers.findIndex(f => {

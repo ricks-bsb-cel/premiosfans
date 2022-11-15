@@ -10,7 +10,6 @@ import qrCode from './qr-code/qr-code';
 import badgeTrueFalse from './badge-true-false/badge-true-false';
 import selectOnClick from './select-on-click/select-on-click';
 import moneyMask from './money-mask/money-mask';
-import dateMask from './date-mask/date-mask';
 import integerMask from './integer-mask/integer-mask';
 import imageGallery from './image-gallery/image-gallery';
 import topProgressBar from './top-progress-bar/top-progress-bar';
@@ -33,6 +32,7 @@ import premiosCampanha from './premios-campanha/premios-campanha';
 import influencersCampanha from './influencers-campanha/influencers-campanha';
 import sorteiosCampanha from './sorteios-campanha/sorteios-campanha';
 import sorteioCampanhaPremios from './sorteio-campanha-premios/sorteio-campanha-premios';
+import inputDate from './input-date/input-date';
 
 const ngModule = angular.module('directives', [
     loginBox.name,
@@ -48,7 +48,6 @@ const ngModule = angular.module('directives', [
     badgeTrueFalse.name,
     selectOnClick.name,
     moneyMask.name,
-    dateMask.name,
     integerMask.name,
     imageGallery.name,
     topProgressBar.name,
@@ -69,7 +68,8 @@ const ngModule = angular.module('directives', [
     premiosCampanha.name,
     influencersCampanha.name,
     sorteiosCampanha.name,
-    sorteioCampanhaPremios.name
+    sorteioCampanhaPremios.name,
+    inputDate.name
 ]);
 
 export default ngModule;

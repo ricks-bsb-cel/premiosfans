@@ -4,7 +4,8 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
 
     .controller('sorteiosCampanhaController',
         function (
-            $scope
+            $scope,
+            globalFactory
         ) {
 
             $scope.add = _ => {
@@ -27,8 +28,27 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
             }
 
             $scope.delegate = {
-                clonarSorteio: _ => {
-                    $scope.add();
+                clonarSorteio: sorteio => {
+
+                    const s = {
+                        ativo: false,
+                        guidSorteio: globalFactory.guid()
+                    };
+
+                    sorteio = {
+                        ...s,
+                        ...sorteio
+                    };
+
+                    sorteio.premios = sorteio.premios.map(p => {
+                        return {
+                            descricao: p.descricao,
+                            guidPremio: globalFactory.guid(),
+                            valor: p.valor
+                        };
+                    })
+
+                    $scope.sorteios.push(sorteio);
                 }
             }
 

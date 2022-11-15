@@ -37,9 +37,6 @@ const ngModule = angular.module('views.contratos-edit', [
 
 			if (typeof $scope.campanha.ativo === 'undefined') $scope.campanha.ativo = false;
 
-			console.info($scope.campanha);
-			return;
-
 			blockUiFactory.start();
 
 			collectionCampanhas.save($scope.campanha)

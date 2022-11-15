@@ -53,17 +53,19 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
 
             const init = _ => {
                 $scope.sorteio = $scope.sorteio || {
+                    guidSorteio: globalFactory.guid(),
                     dtSorteio: null,
                     ativo: false,
                     premios: []
                 };
+                
                 $scope.sorteio.premios = $scope.sorteio.premios || [];
 
                 if (!$scope.sorteio.premios.length) $scope.add();
             }
 
-            $scope.clonarSorteio = _ => {
-                $scope.delegate.clonarSorteio();
+            $scope.clonarSorteio = sorteio => {
+                $scope.delegate.clonarSorteio(sorteio);
             }
 
             $scope.situacao = _ =>{

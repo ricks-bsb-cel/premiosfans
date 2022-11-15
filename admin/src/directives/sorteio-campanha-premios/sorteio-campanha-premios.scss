@@ -1,5 +1,14 @@
 sorteio-campanha-premios{
     
+    .card-header{
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        .card-tools{
+            margin-top: 1px;
+        }
+    }
+
     .card-tools{
         padding-top: 4px;
 
@@ -8,10 +17,7 @@ sorteio-campanha-premios{
         }
     }
 
-    input.dt-sorteio{
-        padding: 5px;
-        height: 30px;
-        width: 110px;
+    div.input-date{
         display: inline-block;
     }
 

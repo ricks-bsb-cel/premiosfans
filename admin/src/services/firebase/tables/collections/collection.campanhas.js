@@ -51,6 +51,8 @@ const ngModule = angular.module('collection.campanhas', [])
                 let id = campanha.id || 'new';
 
                 delete campanha.id;
+                
+                debugger;
 
                 firebaseCollection.addOrUpdateDoc(id, campanha)
 
@@ -76,6 +78,24 @@ const ngModule = angular.module('collection.campanhas', [])
                     }
                 });
 
+            campanha.sorteios = campanha.sorteios.map(s => {
+                return {
+                    ativo: s.ativo,
+                    dtSorteio: s.dtSorteio,
+                    dtSorteio_timestamp: s.dtSorteio_timestamp,
+                    dtSorteio_weak_day: s.dtSorteio_weak_day,
+                    dtSorteio_yyyymmdd: s.dtSorteio_yyyymmdd,
+                    premios: s.premios.map(p => {
+                        return {
+                            guidPremio: p.guidPremio,
+                            descricao: p.descricao,
+                            valor: p.valor
+                        };
+                    })
+                };
+            })
+
+            /*    
             campanha.premios = campanha.premios
                 .map(p => {
 
@@ -91,6 +111,7 @@ const ngModule = angular.module('collection.campanhas', [])
                         dtSorteio: p.dtSorteio
                     }
                 });
+            */
 
             campanha.images = campanha.images
                 .map(i => {
