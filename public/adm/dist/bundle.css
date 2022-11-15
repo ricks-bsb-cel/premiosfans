@@ -736,7 +736,10 @@ image-gallery .image .actions a.active {
   padding: 0px 0px 0px 2px;
   border-radius: 50%;
 }
-
+influencers-campanha table tbody td span.form-control {
+  background-color: #e9ecef;
+  cursor: pointer;
+}
 .input-date {
   position: relative;
 }
@@ -974,7 +977,6 @@ sorteio-campanha-premios table td.actions a.disabled {
 sorteio-campanha-premios table input.right {
   text-align: right;
 }
-
 .image-chooser-modal .slim {
   height: 1px;
   width: 1px;

@@ -46,15 +46,16 @@ const ngModule = angular.module('collection.campanhas', [])
 
             return $q((resolve, reject) => {
 
-                campanha = sanitizeCampanha(campanha);
+                // Não modifique o objeto que está no AngularJS...
+                let toSave = { ...campanha };
 
-                let id = campanha.id || 'new';
+                toSave = sanitizeCampanha(toSave);
 
-                delete campanha.id;
-                
-                debugger;
+                let id = toSave.id || 'new';
 
-                firebaseCollection.addOrUpdateDoc(id, campanha)
+                delete toSave.id;
+
+                firebaseCollection.addOrUpdateDoc(id, toSave)
 
                     .then(data => {
                         return resolve(data);
@@ -70,8 +71,8 @@ const ngModule = angular.module('collection.campanhas', [])
         }
 
         const sanitizeCampanha = campanha => {
+
             campanha.influencers = campanha.influencers
-                .filter(f => { return f.selected; })
                 .map(i => {
                     return {
                         idInfluencer: i.idInfluencer
@@ -85,9 +86,10 @@ const ngModule = angular.module('collection.campanhas', [])
                     dtSorteio_timestamp: s.dtSorteio_timestamp,
                     dtSorteio_weak_day: s.dtSorteio_weak_day,
                     dtSorteio_yyyymmdd: s.dtSorteio_yyyymmdd,
+                    guidSorteio: s.guidSorteio || globalFactory.guid(),
                     premios: s.premios.map(p => {
                         return {
-                            guidPremio: p.guidPremio,
+                            guidPremio: p.guidPremio || globalFactory.guid(),
                             descricao: p.descricao,
                             valor: p.valor
                         };
@@ -95,25 +97,7 @@ const ngModule = angular.module('collection.campanhas', [])
                 };
             })
 
-            /*    
-            campanha.premios = campanha.premios
-                .map(p => {
-
-                    if (!p.dtSorteio) {
-                        throw new Error('A data do sorteio é obrigatória');
-                    }
-
-                    return {
-                        guidPremio: p.guidPremio,
-                        descricao: p.descricao || null,
-                        valor: parseFloat(p.valor),
-                        qtd: p.qtd || 1,
-                        dtSorteio: p.dtSorteio
-                    }
-                });
-            */
-
-            campanha.images = campanha.images
+            campanha.images = (campanha.images || [])
                 .map(i => {
                     delete i.$$hashKey;
                     delete i.created_at;

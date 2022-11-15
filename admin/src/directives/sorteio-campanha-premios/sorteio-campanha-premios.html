@@ -1,4 +1,4 @@
-<div class="card sorteio-campanha-premios">
+<div class="card sorteio-campanha-premios mb-0">
     <div class="card-header">
         <h3 class="card-title">
             Sorteio
@@ -62,6 +62,10 @@
                 <i class="fas fa-clone"></i>
             </button>
 
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+
         </div>
     </div>
     <div class="card-body p-3">
@@ -77,7 +81,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="p in sorteio.premios">
+                <tr ng-repeat="p in sorteio.premios track by p.guidPremio">
                     <td class="center pt-2">
                         {{$index + 1}}
                     </td>

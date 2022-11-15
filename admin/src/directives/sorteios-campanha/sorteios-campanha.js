@@ -11,7 +11,8 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
             $scope.add = _ => {
                 $scope.sorteios.push({
                     ativo: false,
-                    dtSorteio: null
+                    dtSorteio: null,
+                    guidSorteio: globalFactory.guid()
                 })
             }
 
@@ -32,12 +33,13 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
 
                     const s = {
                         ativo: false,
-                        guidSorteio: globalFactory.guid()
+                        guidSorteio: globalFactory.guid(),
+                        dtSorteio: null
                     };
 
                     sorteio = {
-                        ...s,
-                        ...sorteio
+                        ...sorteio,
+                        ...s
                     };
 
                     sorteio.premios = sorteio.premios.map(p => {

@@ -20,14 +20,6 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                 })
             }
 
-            /*
-            $scope.remove = p => {
-                $scope.sorteio.premios = $scope.sorteio.premios.filter(f => {
-                    return f.guidPremio !== p.guidPremio;
-                })
-            }
-            */
-
             $scope.up = pos => {
                 if (pos === 0) return;
 
@@ -40,6 +32,12 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                 p = { ...p };
                 p.guidPremio = globalFactory.guid();
                 delete p.$$hashKey;
+
+                $scope.sorteio.premios = $scope.sorteio.premios.map(p => {
+                    p.guidPremio = globalFactory.guid();
+                    
+                    return p;
+                })
 
                 $scope.sorteio.premios.splice(pos, 0, p);
             }
@@ -58,7 +56,7 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                     ativo: false,
                     premios: []
                 };
-                
+
                 $scope.sorteio.premios = $scope.sorteio.premios || [];
 
                 if (!$scope.sorteio.premios.length) $scope.add();
@@ -68,7 +66,7 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                 $scope.delegate.clonarSorteio(sorteio);
             }
 
-            $scope.situacao = _ =>{
+            $scope.situacao = _ => {
                 $scope.sorteio.ativo = !$scope.sorteio.ativo;
             }
 

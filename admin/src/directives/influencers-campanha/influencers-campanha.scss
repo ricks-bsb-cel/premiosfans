@@ -1,8 +1,12 @@
 influencers-campanha{
-
     table{
-
-    
+        tbody{
+            td{
+                span.form-control{
+                    background-color: #e9ecef;
+                    cursor: pointer;
+                }
+            }
+        }
     }
-
 }

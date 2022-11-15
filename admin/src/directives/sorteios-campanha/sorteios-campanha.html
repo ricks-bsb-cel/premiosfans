@@ -1,8 +1,6 @@
-<div class="row sorteios-campanha">
-    <div class="col-12" ng-repeat="s in sorteios track by s.guidSorteio">
-        <sorteio-campanha-premios
-            sorteio="s"
-            delegate="delegate"
-        ></sorteio-campanha-premios>
-    </div>
-</div>
+<sorteio-campanha-premios
+    ng-repeat="s in sorteios track by s.guidSorteio"
+    sorteio="s"
+    delegate="delegate"
+    class="col-12"
+></sorteio-campanha-premios>

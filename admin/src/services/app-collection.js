@@ -69,6 +69,7 @@ const ngModule = angular.module('services.app-collection', [])
 							blockUiFactory.stop();
 							return resolve(data);
 						})
+						
 						.catch(e => {
 							blockUiFactory.stop();
 							console.error(attr.collection, e);

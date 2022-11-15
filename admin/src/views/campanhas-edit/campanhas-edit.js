@@ -42,10 +42,12 @@ const ngModule = angular.module('views.contratos-edit', [
 			collectionCampanhas.save($scope.campanha)
 				.then(saveResult => {
 
+					/*
 					premiosFansService.generateTemplates({
 						data: { idCampanha: saveResult.id },
 						blockUi: false
 					});
+					*/
 
 					$location.path('/campanhas');
 					blockUiFactory.stop();

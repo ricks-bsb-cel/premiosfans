@@ -29,6 +29,10 @@ const ngModule = angular.module('directives.input-date', [])
 					return;
 				}
 
+				if ($scope.value !== v) {
+					$scope.value = v;
+				}
+
 				const d = moment(v, 'DD/MM/YYYY');
 
 				if (d.isValid()) {
@@ -60,17 +64,20 @@ const ngModule = angular.module('directives.input-date', [])
 				disableWatchValue = null;
 			}
 
-			$scope.$watch('model', newValue => {
-				stopWatchValue();
+			const initWatchModel = _ => {
+				$scope.$watch('model', (newValue, oldValue) => {
+					const newDate = newValue && newValue[$scope.fieldName] ? newValue[$scope.fieldName] : null;
 
-				setData(newValue);
-
-				initWatchValue();
-			})
+					stopWatchValue();
+					setData(newDate);
+					initWatchValue();
+				})
+			}
 
 			$timeout(_ => {
 				applyMask();
 				initWatchValue();
+				initWatchModel();
 			})
 
 		})
