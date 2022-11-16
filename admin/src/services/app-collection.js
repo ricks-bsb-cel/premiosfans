@@ -35,11 +35,16 @@ const ngModule = angular.module('services.app-collection', [])
 			}
 
 			const addWhereAsString = (q, w) => {
-				if (_.isObject(w) && w.field && w.operator && typeof w.value !== 'undefined') {
-					return appFirestore.query(q, appFirestore.where(w.field, w.operator, w.value));
-				} else {
-					var c = w.trim().split(' ');
-					return appFirestore.query(q, appFirestore.where(c[0], c[1], c[2]));
+				try {
+					if (_.isObject(w) && w.field && w.operator && typeof w.value !== 'undefined') {
+						return appFirestore.query(q, appFirestore.where(w.field, w.operator, w.value));
+					} else {
+						var c = w.trim().split(' ');
+						return appFirestore.query(q, appFirestore.where(c[0], c[1], c[2]));
+					}
+				}
+				catch (e) {
+					console.error('app-collection.addWhereAsString', e);
 				}
 			}
 
@@ -249,21 +254,26 @@ const ngModule = angular.module('services.app-collection', [])
 			}
 
 			this.query = filter => {
-				const db = appFirestore.firestore;
-				const c = appFirestore.collection(db, attr.collection);
-				var q = appFirestore.query(c);
+				try {
+					const db = appFirestore.firestore;
+					const c = appFirestore.collection(db, attr.collection);
+					var q = appFirestore.query(c);
 
-				if (filter) {
-					if (Array.isArray(filter)) {
-						filter.forEach(f => {
-							q = addWhereAsString(q, f);
-						})
-					} else {
-						q = addWhereAsString(q, filter);
+					if (filter) {
+						if (Array.isArray(filter)) {
+							filter.forEach(f => {
+								q = addWhereAsString(q, f);
+							})
+						} else {
+							q = addWhereAsString(q, filter);
+						}
 					}
-				}
 
-				return appFirestoreHelper.docs(q);
+					return appFirestoreHelper.docs(q);
+				}
+				catch (e) {
+					console.error('app-collection.query', e);
+				}
 			}
 
 			if (attr.autoStartSnapshot) {

@@ -90,42 +90,38 @@ const ngModule = angular.module('collection.campanhasSorteios', [])
 
                     .then(premiosSaved => {
                         result.premios = premiosSaved;
-                        
-                        return removePremios(result.sorteio);
+
+                        return removeDeletedPremios(sorteio);
                     })
 
                     .then(_ => {
                         return resolve(result);
                     })
 
-                    .catch(function (e) {
-                        appErrors.showError(e);
+                    .catch(e => {
+                        console.error(e);
+
                         return reject(e);
                     })
 
             })
         }
 
-        const removePremios = sorteio => {
-            // Remove os prêmios que não tem o hash do último update
+        const removeDeletedPremios = sorteio => {
+            // Remove os prêmios que foram excluídos pelo usuário
             return $q((resolve, reject) => {
 
-                let query = [
-                    { field: "idCampanha", operator: "==", value: sorteio.idCampanha },
-                    { field: "ativo", operator: "==", value: false },
-                    { field: "updateHash", operator: "!=", value: sorteio.updateHash }
-                ];
+                let promises = [];
 
-                return collectionCampanhasSorteiosPremios.collection.query(query)
-                    .then(toDelete => {
-                        let promises = [];
-
-                        toDelete.forEach(doc => {
-                            promises.push(collectionCampanhasSorteiosPremios.collection.removeDoc(doc.id));
-                        })
-
-                        return Promise.all(promises);
+                sorteio.premios
+                    .filter(f => {
+                        return !f.ativo && f.deleted && f.id !== 'new';
                     })
+                    .forEach(p => {
+                        promises.push(collectionCampanhasSorteiosPremios.collection.removeDoc(p.id));
+                    });
+
+                return Promise.all(promises)
 
                     .then(_ => {
                         return resolve();

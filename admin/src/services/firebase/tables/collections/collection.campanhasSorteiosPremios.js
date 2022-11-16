@@ -67,8 +67,6 @@ const ngModule = angular.module('collection.campanhas-sorteios-premios', [])
             result.uidAlteracao = appAuthHelper.profile.user.uid;
             result.dtAlteracao = appFirestoreHelper.currentTimestamp();
 
-            result.keywords = globalFactory.generateKeywords(result.descricao);
-
             return result;
         }
 
@@ -77,11 +75,13 @@ const ngModule = angular.module('collection.campanhas-sorteios-premios', [])
 
                 let promises = [];
 
-                premios.forEach((p, i) => {
-                    p.pos = i + 1;
+                premios
+                    .filter(f => { return !f.deleted; })
+                    .forEach((p, i) => {
+                        p.pos = i + 1;
 
-                    promises.push(save(sorteio, p));
-                })
+                        promises.push(save(sorteio, p));
+                    })
 
                 Promise.all(promises)
                     .then(savedData => {

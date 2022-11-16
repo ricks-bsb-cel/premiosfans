@@ -22,9 +22,7 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
 
             $scope.removerPremio = p => {
                 alertFactory.yesno('Tem certeza que deseja remover o prêmio?').then(_ => {
-                    $scope.sorteio.premios = $scope.sorteio.premios.filter(f => {
-                        return f.guidPremio !== p.guidPremio;
-                    })
+                    p.deleted = true;
                 })
             }
 

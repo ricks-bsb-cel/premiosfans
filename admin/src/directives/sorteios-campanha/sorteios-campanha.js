@@ -30,7 +30,6 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
 
             $scope.delegate = {
                 clonarSorteio: sorteio => {
-
                     const s = {
                         ativo: false,
                         guidSorteio: globalFactory.guid(),

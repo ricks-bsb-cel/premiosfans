@@ -24,27 +24,15 @@
         <div class="card-tools">
 
             <button
-                ng-if="sorteio.premios.length < 5"
+                ng-if="sorteio.premios.filter(f=>{return !f.deleted;}).length < 5 && !sorteio.ativo"
                 type="button"
                 ng-click="add()"
                 class="btn btn-tool"
                 uib-popover="Adicionar um novo prêmio"
-                ng-if="!sorteio.ativo" 
             >
                 <i class="fas fa-plus"></i>
                 Adicionar Prêmio
             </button>
-
-            <!--
-            <button
-                type="button"
-                class="btn btn-tool"
-                uib-popover="Ativar a Data do Sorteio"
-                ng-click="situacao()"
-            >
-                <i class="fas fa-toggle-on"></i>
-            </button>
-            -->
 
             <button
                 type="button"
@@ -85,7 +73,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="p in sorteio.premios track by p.guidPremio">
+                <tr ng-repeat="p in sorteio.premios | filter:{deleted:false} track by p.guidPremio">
                     <td class="center pt-2">
                         {{$index + 1}}
                     </td>
@@ -137,7 +125,7 @@
 
                         <a
                             href="#"
-                            ng-if="sorteio.premios.length < 5"
+                            ng-if="sorteio.premios.filter(f=>{return !f.deleted;}).length < 5"
                             ng-click="clonePremio($index)"
                             uib-popover="Clonar este prêmio, criando um idêntico"
                             ng-class="{

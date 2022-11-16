@@ -84,7 +84,8 @@ const ngModule = angular.module('collection.campanhasInfluencers', [])
                     })
 
                     .catch(function (e) {
-                        appErrors.showError(e);
+                        console.error(e);
+
                         return reject(e);
                     })
 

@@ -45,8 +45,17 @@ const ngModule = angular.module('collection.campanhas', [])
                         campanha.sorteios = globalFactory.sortArray(sorteios, 'dtSorteio_yyyymmdd');
 
                         campanha.sorteios = campanha.sorteios.map(s => {
-                            s.premios = premios.filter(f => { return f.idSorteio === s.id; });
+                            s.premios = premios
+                                .filter(f => {
+                                    return f.idSorteio === s.id;
+                                })
+                                .map(p => {
+                                    p.deleted = false;
+                                    return p;
+                                });
+
                             s.premios = globalFactory.sortArray(s.premios, 'pos');
+                            s.deleted = false;
 
                             return s;
                         });
@@ -62,7 +71,6 @@ const ngModule = angular.module('collection.campanhas', [])
         }
 
         const save = campanha => {
-
             return $q((resolve, reject) => {
 
                 // Não modifique o objeto que está no AngularJS...
@@ -94,15 +102,17 @@ const ngModule = angular.module('collection.campanhas', [])
                     .then(dadosSorteios => {
                         result.sorteios = dadosSorteios;
 
-                        return removeSorteios(result.campanha);
+                        return removeDeletedSorteios(campanha);
                     })
 
                     .then(_ => {
                         return resolve(result);
                     })
 
+
                     .catch(function (e) {
-                        appErrors.showError(e);
+                        console.error(e);
+
                         return reject(e);
                     })
 
@@ -151,26 +161,21 @@ const ngModule = angular.module('collection.campanhas', [])
             return result;
         }
 
-        const removeSorteios = campanha => {
-            // Remove os sorteios que não tem o hash do último update
+        const removeDeletedSorteios = campanha => {
+            // Remove os sorteios quer foram excluídos pelo usuário
             return $q((resolve, reject) => {
 
-                let query = [
-                    { field: "idCampanha", operator: "==", value: campanha.id },
-                    { field: "ativo", operator: "==", value: false },
-                    { field: "updateHash", operator: "!=", value: campanha.updateHash }
-                ];
+                let promises = [];
 
-                return collectionCampanhasSorteios.collection.query(query)
-                    .then(toDelete => {
-                        let promises = [];
-
-                        toDelete.forEach(doc => {
-                            promises.push(collectionCampanhasSorteios.collection.removeDoc(doc.id));
-                        })
-
-                        return Promise.all(promises);
+                campanha.sorteios
+                    .filter(f => {
+                        return !f.ativo && f.deleted && f.id !== 'new';
                     })
+                    .forEach(s => {
+                        promises.push(collectionCampanhasSorteios.collection.removeDoc(s.id));
+                    });
+
+                return Promise.all(promises)
 
                     .then(_ => {
                         return resolve();
