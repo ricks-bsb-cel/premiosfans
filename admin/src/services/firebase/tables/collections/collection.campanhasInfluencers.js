@@ -92,11 +92,12 @@ const ngModule = angular.module('collection.campanhasInfluencers', [])
         }
 
         const sanitize = (campanha, influencer) => {
-
             let result = {
                 id: influencer.id || 'new',
                 idCampanha: campanha.id,
-                idInfluencer: influencer.idInfluencer
+                idInfluencer: influencer.idInfluencer,
+                selected: typeof influencer.selected === 'boolean' ? influencer.selected : false,
+                updateHash: campanha.updateHash
             };
 
             if (result.id === 'new') {

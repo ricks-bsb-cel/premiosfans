@@ -1,5 +1,7 @@
 'use strict';
 
+import { update } from "lodash";
+
 const ngModule = angular.module('collection.campanhas', [])
 
     .factory('collectionCampanhas', function (
@@ -9,7 +11,6 @@ const ngModule = angular.module('collection.campanhas', [])
         globalFactory,
         $q,
 
-        collectionEmpresas,
         collectionCampanhasInfluencers,
         collectionCampanhasSorteios,
         collectionCampanhasSorteiosPremios
@@ -27,7 +28,6 @@ const ngModule = angular.module('collection.campanhas', [])
 
                 const promises = [
                     appFirestoreHelper.getDoc(attr.collection, idCampanha),
-                    collectionEmpresas.get(),
                     collectionCampanhasInfluencers.get(idCampanha),
                     collectionCampanhasSorteios.get(idCampanha),
                     collectionCampanhasSorteiosPremios.get(idCampanha)
@@ -37,50 +37,26 @@ const ngModule = angular.module('collection.campanhas', [])
 
                     .then(promisesResult => {
                         let campanha = promisesResult[0],
-                            empresas = promisesResult[1],
-                            influencers = promisesResult[2],
-                            sorteios = promisesResult[3],
-                            premios = promisesResult[4];
+                            influencers = promisesResult[1],
+                            sorteios = promisesResult[2],
+                            premios = promisesResult[3];
 
                         campanha.influencers = influencers;
-                        campanha.sorteios = sorteios;
+                        campanha.sorteios = globalFactory.sortArray(sorteios, 'dtSorteio_yyyymmdd');
 
                         campanha.sorteios = campanha.sorteios.map(s => {
                             s.premios = premios.filter(f => { return f.idSorteio === s.id; });
+                            s.premios = globalFactory.sortArray(s.premios, 'pos');
 
                             return s;
                         });
 
-                        debugger;
-
                         return resolve(campanha);
                     })
 
                     .catch(e => {
                         return reject(e);
                     })
-
-
-                /*
-                return appFirestoreHelper.getDoc(attr.collection, idCampanha)
-                    .then(campanha => {
-                        campanha.influencers = campanha.influencers.map(influencer => {
-                            const pos = appAuthHelper.profile.user.empresas.findIndex(f => {
-                                return f.id === influencer.idInfluencer;
-                            });
-
-                            influencer.nome = pos < 0 ? '* Unauthorized *' : appAuthHelper.profile.user.empresas[pos].nome;
-                            influencer.selected = true;
-
-                            return influencer;
-                        })
-
-                        return resolve(campanha);
-                    })
-                    .catch(e => {
-                        return reject(e);
-                    })
-                */
 
             })
         }
@@ -118,6 +94,10 @@ const ngModule = angular.module('collection.campanhas', [])
                     .then(dadosSorteios => {
                         result.sorteios = dadosSorteios;
 
+                        return removeSorteios(result.campanha);
+                    })
+
+                    .then(_ => {
                         return resolve(result);
                     })
 
@@ -131,6 +111,10 @@ const ngModule = angular.module('collection.campanhas', [])
 
         const sanitize = campanha => {
 
+            const updateHash = globalFactory.generateRandomId(16);
+
+            console.info(updateHash);
+
             let result = {
                 id: campanha.id || 'new',
                 ativo: typeof campanha.ativo === 'function' ? campanha.ativo : false,
@@ -139,7 +123,8 @@ const ngModule = angular.module('collection.campanhas', [])
                 subTitulo: campanha.subTitulo || null,
                 detalhe: campanha.detalhe || null,
                 template: campanha.template,
-                url: campanha.url
+                url: campanha.url,
+                updateHash: updateHash
             };
 
             if (campanha.images && campanha.images.length) {
@@ -165,6 +150,40 @@ const ngModule = angular.module('collection.campanhas', [])
 
             return result;
         }
+
+        const removeSorteios = campanha => {
+            // Remove os sorteios que não tem o hash do último update
+            return $q((resolve, reject) => {
+
+                let query = [
+                    { field: "idCampanha", operator: "==", value: campanha.id },
+                    { field: "ativo", operator: "==", value: false },
+                    { field: "updateHash", operator: "!=", value: campanha.updateHash }
+                ];
+
+                return collectionCampanhasSorteios.collection.query(query)
+                    .then(toDelete => {
+                        let promises = [];
+
+                        toDelete.forEach(doc => {
+                            promises.push(collectionCampanhasSorteios.collection.removeDoc(doc.id));
+                        })
+
+                        return Promise.all(promises);
+                    })
+
+                    .then(_ => {
+                        return resolve();
+                    })
+
+                    .catch(e => {
+                        console.error(e);
+
+                        return reject();
+                    })
+            })
+        }
+
 
         return {
             collection: firebaseCollection,

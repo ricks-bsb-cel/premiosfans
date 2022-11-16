@@ -35,7 +35,7 @@ const ngModule = angular.module('services.app-collection', [])
 			}
 
 			const addWhereAsString = (q, w) => {
-				if (_.isObject(w) && w.field && w.operator && w.value) {
+				if (_.isObject(w) && w.field && w.operator && typeof w.value !== 'undefined') {
 					return appFirestore.query(q, appFirestore.where(w.field, w.operator, w.value));
 				} else {
 					var c = w.trim().split(' ');
@@ -279,6 +279,5 @@ const ngModule = angular.module('services.app-collection', [])
 
 		return instance;
 	})
-
 
 export default ngModule;

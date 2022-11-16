@@ -34,7 +34,8 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
                     const s = {
                         ativo: false,
                         guidSorteio: globalFactory.guid(),
-                        dtSorteio: null
+                        dtSorteio: null,
+                        id: 'new'
                     };
 
                     sorteio = {
@@ -46,7 +47,8 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
                         return {
                             descricao: p.descricao,
                             guidPremio: globalFactory.guid(),
-                            valor: p.valor
+                            valor: p.valor,
+                            id: 'new'
                         };
                     })
 

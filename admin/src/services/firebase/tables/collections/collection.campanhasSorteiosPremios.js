@@ -47,14 +47,16 @@ const ngModule = angular.module('collection.campanhas-sorteios-premios', [])
         }
 
         const sanitize = (sorteio, premio) => {
-
             let result = {
                 id: premio.id || 'new',
                 idCampanha: sorteio.idCampanha,
                 idSorteio: sorteio.id,
                 guidPremio: premio.guidPremio || globalFactory.guid(),
                 descricao: premio.descricao,
-                valor: premio.valor
+                valor: premio.valor,
+                updateHash: sorteio.updateHash,
+                ativo: false,
+                pos: premio.pos
             }
 
             if (result.id === 'new') {
@@ -75,7 +77,9 @@ const ngModule = angular.module('collection.campanhas-sorteios-premios', [])
 
                 let promises = [];
 
-                premios.forEach(p => {
+                premios.forEach((p, i) => {
+                    p.pos = i + 1;
+
                     promises.push(save(sorteio, p));
                 })
 
@@ -98,7 +102,8 @@ const ngModule = angular.module('collection.campanhas-sorteios-premios', [])
 
             return $q((resolve, reject) => {
 
-                let toSave = sanitize(sorteio, premio);
+                let result = {},
+                    toSave = sanitize(sorteio, premio);
 
                 let id = toSave.id || 'new';
 
@@ -106,8 +111,10 @@ const ngModule = angular.module('collection.campanhas-sorteios-premios', [])
 
                 firebaseCollection.addOrUpdateDoc(id, toSave)
 
-                    .then(data => {
-                        return resolve(data);
+                    .then(updateResult => {
+                        result.updateResult = updateResult;
+
+                        return resolve(result);
                     })
 
                     .catch(function (e) {

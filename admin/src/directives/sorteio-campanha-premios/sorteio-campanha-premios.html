@@ -29,11 +29,13 @@
                 ng-click="add()"
                 class="btn btn-tool"
                 uib-popover="Adicionar um novo prêmio"
+                ng-if="!sorteio.ativo" 
             >
                 <i class="fas fa-plus"></i>
                 Adicionar Prêmio
             </button>
 
+            <!--
             <button
                 type="button"
                 class="btn btn-tool"
@@ -42,12 +44,14 @@
             >
                 <i class="fas fa-toggle-on"></i>
             </button>
+            -->
 
             <button
                 type="button"
                 class="btn btn-tool"
                 uib-popover="Clonar o Sorteio"
                 ng-click="clonarSorteio(sorteio)"
+                ng-if="!sorteio.ativo" 
             >
                 <i class="fas fa-clone"></i>
             </button>
@@ -57,6 +61,7 @@
                 class="btn btn-tool"
                 uib-popover="Excluir o Sorteio"
                 ng-click="removerSorteio(sorteio)"
+                ng-if="!sorteio.ativo" 
             >
                 <i class="fas fa-trash"></i>
             </button>
@@ -133,8 +138,8 @@
                         <a
                             href="#"
                             ng-if="sorteio.premios.length < 5"
-                            ng-click="clone($index)"
-                            uib-popover="Clonar"
+                            ng-click="clonePremio($index)"
+                            uib-popover="Clonar este prêmio, criando um idêntico"
                             ng-class="{
                                 'pointer-events':$last ? 'none' : 'initial'
                             }"

@@ -35,17 +35,16 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                 $scope.sorteio.premios.splice(pos - 1, 0, p);
             }
 
-            $scope.clone = pos => {
+            $scope.clonePremio = pos => {
                 let p = $scope.sorteio.premios[pos];
+
                 p = { ...p };
+
                 p.guidPremio = globalFactory.guid();
+
                 delete p.$$hashKey;
 
-                $scope.sorteio.premios = $scope.sorteio.premios.map(p => {
-                    p.guidPremio = globalFactory.guid();
-
-                    return p;
-                })
+                p.id = 'new';
 
                 $scope.sorteio.premios.splice(pos, 0, p);
             }

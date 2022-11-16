@@ -90,7 +90,11 @@ const ngModule = angular.module('collection.campanhasSorteios', [])
 
                     .then(premiosSaved => {
                         result.premios = premiosSaved;
+                        
+                        return removePremios(result.sorteio);
+                    })
 
+                    .then(_ => {
                         return resolve(result);
                     })
 
@@ -99,6 +103,39 @@ const ngModule = angular.module('collection.campanhasSorteios', [])
                         return reject(e);
                     })
 
+            })
+        }
+
+        const removePremios = sorteio => {
+            // Remove os prêmios que não tem o hash do último update
+            return $q((resolve, reject) => {
+
+                let query = [
+                    { field: "idCampanha", operator: "==", value: sorteio.idCampanha },
+                    { field: "ativo", operator: "==", value: false },
+                    { field: "updateHash", operator: "!=", value: sorteio.updateHash }
+                ];
+
+                return collectionCampanhasSorteiosPremios.collection.query(query)
+                    .then(toDelete => {
+                        let promises = [];
+
+                        toDelete.forEach(doc => {
+                            promises.push(collectionCampanhasSorteiosPremios.collection.removeDoc(doc.id));
+                        })
+
+                        return Promise.all(promises);
+                    })
+
+                    .then(_ => {
+                        return resolve();
+                    })
+
+                    .catch(e => {
+                        console.error(e);
+
+                        return reject();
+                    })
             })
         }
 
@@ -112,7 +149,9 @@ const ngModule = angular.module('collection.campanhasSorteios', [])
                 dtSorteio_timestamp: sorteio.dtSorteio_timestamp,
                 dtSorteio_weak_day: sorteio.dtSorteio_weak_day,
                 dtSorteio_yyyymmdd: sorteio.dtSorteio_yyyymmdd,
-                guidSorteio: sorteio.guidSorteio || globalFactory.guid()
+                guidSorteio: sorteio.guidSorteio || globalFactory.guid(),
+                updateHash: campanha.updateHash,
+                ativo: false
             }
 
             if (result.id === 'new') {
