@@ -44,12 +44,16 @@ const ngModule = angular.module('services.app-auth-helper', [])
 		const checkTokenChange = () => {
 			const auth = appAuth.getAuth();
 			auth.onIdTokenChanged(user => {
+				console.info('IdTokenChanged');
+
 				currentUser = user;
+
 				if (!user) {
 					clearSessions();
 					redirectToLogin();
 					return;
 				}
+
 				setUserCookies(user);
 			});
 		}

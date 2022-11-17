@@ -10,19 +10,27 @@ const ngModule = angular.module('services.premios-fans', [])
             toastrFactory
         ) {
 
+            const getUrlEndPoint = url => {
+                const localUrl = 'http://localhost:5000';
+                const gatewayUrl = 'https://premios-fans-a8fj1dkb.uc.gateway.dev';
+
+                return (window.location.hostname === 'localhost' ? localUrl : gatewayUrl) + url;
+            }
+
             const generateTemplates = attrs => {
                 attrs = attrs || {
                     blockUi: true
                 };
+                
                 attrs.data = attrs.data || {};
 
-                attrs.data.idInfluencer = attrs.data.idInfluencer || 'all';
                 attrs.data.idCampanha = attrs.data.idCampanha || 'all';
+                attrs.data.idInfluencer = attrs.data.idInfluencer || 'all';
 
                 if (attrs.blockUi) blockUiFactory.start();
 
                 $http({
-                    url: 'https://premios-fans-a8fj1dkb.uc.gateway.dev/api/eeb/v1/generate-templates',
+                    url: getUrlEndPoint('/api/eeb/v1/generate-templates'),
                     method: 'post',
                     data: attrs.data,
                     headers: {

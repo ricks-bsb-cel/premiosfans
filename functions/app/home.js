@@ -266,7 +266,7 @@ const compileApp = (sourceData, obj) => {
                     qtd: i,
                     qtdExibicao: `<strong>${i}</strong> <small>Título${i > 1 ? 's' : ''}</small>`,
                     vlTotal: render.config.vlTitulo * i,
-                    vlTotalExibicao: `<strong>R$ ${render.config.vlTitulo * i}</strong><small>,00</small>`
+                    vlTotal_html: global.formatMoney(render.config.vlTitulo * i, true, true)
                 })
             }
 
@@ -277,14 +277,14 @@ const compileApp = (sourceData, obj) => {
                         return f.idSorteio === s.id;
                     })
                     .map(p => {
-                        p.valor_html = global.formatMoney(p.valor);
+                        p.valor_html = global.formatMoney(p.valor, true, true);
 
                         return p;
                     })
 
                 s.titulo = (i + 1) + 'º Sorteio';
                 s.titulo_html = `<strong>${i + 1}º</strong> <small>Sorteio</small>`;
-                s.vlTotalPremios_html = global.formatMoney(s.vlTotalPremios);
+                s.vlTotalPremios_html = global.formatMoney(s.vlTotalPremios, true, true);
 
                 s.premios = _.orderBy(s.premios, ['pos']);
 

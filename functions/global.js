@@ -51,10 +51,19 @@ const splitReplace = function (value, search, replacement) {
     return value.split(search).join(replacement);
 }
 
-const formatMoney = (value, showMoeda) => {
-    showMoeda = typeof showMoeda === 'boolean' ? showMoeda : true;
-    const formato = { minimumFractionDigits: 2, style: 'currency', currency: showMoeda ? 'BRL' : null };
-    return value.toLocaleString('pt-BR', formato)
+const formatMoney = (value, showMoeda, html) => {
+    const locale = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BLR' });
+    const moeda = showMoeda ? (html ? '<small class="currency">R$</small>' : 'R$') : '';
+    let result = locale.format(value);
+
+    result = result.replace('BLR', moeda);
+
+    if (html) {
+        const centavos = result.slice(result.length - 3);
+        result = result.replace(centavos, `<small class="cents">${centavos}</small>`);
+    }
+
+    return result;
 }
 exports.formatMoney = formatMoney;
 

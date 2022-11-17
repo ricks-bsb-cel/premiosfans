@@ -52,6 +52,26 @@ small {
     background-size: cover;
 }
 
+h2.valor{
+    position: relative;
+    letter-spacing: -1px;
+    font-weight: bold;
+}
+h2.valor small.currency{
+    font-size: 0.4em;
+    bottom: 1px;
+    position: relative;
+    left: 2px;
+    font-weight: 300;
+}
+h2.valor small.cents{
+    font-size: 0.45em;
+    position: relative;
+    font-weight: 400;
+    top: -12px;
+    right: -2px;
+}
+
 .hero header {
     position: relative;
 }

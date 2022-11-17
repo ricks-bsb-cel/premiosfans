@@ -1,3 +1,6 @@
+/*
+    Este script solicita a geração de todos os templates para cada um dos influencers selecionados na(s) campanha(s)
+*/
 "use strict";
 
 const path = require('path');
@@ -12,9 +15,8 @@ const generateOneTemplate = require('./generateOneTemplate');
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
-// const frontTemplates = firestoreDAL.frontTemplates();
-const influencers = firestoreDAL.influencers();
-const campanhas = firestoreDAL.campanhas();
+const collectionCampanhas = firestoreDAL.campanhas();
+const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
 
 class Service extends eebService {
 
@@ -28,57 +30,67 @@ class Service extends eebService {
         return new Promise((resolve, reject) => {
 
             // A campanha já tem o template a ser utilizado...
+            // A campanha já tem os influencers vinculados
 
-            const idCampanha = this.parm.data.idCampanha;
-            const idInfluencer = this.parm.data.idInfluencer;
+            const idCampanha = this.parm.data.idCampanha,
+                idInfluencer = this.parm.data.idInfluencer,
+                result = {
+                    success: true,
+                    host: this.parm.host
+                };
 
-            // const idTemplate = this.parm.data.idTemplate;
+            if (!idCampanha) throw new Error(`idCampanha inválido. Informe id ou all para todas as campanhas ativas`);
+            if (!idInfluencer) throw new Error(`idInfluencer inválido. Informe id ou all para todos os influencers selecionados na campanha`);
 
-            const result = {
-                success: true,
-                host: this.parm.host
-            };
+            return idCampanha === 'all' ? collectionCampanhas.get() : collectionCampanhas.getDoc(idCampanha)
 
-            if (!idCampanha) throw new Error(`idCampanha inválido. Informe id ou all`);
-            if (!idInfluencer) throw new Error(`idInfluencer inválido. Informe id ou all`);
-            // if (!idTemplate) throw new Error(`idTemplate inválido. Informe id ou all`);
+                .then(campanhaResults => {
 
-            // Carga dos dados
-            const promises = [];
+                    result.campanhas = idCampanha === 'all' ? campanhaResults : [campanhaResults];
 
-            promises.push(idCampanha === 'all' ? campanhas.get() : campanhas.getDoc(idCampanha));
-            promises.push(idInfluencer === 'all' ? influencers.get() : influencers.getDoc(idInfluencer));
-            // promises.push(idTemplate === 'all' ? frontTemplates.get() : frontTemplates.getDoc(idTemplate));
+                    const idsCampanhas = [];
 
-            return Promise.all(promises)
+                    result.campanhas.forEach(c => {
+                        idsCampanhas.push(c.id);
+                    });
 
-                .then(promisesResult => {
+                    const filterInfluencesCampanha = [
+                        { field: "idCampanha", condition: "in", value: idsCampanhas },
+                        { field: "selected", condition: "==", value: true }
+                    ];
 
-                    result.campanhas = idCampanha === 'all' ? promisesResult[0] : [promisesResult[0]];
-                    result.influencers = idInfluencer === 'all' ? promisesResult[1] : [promisesResult[1]];
+                    if (idInfluencer !== 'all') {
+                        filterInfluencesCampanha.push(
+                            { field: "idInfluencer", condition: "==", value: idInfluencer }
+                        )
+                    }
 
-                    // result.templates = idTemplate === 'all' ? promisesResult[_frontTemplates] : [promisesResult[_frontTemplates]];
+                    return collectionCampanhasInfluencers.get({ filter: filterInfluencesCampanha });
+                })
+
+                .then(resultCampanhasInfluencers => {
+
+                    result.campanhasInfluencers = resultCampanhasInfluencers;
+
+                    // result.campanhas contem todas as campanhas
+                    // result.campanhasInfluencers contem todos os influencers das campanhas
 
                     const generate = [];
 
-                    /*
-                    result.templates.forEach(template => {
-                        result.influencers.forEach(influencer => {
-                            result.campanhas.forEach(campanha => {
+                    result.campanhas.forEach(campanha => {
+                        result.campanhasInfluencers
+                            .filter(f => { return f.idCampanha === campanha.id })
+                            .forEach(influencer => {
+                                this.log('generate-template', 'INFO', {
+                                    template: campanha.template,
+                                    influencer: influencer.idInfluencer,
+                                    campanha: campanha.idCampanha
+                                });
+
                                 generate.push(
-                                    generateOneTemplate.call(template.id, influencer.id, campanha.id)
+                                    generateOneTemplate.call(campanha.template, influencer.idInfluencer, campanha.id)
                                 )
                             })
-                        })
-                    })
-                    */
-
-                    result.influencers.forEach(influencer => {
-                        result.campanhas.forEach(campanha => {
-                            generate.push(
-                                generateOneTemplate.call(campanha.template, influencer.id, campanha.id)
-                            )
-                        })
                     })
 
                     return Promise.all(generate);
@@ -87,16 +99,34 @@ class Service extends eebService {
                 .then(generateResult => {
                     result.generateResult = generateResult;
 
-                    return resolve(this.parm.async ? { success: true } : result);
+                    return resolve(this.parm.async ? { success: true } : {
+                        success: true,
+                        host: result.host,
+                        campanhas: result.campanhas.map(c => {
+                            return {
+                                id: c.id,
+                                titulo: c.titulo,
+                                influencers: result.campanhasInfluencers
+                                    .filter(f => { return f.idCampanha === c.id; })
+                                    .map(i => {
+                                        return {
+                                            idCampanha: i.idCampanha,
+                                            idInfluencer: i.idInfluencer,
+                                            selected: i.selected
+                                        }
+                                    })
+                            }
+                        })
+                    });
                 })
 
                 .catch(e => {
                     console.error(e);
+
                     return reject(e);
                 })
 
         })
-
     }
 
 }

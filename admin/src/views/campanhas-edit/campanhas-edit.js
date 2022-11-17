@@ -17,7 +17,8 @@ const ngModule = angular.module('views.contratos-edit', [
 		blockUiFactory,
 		globalFactory,
 		$timeout,
-		$location
+		$location,
+		premiosFansService
 	) {
 
 		$scope.collectionCampanhas = collectionCampanhas;
@@ -42,7 +43,7 @@ const ngModule = angular.module('views.contratos-edit', [
 				.then(saveResult => {
 
 					premiosFansService.generateTemplates({
-						data: { idCampanha: saveResult.id },
+						data: { idCampanha: saveResult.campanha.id },
 						blockUi: false
 					});
 

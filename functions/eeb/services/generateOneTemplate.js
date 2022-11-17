@@ -60,7 +60,7 @@ class Service extends eebService {
                 collectionFrontTemplates.getDoc(idTemplate),
                 collectionInfluencers.getDoc(idInfluencer),
                 collectionCampanhas.getDoc(idCampanha),
-                collectionCampanhasInfluencers.get({ idCampanha: idCampanha }),
+                collectionCampanhasInfluencers.get({ idCampanha: idCampanha, idInfluencer: idInfluencer }),
                 collectionCampanhasSorteios.get({ idCampanha: idCampanha }),
                 collectionCampanhasSorteiosPremios.get({ idCampanha: idCampanha })
             ];
@@ -70,9 +70,16 @@ class Service extends eebService {
                     result.template = promisesResult[0];
                     result.influencer = promisesResult[1];
                     result.campanha = promisesResult[2];
-                    result.campanhaInfluencers = promisesResult[3];
+                    result.campanhaInfluencer = promisesResult[3];
                     result.campanhaSorteios = promisesResult[4];
                     result.campanhaSorteiosPremios = promisesResult[5];
+
+                    if (!result.template) throw new Error('Template not found');
+                    if (!result.influencer) throw new Error('Influencer not found');
+                    if (!result.campanha) throw new Error('Campanha not found');
+                    if (!result.campanhaInfluencer || result.campanhaInfluencer.length === 0) throw new Error('Influencer da Campanha not found');
+                    if (!result.campanhaSorteios || result.campanhaSorteios.length === 0) throw new Error('Sorteios da Campanha not found');
+                    if (!result.campanhaSorteiosPremios || result.campanhaSorteiosPremios === 0) throw new Error('Premios da not found');
 
                     result.version = version;
 
