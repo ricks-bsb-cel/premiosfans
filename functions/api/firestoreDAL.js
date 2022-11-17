@@ -278,6 +278,18 @@ exports.campanhas = _ => {
     return new collectionClass('campanhas');
 }
 
+exports.campanhasInfluencers = _ => {
+    return new collectionClass('campanhasInfluencers');
+}
+
+exports.campanhasSorteios = _ => {
+    return new collectionClass('campanhasSorteios');
+}
+
+exports.campanhasSorteiosPremios = _ => {
+    return new collectionClass('campanhasSorteiosPremios');
+}
+
 exports.appLinks = _ => {
     return new collectionClass('appLinks');
 }

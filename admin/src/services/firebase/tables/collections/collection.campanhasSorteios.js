@@ -146,9 +146,16 @@ const ngModule = angular.module('collection.campanhasSorteios', [])
                 dtSorteio_weak_day: sorteio.dtSorteio_weak_day,
                 dtSorteio_yyyymmdd: sorteio.dtSorteio_yyyymmdd,
                 guidSorteio: sorteio.guidSorteio || globalFactory.guid(),
-                updateHash: campanha.updateHash,
-                ativo: false
+                ativo: false,
+                vlTotalPremios: 0,
+                qtdPremios: sorteio.premios.filter(f => { return !f.deleted; }).length
             }
+
+            sorteio.premios
+                .filter(f => { return !f.deleted; })
+                .forEach(p => {
+                    result.vlTotalPremios = (parseFloat(result.vlTotalPremios) + parseFloat(p.valor)).toFixed(2);
+                })
 
             if (result.id === 'new') {
                 result.uidInclusao = appAuthHelper.profile.user.uid;

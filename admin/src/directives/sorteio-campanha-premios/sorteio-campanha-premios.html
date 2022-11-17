@@ -12,19 +12,11 @@
                 field-name="dtSorteio"
             ></input-date>
             
-            <span ng-click="situacao()" ng-if="!sorteio.ativo" class="badge bg-danger">
-                Inativo
-            </span>
-
-            <span ng-click="situacao()" ng-if="sorteio.ativo" class="badge bg-success">
-                Ativo
-            </span>
-
         </h3>
         <div class="card-tools">
 
             <button
-                ng-if="sorteio.premios.filter(f=>{return !f.deleted;}).length < 5 && !sorteio.ativo"
+                ng-if="!campanha.ativo && permitirInclusaoPremios()"
                 type="button"
                 ng-click="add()"
                 class="btn btn-tool"
@@ -39,7 +31,7 @@
                 class="btn btn-tool"
                 uib-popover="Clonar o Sorteio"
                 ng-click="clonarSorteio(sorteio)"
-                ng-if="!sorteio.ativo" 
+                ng-if="!campanha.ativo" 
             >
                 <i class="fas fa-clone"></i>
             </button>
@@ -49,7 +41,7 @@
                 class="btn btn-tool"
                 uib-popover="Excluir o Sorteio"
                 ng-click="removerSorteio(sorteio)"
-                ng-if="!sorteio.ativo" 
+                ng-if="!campanha.ativo" 
             >
                 <i class="fas fa-trash"></i>
             </button>
@@ -125,7 +117,7 @@
 
                         <a
                             href="#"
-                            ng-if="sorteio.premios.filter(f=>{return !f.deleted;}).length < 5"
+                            ng-if="!campanha.ativo && permitirInclusaoPremios()"
                             ng-click="clonePremio($index)"
                             uib-popover="Clonar este prêmio, criando um idêntico"
                             ng-class="{
@@ -137,6 +129,7 @@
 
                         <a
                             href="#"
+                            ng-if="!campanha.ativo"
                             ng-click="removerPremio(p)"
                             uib-popover="Excluir"
                         >

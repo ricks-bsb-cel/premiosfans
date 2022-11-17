@@ -121,9 +121,11 @@ const ngModule = angular.module('collection.campanhas', [])
 
         const sanitize = campanha => {
 
-            const updateHash = globalFactory.generateRandomId(16);
-
-            console.info(updateHash);
+            if (!campanha.titulo) throw new Error(`O nome da campanha é obrigatório`);
+            if (!campanha.url) throw new Error(`A URL da campanha é obrigatório`);
+            if (!campanha.template) throw new Error(`O Template da campanha é obrigatório`);
+            if (!campanha.vlTitulo) throw new Error(`O Valor do Título é obrigatório`);
+            if (!campanha.qtdNumerosDaSortePorTitulo) throw new Error(`A quantidade de números da sorte por título é obrigatório`);
 
             let result = {
                 id: campanha.id || 'new',
@@ -134,8 +136,20 @@ const ngModule = angular.module('collection.campanhas', [])
                 detalhe: campanha.detalhe || null,
                 template: campanha.template,
                 url: campanha.url,
-                updateHash: updateHash
+                vlTitulo: campanha.vlTitulo,
+                qtdNumerosDaSortePorTitulo: campanha.qtdNumerosDaSortePorTitulo,
+                qtdSorteios: 0,
+                qtdPremios: 0,
+                vlTotal: 0
             };
+
+            campanha.sorteios.forEach(s => {
+                result.qtdSorteios++;
+                s.premios.forEach(p => {
+                    result.qtdPremios++;
+                    result.vlTotal = (parseFloat(result.vlTotal) + parseFloat(p.valor)).toFixed(2)
+                })
+            })
 
             if (campanha.images && campanha.images.length) {
                 result.images = campanha.images

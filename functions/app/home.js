@@ -3,6 +3,7 @@
 const admin = require('firebase-admin');
 const global = require('../global');
 const path = require('path');
+const _ = require("lodash");
 const fs = require('fs');
 
 const bucketName = 'premios-fans.appspot.com';
@@ -254,13 +255,12 @@ const compileApp = (sourceData, obj) => {
             if (render.campanha.images && render.campanha.images.length) {
                 render.campanha.imagePrincipal = render.campanha.images[0].secure_url;
             } else {
-                render.campanha.imagePrincipal = fakeData.campanha.image[0].secure_url
+                render.campanha.imagePrincipal = fakeData.campanha.images[0].secure_url
             }
 
             render.campanha.thumb = render.campanha.imagePrincipal.replace('/upload/', '/upload/c_thumb,h_500,w_500/');
-            render.campanha.qtdPremios = 0;
 
-            for (let i = 1; i <= render.config.qtdMaximaCompraSugerida; i++) {
+            for (let i = 1; i <= 6; i++) {
                 render.config.sugestoes.push({
                     id: global.generateRandomId(7),
                     qtd: i,
@@ -270,53 +270,31 @@ const compileApp = (sourceData, obj) => {
                 })
             }
 
-            render.campanha.premios = render.campanha.premios.map((p, i) => {
-                render.campanha.qtdPremios += parseInt(p.qtd);
+            render.campanhaSorteios = render.campanhaSorteios.map((s, i) => {
 
-                const detalhes = {
-                    titulo: (i + 1) + 'º Prêmio',
-                    tituloHtml: `<strong>${i + 1}º</strong> <small>Prêmio</small>`,
-                    valorDescricao: global.formatMoney(p.valor),
-                    showRibbon: p.qtd > 1
-                };
+                s.premios = render.campanhaSorteiosPremios
+                    .filter(f => {
+                        return f.idSorteio === s.id;
+                    })
+                    .map(p => {
+                        p.valor_html = global.formatMoney(p.valor);
 
-                return {
-                    ...p,
-                    ...detalhes
-                };
-            });
+                        return p;
+                    })
+
+                s.titulo = (i + 1) + 'º Sorteio';
+                s.titulo_html = `<strong>${i + 1}º</strong> <small>Sorteio</small>`;
+                s.vlTotalPremios_html = global.formatMoney(s.vlTotalPremios);
+
+                s.premios = _.orderBy(s.premios, ['pos']);
+
+                return s;
+            })
 
             render.campanha.description =
                 render.campanha.detalhes ||
                 render.campanha.subTitulo ||
                 render.campanha.titulo;
-
-            // Agrupa os premios por data do sorteio
-            render.campanha.groupPremios = [];
-            render.campanha.premios.forEach(p => {
-                let i = render.campanha.groupPremios.findIndex(f => {
-                    return f.dtSorteio === p.dtSorteio;
-                })
-
-                if (i < 0) {
-                    i = render.campanha.groupPremios.push({
-                        dtSorteio: p.dtSorteio,
-                        qtdPremios: 0,
-                        premios: [],
-                        showRibbon: false,
-                        vlTotalGrupo: 0
-                    }) - 1;
-                }
-
-                render.campanha.groupPremios[i].premios.push(p);
-                render.campanha.groupPremios[i].qtdPremios += parseInt(p.qtd);
-                render.campanha.groupPremios[i].vlTotalGrupo += (p.valor * p.qtd);
-
-                render.campanha.groupPremios[i].vlTotalGrupoDescricao = global.formatMoney(render.campanha.groupPremios[i].vlTotalGrupo);
-                render.campanha.groupPremios[i].showRibbon = render.campanha.groupPremios[i].qtdPremios > 1;
-
-                render.campanha.groupPremios[i].singleLine = render.campanha.groupPremios[i].premios.length === 1;
-            })
 
             const compiled = global.compile(sourceData, render);
 

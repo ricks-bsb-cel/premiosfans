@@ -54,7 +54,6 @@ const ngModule = angular.module('collection.campanhas-sorteios-premios', [])
                 guidPremio: premio.guidPremio || globalFactory.guid(),
                 descricao: premio.descricao,
                 valor: premio.valor,
-                updateHash: sorteio.updateHash,
                 ativo: false,
                 pos: premio.pos
             }

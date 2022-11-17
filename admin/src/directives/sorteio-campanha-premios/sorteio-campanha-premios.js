@@ -77,6 +77,12 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                 })
             }
 
+            $scope.permitirInclusaoPremios = _ => {
+                return $scope.sorteio.premios.filter(f => {
+                        return !f.deleted;
+                    }).length < 5;
+            }
+
             $scope.situacao = _ => {
                 $scope.sorteio.ativo = !$scope.sorteio.ativo;
             }

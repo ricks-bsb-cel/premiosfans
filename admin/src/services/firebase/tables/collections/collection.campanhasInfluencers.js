@@ -97,8 +97,7 @@ const ngModule = angular.module('collection.campanhasInfluencers', [])
                 id: influencer.id || 'new',
                 idCampanha: campanha.id,
                 idInfluencer: influencer.idInfluencer,
-                selected: typeof influencer.selected === 'boolean' ? influencer.selected : false,
-                updateHash: campanha.updateHash
+                selected: typeof influencer.selected === 'boolean' ? influencer.selected : false
             };
 
             if (result.id === 'new') {

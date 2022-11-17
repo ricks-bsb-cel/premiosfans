@@ -16,7 +16,6 @@ const ngModule = angular.module('views.contratos-edit', [
 		toastrFactory,
 		blockUiFactory,
 		globalFactory,
-		premiosFansService,
 		$timeout,
 		$location
 	) {
@@ -42,12 +41,10 @@ const ngModule = angular.module('views.contratos-edit', [
 			collectionCampanhas.save($scope.campanha)
 				.then(saveResult => {
 
-					/*
 					premiosFansService.generateTemplates({
 						data: { idCampanha: saveResult.id },
 						blockUi: false
 					});
-					*/
 
 					$location.path('/campanhas');
 					blockUiFactory.stop();
@@ -127,17 +124,6 @@ const ngModule = angular.module('views.contratos-edit', [
 							type: 'textarea',
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
-						/*
-						{
-							key: 'dtSorteio',
-							templateOptions: {
-								label: 'Data do Sorteio',
-								required: true
-							},
-							type: 'data',
-							className: 'col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-8'
-						},
-						*/
 						{
 							key: 'template',
 							templateOptions: {
@@ -146,32 +132,26 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							type: 'ng-selector-front-template',
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
-						}
-					],
-					form: null
-				},
-				faixa: {
-					fields: [
-						{
-							key: 'faixaInicio',
-							defaultValue: 1,
-							templateOptions: {
-								label: 'Número Inicial',
-								required: true
-							},
-							type: 'integer',
-							className: 'col-12'
 						},
 						{
-							key: 'faixaFinal',
-							defaultValue: 999999,
+							key: 'vlTitulo',
 							templateOptions: {
-								label: 'Número Final',
+								label: 'Valor',
 								required: true
 							},
+							type: 'reais',
+							className: 'col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6'
+						},
+						{
+							key: 'qtdNumerosDaSortePorTitulo',
+							templateOptions: {
+								label: 'Números por Título',
+								required: true
+							},
+							defaultValue: 2,
 							type: 'integer',
-							className: 'col-12'
-						}
+							className: 'col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6'
+						},
 					],
 					form: null
 				}
@@ -180,7 +160,7 @@ const ngModule = angular.module('views.contratos-edit', [
 
 		const loadCampanha = idCampanha => {
 			collectionCampanhas.get(idCampanha)
-			
+
 				.then(result => {
 					$scope.campanha = { ...result };
 

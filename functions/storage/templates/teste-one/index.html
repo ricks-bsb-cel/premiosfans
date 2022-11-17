@@ -30,6 +30,8 @@
     <meta property="og:type" content="video.movie">
     <meta property="og:locale" content="pt_BR">
 
+    <meta property="premiosfans:template" content="{{campanha.idTemplate}}">
+
     <link rel="shortcut icon" href="/favicon.ico">
 
     <link rel="stylesheet" href="/assets/pico/css/pico.min.css">
@@ -132,24 +134,17 @@
 
                         <div class="row">
                             {{#each config.sugestoes}}
-                            <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
-                                <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
-                                    <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})" class="m-0 mb-20 p-10">
-                                        <div class="sugestao text-center">
-                                            <h3 class="mb-10 mt-10">
-                                                {{{this.qtdExibicao}}}
-                                            </h3>
-                                            <!--
-                                            <footer>
-                                                <h3 class="mb-5">
-                                                    {{{this.vlTotalExibicao}}}
+                                <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
+                                    <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
+                                        <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})" class="m-0 mb-20 p-10">
+                                            <div class="sugestao text-center">
+                                                <h3 class="mb-10 mt-10">
+                                                    {{{this.qtdExibicao}}}
                                                 </h3>
-                                            </footer>
-                                            -->
-                                        </div>
-                                    </article>
+                                            </div>
+                                        </article>
+                                    </div>
                                 </div>
-                            </div>
                             {{/each}}
                         </div>
 
@@ -163,7 +158,6 @@
                     <form-cliente></form-cliente>
 
                     <button ng-click="openSell()" class="mt-10">Comprar</button>
-
 
                 </form>
 
@@ -179,62 +173,46 @@
                         <h2>Prêmios desta edição</h2>
                         <h3>Confira as datas e prêmios desta edicão do Prêmios Fans.<br />
                             São
-                            <strong style="color: var(--primary);font-size:1.2em;">{{campanha.qtdPremios}}</strong>
+                            <strong style="color: var(--primary);font-size:1.2em;">
+                                {{campanha.qtdPremios}}
+                            </strong>
                             chances de ganhar!</strong>
                         </h3>
                     </hgroup>
 
                     <div class="row">
-                        {{#each campanha.groupPremios}}
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                        {{#each campanhaSorteios}}
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
 
-                            <article class="m-0 mb-20 p-10">
-                                <div class="sugestao text-center">
-                                    {{#if this.showRibbon}}
-                                    <div class="ribbon ribbon-top-left">
-                                        <span>
-                                            {{this.qtdPremios}}
-                                            Sorteios
-                                        </span>
-                                    </div>
-                                    {{/if}}
+                                <article class="m-0 mb-20 p-10">
+                                    <div class="sugestao text-center">
+                                        <div class="ribbon ribbon-top-left">
+                                            <span>
+                                                {{this.qtdPremios}}
+                                                Prêmios
+                                            </span>
+                                        </div>
 
-                                    <p class="mb-5">
-                                        <small>Dia</small>
-                                        {{{this.dtSorteio}}}
-                                    </p>
-
-                                    <h2 class="m-0">
-                                        {{{this.vlTotalGrupoDescricao}}}
-                                    </h2>
-
-                                    {{#if this.singleLine}}
-                                    {{#each this.premios}}
-                                    <footer class="pt-10">
-                                        {{#if this.showRibbon}}
-                                        <strong>{{this.qtd}}</strong>
-                                        x
-                                        {{/if}}
-                                        {{this.descricao}}
-                                    </footer>
-                                    {{/each}}
-                                    {{/if}}
-
-                                    {{#unless this.singleLine}}
-                                    <footer>
-                                        {{#each this.premios}}
-                                        <p class="m-0">
-                                            <strong>{{this.qtd}}</strong>
-                                            x
-                                            {{{this.descricao}}}
+                                        <p class="mb-5">
+                                            <small>Dia</small>
+                                            {{{this.dtSorteio}}}
                                         </p>
-                                        {{/each}}
-                                    </footer>
-                                    {{/unless}}
-                                </div>
-                            </article>
 
-                        </div>
+                                        <h2 class="m-0">
+                                            {{{this.vlTotalPremios_html}}}
+                                        </h2>
+
+                                        {{#each this.premios}}
+                                            <footer class="pt-10">
+                                                {{this.descricao}}
+                                            </footer>
+                                        {{/each}}
+
+                                    </div>
+                                    
+                                </article>
+
+                            </div>
                         {{/each}}
                     </div>
 

@@ -16,9 +16,13 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 const firestoreDAL = require('../../api/firestoreDAL');
 const global = require('../../global');
 
+const collectionCampanhas = firestoreDAL.campanhas();
+const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
+const collectionCampanhasSorteios = firestoreDAL.campanhasSorteios();
+const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
+
 const collectionFrontTemplates = firestoreDAL.frontTemplates();
 const collectionInfluencers = firestoreDAL.influencers();
-const collectionCampanhas = firestoreDAL.campanhas();
 const collectionAppLinks = firestoreDAL.appLinks();
 
 const storage = new Storage();
@@ -55,7 +59,10 @@ class Service extends eebService {
             const promises = [
                 collectionFrontTemplates.getDoc(idTemplate),
                 collectionInfluencers.getDoc(idInfluencer),
-                collectionCampanhas.getDoc(idCampanha)
+                collectionCampanhas.getDoc(idCampanha),
+                collectionCampanhasInfluencers.get({ idCampanha: idCampanha }),
+                collectionCampanhasSorteios.get({ idCampanha: idCampanha }),
+                collectionCampanhasSorteiosPremios.get({ idCampanha: idCampanha })
             ];
 
             return Promise.all(promises)
@@ -63,6 +70,11 @@ class Service extends eebService {
                     result.template = promisesResult[0];
                     result.influencer = promisesResult[1];
                     result.campanha = promisesResult[2];
+                    result.campanhaInfluencers = promisesResult[3];
+                    result.campanhaSorteios = promisesResult[4];
+                    result.campanhaSorteiosPremios = promisesResult[5];
+
+                    result.version = version;
 
                     return loadTemplateFiles(result.template);
                 })
@@ -70,7 +82,7 @@ class Service extends eebService {
                 .then(files => {
                     result.template.files = files;
 
-                    return compileAndSendToStorage(result.template, result.influencer, result.campanha, version);
+                    return compileAndSendToStorage(result);
                 })
 
                 .then(sendResult => {
@@ -107,7 +119,6 @@ class Service extends eebService {
                 })
 
                 .then(resultAppLinks => {
-
                     return collectionAppLinks.insertUpdate(
                         resultAppLinks.length ? resultAppLinks[0].id : null,
                         saveLink
@@ -115,10 +126,6 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
-                    delete result.template;
-                    delete result.campanha;
-                    delete result.influencer;
-
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 
@@ -132,22 +139,14 @@ class Service extends eebService {
 
 }
 
-const compileAndSendToStorage = (template, influencer, campanha, version) => {
+const compileAndSendToStorage = (data) => {
     return new Promise((resolve, reject) => {
-
-        const storagePath = `app/${influencer.id}/${campanha.id}`;
-
-        const obj = {
-            template: template,
-            influencer: influencer,
-            campanha: campanha,
-            version: version
-        };
+        const storagePath = `app/${data.influencer.id}/${data.campanha.id}`;
 
         const promises = [];
 
-        template.files.forEach(file => {
-            promises.push(compileAndSaveContentOnStorage(storagePath, file, obj));
+        data.template.files.forEach(file => {
+            promises.push(compileAndSaveContentOnStorage(storagePath, file, data));
         })
 
         return Promise.all(promises)
