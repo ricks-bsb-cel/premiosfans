@@ -46,6 +46,13 @@ const newError = (msg, code, details) => {
 }
 exports.newError = newError;
 
+exports.randomNumber = max => {
+    return _.random(max);
+}
+
+exports.shuffleArray = array => {
+    return _.shuffle(array);
+}
 
 const splitReplace = function (value, search, replacement) {
     return value.split(search).join(replacement);

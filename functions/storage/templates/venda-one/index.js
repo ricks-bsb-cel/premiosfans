@@ -108,7 +108,7 @@ angular.module('app', [
                 }
             },
             templateUrl: `/templates/teste-one/form-cliente.html?v=${version}`,
-            link: function (scope, element) {
+            link: function (scope) {
                 scope.initDelegates();
             }
         };

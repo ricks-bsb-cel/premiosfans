@@ -45,6 +45,10 @@ api.post("/v1/generate-one-template", (request, response) => {
     initFirebase.call(require('./services/generateOneTemplate').callRequest, request, response);
 })
 
+api.post("/v1/generate-ns-premio", (request, response) => {
+    initFirebase.call(require('./services/generateNumerosDaSortePremio').callRequest, request, response);
+})
+
 const eeb = express();
 
 eeb.use(cors());
