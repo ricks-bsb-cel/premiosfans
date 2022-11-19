@@ -15,6 +15,7 @@ const firestoreDAL = require('../../api/firestoreDAL');
 const collectionTitulos = firestoreDAL.titulos();
 
 const generatePremioTitulo = require('./generatePremioTitulo');
+const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 
 const tituloSchema = _ => {
     const schema = Joi.object({
@@ -35,8 +36,6 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let promise;
-
             const result = {
                 success: true,
                 host: this.parm.host,
@@ -46,7 +45,7 @@ class Service extends eebService {
             return tituloSchema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    result.data.titulo = sanitizeData(dataResult);
+                    result.data.titulo = dataResult;
 
                     return collectionTitulos.getDoc(result.data.titulo.idTitulo);
                 })
@@ -60,13 +59,13 @@ class Service extends eebService {
                     }
 
                     // Atualiza a situação do titulo
-                    let updateTitulo = {
+                    result.data.updateTitulo = {
                         situacao: 'pago'
                     };
 
-                    global.setDateTime(updateTitulo, 'dtPagamento');
+                    global.setDateTime(result.data.updateTitulo, 'dtPagamento');
 
-                    return collectionTitulos.set(result.data.titulo.id, updateTitulo, true);
+                    return collectionTitulos.set(result.data.titulo.id, result.data.updateTitulo, true);
                 })
 
                 .then(_ => {
@@ -108,8 +107,7 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
-
-
+                    return resolve(this.parm.async ? { success: true } : result.data.updateTitulo)
                 })
 
                 .catch(e => {
@@ -127,19 +125,14 @@ exports.Service = Service;
 
 const call = (data, request, response) => {
 
-    if (!data.idCampanha) {
-        throw new Error('invalid parm');
-    }
-
     const service = new Service(request, response, {
         name: 'pagar-titulo',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        noAuth: false, // Autenticação Obrigatória
-        authAnonymous: true, // Pode ser usuário Anonimo
+        noAuth: true, // Autenticação Obrigatória
         data: data,
         attributes: {
-            idEmpresa: data.idCampanha
+            idEmpresa: 'all'
         }
     });
 
@@ -150,7 +143,10 @@ exports.call = call;
 
 exports.callRequest = (request, response) => {
 
-    if (!request.body) {
+    // Só pode ser chamado em testes ou entre rotinas
+    const host = global.getHost(request);
+
+    if (!request.body || host !== 'localhost') {
         return response.status(500).json({
             success: false,
             error: 'Invalid parms'

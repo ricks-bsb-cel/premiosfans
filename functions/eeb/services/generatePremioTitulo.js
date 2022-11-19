@@ -97,6 +97,8 @@ class Service extends eebService {
                     result.data.tituloPremio.premioDescricao = result.data.premio.descricao;
                     result.data.tituloPremio.premioValor = result.data.premio.valor;
                     result.data.tituloPremio.numerosDaSorte = [];
+                    result.data.tituloPremio.qtdNumerosDaSortePorTitulo = result.data.titulo.qtdNumerosDaSortePorTitulo;
+                    result.data.tituloPremio.uidComprador = result.data.titulo.uidComprador;
 
                     // Dados do Sorteio
                     result.data.tituloPremio.sorteioDtSorteio = result.data.sorteio .dtSorteio;
@@ -153,6 +155,7 @@ exports.call = call;
 
 exports.callRequest = (request, response) => {
 
+    // Só pode ser chamado em testes ou entre rotinas
     const host = global.getHost(request);
 
     if (!request.body || host !== 'localhost') {

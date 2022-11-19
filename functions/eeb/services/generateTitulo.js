@@ -18,15 +18,13 @@ const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
 const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 const collectionTitulos = firestoreDAL.titulos();
 
-const generatePremioTitulo = require('./generatePremioTitulo');
-
 /*
     generateTitulo
     - Valida o token do cliente
     - Valida os dados do cliente
     - Verifica as configurações da campanha
     - Gera o registro do título
-    - Solicita que os premios do titulo sejam gerados, via generatePremioTitulo (async)
+    - NÃO GERA OS PRÊMIOS DO TÍTULO. Isso será feito após o pagamento.
 
     * Lembre-se! Cada vez que esta rotina é executada um novo títuo é gerado!
 */
@@ -138,29 +136,6 @@ class Service extends eebService {
                     result.data.titulo.uidComprador = this.parm.attributes.uid;
 
                     return collectionTitulos.add(result.data.titulo);
-                })
-
-                .then(resultAddTitulo => {
-
-                    result.data.titulo = resultAddTitulo;
-
-                    // Solicita a geração dos premios do título de forma asyncrona
-                    promise = [];
-
-                    result.data.campanhaPremios.forEach(p => {
-                        promise.push(
-                            generatePremioTitulo.call(
-                                {
-                                    "idCampanha": result.data.titulo.idCampanha,
-                                    "idTitulo": result.data.titulo.id,
-                                    "idPremio": p.id,
-                                    "idSorteio": p.idSorteio
-                                }
-                            )
-                        );
-                    });
-
-                    return Promise.all(promise);
                 })
 
                 .then(_ => {

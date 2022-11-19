@@ -37,6 +37,7 @@ api.post("/v1/whr/:source/:type?", (request, response) => {
     initFirebase.call(require('./services/webhook').callRequest, request, response);
 })
 
+
 api.post("/v1/generate-templates", (request, response) => {
     initFirebase.call(require('./services/generateTemplates').callRequest, request, response);
 })
@@ -53,10 +54,17 @@ api.post("/v1/generate-titulo", (request, response) => {
     initFirebase.call(require('./services/generateTitulo').callRequest, request, response);
 })
 
+api.post("/v1/pagar-titulo", (request, response) => {
+    initFirebase.call(require('./services/pagarTitulo').callRequest, request, response);
+})
+
 api.post("/v1/generate-premio-titulo", (request, response) => {
     initFirebase.call(require('./services/generatePremioTitulo').callRequest, request, response);
 })
 
+api.post("/v1/link-ns-premio", (request, response) => {
+    initFirebase.call(require('./services/linkNumeroDaSortePremioTitulo').callRequest, request, response);
+})
 
 const eeb = express();
 

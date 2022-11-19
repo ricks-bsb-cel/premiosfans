@@ -3,6 +3,8 @@
 const admin = require('firebase-admin');
 const path = require('path');
 const eebService = require('../eventBusService').abstract;
+const global = require("../../global");
+const Joi = require('joi');
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
@@ -11,7 +13,7 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
-const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
+const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
 // Receber no parametro um guidTitulo e idInfluencer (obrigatórios)
 // Pesquisar e criar o título se não existir
@@ -22,16 +24,26 @@ const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios
 // Se chamar mais do que a quantidade de números da sorte do premio, ignora
 // Todo título tem o mesmo guidTitulo para todos os seus premios
 
+const linkNumeroDaSorteSchema = _ => {
+    const schema = Joi.object({
+        idPremioTitulo: Joi.string().token().min(18).max(22).required()
+    });
+
+    return schema;
+}
+
 const findLote = path => {
     return new Promise((resolve, reject) => {
-        const ref = admin.database().ref(path);
+        const ref = admin.database().ref(`${path}/lotes`);
         const query = ref.orderByChild('qtdDisponiveis').limitToLast(1);
+
+        console.info('Search:', path);
 
         return query.on('value', data => {
             data = data.val();
 
             if (!data || typeof data !== 'object') {
-                return reject(new Error(`Não existe nenhum lote de números gerados para o premio`));
+                return reject(new Error(`Não existe nenhum lote de números gerados para o premio [${path}]`));
             }
 
             return resolve(Object.keys(data)[0]);
@@ -47,8 +59,9 @@ const getNumero = (path, idTitulo) => {
 
             .then(lote => {
                 result.idLote = lote;
+                result.pathLote = `${path}/lotes/${lote}`;
 
-                return admin.database().ref(`${result.path}/lotes/${lote}`).transaction(data => {
+                return admin.database().ref(result.pathLote).transaction(data => {
                     if (data.qtdDisponiveis && data.qtdDisponiveis > 0) {
                         data.qtdDisponiveis--;
                         data.qtdUtilizados++;
@@ -84,6 +97,33 @@ const getNumero = (path, idTitulo) => {
     })
 }
 
+const updatePremioTitulo = async (idPremioTitulo, numeroDaSorte) => {
+    const premioTituloRef = admin.firestore().collection("titulosPremios").doc(idPremioTitulo);
+
+    try {
+        await admin.firestore().runTransaction(async t => {
+            const doc = await t.get(premioTituloRef);
+
+            const numerosDaSorte = doc.data().numerosDaSorte || [];
+            const linksNumerosDaSorte = doc.data().linksNumerosDaSorte || [];
+
+            numerosDaSorte.push(numeroDaSorte.numero);
+            linksNumerosDaSorte.push(numeroDaSorte);
+
+            await t.update(premioTituloRef, {
+                numerosDaSorte: numerosDaSorte,
+                linksNumerosDaSorte: linksNumerosDaSorte
+            });
+
+            return true;
+        });
+    } catch (e) {
+        console.error(e);
+
+        return false;
+    }
+}
+
 class Service extends eebService {
 
     constructor(request, response, parm) {
@@ -93,35 +133,48 @@ class Service extends eebService {
     }
 
     run() {
+
+        const result = {
+            success: true,
+            host: this.parm.host,
+            jaGerado: false,
+            data: {}
+        };
+
         return new Promise((resolve, reject) => {
 
-            const idCampanha = this.parm.data.idCampanha;
-            const idPremio = this.parm.data.idPremio;
+            return linkNumeroDaSorteSchema().validateAsync(this.parm.data)
+                .then(dataResult => {
+                    result.data = dataResult;
 
-            const result = {
-                success: true,
-                host: this.parm.host,
-                idCampanha: idCampanha,
-                idPremio: idPremio,
-                path: `numerosDaSorte/${idCampanha}/${idPremio}`
-            };
+                    return collectionTitulosPremios.getDoc(result.data.idPremioTitulo);
+                })
 
-            if (!idCampanha) throw new Error(`idCampanha inválido`);
-            if (!idPremio) throw new Error(`idPremio inválido`);
+                .then(resultPremioTitulo => {
+                    result.data.premioTitulo = resultPremioTitulo;
 
-            return collectionCampanhasSorteiosPremios.getDoc(idPremio)
+                    if (result.data.premioTitulo.numerosDaSorte.length >= result.data.premioTitulo.qtdNumerosDaSortePorTitulo) {
+                        result.jaGerado = true;
+                        return true;
+                    }
 
-                .then(premioResult => {
-                    result.premio = premioResult;
+                    result.idCampanha = result.data.premioTitulo.idCampanha;
+                    result.idPremio = result.data.premioTitulo.idPremio;
+                    result.idTitulo = result.data.premioTitulo.idTitulo;
+                    result.path = `/numerosDaSorte/${result.idCampanha}/${result.idPremio}`;
 
-                    if (result.premio.idCampanha !== idCampanha) throw new Error('O premio não pertence à campanha');
-
-                    return getNumero(result.path);
+                    return getNumero(result.path, result.idTitulo);
                 })
 
                 .then(getNumeroResult => {
+                    if (result.jaGerado) { return true; }
+                    
                     result.numero = getNumeroResult;
 
+                    return updatePremioTitulo(result.data.idPremioTitulo, result.numero);
+                })
+
+                .then(_ => {
                     delete result.premio;
 
                     return resolve(this.parm.async ? { success: true } : result);
@@ -140,20 +193,18 @@ class Service extends eebService {
 
 exports.Service = Service;
 
-const call = (idCampanha, idPremio, qtdNumeros, request, response) => {
+const call = (idPremioTitulo, request, response) => {
 
     const service = new Service(request, response, {
-        name: 'generate-titulo',
+        name: 'link-numero-da-sorte-premio-titulo',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        requireIdEmpresa: false,
+        noAuth: true,
         data: {
-            idCampanha: idCampanha,
-            idPremio: idPremio,
-            qtdNumeros: qtdNumeros
+            idPremioTitulo: idPremioTitulo
         },
         attributes: {
-            idEmpresa: idCampanha
+            idEmpresa: 'all'
         }
     });
 
@@ -163,16 +214,15 @@ const call = (idCampanha, idPremio, qtdNumeros, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-    const idCampanha = request.body.idCampanha;
-    const idPremio = request.body.idPremio;
-    const qtdNumeros = request.body.qtdNumeros || 2;
+    const idPremioTitulo = request.body.idPremioTitulo;
+    const host = global.getHost(request);
 
-    if (!idCampanha || !idPremio || !qtdNumeros || typeof qtdNumeros !== 'number') {
+    if (!idPremioTitulo || host !== 'localhost') {
         return response.status(500).json({
             success: false,
             error: 'Invalid parms'
         })
     }
 
-    return call(idCampanha, idPremio, qtdNumeros, request, response);
+    return call(idPremioTitulo, request, response);
 }

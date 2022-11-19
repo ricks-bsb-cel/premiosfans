@@ -38,7 +38,7 @@ class collectionClass {
 
             delete data.id;
 
-            doc.set(data, { merge: typeof merge === 'boolean' ? merge : false })
+            doc.set(data, { merge: typeof merge === 'boolean' ? merge : true })
                 .then(_ => {
                     data.id = doc.id;
                     return resolve(data);

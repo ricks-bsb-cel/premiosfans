@@ -158,7 +158,6 @@ const call = (idCampanha, idPremio, force, request, response) => {
         name: 'generate-numeros-da-sorte-premio',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        requireIdEmpresa: false,
         data: {
             idCampanha: idCampanha,
             idPremio: idPremio,
@@ -179,7 +178,9 @@ exports.callRequest = (request, response) => {
     const idPremio = request.body.idPremio;
     const force = typeof request.body.force === 'boolean' ? request.body.force : false;
 
-    if (!idCampanha || !idPremio) {
+    const host = global.getHost(request);
+
+    if (!idCampanha || !idPremio || host !== 'localhost') {
         return response.status(500).json({
             success: false,
             error: 'Invalid parms'
