@@ -167,8 +167,8 @@ class Service extends eebService {
                 })
 
                 .then(getNumeroResult => {
-                    if (result.jaGerado) { return true; }
-                    
+                    if (result.jaGerado) return true;
+
                     result.numero = getNumeroResult;
 
                     return updatePremioTitulo(result.data.idPremioTitulo, result.numero);
