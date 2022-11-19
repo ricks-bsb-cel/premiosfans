@@ -14,71 +14,21 @@ const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 
-// Geração dos lotes
-const createLotes = _ => {
+const findLote = path => {
+    return new Promise((resolve, reject) => {
+        const ref = admin.database().ref(path);
+        const query = ref.orderByChild('qtdDisponiveis').limitToLast(1);
 
-    const rand = global.randomNumber(7);
+        return query.on('value', data => {
+            data = data.val();
 
-    const result = {
-        qtdLotes: 0,
-        qtdLotesDisponiveis: 0,
-        qtdLotesUtilizados: 0,
-        qtdLotesEncerrados: 0,
-        qtdNumerosDisponiveis: 0,
-        qtdNumerosUtilizados: 0,
-        lotes: {}
-    };
+            if (!data || typeof data !== 'object') {
+                return reject(new Error(`Não existe nenhum lote de números gerados para o premio`));
+            }
 
-    let numerosLote = [];
-
-    for (let l = 0; l < 100; l++) {
-        numerosLote.push(l);
-    }
-
-    for (let r = 0; r <= rand; r++) {
-        numerosLote = global.shuffleArray(numerosLote);
-    }
-
-    // Cria os 100 lotes de 1000 números cada
-    numerosLote.forEach(l => {
-        let numerosDaSorte = [];
-
-        let lote = {
-            codigo: l,
-            qtdDisponiveis: 0,
-            qtdUtilizados: 0,
-            numeros: []
-        };
-
-        const codigoLote = `lote-${global.generateRandomId(6).toLowerCase()}-${l.toString().padStart(2, '0')}`;
-
-        // Carrega os 1000 números em sequencial
-        for (let ns = 0; ns < 1000; ns++) {
-            numerosDaSorte.push(ns);
-        }
-
-        // Shuffle
-
-        for (let r = 0; r <= rand; r++) {
-            numerosDaSorte = global.shuffleArray(numerosDaSorte);
-        }
-
-        // Adiciona no lote
-        numerosDaSorte.forEach(ns => {
-            lote.qtdDisponiveis++;
-            lote.numeros.push({
-                n: ns,
-                t: 0
-            })
+            return resolve(Object.keys(data)[0]);
         })
-
-        result.qtdLotes++;
-        result.qtdLotesDisponiveis++;
-        result.qtdNumerosDisponiveis += lote.numeros.length;
-        result.lotes[codigoLote] = lote;
     })
-
-    return result;
 }
 
 class Service extends eebService {
@@ -94,21 +44,19 @@ class Service extends eebService {
 
             const idCampanha = this.parm.data.idCampanha;
             const idPremio = this.parm.data.idPremio;
-            const force = typeof this.parm.data.force === 'boolean' ? this.parm.data.force : false;
+            let qtdNumeros = this.parm.data.qtdNumeros;
 
             const result = {
                 success: true,
                 host: this.parm.host,
                 idCampanha: idCampanha,
                 idPremio: idPremio,
-                force: force,
                 path: `numerosDaSorte/${idCampanha}/${idPremio}`
             };
 
             if (!idCampanha) throw new Error(`idCampanha inválido`);
             if (!idPremio) throw new Error(`idPremio inválido`);
 
-            // Localiza o Premio
             return collectionCampanhasSorteiosPremios.getDoc(idPremio)
 
                 .then(premioResult => {
@@ -116,24 +64,45 @@ class Service extends eebService {
 
                     if (result.premio.idCampanha !== idCampanha) throw new Error('O premio não pertence à campanha');
 
-                    // Outras validações...
-
-                    // Verifica se já não foi gerado
-                    return force ? null : admin.database().ref(result.path).once('value');
+                    return findLote(`${result.path}/lotes`);
                 })
 
-                .then(lotesNumerosDaSorte => {
-                    result.data = lotesNumerosDaSorte ? lotesNumerosDaSorte.val() : null;
+                .then(lote => {
+                    result.idLote = lote;
+                    result.titulo = 'abctitulo';
+                    result.numeros = [];
 
-                    if (result.data) return null;
+                    return admin.database().ref(`${result.path}/lotes/${lote}`).transaction(data => {
+                        if (data.qtdDisponiveis && data.qtdDisponiveis > 0) {
+                            data.qtdDisponiveis--;
+                            data.qtdUtilizados++;
 
-                    result.data = createLotes();
+                            while (qtdNumeros > 0) {
+                                qtdNumeros--;
 
-                    // Salva no RealTime
-                    return admin.database().ref(result.path).set(result.data);
+                                const pos = data.numeros.findIndex(f => { return f.t === 0; });
+
+                                if (pos >= 0) {
+                                    result.lote = data.codigo;
+                                    result.numeros.push(
+                                        
+                                    );
+                                    data.numeros[pos].t = result.titulo;
+                                }
+                            }
+                        }
+
+                        result.qtdDisponiveis = data.qtdDisponiveis;
+
+                        return data;
+                    });
                 })
 
-                .then(_ => {
+                .then(transactionResult => {
+                    if (!transactionResult.committed) {
+                        throw new Error('Transaction error...');
+                    }
+
                     delete result.premio;
 
                     return resolve(this.parm.async ? { success: true } : result);
@@ -152,17 +121,17 @@ class Service extends eebService {
 
 exports.Service = Service;
 
-const call = (idCampanha, idPremio, force, request, response) => {
+const call = (idCampanha, idPremio, qtdNumeros, request, response) => {
 
     const service = new Service(request, response, {
-        name: 'generate-numeros-da-sorte-premio',
+        name: 'generate-titulo',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         requireIdEmpresa: false,
         data: {
             idCampanha: idCampanha,
             idPremio: idPremio,
-            force: force
+            qtdNumeros: qtdNumeros
         },
         attributes: {
             idEmpresa: idCampanha
@@ -177,14 +146,14 @@ exports.call = call;
 exports.callRequest = (request, response) => {
     const idCampanha = request.body.idCampanha;
     const idPremio = request.body.idPremio;
-    const force = typeof request.body.force === 'boolean' ? request.body.force : false;
+    const qtdNumeros = request.body.qtdNumeros || 2;
 
-    if (!idCampanha || !idPremio) {
+    if (!idCampanha || !idPremio || !qtdNumeros || typeof qtdNumeros !== 'number') {
         return response.status(500).json({
             success: false,
             error: 'Invalid parms'
         })
     }
 
-    return call(idCampanha, idPremio, force, request, response);
+    return call(idCampanha, idPremio, qtdNumeros, request, response);
 }

@@ -49,6 +49,10 @@ api.post("/v1/generate-ns-premio", (request, response) => {
     initFirebase.call(require('./services/generateNumerosDaSortePremio').callRequest, request, response);
 })
 
+api.post("/v1/generate-titulo", (request, response) => {
+    initFirebase.call(require('./services/generateTitulo').callRequest, request, response);
+})
+
 const eeb = express();
 
 eeb.use(cors());
