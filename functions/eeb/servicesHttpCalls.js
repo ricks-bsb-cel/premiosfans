@@ -53,6 +53,11 @@ api.post("/v1/generate-titulo", (request, response) => {
     initFirebase.call(require('./services/generateTitulo').callRequest, request, response);
 })
 
+api.post("/v1/generate-premio-titulo", (request, response) => {
+    initFirebase.call(require('./services/generatePremioTitulo').callRequest, request, response);
+})
+
+
 const eeb = express();
 
 eeb.use(cors());

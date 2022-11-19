@@ -43,7 +43,7 @@ const createLotes = _ => {
     numerosLote.forEach(l => {
         let numerosDaSorte = [];
 
-        let lote = {
+        const lote = {
             codigo: l,
             qtdDisponiveis: 0,
             qtdUtilizados: 0,

@@ -42,13 +42,14 @@ class eventBusService {
 
         this.parm.ordered = typeof this.parm.ordered !== 'boolean' ? false : this.parm.ordered;
         this.parm.noAuth = typeof this.parm.noAuth !== 'boolean' ? false : this.parm.noAuth;
+        this.parm.authAnonymous = typeof this.parm.authAnonymous !== 'boolean' ? false : this.parm.authAnonymous;
         this.parm.orderingKey = this.parm.orderingKey || null;
         this.parm.attributes = this.parm.attributes || {};
 
         this.parm.topic = `eeb-${this.parm.name}`
         this.parm.topicSubscription = `eeb-subscription-${this.parm.name}`
 
-        if (this.parm.noAuth) { this.parm.requireIdEmpresa = false; }
+        // if (this.parm.noAuth) { this.parm.requireIdEmpresa = false; }
 
         // Se chamada direta (fora do request, não usa autenticação)
         if (!this.request && !this.response) { this.parm.noAuth = true; }
@@ -129,7 +130,13 @@ class eventBusService {
                     if (userInfoResult) {
                         this.parm.attributes.uid = userInfoResult.data.uid;
 
+                        if (userInfoResult.data.isAnonymous && !this.parm.authAnonymous) {
+                            throw new Error(`O usuário ${userInfoResult.data.uid} é anonimo e não tem acesso a este endpoint`);
+                        }
+
                         if (
+                            !userInfoResult.data.isAnonymous &&
+                            !this.parm.authAnonymous &&
                             this.parm.attributes.idEmpresa &&
                             !userInfoResult.data.superUser &&
                             !userInfoResult.data.idsEmpresas.includes(this.parm.attributes.idEmpresa)
@@ -309,9 +316,10 @@ const eventBusServiceParmSchema = _ => {
             async: Joi.boolean().default(false),
             debug: Joi.boolean().default(false),
             noAuth: Joi.boolean().default(false),
+            authAnonymous: Joi.boolean().default(false),
             ordered: Joi.boolean().default(false),
-            orderingKey: Joi.string().allow(null),
-            requireIdEmpresa: Joi.boolean().default(true)
+            orderingKey: Joi.string().allow(null)
+            // requireIdEmpresa: Joi.boolean().default(true)
         });
 
     return schema;

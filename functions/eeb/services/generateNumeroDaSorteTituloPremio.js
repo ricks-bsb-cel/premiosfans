@@ -3,7 +3,6 @@
 const admin = require('firebase-admin');
 const path = require('path');
 const eebService = require('../eventBusService').abstract;
-const global = require("../../global");
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
@@ -98,7 +97,6 @@ class Service extends eebService {
 
             const idCampanha = this.parm.data.idCampanha;
             const idPremio = this.parm.data.idPremio;
-            let qtdNumeros = this.parm.data.qtdNumeros;
 
             const result = {
                 success: true,

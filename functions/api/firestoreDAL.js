@@ -294,3 +294,10 @@ exports.appLinks = _ => {
     return new collectionClass('appLinks');
 }
 
+exports.titulos = _ => {
+    return new collectionClass('titulos');
+}
+
+exports.titulosPremios = _ => {
+    return new collectionClass('titulosPremios');
+}

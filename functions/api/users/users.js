@@ -179,7 +179,6 @@ const getUserInfoWithToken = (token, full, uid) => {
 
         Promise.all(checkToken)
 
-
             .then(solutions => {
 
                 user = solutions[0] || solutions[1];
@@ -194,19 +193,18 @@ const getUserInfoWithToken = (token, full, uid) => {
             .then(getUserResult => {
 
                 userRecord = getUserResult;
+                userRecord.isAnonymous = typeof userRecord.displayName === 'undefined' &&
+                    typeof userRecord.email === 'undefined' &&
+                    typeof userRecord.phoneNumber === 'undefined';
 
-                const isPhoneProvider = (userRecord.providerData || []).findIndex(f => {
-                    return f.providerId === 'phone';
-                }) >= 0;
-
-                if (!user.data.idEmpresa && !user.data.superUser && !isPhoneProvider) {
+                if (!user.data.idEmpresa && !user.data.superUser && !userRecord.isAnonymous) {
 
                     let userDetail = user.data.uid;
 
                     if (userRecord.phoneNumber) { userDetail += ', ' + userRecord.phoneNumber; }
                     if (userRecord.email) { userDetail += ', ' + userRecord.email; }
 
-                    throw new Error(`O usuário atual [${userDetail}] não pertence a nenhuma empresa`);
+                    throw new Error(`O usuário atual [${userDetail}] não pertence a nenhuma empresa ~ ${JSON.stringify(userRecord)}`);
                 }
 
                 if (userRecord.customClaims) user.data.customClaims = userRecord.customClaims;
@@ -244,13 +242,17 @@ const getUserInfoWithToken = (token, full, uid) => {
 
                     result.data = {
                         uid: userInfo.uid,
-                        email: userInfo.email,
-                        displayName: userInfo.displayName || userRecord.displayName,
+                        email: userInfo.email || 'null',
+                        displayName: userInfo.displayName || userRecord.displayName || 'Anonymous',
                         idEmpresa: userInfo.idEmpresa || null,
                         superUser: userInfo.superUser || false,
-                        idsEmpresas: getIdsEmpresas(userInfo.empresas),
                         customClaims: userRecord.customClaims,
+                        isAnonymous: userRecord.isAnonymous,
                         providers: []
+                    }
+
+                    if (result.data.email) {
+                        result.data.idsEmpresas = getIdsEmpresas(userInfo.empresas);
                     }
 
                     result.extrainfo = {
@@ -262,9 +264,10 @@ const getUserInfoWithToken = (token, full, uid) => {
                     // Solicitada informações do usuário do próprio token...
                     result = user;
 
-                    result.data.displayName = result.data.displayName || userRecord.displayName || null;
+                    result.data.displayName = result.data.displayName || userRecord.displayName || 'Anonymous';
                     result.data.email = result.data.email || userRecord.email || null;
                     result.data.providers = [];
+                    result.data.isAnonymous = userRecord.isAnonymous;
 
                     if (userRecord.phoneNumber) {
                         result.data.phoneNumber = userRecord.phoneNumber;
