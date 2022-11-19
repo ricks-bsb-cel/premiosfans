@@ -200,6 +200,8 @@ const call = (idPremioTitulo, request, response) => {
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         noAuth: true,
+        ordered: true,
+        orderingKey: idPremioTitulo,
         data: {
             idPremioTitulo: idPremioTitulo
         },
@@ -214,7 +216,8 @@ const call = (idPremioTitulo, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-    const idPremioTitulo = request.body.idPremioTitulo;
+    const idPremioTitulo = request.body.idPremioTitulo || null;
+
     const host = global.getHost(request);
 
     if (!idPremioTitulo || host !== 'localhost') {
@@ -224,5 +227,5 @@ exports.callRequest = (request, response) => {
         })
     }
 
-    return call(idPremioTitulo, request, response);
+    return call(idPremioTitulos, request, response);
 }
