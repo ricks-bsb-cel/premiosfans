@@ -14,6 +14,15 @@ const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 
+// Receber no parametro um guidTitulo e idInfluencer (obrigatórios)
+// Pesquisar e criar o título se não existir
+// Cada chamada do generateTitulo gera um número da sorte e grava no título
+// Se são 2 números, esta rotina deve ser chamada 2 vezes
+// Esta rotina sofre retentativa automática. Se houver colisão com outra geração, não tentar novamente na rotinas
+// Lembre-se que esta rotina deve ser chamada uma vez para cada número da sorte de cada premio de cada titulos
+// Se chamar mais do que a quantidade de números da sorte do premio, ignora
+// Todo título tem o mesmo guidTitulo para todos os seus premios
+
 const findLote = path => {
     return new Promise((resolve, reject) => {
         const ref = admin.database().ref(path);
@@ -28,6 +37,51 @@ const findLote = path => {
 
             return resolve(Object.keys(data)[0]);
         })
+    })
+}
+
+const getNumero = (path, idTitulo) => {
+    return new Promise((resolve, reject) => {
+        const result = {};
+
+        return findLote(path)
+
+            .then(lote => {
+                result.idLote = lote;
+
+                return admin.database().ref(`${result.path}/lotes/${lote}`).transaction(data => {
+                    if (data.qtdDisponiveis && data.qtdDisponiveis > 0) {
+                        data.qtdDisponiveis--;
+                        data.qtdUtilizados++;
+
+                        const pos = data.numeros.findIndex(f => { return f.t === 0; });
+
+                        if (pos >= 0) {
+                            result.lote = data.codigo;
+                            result.numero = data.codigo.toString().padStart(2, '0') + data.numeros[pos].n.toString().padStart(3, '0');
+                            data.numeros[pos].t = idTitulo;
+                        }
+                    }
+
+                    result.qtdDisponiveis = data.qtdDisponiveis;
+                    result.qtdUtilizados = data.qtdUtilizados;
+
+                    return data;
+                });
+            })
+
+            .then(transactionResult => {
+                if (!transactionResult.committed) {
+                    throw new Error('Transaction error...');
+                }
+
+                return resolve(result);
+            })
+
+            .catch(e => {
+                return reject(e);
+            })
+
     })
 }
 
@@ -64,44 +118,11 @@ class Service extends eebService {
 
                     if (result.premio.idCampanha !== idCampanha) throw new Error('O premio não pertence à campanha');
 
-                    return findLote(`${result.path}/lotes`);
+                    return getNumero(result.path);
                 })
 
-                .then(lote => {
-                    result.idLote = lote;
-                    result.titulo = 'abctitulo';
-                    result.numeros = [];
-
-                    return admin.database().ref(`${result.path}/lotes/${lote}`).transaction(data => {
-                        if (data.qtdDisponiveis && data.qtdDisponiveis > 0) {
-                            data.qtdDisponiveis--;
-                            data.qtdUtilizados++;
-
-                            while (qtdNumeros > 0) {
-                                qtdNumeros--;
-
-                                const pos = data.numeros.findIndex(f => { return f.t === 0; });
-
-                                if (pos >= 0) {
-                                    result.lote = data.codigo;
-                                    result.numeros.push(
-                                        
-                                    );
-                                    data.numeros[pos].t = result.titulo;
-                                }
-                            }
-                        }
-
-                        result.qtdDisponiveis = data.qtdDisponiveis;
-
-                        return data;
-                    });
-                })
-
-                .then(transactionResult => {
-                    if (!transactionResult.committed) {
-                        throw new Error('Transaction error...');
-                    }
+                .then(getNumeroResult => {
+                    result.numero = getNumeroResult;
 
                     delete result.premio;
 
