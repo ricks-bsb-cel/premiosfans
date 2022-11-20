@@ -227,5 +227,5 @@ exports.callRequest = (request, response) => {
         })
     }
 
-    return call(idPremioTitulos, request, response);
+    return call(idPremioTitulo, request, response);
 }
