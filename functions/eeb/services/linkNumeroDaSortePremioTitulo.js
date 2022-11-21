@@ -13,6 +13,8 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
+const checkPremioTitulo = require('./checkPremioTitulo');
+
 const collectionCampanha = firestoreDAL.campanhas();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
@@ -43,6 +45,10 @@ const findLote = path => {
 
             if (!data || typeof data !== 'object') {
                 return reject(new Error(`Não existe nenhum lote de números gerados para o premio [${path}]`));
+            }
+
+            if (data.qtdDisponiveis <= 0) {
+                return reject(new Error(`Lotes esgotados [${path}]`));
             }
 
             return resolve(Object.keys(data)[0]);
@@ -77,6 +83,8 @@ const getNumero = (parm) => {
                             result.numero = data.codigo.toString().padStart(gruposLength, '0') +
                                 data.numeros[pos].n.toString().padStart(NumerosPorGrupoLength, '0');
                             data.numeros[pos].t = idTitulo;
+                        } else {
+                            throw new Error('Lote esgotado. Nenhum número encontrado para ser utilizado.');
                         }
                     }
 
@@ -191,6 +199,13 @@ class Service extends eebService {
                 .then(_ => {
                     delete result.premio;
 
+                    // Solicita Verificação do PremioTitulo
+                    return checkPremioTitulo.call({
+                        idPremioTitulo: result.data.idPremioTitulo
+                    });
+                })
+
+                .then(_ => {
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 

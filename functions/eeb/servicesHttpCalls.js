@@ -75,6 +75,10 @@ api.post("/v1/link-ns-premio", (request, response) => {
     initFirebase.call(require('./services/linkNumeroDaSortePremioTitulo').callRequest, request, response);
 })
 
+api.post("/v1/check-premio-titulo", (request, response) => {
+    initFirebase.call(require('./services/checkPremioTitulo').callRequest, request, response);
+})
+
 const eeb = express();
 
 eeb.use(cors());
