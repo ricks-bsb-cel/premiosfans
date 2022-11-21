@@ -1057,7 +1057,9 @@ sorteio-campanha-premios table input.right {
   height: 124px;
   resize: none;
 }
-
+.campanhas table .actions {
+  width: 160px;
+}
 .clientes table .dt-alteracao {
   text-align: right;
 }

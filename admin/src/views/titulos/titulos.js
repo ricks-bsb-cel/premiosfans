@@ -10,7 +10,8 @@ const ngModule = angular.module('views.titulos', [
 		$scope,
 		appAuthHelper,
 		collectionTitulos,
-		toastrFactory
+		toastrFactory,
+		$routeParams
 	) {
 
 		$scope.collectionTitulos = collectionTitulos;
@@ -19,10 +20,14 @@ const ngModule = angular.module('views.titulos', [
 
 			run: function (termo) {
 
-				var attrFilter = {};
+				var attrFilter = {
+					filter: [
+						{ field: "idCampanha", operator: "==", value: $routeParams.idCampanha }
+					]
+				};
 
 				if (termo) {
-					attrFilter.filter = `keywords array-contains ${termo}`;
+					attrFilter.filter.push({ field: "keywords", operator: "array-contains ", value: termo });
 				} else {
 					attrFilter.limit = 60;
 					toastrFactory.info('Apenas os primeiros ' + attrFilter.limit + ' registros serão apresentados... Informe um termo de pesquisa para buscar dados mais específicos.');

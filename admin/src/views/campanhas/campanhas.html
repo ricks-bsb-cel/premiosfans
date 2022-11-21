@@ -22,7 +22,7 @@
                                     <th class="url">URL</th>
                                     <th class="template">Template</th>
                                     <th class="ativa right">Ativa</th>
-                                    <th class="dt-inclusao right">Última Alteraçãp</th>
+                                    <th class="actions right"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,8 +46,9 @@
                                     <td class="ativa right">
                                         <badge-true-false value="c.ativo"></badge-true-false>
                                     </td>
-                                    <td class="dt-criacao right">
-                                        {{c.dtAlteracao | ddmmyyyyhhmm}}
+                                    <td class="actions right">
+                                        <a class="btn btn-default btn-xs" ng-href="#!/titulos-compras/{{c.id}}">Compras</a>
+                                        <a class="btn btn-default btn-xs" ng-href="#!/titulos/{{c.id}}">Títulos</a>
                                     </td>
                                 </tr>
                             </tbody>

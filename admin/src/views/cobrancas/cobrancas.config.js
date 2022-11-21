@@ -23,13 +23,6 @@ config = function (
 	$routeProvider,
 	pathProvider
 ) {
-	
-	/*
-	if (!window.location.pathname.startsWith('/adm/home')) {
-		return;
-	}
-	*/
-
 	var pathObj = pathProvider.addPath(
 		view,
 		configPath
@@ -38,7 +31,6 @@ config = function (
 	var path = pathObj.path;
 
 	$routeProvider.when(path + ':idCliente?/:idContrato?', route);
-
 };
 
 export default config;

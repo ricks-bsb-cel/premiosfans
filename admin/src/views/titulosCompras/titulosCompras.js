@@ -10,28 +10,30 @@ const ngModule = angular.module('views.titulos-compras', [
 		$scope,
 		appAuthHelper,
 		collectionTitulosCompras,
-		toastrFactory
+		toastrFactory,
+		$routeParams
 	) {
+
 
 		$scope.collectionTitulosCompras = collectionTitulosCompras;
 
 		$scope.filter = {
-
 			run: function (termo) {
-
-				var attrFilter = {};
+				var attrFilter = {
+					filter: [
+						{ field: "idCampanha", operator: "==", value: $routeParams.idCampanha }
+					]
+				};
 
 				if (termo) {
-					attrFilter.filter = `keywords array-contains ${termo}`;
+					attrFilter.filter.push({ field: "keywords", operator: "array-contains ", value: termo });
 				} else {
 					attrFilter.limit = 60;
 					toastrFactory.info('Apenas os primeiros ' + attrFilter.limit + ' registros serão apresentados... Informe um termo de pesquisa para buscar dados mais específicos.');
 				}
 
 				$scope.collectionTitulosCompras.collection.startSnapshot(attrFilter);
-
 			}
-
 		}
 
 		appAuthHelper.ready()

@@ -27,7 +27,7 @@ const config = function (
 
 	var path = pathObj.path;
 
-	$routeProvider.when(path, route);
+	$routeProvider.when(path + ':idCampanha', route);
 
 };
 
