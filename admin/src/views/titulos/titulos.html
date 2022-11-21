@@ -1,0 +1,67 @@
+<section class="content titulos">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay 
+        ready="collectionTitulos.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionTitulos.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum link encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionTitulos.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="id monospace">ID</th>
+                                    <th class="campanha">Campanha</th>
+                                    <th class="nome">Cliente</th>
+                                    <th class="cpf">CPF</th>
+                                    <th class="celular">Celular</th>
+                                    <th class="email">Email</th>
+                                    <th class="situacao">Situação</th>
+                                    <th class="dt-inclusao right">Dt.Inclusao</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="t in collectionTitulos.collection.data">
+                                    <td class="id monospace">
+                                        {{t.id}}
+                                    </td>
+                                    <td class="influencer">
+                                        {{t.campanhaNome}}
+                                    </td>
+                                    <td class="nome">
+                                            {{t.nome}}
+                                    </td>
+                                    <td class="cpf">
+                                        {{t.cpf_formated}}
+                                    </td>
+                                    <td class="celular">
+                                        {{t.celular_formated}}
+                                    </td>
+                                    <td class="email">
+                                        {{t.email}}
+                                    </td>
+                                    <td class="situacao">
+                                        {{t.situacao}}
+                                    </td>
+                                    <td class="dt-inclusao right">
+                                        {{t.dtInclusao_timestamp | ddmmyyyyhhmmss}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

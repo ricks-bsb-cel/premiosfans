@@ -1,0 +1,71 @@
+<section class="content titulos-compras">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay 
+        ready="collectionTitulosCompras.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionTitulosCompras.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum link encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionTitulosCompras.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="id monospace">ID</th>
+                                    <th class="campanha">Campanha</th>
+                                    <th class="qtd">Qtd Títulos</th>
+                                    <th class="nome">Cliente</th>
+                                    <th class="cpf">CPF</th>
+                                    <th class="celular">Celular</th>
+                                    <th class="email">Email</th>
+                                    <th class="situacao">Situação</th>
+                                    <th class="dt-inclusao right">Dt.Inclusao</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionTitulosCompras.collection.data">
+                                    <td class="id monospace">
+                                        {{c.id}}
+                                    </td>
+                                    <td class="campanha">
+                                        {{c.campanhaNome}}
+                                    </td>
+                                    <td class="qtd">
+                                        {{c.qtdTitulosCompra}}
+                                    </td>
+                                    <td class="nome">
+                                        {{c.nome}}
+                                    </td>
+                                    <td class="cpf">
+                                        {{c.cpf_formated}}
+                                    </td>
+                                    <td class="celular">
+                                        {{c.celular_formated}}
+                                    </td>
+                                    <td class="email">
+                                        {{c.email}}
+                                    </td>
+                                    <td class="situacao">
+                                        {{c.situacao}}
+                                    </td>
+                                    <td class="dt-inclusao right">
+                                        {{c.dtInclusao_timestamp | ddmmyyyyhhmmss}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

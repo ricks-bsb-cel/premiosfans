@@ -101,6 +101,8 @@ class Service extends eebService {
                     result.data.tituloPremio.numerosDaSorte = [];
                     result.data.tituloPremio.qtdNumerosDaSortePorTitulo = result.data.titulo.qtdNumerosDaSortePorTitulo;
                     result.data.tituloPremio.uidComprador = result.data.titulo.uidComprador;
+                    result.data.tituloPremio.idTituloCompra = result.data.titulo.idTituloCompra;
+                    result.data.tituloPremio.keywords = result.data.titulo.keywords;
 
                     // Dados do Sorteio
                     result.data.tituloPremio.sorteioDtSorteio = result.data.sorteio.dtSorteio;

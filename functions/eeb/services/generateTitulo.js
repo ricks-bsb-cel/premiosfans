@@ -17,13 +17,14 @@ const collectionInfluencers = firestoreDAL.influencers();
 const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
 const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 const collectionTitulos = firestoreDAL.titulos();
+const collectionTitulosCompras = firestoreDAL.titulosCompras();
 
 /*
     generateTitulo
     - Valida o token do cliente
     - Valida os dados do cliente
     - Verifica as configurações da campanha
-    - Gera o registro do título
+    - Gera o registro de Compra e dos títulos
     - NÃO GERA OS PRÊMIOS DO TÍTULO. Isso será feito após o pagamento.
 
     * Lembre-se! Cada vez que esta rotina é executada um novo títuo é gerado!
@@ -36,7 +37,8 @@ const clienteSchema = _ => {
         nome: Joi.string().min(6).max(120).required(),
         email: Joi.string().email().required(),
         celular: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(),
-        cpf: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required()
+        cpf: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(),
+        qtdTitulos: Joi.number().min(1).max(6).required()
     });
 
     return schema;
@@ -58,12 +60,7 @@ const sanitizeData = data => {
     data.email_hide = global.hideEmail(data.email);
     data.celular_hide = global.hideCelular(data.celular);
 
-    data.guidTitulo = global.guid();
-
-    global.setDateTime(data, 'dtInclusao');
-
     return data;
-
 }
 
 class Service extends eebService {
@@ -82,6 +79,7 @@ class Service extends eebService {
             const result = {
                 success: true,
                 host: this.parm.host,
+                qtdTitulos: 0,
                 data: {}
             };
 
@@ -89,6 +87,9 @@ class Service extends eebService {
 
                 .then(dataResult => {
                     result.data.titulo = sanitizeData(dataResult);
+                    result.qtdTitulos = result.data.titulo.qtdTitulos;
+
+                    delete result.data.titulo.qtdTitulos;
 
                     promise = [
                         collectionCampanhas.getDoc(result.data.titulo.idCampanha),
@@ -126,6 +127,45 @@ class Service extends eebService {
 
                     result.data.campanhaInfluencer = result.data.campanhaInfluencer[0];
 
+                    // Registro da Compra
+                    result.data.compra = {
+                        idCampanha: result.data.titulo.idCampanha,
+                        idInfluencer: result.data.titulo.idInfluencer,
+                        qtdPremios: result.data.campanhaPremios.length,
+                        campanhaQtdNumerosDaSortePorTitulo: result.data.campanha.qtdNumerosDaSortePorTitulo,
+                        campanhaNome: result.data.campanha.titulo,
+                        campanhaSubTitulo: result.data.campanha.subTitulo || '',
+                        campanhaDetalhes: result.data.campanha.detalhes || '',
+                        campanhaVlTitulo: result.data.campanha.vlTitulo,
+                        campanhaQtdPremios: result.data.campanha.qtdPremios,
+                        campanhaTemplate: result.data.campanha.template,
+                        situacao: 'aguardando-pagamento',
+                        guidCompra: global.guid(),
+                        qtdTitulosCompra: result.qtdTitulos,
+                        uidComprador: this.parm.attributes.uid
+                    };
+
+                    result.data.compra = {
+                        ...result.data.compra,
+                        ...result.data.titulo
+                    }
+
+                    result.data.compra.keywords = global.generateKeywords(
+                        result.data.compra.nome,
+                        result.data.compra.cpf,
+                        result.data.compra.email,
+                        result.data.compra.celular
+                    );
+
+                    global.setDateTime(result.data.compra, 'dtInclusao');
+
+                    return collectionTitulosCompras.add(result.data.compra);
+
+                })
+                .then(resultTituloCompra => {
+                    result.data.compra = resultTituloCompra;
+
+                    result.data.titulo.uidComprador = this.parm.attributes.uid;
                     result.data.titulo.qtdPremios = result.data.campanhaPremios.length;
                     result.data.titulo.qtdNumerosDaSortePorTitulo = result.data.campanha.qtdNumerosDaSortePorTitulo;
                     result.data.titulo.campanhaNome = result.data.campanha.titulo;
@@ -134,16 +174,36 @@ class Service extends eebService {
                     result.data.titulo.campanhaVlTitulo = result.data.campanha.vlTitulo;
                     result.data.titulo.campanhaQtdPremios = result.data.campanha.qtdPremios;
                     result.data.titulo.campanhaTemplate = result.data.campanha.template;
-
                     result.data.titulo.situacao = 'aguardando-pagamento';
 
-                    result.data.titulo.uidComprador = this.parm.attributes.uid;
+                    result.data.titulo.idTituloCompra = result.data.compra.id;
+                    result.data.titulo.keywords = result.data.compra.keywords;
 
-                    return collectionTitulos.add(result.data.titulo);
+                    const promise = [];
+
+                    for (let i = 0; i < result.qtdTitulos; i++) {
+                        const t = {
+                            guidTitulo: global.guid()
+                        }
+
+                        global.setDateTime(t, 'dtInclusao');
+
+                        promise.push(
+                            collectionTitulos.add({
+                                ...result.data.titulo,
+                                ...t
+                            })
+                        )
+                    }
+
+                    return Promise.all(promise);
                 })
 
-                .then(_ => {
-                    result.data = result.data.titulo;
+                .then(resultTitulos => {
+                    result.data = {
+                        compra: result.data.compra,
+                        titulos: resultTitulos
+                    }
 
                     return resolve(this.parm.async ? { success: true } : result);
                 })

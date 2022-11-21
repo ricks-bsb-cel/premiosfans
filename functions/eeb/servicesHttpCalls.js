@@ -59,6 +59,10 @@ api.post("/v1/generate-titulo", (request, response) => {
     initFirebase.call(require('./services/generateTitulo').callRequest, request, response);
 })
 
+api.post("/v1/pagar-compra", (request, response) => {
+    initFirebase.call(require('./services/pagarCompra').callRequest, request, response);
+})
+
 api.post("/v1/pagar-titulo", (request, response) => {
     initFirebase.call(require('./services/pagarTitulo').callRequest, request, response);
 })

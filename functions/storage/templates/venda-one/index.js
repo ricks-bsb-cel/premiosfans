@@ -125,7 +125,8 @@ angular.module('app', [
                     nome: data.nome,
                     email: data.email,
                     celular: data.celular,
-                    cpf: data.cpf
+                    cpf: data.cpf,
+                    qtdTitulos: data.qtdTitulos
                 };
 
                 $http({
@@ -139,7 +140,7 @@ angular.module('app', [
 
                     .then(
                         function (response) {
-                            Swal.fire('Título Gerado', `Código do Título: ${response.data.result.data.id}`, 'info');
+                            Swal.fire('Título Gerado', `Código da Compra: ${response.data.result.data.compra.id}`, 'info');
 
                             return resolve(response);
                         },
@@ -168,7 +169,8 @@ angular.module('app', [
             ) {
                 $scope.titulo = {};
 
-                const send = _ => {
+                const send = qtdTitulos => {
+                    $scope.titulo.qtdTitulos = qtdTitulos;
                     httpCalls.generateTitulo($scope.titulo);
                 }
 
@@ -177,9 +179,7 @@ angular.module('app', [
                         showFormCliente: _ => {
                             $("#form-cliente").show();
                         },
-                        send: _ => {
-                            return send();
-                        }
+                        send: send
                     }
                 }
             },
@@ -198,6 +198,7 @@ angular.module('app', [
 
         $scope.selectQtd = (id, vlTotal, qtd) => {
             $scope.selected = id;
+            $scope.qtd = qtd;
             $scope.vlCompra = vlTotal;
 
             $("#vl-total").show();
@@ -213,8 +214,7 @@ angular.module('app', [
                 return;
             }
 
-            formClienteFactory.delegate.send();
+            formClienteFactory.delegate.send($scope.qtd);
         }
-
 
     });

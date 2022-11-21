@@ -28,6 +28,10 @@ import collectionFrontTemplates from './collections/collection.front-templates';
 
 import collectionAppLinks from './collections/collection.appLinks';
 
+import collectionTitulos from './collections/collection.titulos';
+import collectionTitulosCompras from './collections/collection.titulosCompras';
+import collectionTitulosPremios from './collections/collection.titulosPremios';
+
 let ngModule = angular.module('firebase.collections', [
 	collectionCrud.name,
 
@@ -51,7 +55,11 @@ let ngModule = angular.module('firebase.collections', [
 
 	collectionEntidades.name,
 	collectionFrontTemplates.name,
-	collectionAppLinks.name
+	collectionAppLinks.name,
+
+	collectionTitulos.name,
+	collectionTitulosCompras.name,
+	collectionTitulosPremios.name
 ]);
 
 export default ngModule;

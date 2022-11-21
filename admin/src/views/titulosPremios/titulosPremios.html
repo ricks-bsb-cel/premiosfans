@@ -1,0 +1,64 @@
+<section class="content titulos-premios">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay 
+        ready="collectionTitulosPremios.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionTitulosPremios.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum link encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionTitulosPremios.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="id-premio monospace">ID Prêmio</th>
+                                    <th class="descricao">Descricao</th>
+                                    <th class="numeros">Números</th>
+                                    <th class="id-campanha monospace">ID Campanha</th>
+                                    <th class="id-compra monospace">ID Compra</th>
+                                    <th class="id-titulo monospace">ID Título</th>
+                                    <th class="dt-inclusao right">Dt.Inclusao</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionTitulosPremios.collection.data">
+                                    <td class="id-campanha monospace">
+                                        {{c.idCampanha}}
+                                    </td>
+                                    <td class="descricao">
+                                        {{c.premioDescricao}}
+                                    </td>
+                                    <td class="numeros">
+                                        <span ng-repeat="n in c.numerosDaSorte" class="badge bg-success mr-1">{{n}}</span>
+                                    </span>
+                                    <td class="id-compra monospace">
+                                        {{c.idTituloCompra}}
+                                    </td>
+                                    <td class="id-titulo monospace">
+                                        {{c.idTitulo}}
+                                    </td>
+                                    <td class="id-premio monospace">
+                                        {{c.idPremio}}
+                                    </td>
+                                    </td>
+                                    <td class="dt-inclusao right">
+                                        {{c.dtInclusao_timestamp | ddmmyyyyhhmmss}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

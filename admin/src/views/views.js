@@ -25,6 +25,10 @@ import viewInfluencers from './influencers/influencers';	// Cópia da viewEmpres
 import viewUsuarios from './usuarios/usuarios';
 import viewClientes from './clientes/clientes';
 
+import viewTitulos from './titulos/titulos';
+import viewTitulosCompras from './titulosCompras/titulosCompras';
+import viewTitulosPremios from './titulosPremios/titulosPremios';
+
 let ngModule = angular.module('views', [
 	viewAdmConfigPath.name,
 	viewAdmConfigProfiles.name,
@@ -53,7 +57,11 @@ let ngModule = angular.module('views', [
 	viewAppLinks.name,
 
 	viewClientes.name,
-	viewDashboardClientes.name
+	viewDashboardClientes.name,
+
+	viewTitulos.name,
+	viewTitulosCompras.name,
+	viewTitulosPremios.name
 ]);
 
 export default ngModule;
