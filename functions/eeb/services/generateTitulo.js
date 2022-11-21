@@ -77,7 +77,7 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let promise;
+            let promise
 
             const result = {
                 success: true,
@@ -116,6 +116,10 @@ class Service extends eebService {
                     result.data.campanhaInfluencer = promiseResult[2];
                     result.data.campanhaPremios = promiseResult[3];
 
+                    if (!result.data.campanha.ativo) {
+                        throw new Error(`A campanha ${result.data.titulo.idCampanha} não está ativa`);
+                    }
+
                     if (result.data.campanhaInfluencer.length !== 1) {
                         throw new Error(`Influencer ${result.data.idInfluencer} não vinculado à campanha ${result.data.idCampanha}`);
                     }
@@ -125,8 +129,8 @@ class Service extends eebService {
                     result.data.titulo.qtdPremios = result.data.campanhaPremios.length;
                     result.data.titulo.qtdNumerosDaSortePorTitulo = result.data.campanha.qtdNumerosDaSortePorTitulo;
                     result.data.titulo.campanhaNome = result.data.campanha.titulo;
-                    result.data.titulo.campanhaSubTitulo = result.data.campanha.subTitulo;
-                    result.data.titulo.campanhaDetalhes = result.data.campanha.detalhes;
+                    result.data.titulo.campanhaSubTitulo = result.data.campanha.subTitulo || '';
+                    result.data.titulo.campanhaDetalhes = result.data.campanha.detalhes || '';
                     result.data.titulo.campanhaVlTitulo = result.data.campanha.vlTitulo;
                     result.data.titulo.campanhaQtdPremios = result.data.campanha.qtdPremios;
                     result.data.titulo.campanhaTemplate = result.data.campanha.template;
@@ -139,6 +143,8 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
+                    result.data = result.data.titulo;
+
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 
@@ -156,11 +162,6 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-
-    if (!data.idCampanha) {
-        throw new Error('invalid parm');
-    }
-
     const service = new Service(request, response, {
         name: 'generate-titulo',
         async: request && request.query.async ? request.query.async === 'true' : true,
@@ -179,8 +180,7 @@ const call = (data, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-
-    if (!request.body) {
+    if (!request.body || !request.body.idCampanha) {
         return response.status(500).json({
             success: false,
             error: 'Invalid parms'

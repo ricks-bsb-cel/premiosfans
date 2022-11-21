@@ -14,9 +14,13 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                     alertFactory.error('Cada sorteio pode ter no máximo 5 prêmios');
                     return;
                 }
+
+                $scope.sorteio.premios = $scope.sorteio.premios || [];
+
                 $scope.sorteio.premios.push({
                     guidPremio: globalFactory.guid(),
-                    valor: 0
+                    valor: 0,
+                    deleted: false
                 })
             }
 
@@ -59,6 +63,7 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
                     guidSorteio: globalFactory.guid(),
                     dtSorteio: null,
                     ativo: false,
+                    deleted: false,
                     premios: []
                 };
 

@@ -138,7 +138,6 @@ const call = (idInfluencer, idCampanha, request, response) => {
         name: 'generate-templates',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        requireIdEmpresa: false,
         data: {
             idInfluencer: idInfluencer,
             idCampanha: idCampanha

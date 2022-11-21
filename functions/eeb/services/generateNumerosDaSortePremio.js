@@ -6,6 +6,18 @@ const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 
 /*
+Esta rotina recebe
+    O Código da Campanha
+    O Código do Premio
+    Quantidade de Grupos ~ se não informado 100, começando de 0 (zero)
+    Quantidade de Números por Grupo ~ se não informado 1000, começando de 0 (zero)
+
+
+    E gera os lotes de números no RealTime Database, em
+    /numerosDaSorte/<idCampanha>/<idPremio>
+*/
+
+/*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
@@ -15,7 +27,7 @@ const firestoreDAL = require('../../api/firestoreDAL');
 const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 
 // Geração dos lotes
-const createLotes = _ => {
+const createLotes = (qtdGrupos, qtdNumerosPorGrupo) => {
 
     const rand = global.randomNumber(7);
 
@@ -31,7 +43,7 @@ const createLotes = _ => {
 
     let numerosLote = [];
 
-    for (let l = 0; l < 100; l++) {
+    for (let l = 0; l < qtdGrupos; l++) {
         numerosLote.push(l);
     }
 
@@ -53,7 +65,7 @@ const createLotes = _ => {
         const codigoLote = `lote-${global.generateRandomId(6).toLowerCase()}-${l.toString().padStart(2, '0')}`;
 
         // Carrega os 1000 números em sequencial
-        for (let ns = 0; ns < 1000; ns++) {
+        for (let ns = 0; ns < qtdNumerosPorGrupo; ns++) {
             numerosDaSorte.push(ns);
         }
 
@@ -96,6 +108,9 @@ class Service extends eebService {
             const idPremio = this.parm.data.idPremio;
             const force = typeof this.parm.data.force === 'boolean' ? this.parm.data.force : false;
 
+            const qtdGrupos = this.parm.data.qtdGrupos || 100;
+            const qtdNumerosPorGrupo = this.parm.data.qtdNumerosPorGrupo || 1000;
+
             const result = {
                 success: true,
                 host: this.parm.host,
@@ -127,7 +142,7 @@ class Service extends eebService {
 
                     if (result.data) return null;
 
-                    result.data = createLotes();
+                    result.data = createLotes(qtdGrupos, qtdNumerosPorGrupo);
 
                     // Salva no RealTime
                     return admin.database().ref(result.path).set(result.data);
@@ -152,19 +167,23 @@ class Service extends eebService {
 
 exports.Service = Service;
 
-const call = (idCampanha, idPremio, force, request, response) => {
+const call = (data, request, response) => {
+
+    if (!data) throw new Error('invalid parms');
+    if (!data.idCampanha) throw new Error('Informe idCampanha');
+    if (!data.idPremio) throw new Error('Informe idCampanha');
+
+    data.qtdGrupos = data.qtdGrupos || 100;
+    data.qtdNumerosPorGrupo = data.qtdNumerosPorGrupo || 1000;
+    data.force = typeof data.force === 'boolean' ? data.force : false;
 
     const service = new Service(request, response, {
         name: 'generate-numeros-da-sorte-premio',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        data: {
-            idCampanha: idCampanha,
-            idPremio: idPremio,
-            force: force
-        },
+        data: data,
         attributes: {
-            idEmpresa: idCampanha
+            idEmpresa: data.idCampanha
         }
     });
 
@@ -174,18 +193,22 @@ const call = (idCampanha, idPremio, force, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-    const idCampanha = request.body.idCampanha;
-    const idPremio = request.body.idPremio;
-    const force = typeof request.body.force === 'boolean' ? request.body.force : false;
+    const data = {
+        idCampanha: request.body.idCampanha,
+        idPremio: request.body.idPremio,
+        qtdGrupos: request.body.qtdGrupos || 100,
+        qtdNumerosPorGrupo: request.body.qtdNumerosPorGrupo || 1000,
+        force: typeof request.body.force === 'boolean' ? request.body.force : false
+    }
 
     const host = global.getHost(request);
 
-    if (!idCampanha || !idPremio || host !== 'localhost') {
+    if (!data.idCampanha || !data.idPremio || host !== 'localhost') {
         return response.status(500).json({
             success: false,
             error: 'Invalid parms'
         })
     }
 
-    return call(idCampanha, idPremio, force, request, response);
+    return call(data, request, response);
 }

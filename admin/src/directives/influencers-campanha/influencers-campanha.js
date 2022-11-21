@@ -42,11 +42,11 @@ let ngModule = angular.module('directives.influencers-campanha', [])
             }
 
             $scope.isAllSelected = _ => {
-                return $scope.influencers.filter(f => { return f.selected; }).length === collectionEmpresas.collection.data.length;
+                return ($scope.influencers || []).filter(f => { return f.selected; }).length === collectionEmpresas.collection.data.length;
             }
 
             $scope.isSelected = idInfluencer => {
-                const pos = $scope.influencers.findIndex(f => { return f.idInfluencer === idInfluencer; });
+                const pos = ($scope.influencers || []).findIndex(f => { return f.idInfluencer === idInfluencer; });
 
                 return pos >= 0 ? $scope.influencers[pos].selected : false;
             }

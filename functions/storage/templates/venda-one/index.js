@@ -94,20 +94,96 @@ angular.module('app', [
         }
     })
 
+    .factory('httpCalls', function ($http, $q) {
+        const auth = getAuth();
 
-    .directive('formCliente', function (formClienteFactory) {
+        const getUrlEndPoint = url => {
+            const localUrl = 'http://localhost:5000';
+            const gatewayUrl = 'https://premios-fans-a8fj1dkb.uc.gateway.dev';
+
+            return (window.location.hostname === 'localhost' ? localUrl : gatewayUrl) + url;
+        }
+
+        const generateTitulo = data => {
+            const token = auth.currentUser ? auth.currentUser.accessToken : null;
+
+            return $q(function (resolve, reject) {
+
+                if (!token) {
+                    Swal.fire('Ooops!', 'Não foi possível iniciar a compra...', 'error');
+                    return reject();
+                }
+
+                if (!data || !data.nome || !data.email || !data.celular || !data.cpf) {
+                    Swal.fire('Ooops!', 'Verifique seus dados...', 'error');
+                    return reject();
+                }
+
+                data = {
+                    idCampanha: _idCampanha,
+                    idInfluencer: _idInfluencer,
+                    nome: data.nome,
+                    email: data.email,
+                    celular: data.celular,
+                    cpf: data.cpf
+                };
+
+                $http({
+                    url: getUrlEndPoint('/api/eeb/v1/generate-titulo?async=false'),
+                    method: 'post',
+                    data: data,
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+
+                    .then(
+                        function (response) {
+                            Swal.fire('Título Gerado', `Código do Título: ${response.data.result.data.id}`, 'info');
+
+                            return resolve(response);
+                        },
+                        function (e) {
+                            Swal.fire('Ooops!', e.data.error, 'error');
+
+                            return reject(e);
+                        }
+                    );
+            })
+        }
+
+        return {
+            generateTitulo: generateTitulo
+        }
+
+    })
+
+    .directive('formCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope) {
+            controller: function (
+                $scope,
+                formClienteFactory,
+                httpCalls
+            ) {
+                $scope.titulo = {};
+
+                const send = _ => {
+                    httpCalls.generateTitulo($scope.titulo);
+                }
+
                 $scope.initDelegates = _ => {
                     formClienteFactory.delegate = {
                         showFormCliente: _ => {
                             $("#form-cliente").show();
+                        },
+                        send: _ => {
+                            return send();
                         }
                     }
                 }
             },
-            templateUrl: `/templates/teste-one/form-cliente.html?v=${version}`,
+            templateUrl: `/templates/venda-one/form-cliente.html?v=` + _version,
             link: function (scope) {
                 scope.initDelegates();
             }
@@ -126,14 +202,18 @@ angular.module('app', [
 
             $("#vl-total").show();
 
-            formClienteFactory.delegate.showFormCliente();
+            if (formClienteFactory && formClienteFactory.delegate && typeof formClienteFactory.delegate.showFormCliente === 'function')
+                formClienteFactory.delegate.showFormCliente();
         }
 
         $scope.openSell = _ => {
+
             if (!$scope.vlCompra) {
                 Swal.fire('Ooops!', 'Selecione uma quantidade de títulos desejada!', 'info');
                 return;
             }
+
+            formClienteFactory.delegate.send();
         }
 
 

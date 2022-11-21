@@ -14,12 +14,26 @@ const ngModule = angular.module('views.contratos-edit', [
 		collectionCampanhas,
 		appAuthHelper,
 		toastrFactory,
+		alertFactory,
 		blockUiFactory,
 		globalFactory,
 		$timeout,
 		$location,
 		premiosFansService
 	) {
+
+		/* não há nada mais apavorante do que alguem que acredita em sua própria luta, e é fanático por ela */
+
+		const _qtdGrupos = 100;
+		const _qtdNumerosPorGrupo = 1000;
+		const _qtdNumerosDaSortePorTitulo = 2;
+		const _vlTitulo = 10;
+		const _sorteio = {
+			ativo: false,
+			dtSorteio: null,
+			guidSorteio: globalFactory.guid(),
+			deleted: false
+		}
 
 		$scope.collectionCampanhas = collectionCampanhas;
 		$scope.idCampanha = $routeParams.id || null;
@@ -37,16 +51,15 @@ const ngModule = angular.module('views.contratos-edit', [
 
 			if (typeof $scope.campanha.ativo === 'undefined') $scope.campanha.ativo = false;
 
+			if ($scope.campanha.influencers.filter(f => { return f.selected; }).length === 0) {
+				alertFactory.error('Selecione um ou mais Influencers.');
+				return;
+			}
+
 			blockUiFactory.start();
 
 			collectionCampanhas.save($scope.campanha)
 				.then(saveResult => {
-
-					premiosFansService.generateTemplates({
-						data: { idCampanha: saveResult.campanha.id },
-						blockUi: false
-					});
-
 					$location.path('/campanhas');
 					blockUiFactory.stop();
 				})
@@ -57,6 +70,13 @@ const ngModule = angular.module('views.contratos-edit', [
 
 		}
 
+		const generateTemplates = _ => {
+			premiosFansService.generateTemplates({
+				data: { idCampanha: $scope.campanha.id },
+				blockUi: false
+			});
+		}
+
 		const showNavbar = _ => {
 
 			let nav = [
@@ -65,12 +85,23 @@ const ngModule = angular.module('views.contratos-edit', [
 					route: '/campanhas/'
 				},
 				{
-					id: 'save',
-					label: 'Salvar',
-					onClick: save,
-					icon: 'far fa-save'
+					id: 'generage',
+					label: 'Gerar Templates',
+					onClick: generateTemplates,
+					icon: 'fas fa-refresh'
 				}
 			];
+
+			if ($scope.campanha && !$scope.campanha.ativo) {
+				nav.push(
+					{
+						id: 'save',
+						label: 'Salvar',
+						onClick: save,
+						icon: 'far fa-save'
+					}
+				);
+			}
 
 			navbarTopLeftFactory.reset();
 			navbarTopLeftFactory.extend(nav);
@@ -140,6 +171,7 @@ const ngModule = angular.module('views.contratos-edit', [
 								label: 'Valor',
 								required: true
 							},
+							defaultValue: _vlTitulo,
 							type: 'reais',
 							className: 'col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6'
 						},
@@ -149,9 +181,34 @@ const ngModule = angular.module('views.contratos-edit', [
 								label: 'Números por Título',
 								required: true
 							},
-							defaultValue: 2,
+							defaultValue: _qtdNumerosDaSortePorTitulo,
 							type: 'integer',
 							className: 'col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6'
+						},
+					],
+					form: null
+				},
+				geracao: {
+					fields: [
+						{
+							key: 'qtdGrupos',
+							templateOptions: {
+								label: 'Grupos',
+								required: true
+							},
+							defaultValue: _qtdGrupos,
+							type: 'integer',
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+						},
+						{
+							key: 'qtdNumerosPorGrupo',
+							templateOptions: {
+								label: 'Números por Grupo',
+								required: true
+							},
+							defaultValue: _qtdNumerosPorGrupo,
+							type: 'integer',
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
 					],
 					form: null
@@ -159,11 +216,25 @@ const ngModule = angular.module('views.contratos-edit', [
 			};
 		}
 
+		$scope.qtdNumeros = _ => {
+			const qtdGrupos = $scope.campanha.qtdGrupos || 0;
+			const qtdNumerosPorGrupo = $scope.campanha.qtdNumerosPorGrupo || 0;
+
+			const total = (qtdGrupos * qtdNumerosPorGrupo) - 1;
+
+			return total;
+		}
+
 		const loadCampanha = idCampanha => {
 			collectionCampanhas.get(idCampanha)
 
 				.then(result => {
 					$scope.campanha = { ...result };
+
+					$scope.campanha.vlTitulo = $scope.campanha.vlTitulo || _vlTitulo;
+					$scope.campanha.qtdGrupos = $scope.campanha.qtdGrupos || _qtdGrupos;
+					$scope.campanha.qtdNumerosPorGrupo = $scope.campanha.qtdNumerosPorGrupo || _qtdNumerosPorGrupo;
+					$scope.campanha.qtdNumerosDaSortePorTitulo = $scope.campanha.qtdNumerosDaSortePorTitulo || _qtdNumerosDaSortePorTitulo;
 
 					showNavbar();
 
@@ -184,7 +255,16 @@ const ngModule = angular.module('views.contratos-edit', [
 
 						loadCampanha($scope.idCampanha);
 					} else {
-						$scope.campanha.guidCampanha = globalFactory.guid();
+						// New
+						$scope.campanha = {
+							guidCampanha: globalFactory.guid(),
+							qtdGrupos: _qtdGrupos,
+							qtdNumerosPorGrupo: _qtdNumerosPorGrupo,
+							qtdNumerosDaSortePorTitulo: _qtdNumerosDaSortePorTitulo,
+							vlTitulo: _vlTitulo,
+							influencers: [],
+							sorteios: [_sorteio]
+						};
 
 						initForms();
 						showNavbar();

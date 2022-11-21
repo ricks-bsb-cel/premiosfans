@@ -41,8 +41,21 @@ const ngModule = angular.module('collection.campanhas', [])
                             sorteios = promisesResult[2],
                             premios = promisesResult[3];
 
+                        if (!sorteios || sorteios.length === 0) {
+                            sorteios.push({
+                                ativo: false,
+                                idCampanha: campanha.id,
+                                guidSorteio: globalFactory.guid(),
+                                deleted: false,
+                                premios: []
+                            })
+                        }
+
                         campanha.influencers = influencers;
                         campanha.sorteios = globalFactory.sortArray(sorteios, 'dtSorteio_yyyymmdd');
+
+                        campanha.qtdGrupos = campanha.qtdGrupos || 100;
+                        campanha.qtdNumerosPorGrupo = campanha.qtdNumerosPorGrupo || 1000;
 
                         campanha.sorteios = campanha.sorteios.map(s => {
                             s.premios = premios
@@ -140,7 +153,9 @@ const ngModule = angular.module('collection.campanhas', [])
                 qtdNumerosDaSortePorTitulo: campanha.qtdNumerosDaSortePorTitulo,
                 qtdSorteios: 0,
                 qtdPremios: 0,
-                vlTotal: 0
+                vlTotal: 0,
+                qtdGrupos: campanha.qtdGrupos,
+                qtdNumerosPorGrupo: campanha.qtdNumerosPorGrupo
             };
 
             campanha.sorteios.forEach(s => {

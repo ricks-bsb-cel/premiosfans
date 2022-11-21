@@ -86,10 +86,12 @@ class Service extends eebService {
 
                     result.data.sorteiosPremios.forEach(s => {
                         promise.push(
-                            generateNumeroDaSortePremio.call(
-                                result.data.idCampanha,
-                                s.id
-                            )
+                            generateNumeroDaSortePremio.call({
+                                idCampanha: result.data.idCampanha,
+                                idPremio: s.id,
+                                qtdGrupos: result.data.campanha.qtdGrupos,
+                                qtdNumerosPorGrupo: result.data.campanha.qtdNumerosPorGrupo
+                            })
                         )
                     });
 
@@ -100,7 +102,7 @@ class Service extends eebService {
 
                     delete result.data.campanha;
 
-                    result.data.sorteiosPremios = result.data.sorteiosPremios.map(p=>{
+                    result.data.sorteiosPremios = result.data.sorteiosPremios.map(p => {
                         return {
                             idSorteio: p.idSorteio,
                             id: p.id

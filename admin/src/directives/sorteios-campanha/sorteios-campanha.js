@@ -12,7 +12,8 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
                 $scope.sorteios.push({
                     ativo: false,
                     dtSorteio: null,
-                    guidSorteio: globalFactory.guid()
+                    guidSorteio: globalFactory.guid(),
+                    deleted: false
                 })
             }
 
@@ -23,17 +24,12 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
             }
 
             $scope.delegate = {
-                add: function () {
-                    $scope.add();
-                }
-            }
-
-            $scope.delegate = {
                 clonarSorteio: sorteio => {
                     const s = {
                         ativo: false,
                         guidSorteio: globalFactory.guid(),
                         dtSorteio: null,
+                        deleted: false,
                         id: 'new'
                     };
 
@@ -47,6 +43,7 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
                             descricao: p.descricao,
                             guidPremio: globalFactory.guid(),
                             valor: p.valor,
+                            deleted: false,
                             id: 'new'
                         };
                     })
@@ -57,6 +54,9 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
                     $scope.sorteios = $scope.sorteios.filter(f => {
                         return f.guidSorteio !== sorteio.guidSorteio;
                     })
+                },
+                add: _ => {
+                    $scope.add();
                 }
             }
 

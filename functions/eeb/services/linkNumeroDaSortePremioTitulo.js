@@ -13,6 +13,7 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
+const collectionCampanha = firestoreDAL.campanhas();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
 // Receber no parametro um guidTitulo e idInfluencer (obrigatórios)
@@ -37,8 +38,6 @@ const findLote = path => {
         const ref = admin.database().ref(`${path}/lotes`);
         const query = ref.orderByChild('qtdDisponiveis').limitToLast(1);
 
-        console.info('Search:', path);
-
         return query.on('value', data => {
             data = data.val();
 
@@ -51,7 +50,12 @@ const findLote = path => {
     })
 }
 
-const getNumero = (path, idTitulo) => {
+const getNumero = (parm) => {
+    const path = parm.path,
+        idTitulo = parm.idTitulo,
+        gruposLength = parm.gruposLength,
+        NumerosPorGrupoLength = parm.NumerosPorGrupoLength;
+
     return new Promise((resolve, reject) => {
         const result = {};
 
@@ -70,7 +74,8 @@ const getNumero = (path, idTitulo) => {
 
                         if (pos >= 0) {
                             result.lote = data.codigo;
-                            result.numero = data.codigo.toString().padStart(2, '0') + data.numeros[pos].n.toString().padStart(3, '0');
+                            result.numero = data.codigo.toString().padStart(gruposLength, '0') +
+                                data.numeros[pos].n.toString().padStart(NumerosPorGrupoLength, '0');
                             data.numeros[pos].t = idTitulo;
                         }
                     }
@@ -163,7 +168,16 @@ class Service extends eebService {
                     result.idTitulo = result.data.premioTitulo.idTitulo;
                     result.path = `/numerosDaSorte/${result.idCampanha}/${result.idPremio}`;
 
-                    return getNumero(result.path, result.idTitulo);
+                    return collectionCampanha.getDoc(result.idCampanha);
+                })
+
+                .then(resultCampanha => {
+                    result.campanha = resultCampanha;
+
+                    result.gruposLength = (result.campanha.qtdGrupos - 1).toString().length;
+                    result.NumerosPorGrupoLength = (result.campanha.qtdNumerosPorGrupo - 1).toString().length;
+
+                    return getNumero(result);
                 })
 
                 .then(getNumeroResult => {

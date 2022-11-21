@@ -17,6 +17,8 @@ const collectionCampanhasSorteios = firestoreDAL.campanhasSorteios();
 const collectionTitulos = firestoreDAL.titulos();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
+const linkNumeroDaSorte = require('./linkNumeroDaSortePremioTitulo');
+
 /*
     generatePremioTitulo
     - Recebe idTitulo, idCampanha e idPremio
@@ -101,10 +103,10 @@ class Service extends eebService {
                     result.data.tituloPremio.uidComprador = result.data.titulo.uidComprador;
 
                     // Dados do Sorteio
-                    result.data.tituloPremio.sorteioDtSorteio = result.data.sorteio .dtSorteio;
-                    result.data.tituloPremio.sorteioDtSorteio_timestamp = result.data.sorteio .dtSorteio_timestamp;
-                    result.data.tituloPremio.sorteioDtSorteio_weak_day = result.data.sorteio .dtSorteio_weak_day;
-                    result.data.tituloPremio.sorteioDtSorteio_yyyymmdd = result.data.sorteio .dtSorteio_yyyymmdd;
+                    result.data.tituloPremio.sorteioDtSorteio = result.data.sorteio.dtSorteio;
+                    result.data.tituloPremio.sorteioDtSorteio_timestamp = result.data.sorteio.dtSorteio_timestamp;
+                    result.data.tituloPremio.sorteioDtSorteio_weak_day = result.data.sorteio.dtSorteio_weak_day;
+                    result.data.tituloPremio.sorteioDtSorteio_yyyymmdd = result.data.sorteio.dtSorteio_yyyymmdd;
 
                     global.setDateTime(result.data.tituloPremio, 'dtInclusao');
 
@@ -114,6 +116,17 @@ class Service extends eebService {
                 .then(saveResult => {
                     result.data.tituloPremio = saveResult;
 
+                    // Solicita o link com o número da sorte
+                    const promise = [];
+
+                    for (let n = 0; n < result.data.tituloPremio.qtdNumerosDaSortePorTitulo; n++) {
+                        promise.push(linkNumeroDaSorte.call(result.data.tituloPremio.id));
+                    }
+
+                    return Promise.all(promise);
+                })
+
+                .then(_ => {
                     result.data = { tituloPremio: result.data.tituloPremio };
 
                     return resolve(this.parm.async ? { success: true } : result);
