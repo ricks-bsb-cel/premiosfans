@@ -121,16 +121,14 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
         name: 'pagar-compra',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        noAuth: true, // Autenticação Obrigatória
-        data: data,
-        attributes: {
-            idEmpresa: 'all'
-        }
+        auth: eebAuthTypes.internal,
+        data: data
     });
 
     return service.init();

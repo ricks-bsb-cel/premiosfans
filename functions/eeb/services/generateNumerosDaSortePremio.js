@@ -168,6 +168,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
 
     if (!data) throw new Error('invalid parms');
     if (!data.idCampanha) throw new Error('Informe idCampanha');
@@ -182,9 +183,7 @@ const call = (data, request, response) => {
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         data: data,
-        attributes: {
-            idEmpresa: data.idCampanha
-        }
+        auth: eebAuthTypes.internal
     });
 
     return service.init();

@@ -301,18 +301,17 @@ const getFileContent = file => { // Responsável por carregar o conteúdo do arq
 exports.Service = Service;
 
 const call = (idTemplate, idInfluencer, idCampanha, request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
         name: 'generate-one-template',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
+        auth: eebAuthTypes.internal,
         data: {
             idTemplate: idTemplate,
             idInfluencer: idInfluencer,
             idCampanha: idCampanha
-        },
-        attributes: {
-            idEmpresa: idCampanha
         }
     });
 

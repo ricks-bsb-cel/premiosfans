@@ -46,14 +46,14 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
+
     const service = new Service(request, response, {
         name: 'test',
         async: request.query.async ? request.query.async === 'true' : false,
         debug: request.query.debug ? request.query.debug === 'true' : false,
         data: data,
-        attributes: {
-            idEmpresa: 'all'
-        }
+        auth: eebAuthTypes.superUser
     });
 
     return service.init();
@@ -61,5 +61,4 @@ const call = (data, request, response) => {
 
 exports.callRequest = (request, response) => {
     return call(request.body || {}, request, response)
-
 }

@@ -134,16 +134,16 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (idInfluencer, idCampanha, request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
+
     const service = new Service(request, response, {
         name: 'generate-templates',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
+        auth: eebAuthTypes.tokenNotAnonymous,
         data: {
             idInfluencer: idInfluencer,
             idCampanha: idCampanha
-        },
-        attributes: {
-            idEmpresa: idCampanha
         }
     });
 

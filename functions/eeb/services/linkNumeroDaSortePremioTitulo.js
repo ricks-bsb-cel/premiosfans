@@ -214,19 +214,17 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (idPremioTitulo, request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
         name: 'link-numero-da-sorte-premio-titulo',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        noAuth: true,
+        auth: eebAuthTypes.internal,
         ordered: true,
         orderingKey: idPremioTitulo,
         data: {
             idPremioTitulo: idPremioTitulo
-        },
-        attributes: {
-            idEmpresa: 'all'
         }
     });
 

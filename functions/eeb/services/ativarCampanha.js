@@ -127,6 +127,8 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
+
     if (!data.idCampanha) {
         throw new Error('invalid parm');
     }
@@ -135,11 +137,8 @@ const call = (data, request, response) => {
         name: 'ativar-campanha',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        noAuth: false,
         data: data,
-        attributes: {
-            idEmpresa: data.idCampanha
-        }
+        auth: eebAuthTypes.tokenNotAnonymous
     });
 
     return service.init();

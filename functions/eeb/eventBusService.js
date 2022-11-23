@@ -2,6 +2,9 @@
 
 // https://cloud.google.com/pubsub/docs/publisher
 // https://www.npmjs.com/package/@google-cloud/pubsub
+// https://cloud.google.com/nodejs/docs/reference/tasks/latest
+
+const admin = require("firebase-admin");
 
 const initFirebase = require("../initFirebase");
 const { PubSub } = require('@google-cloud/pubsub');
@@ -10,14 +13,30 @@ const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
 const helper = require('./eventBusServiceHelper');
 
-const users = require('../api/users/users');
+// check noAuth
+const _authType = {
+    noAuth: 1, // Pode ser executada livremente, sem nenhum tipo de token
+    internal: 2, // Deve ser disparada de outra rotina ou do PubSub. Se estiver em localhost, exige autenticação de SuperUsuári
+    token: 3, // Exige um token de autenticação (qualquer um)
+    tokenNotAnonymous: 4, // Exige um token de autenticação de usuário não anônimo
+    tokenAnonymous: 5, // Exige um token de autenticacação de usuário anônimo
+    superUser: 6 // Exige um token de autenticação de super usuário
+};
+
+const authTypeDesc = authType => {
+    let result = null;
+    Object.keys(_authType).forEach(k => {
+        if (_authType[k] === authType) result = k;
+    })
+    return result;
+}
 
 /*
 const pubSubRegion = 'us-central1-pubsub.googleapis.com:443';
 const pubSubClient = new PubSub({ apiEndpoint: pubSubRegion });
 */
-const pubSubClient = new PubSub();
 
+const pubSubClient = new PubSub();
 const topicsCache = [];
 
 /*
@@ -26,9 +45,95 @@ O eventBusService é um "envelope" de disparo de métodos utilizando o PubSub
 - A classe é reinstanciada pelo PubSub e executada de acordo com os parametros
 */
 
+const checkAuthentication = (request, response, authType) => {
+    return new Promise((resolve, reject) => {
+        const result = {
+            user_uid: 'public',
+            user_isAnonymous: true,
+            user_isSuperUser: false
+        };
+
+        if (typeof authType === 'undefined') return reject(new Error('Invalid authType'));
+
+        // Sem autenticação
+        if (authType === _authType.noAuth) return resolve(result);
+
+        // Libera Autenticação interna sem request (chamada interna)
+        if (authType === _authType.internal && !request) return resolve(result);
+
+        // Daqui em diante, é exigido um token
+        const token = helper.getUserTokenFromRequest(request, response);
+
+        if (!token) return reject(new Error('Token required'));
+
+        return admin.auth().verifyIdToken(token)
+
+            .then(userTokenDetails => {
+                const isAnonymous = userTokenDetails.provider_id === 'anonymous' || userTokenDetails.firebase.sign_in_provider === 'anonymous';
+                const isSuperUser = typeof userTokenDetails.superUser === 'boolean' ? userTokenDetails.superUser : false;
+
+                result.user_uid = userTokenDetails.uid;
+                result.user_isAnonymous = isAnonymous;
+                result.user_isSuperUser = isSuperUser;
+
+                switch (authType) {
+                    case _authType.noAuth:
+                        return resolve(result);
+
+                    case _authType.internal:
+                        if (isSuperUser) {
+                            return resolve(result);
+                        } else {
+                            return reject(new Error(`Request for internal auth calls is for superuser only. Current user uid [${result.user_uid}]`));
+                        }
+
+                    case _authType.token:
+                        return resolve(result);
+
+                    case _authType.tokenNotAnonymous:
+                        if (isAnonymous) {
+                            return reject(new Error('Anonymous tokens not allowed'));
+                        } else {
+                            return resolve(result);
+                        }
+
+                    case _authType.tokenAnonymous:
+                        if (isAnonymous) {
+                            return resolve(result);
+                        } else {
+                            return reject(new Error('Only Anonymous tokens allowed'));
+                        }
+
+                    case _authType.superUser:
+                        if (isSuperUser && !isAnonymous) {
+                            return resolve(result);
+                        } else {
+                            return reject(new Error(`Only SuperUser allowed. Current user uid  ${result.user_uid}`));
+                        }
+
+                    default:
+                        return reject(new Error('Invalid auth mode'));
+
+                }
+
+            })
+
+            .catch(e => {
+                if (e.code === 'auth/id-token-expired') {
+                    return reject(new Error('Token expired'));
+                } else {
+                    return reject(e);
+                }
+            })
+
+    })
+}
+
 class eventBusService {
 
     constructor(req, resp, p, js) {
+        if (this.constructor === 'eventBusService') throw new Error("Can't instantiate abstract class eventBusService!");
+
         this.request = req && req.constructor.name === 'IncomingMessage' ? req : false;
         this.response = resp && resp.constructor.name === 'ServerResponse' ? resp : false;
 
@@ -41,22 +146,11 @@ class eventBusService {
         this.parm.method = js;
 
         this.parm.ordered = typeof this.parm.ordered !== 'boolean' ? false : this.parm.ordered;
-        this.parm.noAuth = typeof this.parm.noAuth !== 'boolean' ? false : this.parm.noAuth;
-        this.parm.authAnonymous = typeof this.parm.authAnonymous !== 'boolean' ? false : this.parm.authAnonymous;
         this.parm.orderingKey = this.parm.orderingKey || null;
         this.parm.attributes = this.parm.attributes || {};
 
         this.parm.topic = `eeb-${this.parm.name}`
         this.parm.topicSubscription = `eeb-subscription-${this.parm.name}`
-
-        // if (this.parm.noAuth) { this.parm.requireIdEmpresa = false; }
-
-        // Se chamada direta (fora do request, não usa autenticação)
-        if (!this.request && !this.response) { this.parm.noAuth = true; }
-
-        if (this.constructor === 'eventBusService') {
-            throw new Error("Can't instantiate abstract class eventBusService!");
-        }
     }
 
     getTopic() {
@@ -102,48 +196,19 @@ class eventBusService {
                 })
 
                 .then(validateResult => {
-
-                    const host = helper.getHost(this.request);
-
                     this.parm = validateResult;
                     this.parm.serviceId = this.parm.serviceId || uuidv4();
+                    this.parm.authDescription = authTypeDesc(this.parm.auth);
 
-                    if (host) {
-                        this.parm.host = host;
-                    }
+                    if (this.parm.delay > 0 && !this.parm.async) throw new Error('Chamadas com delay tem que ser assincronas (async = true)');
 
-                    if (this.parm.noAuth) {
-                        return null;
-                    } else {
-                        const token = helper.getUserTokenFromRequest(this.request, this.response);
-
-                        if (!token) {
-                            throw new Error(`Invalid auth`);
-                        }
-
-                        return users.getUserInfoWithToken(token);
-                    }
+                    return checkAuthentication(this.request, this.response, this.parm.auth);
                 })
 
                 .then(userInfoResult => {
+                    this.parm = { ...this.parm, ...userInfoResult };
 
-                    if (userInfoResult) {
-                        this.parm.attributes.uid = userInfoResult.data.uid;
-
-                        if (userInfoResult.data.isAnonymous && !this.parm.authAnonymous) {
-                            throw new Error(`O usuário ${userInfoResult.data.uid} é anonimo e não tem acesso a este endpoint`);
-                        }
-
-                        if (
-                            !userInfoResult.data.isAnonymous &&
-                            !this.parm.authAnonymous &&
-                            this.parm.attributes.idEmpresa &&
-                            !userInfoResult.data.superUser &&
-                            !userInfoResult.data.idsEmpresas.includes(this.parm.attributes.idEmpresa)
-                        ) {
-                            throw new Error(`O usuário ${userInfoResult.data.uid} não tem acesso à empresa ${this.parm.attributes.idEmpresa}`);
-                        }
-                    }
+                    this.parm.attributes.user_uid = userInfoResult.user_uid;
 
                     // Dispara de acordo com o o tipo.
                     if (this.parm.async) { // Async... envia para o Pub/Sub
@@ -151,7 +216,6 @@ class eventBusService {
                     } else { // Sync... executa imediatamente
                         return this._startRun();
                     }
-
                 })
 
                 .then(startResult => {
@@ -205,11 +269,6 @@ class eventBusService {
                     publishData.attributes[k] = publishData.attributes[k].toString();
                 }
             });
-
-            // Se houver idEmpresa em data, adiciona attributes
-            if (this.parm.data && this.parm.data.idEmpresa) {
-                publishData.attributes.idEmpresa = this.parm.data.idEmpresa;
-            }
 
             const topic = this.getTopic();
 
@@ -315,12 +374,18 @@ const eventBusServiceParmSchema = _ => {
             topicSubscription: Joi.string().required(),
             async: Joi.boolean().default(false),
             debug: Joi.boolean().default(false),
-            noAuth: Joi.boolean().default(false),
-            authAnonymous: Joi.boolean().default(false),
             ordered: Joi.boolean().default(false),
-            orderingKey: Joi.string().allow(null)
-            // requireIdEmpresa: Joi.boolean().default(true)
+            orderingKey: Joi.string().allow(null),
+            delay: Joi.number().integer().min(0).default(0),
+            auth: Joi.number().integer().min(1).max(6).required() // Tipo de Autenticação
         });
+
+    /*
+    Chamadas do tipo internal tem as seguintes características
+        - Não precisam de autenticação (noAuth tem que ser true)
+        - Podem ser disparadas apenas de outras rotinas
+        - Se disparada de LocalHost, exige token de autenticação de um SuperUser
+    */
 
     return schema;
 }
@@ -392,4 +457,5 @@ const createSubscription = (topic, subscription, method, ordered) => {
 }
 
 exports.abstract = eventBusService;
+exports.authType = _authType;
 

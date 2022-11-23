@@ -142,7 +142,7 @@ class Service extends eebService {
                         situacao: 'aguardando-pagamento',
                         guidCompra: global.guid(),
                         qtdTitulosCompra: result.qtdTitulos,
-                        uidComprador: this.parm.attributes.uid
+                        uidComprador: this.parm.attributes.user_uid
                     };
 
                     result.data.compra = {
@@ -165,7 +165,6 @@ class Service extends eebService {
                 .then(resultTituloCompra => {
                     result.data.compra = resultTituloCompra;
 
-                    result.data.titulo.uidComprador = this.parm.attributes.uid;
                     result.data.titulo.qtdPremios = result.data.campanhaPremios.length;
                     result.data.titulo.qtdNumerosDaSortePorTitulo = result.data.campanha.qtdNumerosDaSortePorTitulo;
                     result.data.titulo.campanhaNome = result.data.campanha.titulo;
@@ -222,16 +221,14 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
+
     const service = new Service(request, response, {
         name: 'generate-titulo',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        noAuth: false, // Autenticação Obrigatória
-        authAnonymous: true, // Pode ser usuário Anonimo
-        data: data,
-        attributes: {
-            idEmpresa: data.idCampanha
-        }
+        auth: eebAuthTypes.token,
+        data: data
     });
 
     return service.init();
