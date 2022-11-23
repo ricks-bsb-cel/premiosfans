@@ -26,8 +26,8 @@ import viewUsuarios from './usuarios/usuarios';
 import viewClientes from './clientes/clientes';
 
 import viewTitulos from './titulos/titulos';
-import viewTitulosCompras from './titulosCompras/titulosCompras';
-import viewTitulosPremios from './titulosPremios/titulosPremios';
+import viewTitulosCompras from './titulos-compras/titulos-compras';
+import viewTitulosPremios from './titulos-premios/titulos-premios';
 
 let ngModule = angular.module('views', [
 	viewAdmConfigPath.name,

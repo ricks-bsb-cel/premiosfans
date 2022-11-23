@@ -13,8 +13,6 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
-const checkPremioTitulo = require('./checkPremioTitulo');
-
 const collectionCampanha = firestoreDAL.campanhas();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
@@ -199,13 +197,6 @@ class Service extends eebService {
                 .then(_ => {
                     delete result.premio;
 
-                    // Solicita Verificação do PremioTitulo
-                    return checkPremioTitulo.call({
-                        idPremioTitulo: result.data.idPremioTitulo
-                    });
-                })
-
-                .then(_ => {
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 

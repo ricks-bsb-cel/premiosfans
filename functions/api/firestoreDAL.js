@@ -302,6 +302,6 @@ exports.titulosPremios = _ => {
     return new collectionClass('titulosPremios');
 }
 
-exports.titulosCompras = _ =>{
+exports.titulosCompras = _ => {
     return new collectionClass('titulosCompras');
 }

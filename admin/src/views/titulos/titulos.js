@@ -21,13 +21,15 @@ const ngModule = angular.module('views.titulos', [
 			run: function (termo) {
 
 				var attrFilter = {
-					filter: [
-						{ field: "idCampanha", operator: "==", value: $routeParams.idCampanha }
-					]
+					filter: []
 				};
 
+				if ($routeParams.idCampanha) {
+					attrFilter.filter.push({ field: "idCampanha", operator: "==", value: $routeParams.idCampanha });
+				}
+
 				if (termo) {
-					attrFilter.filter.push({ field: "keywords", operator: "array-contains ", value: termo });
+					attrFilter.filter.push({ field: "keywords", operator: "array-contains", value: termo });
 				} else {
 					attrFilter.limit = 60;
 					toastrFactory.info('Apenas os primeiros ' + attrFilter.limit + ' registros serão apresentados... Informe um termo de pesquisa para buscar dados mais específicos.');

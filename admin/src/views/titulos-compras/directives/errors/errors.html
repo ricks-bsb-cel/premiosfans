@@ -1,0 +1,45 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Erros ~
+        <small style="font-size: 0.5em;">Compra ID <span class="monospace">{{$ctrl.tituloCompra.id}}</span></small>
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="row">
+        <div class="col-12" ng-if="$ctrl.tituloCompra.errors.length">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 10px;">#</th>
+                        <th style="width: 60px;">Collection</th>
+                        <th>Detalhes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="e in $ctrl.tituloCompra.errors">
+                        <td>{{$index + 1}}</td>
+                        <td>{{e.collection}}</td>
+                        <td ng-bind-html="e.detalhes_html | unsafe">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-12">
+            <b>Total de Erros:</b>
+            {{$ctrl.tituloCompra.errorsQtd}}
+            <br />
+            <b>Data da Validação:</b>
+            {{$ctrl.tituloCompra.errosDtCheck}}
+            <br />
+            <b>Data de Execução:</b>
+            {{$ctrl.tituloCompra.dtPagamento}}
+            <br />
+            <b>Data de Inclusão:</b>
+            {{$ctrl.tituloCompra.dtInclusao}}
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" type="button" ng-click="$ctrl.close()">Fechar</button>
+</div>

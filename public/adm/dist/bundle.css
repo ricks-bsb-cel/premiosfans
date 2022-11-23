@@ -228,6 +228,10 @@
   text-align: center;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .monospace {
   font-family: monospace;
 }
