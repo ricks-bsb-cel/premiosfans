@@ -9,23 +9,23 @@
             Preenche direitinho, se não como vamos te encontrar quando você ganhar?
         </h3>
     </hgroup>
-    <form form="form" ng-controller="formClienteController" novalidate>
+    <form form="form" ng-controller="formClienteController" autocomplete="on" novalidate>
         <div class="row">
             <label class="col-md-6" for="nome">
                 Nome *
-                <input type="text" ng-model="titulo.nome" name="nome" placeholder="Nome completo">
+                <input type="text" ng-model="titulo.nome" name="name" autocomplete="name" placeholder="Nome completo">
             </label>
 
             <label class="col-md-6" for="email">
                 Email *
-                <input type="text" ng-model="titulo.email" name="email" placeholder="Seu melhor email">
+                <input type="text" ng-model="titulo.email" name="email" autocomplete="email" placeholder="Seu melhor email">
             </label>
         </div>
 
         <div class="row">
             <label class="col-md-6" for="celular">
                 Celular *
-                <input type="text" ng-model="titulo.celular" name="celular">
+                <input type="text" ng-model="titulo.celular" autocomplete="mobile" name="celular">
             </label>
 
             <label class="col-md-6" for="cpf">

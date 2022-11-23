@@ -21,12 +21,44 @@ angular.module('app', [
         init.init();
     })
 
-    .factory('init', function () {
+    .factory('global', function () {
+        const guid = _ => {
+            var d = new Date().getTime();
+            var d2 = (performance && performance.now && (performance.now() * 1000)) || 0;
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16;
+                if (d > 0) {
+                    r = (d + r) % 16 | 0;
+                    d = Math.floor(d / 16);
+                } else {
+                    r = (d2 + r) % 16 | 0;
+                    d2 = Math.floor(d2 / 16);
+                }
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+        };
+
+        const blockUi = _ => {
+            $('#wait').show();
+        }
+
+        const unblockUi = _ => {
+            $('#wait').hide()
+        }
+
+        return {
+            guid: guid,
+            blockUi: blockUi,
+            unblockUi: unblockUi
+        }
+    })
+
+    .factory('init', function (global) {
         let app = null;
 
         const init = _ => {
             app = initializeApp(firebaseConfig);
-
+            global.unblockUi();
             stateChanged();
         }
 
@@ -64,37 +96,7 @@ angular.module('app', [
 
     })
 
-    .factory('global', function () {
-        const guid = _ => {
-            var d = new Date().getTime();
-            var d2 = (performance && performance.now && (performance.now() * 1000)) || 0;
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = Math.random() * 16;
-                if (d > 0) {
-                    r = (d + r) % 16 | 0;
-                    d = Math.floor(d / 16);
-                } else {
-                    r = (d2 + r) % 16 | 0;
-                    d2 = Math.floor(d2 / 16);
-                }
-                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            });
-        };
-
-        return {
-            guid: guid
-        }
-    })
-
-    .factory('formClienteFactory', function () {
-        let delegate = {};
-
-        return {
-            delegate: delegate
-        }
-    })
-
-    .factory('httpCalls', function ($http, $q) {
+    .factory('httpCalls', function ($http, $q, global) {
         const auth = getAuth();
 
         const getUrlEndPoint = url => {
@@ -119,13 +121,15 @@ angular.module('app', [
                     return reject();
                 }
 
+                global.blockUi();
+
                 data = {
                     idCampanha: _idCampanha,
                     idInfluencer: _idInfluencer,
                     nome: data.nome,
                     email: data.email,
-                    celular: data.celular,
-                    cpf: data.cpf,
+                    celular: data.celular.replace(/\D/g, ""),
+                    cpf: data.cpf.replace(/\D/g, ""),
                     qtdTitulos: data.qtdTitulos
                 };
 
@@ -140,11 +144,13 @@ angular.module('app', [
 
                     .then(
                         function (response) {
+                            global.unblockUi();
                             Swal.fire('Título Gerado', `Código da Compra: ${response.data.result.data.compra.id}`, 'info');
 
                             return resolve(response);
                         },
                         function (e) {
+                            global.unblockUi();
                             Swal.fire('Ooops!', e.data.error, 'error');
 
                             return reject(e);
@@ -159,6 +165,14 @@ angular.module('app', [
 
     })
 
+    .factory('formClienteFactory', function () {
+        let delegate = {};
+
+        return {
+            delegate: delegate
+        }
+    })
+
     .directive('formCliente', function () {
         return {
             restrict: 'E',
@@ -167,6 +181,8 @@ angular.module('app', [
                 formClienteFactory,
                 httpCalls
             ) {
+                let element = null;
+
                 $scope.titulo = {};
 
                 const send = qtdTitulos => {
@@ -174,18 +190,30 @@ angular.module('app', [
                     httpCalls.generateTitulo($scope.titulo);
                 }
 
-                $scope.initDelegates = _ => {
+                const initMasks = _ => {
+                    const eCpf = element.find('input[name="cpf"]'),
+                        eCelular = element.find('input[name="celular"]');
+
+                    VMasker(eCpf).maskPattern("999.999.999-99");
+                    VMasker(eCelular).maskPattern("(99) 9 9999-9999)");
+                }
+
+                $scope.initDelegates = e => {
+                    element = e;
+
                     formClienteFactory.delegate = {
                         showFormCliente: _ => {
                             $("#form-cliente").show();
+                            initMasks();
                         },
                         send: send
                     }
                 }
+
             },
             templateUrl: `/templates/venda-one/form-cliente.html?v=` + _version,
-            link: function (scope) {
-                scope.initDelegates();
+            link: function (scope, element) {
+                scope.initDelegates(element);
             }
         };
 
