@@ -195,7 +195,7 @@ angular.module('app', [
                         eCelular = element.find('input[name="celular"]');
 
                     VMasker(eCpf).maskPattern("999.999.999-99");
-                    VMasker(eCelular).maskPattern("(99) 9 9999-9999)");
+                    VMasker(eCelular).maskPattern("(99) 9 9999-9999");
                 }
 
                 $scope.initDelegates = e => {

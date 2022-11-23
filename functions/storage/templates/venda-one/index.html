@@ -42,12 +42,30 @@
     <!-- https://icons.getbootstrap.com/ -->
 
     <link rel="stylesheet" href="/templates/venda-one/custom.css?v={{version}}">
+
+    <style>
+        .wait{
+            background: rgba(0,0,0,0.4);
+            position: fixed;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            cursor: wait;
+        }
+
+        .wait svg{
+            background: transparent;
+            position: fixed;
+            width: 120px;
+            height: 120px;
+            top: calc(50% - 60px);
+            left: calc(50% - 60px);
+        }
+    </style>
+
 </head>
 
 <body ng-controller="mainController">
-
-  
-
 
     <nav id="top" class="container-fluid">
         <ul>

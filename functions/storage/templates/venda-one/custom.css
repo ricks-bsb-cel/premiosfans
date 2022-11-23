@@ -5,24 +5,6 @@
     --border-radius: 0;
 }
 
-.wait{
-    background: rgba(0,0,0,0.4);
-    position: fixed;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    cursor: wait;
-}
-
-.wait svg{
-    background: transparent;
-    position: fixed;
-    width: 120px;
-    height: 120px;
-    top: calc(50% - 60px);
-    left: calc(50% - 60px);
-}
-
 html {
     scroll-behavior: smooth;
 }
