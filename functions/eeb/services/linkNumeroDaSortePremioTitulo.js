@@ -3,8 +3,11 @@
 const admin = require('firebase-admin');
 const path = require('path');
 const eebService = require('../eventBusService').abstract;
-const global = require("../../global");
 const Joi = require('joi');
+
+/*
+Esta rotina roda em fila para idPremios iguais!
+*/
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
@@ -27,6 +30,7 @@ const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
 const linkNumeroDaSorteSchema = _ => {
     const schema = Joi.object({
+        idPremio: Joi.string().token().min(18).max(22).required(),
         idPremioTitulo: Joi.string().token().min(18).max(22).required()
     });
 
@@ -135,6 +139,34 @@ const updatePremioTitulo = async (idPremioTitulo, numeroDaSorte) => {
     }
 }
 
+/*
+Incrementa o contado de PremiosGerados no Titulo
+O contador é ativado somente quando o Premios está completamente gerado e com
+Seus números da sorte preenchidos corretamente
+*/
+const incrementQtdPremiosGerados = async (idTitulo) => {
+    const tituloRef = admin.firestore().collection("titulos").doc(idTitulo);
+
+    try {
+        await admin.firestore().runTransaction(async t => {
+            const doc = await t.get(tituloRef);
+
+            const qtdPremiosGerados = (doc.data().qtdPremiosGerados || 0) + 1;
+
+            await t.update(tituloRef, {
+                qtdPremiosGerados: qtdPremiosGerados
+            });
+
+            return true;
+        });
+    } catch (e) {
+        console.error(e);
+
+        return false;
+    }
+}
+
+
 class Service extends eebService {
 
     constructor(request, response, parm) {
@@ -195,6 +227,10 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
+                    return incrementQtdPremiosGerados(qtdPremiosGerados);
+                })
+
+                .then(_ => {
                     delete result.premio;
 
                     return resolve(this.parm.async ? { success: true } : result);
@@ -213,8 +249,12 @@ class Service extends eebService {
 
 exports.Service = Service;
 
-const call = (idPremioTitulo, request, response) => {
+const call = (idPremio, idPremioTitulo, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
+
+    // O orderingKey é o idPremio.
+    // Caso mais do que uma solicitação de link do número tenha o mesmo
+    // idPremio, o pedido será enfileirado no PubSub (e não executado em paralelo)
 
     const service = new Service(request, response, {
         name: 'link-numero-da-sorte-premio-titulo',
@@ -222,8 +262,9 @@ const call = (idPremioTitulo, request, response) => {
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,
         ordered: true,
-        orderingKey: idPremioTitulo,
+        orderingKey: idPremio,
         data: {
+            idPremio: idPremio,
             idPremioTitulo: idPremioTitulo
         }
     });
@@ -234,16 +275,15 @@ const call = (idPremioTitulo, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
+    const idPremio = request.body.idPremio || null;
     const idPremioTitulo = request.body.idPremioTitulo || null;
 
-    const host = global.getHost(request);
-
-    if (!idPremioTitulo || host !== 'localhost') {
+    if (!idPremio || !idPremioTitulo) {
         return response.status(500).json({
             success: false,
             error: 'Invalid parms'
         })
     }
 
-    return call(idPremioTitulo, request, response);
+    return call(idPremio, idPremioTitulo, request, response);
 }

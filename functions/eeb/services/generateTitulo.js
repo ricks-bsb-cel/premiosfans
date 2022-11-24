@@ -127,7 +127,7 @@ class Service extends eebService {
 
                     result.data.campanhaInfluencer = result.data.campanhaInfluencer[0];
 
-                    // Registro da Compra
+                    // Registro da Compra (tituloCompra)
                     result.data.compra = {
                         idCampanha: result.data.titulo.idCampanha,
                         idInfluencer: result.data.titulo.idInfluencer,
@@ -173,6 +173,7 @@ class Service extends eebService {
                     result.data.titulo.campanhaVlTitulo = result.data.campanha.vlTitulo;
                     result.data.titulo.campanhaQtdPremios = result.data.campanha.qtdPremios;
                     result.data.titulo.campanhaTemplate = result.data.campanha.template;
+                    result.data.titulo.uidComprador = this.parm.attributes.user_uid;
                     result.data.titulo.situacao = 'aguardando-pagamento';
 
                     result.data.titulo.idTituloCompra = result.data.compra.id;

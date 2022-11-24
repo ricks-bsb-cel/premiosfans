@@ -100,9 +100,9 @@ class Service extends eebService {
                     result.data.tituloPremio.premioValor = result.data.premio.valor;
                     result.data.tituloPremio.numerosDaSorte = [];
                     result.data.tituloPremio.qtdNumerosDaSortePorTitulo = result.data.titulo.qtdNumerosDaSortePorTitulo;
-                    result.data.tituloPremio.uidComprador = result.data.titulo.uidComprador;
                     result.data.tituloPremio.idTituloCompra = result.data.titulo.idTituloCompra;
                     result.data.tituloPremio.keywords = result.data.titulo.keywords;
+                    result.data.tituloPremio.uidComprador = result.data.titulo.uidComprador || null;
 
                     // Dados do Sorteio
                     result.data.tituloPremio.sorteioDtSorteio = result.data.sorteio.dtSorteio;
@@ -122,7 +122,12 @@ class Service extends eebService {
                     const promise = [];
 
                     for (let n = 0; n < result.data.tituloPremio.qtdNumerosDaSortePorTitulo; n++) {
-                        promise.push(linkNumeroDaSorte.call(result.data.tituloPremio.id));
+                        promise.push(
+                            linkNumeroDaSorte.call(
+                                result.data.tituloPremio.idPremio,
+                                result.data.tituloPremio.id
+                            )
+                        );
                     }
 
                     return Promise.all(promise);

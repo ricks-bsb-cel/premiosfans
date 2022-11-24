@@ -14,7 +14,8 @@ const ngModule = angular.module('views.titulos-compras', [
 		collectionTitulosCompras,
 		toastrFactory,
 		$routeParams,
-		titulosComprasErrorsFactory
+		titulosComprasErrorsFactory,
+		premiosFansService
 	) {
 
 		$scope.collectionTitulosCompras = collectionTitulosCompras;
@@ -34,6 +35,12 @@ const ngModule = angular.module('views.titulos-compras', [
 			}
 
 			$scope.collectionTitulosCompras.collection.startSnapshot(attrFilter);
+		}
+
+		$scope.pagar = tituloCompra => {
+			premiosFansService.pagarTituloCompra({
+				idTituloCompra: tituloCompra.id
+			})
 		}
 
 		$scope.filter = {

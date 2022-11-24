@@ -24,16 +24,18 @@
                                     <th class="campanha">Campanha</th>
                                     <th class="qtd center">Títulos</th>
                                     <th class="nome">Cliente</th>
-                                    <th class="cpf">CPF</th>
                                     <th class="erro center">Validação</th>
                                     <th class="situacao">Situação</th>
                                     <th class="dt-inclusao right">Dt.Inclusao</th>
+                                    <th class="actions right"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="c in collectionTitulosCompras.collection.data | orderBy: '-dtInclusao_js'">
-                                    <td class="id monospace">
-                                        {{c.id}}
+                                    <td class="id">
+                                        <small class="monospace">
+                                            {{c.id}}
+                                        </small>
                                     </td>
                                     <td class="campanha">
                                         {{c.campanhaNome}}
@@ -43,9 +45,6 @@
                                     </td>
                                     <td class="nome">
                                         {{c.nome}}
-                                    </td>
-                                    <td class="cpf">
-                                        {{c.cpf_formated}}
                                     </td>
                                     <td class="erro center">
                                         <small
@@ -70,6 +69,13 @@
                                     <td class="dt-inclusao right">
                                         {{c.dtInclusao_timestamp | ddmmyyyyhhmmss}}
                                     </td>
+                                    <td class="actions right">
+                                        <a  ng-if="c.situacao === 'aguardando-pagamento'"
+                                            class="btn btn-default btn-xs"
+                                            ng-click="pagar(c)"
+                                        >Pagar</a>
+                                    </td>
+                                </tr>
                                 </tr>
                             </tbody>
                         </table>
