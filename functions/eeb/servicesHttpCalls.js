@@ -24,6 +24,12 @@ api.post("/v1/dead-lettering", (request, response) => {
     initFirebase.call(deadLettering.pubSubDeadLetterReceiver, request, response);
 })
 
+// Tasks apontam para cá
+api.post("/v1/task-receiver/:method", (request, response) => {
+    const receiver = require('./eventBusServiceTaskReceiver');
+    initFirebase.call(receiver.taskReceiver, request, response);
+})
+
 // Serviços são definidos abaixo...
 api.get("/v1/test", (request, response) => {
     initFirebase.call(require('./services/test').callRequest, request, response);

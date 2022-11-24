@@ -249,13 +249,20 @@ exports.Service = Service;
 const call = (data, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
 
-    const service = new Service(request, response, {
+    const parm = {
         name: 'check-titulo-compra',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,
         data: data
-    });
+    }
+
+    if (data.delay) {
+        parm.delay = data.delay;
+        delete data.delay;
+    }
+
+    const service = new Service(request, response, parm);
 
     return service.init();
 }

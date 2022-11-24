@@ -41,7 +41,6 @@ const pubSubReceiver = (request, response) => {
         })
 
         .then(_ => {
-
             if (msgAlreadyProcessed) { return null; }
 
             helper.log('async-run-init', helper.logType.info, { method: parm.method, serviceId: parm.serviceId });
@@ -70,7 +69,6 @@ const pubSubReceiver = (request, response) => {
         })
 
         .catch(e => {
-
             helper.log('async-run-error', helper.logType.error, {
                 method: parm.method,
                 serviceId: parm.serviceId,

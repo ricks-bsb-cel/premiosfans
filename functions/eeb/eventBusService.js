@@ -8,10 +8,14 @@ const admin = require("firebase-admin");
 
 const initFirebase = require("../initFirebase");
 const { PubSub } = require('@google-cloud/pubsub');
+const { CloudTasksClient } = require('@google-cloud/tasks');
 
 const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
 const helper = require('./eventBusServiceHelper');
+
+const projectName = 'premios-fans';
+const projectLocation = 'us-central1';
 
 // check noAuth
 const _authType = {
@@ -212,7 +216,11 @@ class eventBusService {
 
                     // Dispara de acordo com o o tipo.
                     if (this.parm.async) { // Async... envia para o Pub/Sub
-                        return this._startPublish();
+                        if (this.parm.delay) {
+                            return this._sentToTask();
+                        } else {
+                            return this._startPublish();
+                        }
                     } else { // Sync... executa imediatamente
                         return this._startRun();
                     }
@@ -242,6 +250,61 @@ class eventBusService {
 
         })
 
+    }
+
+    _sentToTask() {
+        return new Promise((resolve, reject) => {
+            const client = new CloudTasksClient();
+            const parent = client.queuePath(projectName, projectLocation, this.parm.taskQueueName);
+
+            const payload = {
+                data: this.parm.data,
+                attributes: Object.assign(
+                    {
+                        topic: this.parm.topic,
+                        method: this.parm.method,
+                        serviceId: this.parm.serviceId
+                    },
+                    this.parm.attributes || {}
+                )
+            };
+
+            const task = {
+                httpRequest: {
+                    headers: { 'Content-Type': 'text/plain' },
+                    httpMethod: 'POST',
+                    body: Buffer.from(JSON.stringify(payload)),
+                    url: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/task-receiver/${this.parm.method}`
+                },
+                scheduleTime: {
+                    seconds: parseInt(this.parm.delay) + Date.now() / 1000
+                }
+            };
+
+            const request = {
+                parent: parent,
+                task: task
+            };
+
+            return client.createTask(request)
+                .then(createTaskResponse => {
+                    return resolve(createTaskResponse);
+                })
+                .catch(e => {
+                    if (e.code === 9) {
+                        return createTaskQueue(this.parm.taskQueueName);
+                    }
+
+                    return reject(e);
+                })
+                .then(result => {
+                    return resolve(result);
+                })
+                .catch(e => {
+                    return reject(e);
+                })
+
+        })
     }
 
     publish() {
@@ -377,6 +440,7 @@ const eventBusServiceParmSchema = _ => {
             ordered: Joi.boolean().default(false),
             orderingKey: Joi.string().allow(null),
             delay: Joi.number().integer().min(0).default(0),
+            taskQueueName: Joi.string().default('eeb'),
             auth: Joi.number().integer().min(1).max(6).required() // Tipo de Autenticação
         });
 
@@ -453,6 +517,40 @@ const createSubscription = (topic, subscription, method, ordered) => {
                 return reject(e);
             })
 
+    })
+}
+
+const createTaskQueue = (queueName) => {
+    return new Promise((resolve, reject) => {
+        const cloudTasks = require('@google-cloud/tasks');
+        const client = new cloudTasks.CloudTasksClient();
+
+        const parm = {
+            parent: client.locationPath(projectName, projectLocation),
+            queue: {
+                name: client.queuePath(projectName, projectLocation, queueName),
+                appEngineHttpQueue: {
+                    appEngineRoutingOverride: {
+                        service: 'default'
+                    }
+                }
+            }
+        };
+
+        console.info(`Creating queue ${queueName}...`);
+
+        return client.createQueue(parm)
+            .then(_ => {
+                console.info(`Queue ${queueName} created successfully`);
+
+                return resolve({
+                    success: true,
+                    message: `Queue ${queueName} created successfully`
+                });
+            })
+            .catch(e => {
+                return reject(e);
+            })
     })
 }
 

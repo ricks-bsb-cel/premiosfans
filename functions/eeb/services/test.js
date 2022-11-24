@@ -48,13 +48,20 @@ exports.Service = Service;
 const call = (data, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
 
-    const service = new Service(request, response, {
+    const parm = {
         name: 'test',
         async: request.query.async ? request.query.async === 'true' : false,
         debug: request.query.debug ? request.query.debug === 'true' : false,
         data: data,
-        auth: eebAuthTypes.superUser
-    });
+        auth: eebAuthTypes.noAuth
+    };
+
+    if (data.delay) {
+        parm.delay = data.delay;
+        delete data.delay;
+    }
+
+    const service = new Service(request, response, parm);
 
     return service.init();
 }
