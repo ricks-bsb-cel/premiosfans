@@ -1,9 +1,12 @@
 "use strict";
 
+const admin = require('firebase-admin');
 const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 const Joi = require('joi');
+
+const FieldValue = require('firebase-admin').firestore.FieldValue;
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
@@ -52,7 +55,8 @@ class Service extends eebService {
             const result = {
                 success: true,
                 host: this.parm.host,
-                data: {}
+                data: {},
+                jaGerado: false
             };
 
             return premioTituloSchema().validateAsync(this.parm.data)
@@ -90,8 +94,8 @@ class Service extends eebService {
                 })
 
                 .then(resultTituloPremio => {
-
                     if (resultTituloPremio.length) {
+                        result.jaGerado = true;
                         return resultTituloPremio[0];
                     }
 
@@ -117,8 +121,12 @@ class Service extends eebService {
 
                 .then(saveResult => {
                     result.data.tituloPremio = saveResult;
+                })
 
-                    // Solicita o link com o número da sorte
+                .then(_ => {
+                    if (result.jaGerado) return null;
+
+                    // Solicita a geração do número da sorte para o premio
                     const promise = [];
 
                     for (let n = 0; n < result.data.tituloPremio.qtdNumerosDaSortePorTitulo; n++) {
@@ -131,6 +139,15 @@ class Service extends eebService {
                     }
 
                     return Promise.all(promise);
+                })
+
+                .then(_ => {
+                    if (result.jaGerado) return null;
+
+                    // Atualização do contador de Processos
+                    return admin.firestore().collection('titulosCompras').doc(result.data.tituloPremio.idTituloCompra).set({
+                        qtdTotalProcessosConcluidos: FieldValue.increment(1)
+                    }, { merge: true });
                 })
 
                 .then(_ => {

@@ -72,7 +72,8 @@ class Service extends eebService {
 
                     // Passa a campanha para ativa
                     const updateCampanha = {
-                        ativo: true
+                        ativo: true,
+                        qtdPremiosNumerosDaSorteGerados: 0
                     };
 
                     global.setDateTime(updateCampanha, 'dtAtivacao');

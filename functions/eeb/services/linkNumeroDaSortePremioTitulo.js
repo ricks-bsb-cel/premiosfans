@@ -5,6 +5,8 @@ const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
+const FieldValue = require('firebase-admin').firestore.FieldValue;
+
 /*
 Esta rotina roda em fila para idPremios iguais!
 */
@@ -18,6 +20,9 @@ const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionCampanha = firestoreDAL.campanhas();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
+const collectionTitulosCompras = firestoreDAL.titulosCompras();
+
+const checkTituloCompra = require('./checkTituloCompra');
 
 // Receber no parametro um guidTitulo e idInfluencer (obrigatórios)
 // Pesquisar e criar o título se não existir
@@ -59,6 +64,7 @@ const findLote = path => {
 }
 
 const getNumero = (parm) => {
+
     const path = parm.path,
         idTitulo = parm.idTitulo,
         gruposLength = parm.gruposLength,
@@ -115,57 +121,24 @@ const getNumero = (parm) => {
 const updatePremioTitulo = async (idPremioTitulo, numeroDaSorte) => {
     const premioTituloRef = admin.firestore().collection("titulosPremios").doc(idPremioTitulo);
 
-    try {
-        await admin.firestore().runTransaction(async t => {
-            const doc = await t.get(premioTituloRef);
+    await admin.firestore().runTransaction(async t => {
+        const doc = await t.get(premioTituloRef);
 
-            const numerosDaSorte = doc.data().numerosDaSorte || [];
-            const linksNumerosDaSorte = doc.data().linksNumerosDaSorte || [];
+        const numerosDaSorte = doc.data().numerosDaSorte || [];
+        const linksNumerosDaSorte = doc.data().linksNumerosDaSorte || [];
 
-            numerosDaSorte.push(numeroDaSorte.numero);
-            linksNumerosDaSorte.push(numeroDaSorte);
+        numerosDaSorte.push(numeroDaSorte.numero);
+        linksNumerosDaSorte.push(numeroDaSorte);
 
-            await t.update(premioTituloRef, {
-                numerosDaSorte: numerosDaSorte,
-                linksNumerosDaSorte: linksNumerosDaSorte
-            });
-
-            return true;
+        await t.update(premioTituloRef, {
+            numerosDaSorte: numerosDaSorte,
+            linksNumerosDaSorte: linksNumerosDaSorte
         });
-    } catch (e) {
-        console.error(e);
 
-        return false;
-    }
+        return true;
+    });
+
 }
-
-/*
-Incrementa o contado de PremiosGerados no Titulo
-O contador é ativado somente quando o Premios está completamente gerado e com
-Seus números da sorte preenchidos corretamente
-*/
-const incrementQtdPremiosGerados = async (idTitulo) => {
-    const tituloRef = admin.firestore().collection("titulos").doc(idTitulo);
-
-    try {
-        await admin.firestore().runTransaction(async t => {
-            const doc = await t.get(tituloRef);
-
-            const qtdPremiosGerados = (doc.data().qtdPremiosGerados || 0) + 1;
-
-            await t.update(tituloRef, {
-                qtdPremiosGerados: qtdPremiosGerados
-            });
-
-            return true;
-        });
-    } catch (e) {
-        console.error(e);
-
-        return false;
-    }
-}
-
 
 class Service extends eebService {
 
@@ -196,7 +169,7 @@ class Service extends eebService {
                 .then(resultPremioTitulo => {
                     result.data.premioTitulo = resultPremioTitulo;
 
-                    if (result.data.premioTitulo.numerosDaSorte.length >= result.data.premioTitulo.qtdNumerosDaSortePorTitulo) {
+                    if (result.data.premioTitulo.numerosDaSorte && result.data.premioTitulo.numerosDaSorte.length >= result.data.premioTitulo.qtdNumerosDaSortePorTitulo) {
                         result.jaGerado = true;
                         return true;
                     }
@@ -204,12 +177,15 @@ class Service extends eebService {
                     result.idCampanha = result.data.premioTitulo.idCampanha;
                     result.idPremio = result.data.premioTitulo.idPremio;
                     result.idTitulo = result.data.premioTitulo.idTitulo;
+
                     result.path = `/numerosDaSorte/${result.idCampanha}/${result.idPremio}`;
 
                     return collectionCampanha.getDoc(result.idCampanha);
                 })
 
                 .then(resultCampanha => {
+                    if (result.jaGerado) return true;
+
                     result.campanha = resultCampanha;
 
                     result.gruposLength = (result.campanha.qtdGrupos - 1).toString().length;
@@ -227,7 +203,37 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
-                    return incrementQtdPremiosGerados(qtdPremiosGerados);
+                    if (result.jaGerado) return true;
+
+                    // Atualização de Contadores
+                    return Promise.all([
+                        admin.firestore().collection('titulo').doc(result.data.premioTitulo.idTitulo).set({
+                            qtdNumerosGerados: FieldValue.increment(1)
+                        }, { merge: true }),
+                        admin.firestore().collection('titulosCompras').doc(result.data.premioTitulo.idTituloCompra).set({
+                            qtdNumerosGerados: FieldValue.increment(1),
+                            qtdTotalProcessosConcluidos: FieldValue.increment(1)
+                        }, { merge: true })
+                    ])
+
+                })
+
+                .then(_ => {
+
+                    // Verifica se tudo já foi gerado
+                    return collectionTitulosCompras.getDoc(result.data.premioTitulo.idTituloCompra);
+                })
+
+                .then(tituloCompra => {
+
+                    if (tituloCompra.qtdTotalProcessos === tituloCompra.qtdTotalProcessosConcluidos) {
+                        // Tudo foi gerado. Solicita a validação da compra.
+                        return checkTituloCompra.call({
+                            idTituloCompra: result.data.premioTitulo.idTituloCompra
+                        });
+                    } else {
+                        return null;
+                    }
                 })
 
                 .then(_ => {

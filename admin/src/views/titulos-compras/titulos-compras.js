@@ -19,12 +19,13 @@ const ngModule = angular.module('views.titulos-compras', [
 	) {
 
 		$scope.collectionTitulosCompras = collectionTitulosCompras;
+		$scope.idCampanha = $routeParams.idCampanha || null;
 
 		const startSnapshot = termo => {
 			var attrFilter = { filter: [] };
 
-			if ($routeParams.idCampanha) {
-				attrFilter.filter.push({ field: "idCampanha", operator: "==", value: $routeParams.idCampanha });
+			if ($scope.idCampanha) {
+				attrFilter.filter.push({ field: "idCampanha", operator: "==", value: $scope.idCampanha });
 			}
 
 			if (termo) {
@@ -39,6 +40,16 @@ const ngModule = angular.module('views.titulos-compras', [
 
 		$scope.pagar = tituloCompra => {
 			premiosFansService.pagarTituloCompra({
+				idTituloCompra: tituloCompra.id
+			})
+		}
+
+		$scope.percent = (max, qtd) => {
+			return Math.floor((qtd / max) * 100) + '%';
+		}
+
+		$scope.verificar = tituloCompra => {
+			premiosFansService.checkTituloCompra({
 				idTituloCompra: tituloCompra.id
 			})
 		}

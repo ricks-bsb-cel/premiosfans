@@ -98,6 +98,19 @@ class Service extends eebService {
                 .then(dataResult => {
                     result.data.idTituloCompra = dataResult.idTituloCompra;
 
+                    return collectionTituloCompra.set(result.data.idTituloCompra, {
+                        errorsExists: null,
+                        errorsQtd: null,
+                        errors: null,
+                        errosDtCheck: null,
+                        errosDtCheck_js: null,
+                        errosDtCheck_js_desc: null,
+                        errosDtCheck_timestamp: null
+                    }, true);
+                })
+
+                .then(_ => {
+
                     // Carrega os dados
                     return Promise.all([
                         collectionTituloCompra.getDoc(result.data.idTituloCompra),
@@ -107,17 +120,19 @@ class Service extends eebService {
                 })
 
                 .then(promiseResult => {
-                    result.data.tituloCompra = promiseResult[0];
-                    result.data.titulos = promiseResult[1];
-                    result.data.titulosPremios = promiseResult[2];
+                    result.data.tituloCompra = promiseResult[0]; // A compra que está sendo verificada
+                    result.data.titulos = promiseResult[1]; // Os títulos adquiridos na compra
+                    result.data.titulosPremios = promiseResult[2]; // Os premios gerados para a compra
 
-                    if (result.data.tituloCompra.qtdTitulosCompra !== result.data.titulos.length) {
-                        addError(`titulos`, `A quantidade de títulos solicitada na compra [${result.data.tituloCompra.qtdTitulosCompra}] não coincide com o total de títulos [${result.data.titulos.length}]`)
-                    }
-
+                    // Compra está paga?
                     if (result.data.tituloCompra.situacao !== 'pago') {
                         addError(`tituloCompra`, `A compra não está paga`);
                         return false;
+                    }
+
+                    // Quantidade de títulos gerados coincide com o pedido na compra?
+                    if (result.data.tituloCompra.qtdTitulosCompra !== result.data.titulos.length) {
+                        addError(`titulos`, `A quantidade de títulos solicitada na compra [${result.data.tituloCompra.qtdTitulosCompra}] não coincide com o total de títulos [${result.data.titulos.length}]`)
                     }
 
                     return Promise.all([
@@ -132,38 +147,52 @@ class Service extends eebService {
 
                     if (!promiseResult) return [];
 
-                    result.data.campanha = promiseResult[0];
-                    result.data.campanhasInfluencers = promiseResult[1];
-                    result.data.sorteios = promiseResult[2];
-                    result.data.premios = promiseResult[3];
+                    result.data.campanha = promiseResult[0]; // Campanha
+                    result.data.campanhasInfluencers = promiseResult[1]; // Influencers da Campanha
+                    result.data.sorteios = promiseResult[2]; // Sorteios da Campanha
+                    result.data.premios = promiseResult[3]; // Premios da Campanha
 
-                    result.data.qtdTitulos = result.data.titulos.length;
-                    result.data.qtdPremios = result.data.titulosPremios.length;
+                    result.data.qtdTitulos = result.data.titulos.length; // Total de títulos da compra
+                    result.data.qtdPremios = result.data.titulosPremios.length; // Total de premios da compra
                     result.data.situacao = result.data.tituloCompra.situacao;
                     result.data.dtInclusao = result.data.tituloCompra.dtInclusao;
                     result.data.dtPagamento = result.data.tituloCompra.dtPagamento;
 
-                    const promiseCheckNumeros = [];
+                    result.data.qtdPremiosCampanha = result.data.premios.length;
 
-                    const qtdPremios = result.data.premios.length;
+                    // Cada título gerado deve ter a mesma quantidade de premios da campanha
 
-                    if (result.data.campanha.qtdPremios !== qtdPremios) {
+                    // Quantidade premios informada na campanha é igual a guantidade de premios?
+                    if (result.data.campanha.qtdPremios !== result.data.qtdPremiosCampanha) {
                         addError(`campanha`, `A quantidade de premios informado na campanha [${result.data.campanha.qtdPremios}] não coincide com a quantidade de prêmios existente [${qtdPremios}]`);
                     }
 
+                    // Verifica cada título
                     result.data.titulos.forEach(t => {
+                        // Total de premios lançado para o título
                         const qtdPremiosTitulo = result.data.titulosPremios.filter(f => { return f.idTitulo === t.id; }).length;
 
-                        if (t.campanhaQtdPremios !== qtdPremios) {
+                        // A quantidade de premios informada no título é igual a quantidade lançada na campanha?
+                        if (t.campanhaQtdPremios !== result.data.qtdPremiosCampanha) {
                             addError(`titulos`, `A quantidade de premios [${t.campanhaQtdPremios}] do idTitulo [${t.id}] não coincide com a quantidade de premios informado na campanha [${qtdPremios}]`)
                         }
 
+                        // A quantidade de premios informada no título é igual ao total de premios?
                         if (t.campanhaQtdPremios !== qtdPremiosTitulo) {
                             addError(`titulos`, `A quantidade de premios [${t.campanhaQtdPremios}] do idTitulo [${t.id}] não coincide com a quantidade de premios informado no título [${qtdPremiosTitulo}]`)
                         }
+
+                        // A quantiade de premios no título é igual a quantidade de premios da campanha?
+                        if (qtdPremiosTitulo !== result.data.qtdPremiosCampanha) {
+                            addError(`titulos`, `A total de premios [${qtdPremiosTitulo}] do título [${t.id}] não coincide com o total de premios da campanha [${result.data.qtdPremiosCampanha}]`)
+                        }
+
                     })
 
+                    const promiseCheckNumeros = [];
+
                     result.data.titulosPremios.forEach(p => {
+                        // Quantidade de números da sorte do premio do título tem que coincidir com o informado na campanha
                         if (p.numerosDaSorte.length !== result.data.campanha.qtdNumerosDaSortePorTitulo) {
                             addError(`titulosPremios`, `A quantidade de números da sorte [${p.numerosDaSorte.length}] do idTitulo [${p.idTitulo}], idPremio [${p.idPremio}], idPremioTitulo [${p.id}] não coincide com a quantidade solicitada na campanha [${result.data.campanha.qtdNumerosDaSortePorTitulo}]`);
                         }

@@ -142,7 +142,18 @@ class Service extends eebService {
                         situacao: 'aguardando-pagamento',
                         guidCompra: global.guid(),
                         qtdTitulosCompra: result.qtdTitulos,
-                        uidComprador: this.parm.attributes.user_uid
+                        uidComprador: this.parm.attributes.user_uid,
+                        qtdNumerosGerados: 0,
+                        qtdTotalProcessos:
+                            ( // Cada título gera seus próprios premios
+                                result.qtdTitulos * result.data.campanha.qtdPremios
+                            ) +
+                            ( // Cada premio gerado no título gera X números da sorte
+                                result.qtdTitulos *
+                                result.data.campanha.qtdPremios *
+                                result.data.campanha.qtdNumerosDaSortePorTitulo
+                            ),
+                        qtdTotalProcessosConcluidos: 0
                     };
 
                     result.data.compra = {
@@ -162,6 +173,7 @@ class Service extends eebService {
                     return collectionTitulosCompras.add(result.data.compra);
 
                 })
+
                 .then(resultTituloCompra => {
                     result.data.compra = resultTituloCompra;
 
@@ -175,6 +187,7 @@ class Service extends eebService {
                     result.data.titulo.campanhaTemplate = result.data.campanha.template;
                     result.data.titulo.uidComprador = this.parm.attributes.user_uid;
                     result.data.titulo.situacao = 'aguardando-pagamento';
+                    result.data.titulo.qtdNumerosGerados = 0;
 
                     result.data.titulo.idTituloCompra = result.data.compra.id;
                     result.data.titulo.keywords = result.data.compra.keywords;

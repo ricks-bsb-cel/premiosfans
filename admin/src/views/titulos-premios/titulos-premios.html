@@ -2,10 +2,7 @@
 
     <search-filter filter="filter"></search-filter>
 
-    <wait-overlay 
-        ready="collectionTitulosPremios.collection.isReady()"
-        class="container-fluid"
-    >
+    <wait-overlay ready="collectionTitulosPremios.collection.isReady()" class="container-fluid">
         <div class="row">
 
             <div ng-if="collectionTitulosPremios.collection.isEmpty()" class="col-12">
@@ -20,38 +17,38 @@
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                    <th class="id-premio monospace">ID Prêmio</th>
-                                    <th class="descricao">Descricao</th>
+                                    <th class="descricao">Prêmio</th>
+                                    <th class="dt-sorteio">Dt.Sorteio</th>
                                     <th class="numeros">Números</th>
-                                    <th class="id-campanha monospace">ID Campanha</th>
                                     <th class="id-compra monospace">ID Compra</th>
                                     <th class="id-titulo monospace">ID Título</th>
                                     <th class="dt-inclusao right">Dt.Inclusao</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="c in collectionTitulosPremios.collection.data">
-                                    <td class="id-campanha monospace">
-                                        {{c.idCampanha}}
-                                    </td>
+                                <tr ng-repeat="c in collectionTitulosPremios.collection.data | orderBy:'sorteioDtSorteio_yyyymmdd'">
                                     <td class="descricao">
                                         {{c.premioDescricao}}
                                     </td>
+                                    <td class="dt-sorteio">
+                                        {{c.sorteioDtSorteio}}
+                                    </td>
                                     <td class="numeros">
-                                        <span ng-repeat="n in c.numerosDaSorte" class="badge bg-success mr-1">{{n}}</span>
-                                    </span>
+                                        <span ng-repeat="n in c.numerosDaSorte"
+                                            class="badge bg-success mr-1">{{n}}</span>
+                                        </span>
                                     <td class="id-compra monospace">
-                                        {{c.idTituloCompra}}
+                                        <small>
+                                            {{c.idTituloCompra}}
+                                        </small>
                                     </td>
                                     <td class="id-titulo monospace">
-                                        {{c.idTitulo}}
-                                    </td>
-                                    <td class="id-premio monospace">
-                                        {{c.idPremio}}
-                                    </td>
+                                        <small>
+                                            {{c.idTitulo}}
+                                        </small>
                                     </td>
                                     <td class="dt-inclusao right">
-                                        {{c.dtInclusao_timestamp | ddmmyyyyhhmmss}}
+                                        {{c.dtInclusao_timestamp | ddmmhhmm}}
                                     </td>
                                 </tr>
                             </tbody>

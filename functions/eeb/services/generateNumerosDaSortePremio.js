@@ -5,6 +5,8 @@ const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 
+const FieldValue = require('firebase-admin').firestore.FieldValue;
+
 /*
 Esta rotina recebe
     O Código da Campanha
@@ -146,6 +148,13 @@ class Service extends eebService {
 
                     // Salva no RealTime
                     return admin.database().ref(result.path).set(result.data);
+                })
+
+                .then(_ => {
+                    // Atualiza o contador de Geração de Números da Sorte dos Premios na Campanha
+                    return admin.firestore().collection('campanhas').doc(idCampanha).set({
+                        qtdPremiosNumerosDaSorteGerados: FieldValue.increment(1)
+                    }, { merge: true })
                 })
 
                 .then(_ => {

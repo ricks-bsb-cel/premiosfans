@@ -21,12 +21,14 @@
                             <thead>
                                 <tr>
                                     <th class="id monospace">ID</th>
-                                    <th class="campanha">Campanha</th>
-                                    <th class="qtd center">Títulos</th>
+                                    <th class="campanha" ng-if="!idCampanha">Campanha</th>
                                     <th class="nome">Cliente</th>
                                     <th class="erro center">Validação</th>
-                                    <th class="situacao">Situação</th>
-                                    <th class="dt-inclusao right">Dt.Inclusao</th>
+                                    <th class="situacao center">Situação</th>
+                                    <th class="qtd center">Títulos</th>
+                                    <th class="qtd-premios center">Prêmios</th>
+                                    <th class="numeros-gerados center">Nºs</th>
+                                    <th class="dt-inclusao right">Inclusao</th>
                                     <th class="actions right"></th>
                                 </tr>
                             </thead>
@@ -37,12 +39,10 @@
                                             {{c.id}}
                                         </small>
                                     </td>
-                                    <td class="campanha">
+                                    <td ng-if="!idCampanha" class="campanha">
                                         {{c.campanhaNome}}
                                     </td>
-                                    <td class="qtd center">
-                                        {{c.qtdTitulosCompra}}
-                                    </td>
+
                                     <td class="nome">
                                         {{c.nome}}
                                     </td>
@@ -63,17 +63,38 @@
                                             <span ng-if="!c.errorsExists">Ok</span>
                                         </small>
                                     </td>
-                                    <td class="situacao">
-                                        {{c.situacao}}
+                                    <td class="situacao center">
+                                        <span ng-if="c.situacao === 'aguardando-pagamento'" class="badge bg-warning">Pedido</span>
+                                        <span ng-if="c.situacao === 'pago'" class="badge bg-success">Pago</span>
+                                    </td>
+                                    <td class="qtd center">
+                                        {{c.qtdTitulosCompra}}
+                                    </td>
+                                    <td class="qtd-premios center">
+                                        {{c.qtdPremios}}
+                                    </td>
+                                    <td class="numeros-gerados center">
+                                        <span ng-if="c.qtdTotalProcessos===c.qtdTotalProcessosConcluidos">
+                                            {{c.qtdNumerosGerados}}
+                                        </span>
+
+                                        <small ng-if="c.qtdTotalProcessos!==c.qtdTotalProcessosConcluidos">
+                                            {{percent(c.qtdTotalProcessos,c.qtdTotalProcessosConcluidos)}}
+                                        </small>
                                     </td>
                                     <td class="dt-inclusao right">
-                                        {{c.dtInclusao_timestamp | ddmmyyyyhhmmss}}
+                                        {{c.dtInclusao_timestamp | ddmmhhmm}}
                                     </td>
                                     <td class="actions right">
                                         <a  ng-if="c.situacao === 'aguardando-pagamento'"
                                             class="btn btn-default btn-xs"
-                                            ng-click="pagar(c)"
-                                        >Pagar</a>
+                                            ng-click="pagar(c)">Pagar</a>
+                                        <a  ng-if="c.situacao === 'pago'"
+                                            class="btn btn-default btn-xs"
+                                            ng-click="verificar(c)">Verificar</a>
+                                        <a  ng-if="c.situacao === 'pago'"
+                                            class="btn btn-default btn-xs"
+                                            ng-href="#!/titulos-premios/idTituloCompra/{{c.id}}">Prêmios</a>
                                     </td>
                                 </tr>
                                 </tr>

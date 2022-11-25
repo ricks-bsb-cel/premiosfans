@@ -19,9 +19,9 @@
                                 <tr>
                                     <th class="id">ID Campanha</th>
                                     <th class="titulo">Título</th>
-                                    <th class="url">URL</th>
                                     <th class="template">Template</th>
-                                    <th class="ativa right">Ativa</th>
+                                    <th class="ativa center">Ativa?</th>
+                                    <th class="pronta center">Pronta?</th>
                                     <th class="actions right"></th>
                                 </tr>
                             </thead>
@@ -37,20 +37,17 @@
                                     <td class="titulo">
                                         {{c.titulo}}
                                     </td>
-                                    <td class="url">
-                                        {{c.url}}
-                                    </td>
                                     <td class="template">
                                         {{c.template}}
                                     </td>
-                                    <td class="ativa right">
+                                    <td class="ativa center">
                                         <badge-true-false value="c.ativo"></badge-true-false>
+                                    </td>
+                                    <td class="pronta center">
+                                        <badge-true-false value="c.ativo && c.qtdPremios===c.qtdPremiosNumerosDaSorteGerados"></badge-true-false>
                                     </td>
                                     <td class="actions right">
                                         <a class="btn btn-default btn-xs" ng-href="#!/titulos-compras/{{c.id}}">Compras</a>
-                                        <!--
-                                        <a class="btn btn-default btn-xs" ng-href="#!/titulos/{{c.id}}">Títulos</a>
-                                        -->
                                     </td>
                                 </tr>
                             </tbody>

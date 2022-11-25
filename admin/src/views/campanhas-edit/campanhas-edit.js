@@ -24,8 +24,8 @@ const ngModule = angular.module('views.contratos-edit', [
 
 		/* não há nada mais apavorante do que alguem que acredita em sua própria luta, e é fanático por ela */
 
-		const _qtdGrupos = 100;
-		const _qtdNumerosPorGrupo = 1000;
+		const _qtdGrupos = 1000;
+		const _qtdNumerosPorGrupo = 100;
 		const _qtdNumerosDaSortePorTitulo = 2;
 		const _vlTitulo = 10;
 		const _sorteio = {
@@ -77,6 +77,12 @@ const ngModule = angular.module('views.contratos-edit', [
 			});
 		}
 
+		const ativar = _ => {
+			premiosFansService.ativarCampanha({
+				idCampanha: $scope.campanha.id
+			});
+		}
+
 		const showNavbar = _ => {
 
 			let nav = [
@@ -101,6 +107,17 @@ const ngModule = angular.module('views.contratos-edit', [
 						icon: 'far fa-save'
 					}
 				);
+
+				if ($scope.campanha.id) {
+					nav.push(
+						{
+							id: 'ativar',
+							label: 'Ativar',
+							onClick: ativar,
+							icon: 'fa fa-check'
+						}
+					);
+				}
 			}
 
 			navbarTopLeftFactory.reset();

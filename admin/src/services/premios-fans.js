@@ -98,9 +98,93 @@ const ngModule = angular.module('services.premios-fans', [])
                     );
             }
 
+            const checkTituloCompra = attrs => {
+                attrs = attrs || { blockUi: false };
+
+                attrs.data = attrs.data || {};
+
+                attrs.data.idTituloCompra = attrs.idTituloCompra;
+
+                if (!attrs.data.idTituloCompra) throw new Error('Invalid parms');
+
+                if (attrs.blockUi) blockUiFactory.start();
+
+                $http({
+                    url: getUrlEndPoint('/api/eeb/v1/check-one-titulo-compra'),
+                    method: 'post',
+                    data: attrs.data,
+                    headers: {
+                        'Authorization': 'Bearer ' + appAuthHelper.token
+                    }
+                })
+
+                    .then(
+                        function (response) {
+                            if (attrs.blockUi) blockUiFactory.stop();
+
+                            toastrFactory.info(`A verificaçao da compra [${attrs.data.idTituloCompra}] está em andamento...`);
+
+                            if (typeof attrs.success === 'function') {
+                                attrs.success(response.data.data);
+                            }
+                        },
+                        function (e) {
+                            if (attrs.blockUi) blockUiFactory.stop();
+                            console.error(e);
+                            toastrFactory.error(`Erro solicitando a verificação da compra [${attrs.data.idTituloCompra}]...`);
+                            if (typeof attrs.error === 'function') {
+                                attrs.error(e);
+                            }
+                        }
+                    );
+            }
+
+            const ativarCampanha = attrs => {
+                attrs = attrs || { blockUi: false };
+
+                attrs.data = attrs.data || {};
+
+                attrs.data.idCampanha = attrs.idCampanha;
+
+                if (!attrs.data.idCampanha) throw new Error('Invalid parms');
+
+                if (attrs.blockUi) blockUiFactory.start();
+
+                $http({
+                    url: getUrlEndPoint('/api/eeb/v1/ativar-campanha'),
+                    method: 'post',
+                    data: attrs.data,
+                    headers: {
+                        'Authorization': 'Bearer ' + appAuthHelper.token
+                    }
+                })
+
+                    .then(
+                        function (response) {
+                            if (attrs.blockUi) blockUiFactory.stop();
+
+                            toastrFactory.info(`A campanha [${attrs.data.idCampanha}] está em ativação...`);
+
+                            if (typeof attrs.success === 'function') {
+                                attrs.success(response.data.data);
+                            }
+                        },
+                        function (e) {
+                            if (attrs.blockUi) blockUiFactory.stop();
+                            console.error(e);
+                            toastrFactory.error(`Erro solicitando ativação da campanha [${attrs.data.idCampanha}]...`);
+                            if (typeof attrs.error === 'function') {
+                                attrs.error(e);
+                            }
+                        }
+                    );
+            }
+
             return {
                 generateTemplates: generateTemplates,
-                pagarTituloCompra: pagarTituloCompra
+                pagarTituloCompra: pagarTituloCompra,
+                checkTituloCompra: checkTituloCompra,
+                ativarCampanha: ativarCampanha
             };
 
         });
