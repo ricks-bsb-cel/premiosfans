@@ -220,14 +220,17 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
+                    if (result.jaGerado) return true;
+
                     // Verifica se tudo já foi gerado
                     return collectionTitulosCompras.getDoc(result.data.premioTitulo.idTituloCompra);
                 })
 
                 .then(tituloCompra => {
+                    if (result.jaGerado) return true;
 
                     // Tudo foi gerado. Solicita a validação da compra.
-                    if (tituloCompra.qtdTotalProcessos === tituloCompra.qtdTotalPsrocessosConcluidos) {
+                    if (tituloCompra.qtdTotalProcessos === tituloCompra.qtdTotalProcessosConcluidos) {
                         return checkTituloCompra.call({
                             idTituloCompra: result.data.premioTitulo.idTituloCompra
                         });

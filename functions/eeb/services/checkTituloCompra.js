@@ -21,6 +21,8 @@ const collectionTitulo = firestoreDAL.titulos();
 const collectionTituloCompra = firestoreDAL.titulosCompras();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
+const dashboardData = require('./generateDashboardData');
+
 const tituloCompra = _ => {
     const schema = Joi.object({
         idTituloCompra: Joi.string().token().min(18).max(22).required()
@@ -248,8 +250,21 @@ class Service extends eebService {
 
                 .then(_ => {
 
-                    // Gera Estatísticas do Título
+                    // Gera Estatísticas (contadores) do Dashboard
+                    const counters = {
+                        qtdCompras: 1,
+                        qtdTitulos: result.data.tituloCompra.qtdTitulosCompra,
+                        vlTotal: result.data.tituloCompra.vlTotalCompra
+                    };
 
+                    return Promise.all([
+                        dashboardData.call({ path: `/${result.data.tituloCompra.idCampanha}/totalTitulosCompras`, data: counters }),
+                        dashboardData.call({ path: `/${result.data.tituloCompra.idCampanha}/titulosComprasDia/{date}`, data: counters }),
+                        dashboardData.call({ path: `/${result.data.tituloCompra.idCampanha}/titulosComprasDiaInfluencer/${result.data.tituloCompra.idInfluencer}/{date}`, data: counters }),
+                    ]);
+                })
+
+                .then(_ => {
                     // Simplifica o resultado
                     delete result.data.tituloCompra;
                     delete result.data.titulos;

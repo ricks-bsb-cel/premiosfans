@@ -8,8 +8,16 @@ const ngModule = angular.module('admin.formly.ng-selector-front-template', [])
             name: 'ng-selector-front-template',
             extends: 'input',
             templateUrl: 'ng-selector-front-template/ng-selector-front-template.html',
-            controller: function ($scope, collectionFrontTemplates) {
+            controller: function ($scope, appAuthHelper, collectionFrontTemplates) {
                 $scope.collectionFrontTemplates = collectionFrontTemplates;
+
+                appAuthHelper.ready()
+                    .then(_ => {
+                        $scope.collectionFrontTemplates.collection.startSnapshot({
+                            filter: [{ field: "ativo", operator: "==", value: true }]
+                        });
+                    })
+
             }
         };
 

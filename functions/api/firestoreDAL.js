@@ -38,7 +38,7 @@ class collectionClass {
 
             delete data.id;
 
-            doc.set(data, { merge: typeof merge === 'boolean' ? merge : true })
+            return doc.set(data, { merge: typeof merge === 'boolean' ? merge : true })
                 .then(_ => {
                     data.id = doc.id;
                     return resolve(data);
@@ -59,7 +59,7 @@ class collectionClass {
             delete data.id;
             global.setDateTime(data, 'dtInclusao');
 
-            doc.set(data)
+            return doc.set(data)
 
                 .then(_ => {
                     data.id = doc.id;
@@ -79,7 +79,7 @@ class collectionClass {
 
             const doc = admin.firestore().collection(this.collectionName).doc(id);
 
-            doc.delete()
+            return doc.delete()
                 .then(_ => {
                     return resolve();
                 })

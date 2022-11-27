@@ -10,8 +10,6 @@ https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
-const dashboardData = require('./generateDashboardData');
-
 const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionCampanhas = firestoreDAL.campanhas();
@@ -77,7 +75,6 @@ class Service extends eebService {
         return new Promise((resolve, reject) => {
 
             let promise;
-            const dashboarDataPromise = [];
 
             const result = {
                 success: true,
@@ -139,26 +136,27 @@ class Service extends eebService {
                         campanhaNome: result.data.campanha.titulo,
                         campanhaSubTitulo: result.data.campanha.subTitulo || '',
                         campanhaDetalhes: result.data.campanha.detalhes || '',
-                        campanhaVlTitulo: result.data.campanha.vlTitulo,
-                        campanhaQtdPremios: result.data.campanha.qtdPremios,
+                        campanhaVlTitulo: parseFloat(result.data.campanha.vlTitulo),
+                        campanhaQtdPremios: parseInt(result.data.campanha.qtdPremios),
                         campanhaTemplate: result.data.campanha.template,
                         situacao: 'aguardando-pagamento',
                         guidCompra: global.guid(),
-                        qtdTitulosCompra: result.qtdTitulos,
-                        vlTotalCompra: (result.qtdTitulos * result.data.campanha.vlTitulo).toFixed(2),
+                        qtdTitulosCompra: parseInt(result.qtdTitulos),
                         uidComprador: this.parm.attributes.user_uid,
                         qtdNumerosGerados: 0,
                         qtdTotalProcessos:
                             ( // Cada título gera seus próprios premios
-                                result.qtdTitulos * result.data.campanha.qtdPremios
+                                parseInt(result.qtdTitulos) * parseInt(result.data.campanha.qtdPremios)
                             ) +
                             ( // Cada premio gerado no título gera X números da sorte
-                                result.qtdTitulos *
-                                result.data.campanha.qtdPremios *
-                                result.data.campanha.qtdNumerosDaSortePorTitulo
+                                parseInt(result.qtdTitulos) *
+                                parseInt(result.data.campanha.qtdPremios) *
+                                parseInt(result.data.campanha.qtdNumerosDaSortePorTitulo)
                             ),
                         qtdTotalProcessosConcluidos: 0
                     };
+
+                    result.data.compra.vlTotalCompra = parseFloat((result.qtdTitulos * result.data.campanha.vlTitulo).toFixed(2));
 
                     result.data.compra = {
                         ...result.data.compra,
@@ -173,28 +171,6 @@ class Service extends eebService {
                     );
 
                     global.setDateTime(result.data.compra, 'dtInclusao');
-
-                    // Contador geral de Vendas
-                    dashboarDataPromise.push(
-                        dashboardData.call({
-                            path: `/${result.data.titulo.idCampanha}/totalTitulosCompras`,
-                            data: { qtdCompras: 1, qtdTitulos: result.qtdTitulos, vlTotal: result.data.compra.vlTotalCompra }
-                        })
-                    );
-
-                    dashboarDataPromise.push(
-                        dashboardData.call({
-                            path: `/${result.data.titulo.idCampanha}/titulosComprasDia/{date}`,
-                            data: { qtdCompras: 1, qtdTitulos: result.qtdTitulos, vlTotal: result.data.compra.vlTotalCompra }
-                        })
-                    );
-
-                    dashboarDataPromise.push(
-                        dashboardData.call({
-                            path: `/${result.data.titulo.idCampanha}/titulosComprasDiaInfluencer/${result.data.titulo.idInfluencer}/{date}`,
-                            data: { qtdCompras: 1, qtdTitulos: result.qtdTitulos, vlTotal: result.data.compra.vlTotalCompra }
-                        })
-                    );
 
                     return collectionTitulosCompras.add(result.data.compra);
 
@@ -245,11 +221,6 @@ class Service extends eebService {
                         titulos: resultTitulos
                     }
 
-                    // Estatísticas do Dashboard
-                    return Promise.all(dashboarDataPromise);
-                })
-
-                .then(_ => {
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 

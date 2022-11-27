@@ -21,6 +21,22 @@ const schema = _ => {
     return schema;
 }
 
+const increment = (original, value) => {
+    original = original || 0;
+    value = value || 0;
+
+    original = parseFloat(original);
+    value = parseFloat(value);
+
+    original = parseFloat((original + value).toFixed(2));
+
+    if (original - parseFloat(Math.floor(original).toFixed(2)) === 0) {
+        original = parseInt(original);
+    }
+
+    return original;
+}
+
 const updatePath = (parms) => {
     return new Promise((resolve, reject) => {
         const hoje = moment().tz("America/Sao_Paulo");
@@ -45,7 +61,7 @@ const updatePath = (parms) => {
             data = data || {};
 
             Object.keys(parms.data).forEach(k => {
-                data[k] = (data[k] || 0) + parms.data[k];
+                data[k] = increment(data[k], parms.data[k]);
             })
 
             result = {

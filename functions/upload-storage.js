@@ -138,7 +138,8 @@ const uploadTemplates = env => {
                             bucket: bucketName,
                             localPath: f.source,
                             storagePathDev: f.destinationDev.replace('/index.html', ''),
-                            data: f.data
+                            data: f.data,
+                            ativo: true
                         };
 
                         if (env === 'prod') {

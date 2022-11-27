@@ -146,7 +146,7 @@ const ngModule = angular.module('collection.campanhas', [])
                 guidCampanha: campanha.guidCampanha || globalFactory.guid(),
                 titulo: campanha.titulo,
                 subTitulo: campanha.subTitulo || null,
-                detalhe: campanha.detalhe || null,
+                detalhes: campanha.detalhes || null,
                 template: campanha.template,
                 url: campanha.url,
                 vlTitulo: campanha.vlTitulo,
@@ -162,7 +162,7 @@ const ngModule = angular.module('collection.campanhas', [])
                 result.qtdSorteios++;
                 s.premios.forEach(p => {
                     result.qtdPremios++;
-                    result.vlTotal = (parseFloat(result.vlTotal) + parseFloat(p.valor)).toFixed(2)
+                    result.vlTotal = parseFloat((parseFloat(result.vlTotal) + parseFloat(p.valor)).toFixed(2))
                 })
             })
 

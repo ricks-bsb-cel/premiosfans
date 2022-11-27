@@ -8,7 +8,7 @@ const ngModule = angular.module('collection.front-templates', [])
 
         const attr = {
             collection: 'frontTemplates',
-            autoStartSnapshot: true,
+            autoStartSnapshot: false,
             filterEmpresa: false
         };
         

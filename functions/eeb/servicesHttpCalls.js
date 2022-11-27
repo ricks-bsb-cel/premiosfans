@@ -93,6 +93,10 @@ api.post("/v1/generate-dashboard-data", (request, response) => {
     initFirebase.call(require('./services/generateDashboardData').callRequest, request, response);
 })
 
+api.post("/v1/purge-campanha", (request, response) => {
+    initFirebase.call(require('./services/purgeCampanha').callRequest, request, response);
+})
+
 const eeb = express();
 
 eeb.use(cors());

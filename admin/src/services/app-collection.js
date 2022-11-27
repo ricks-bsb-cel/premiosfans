@@ -28,9 +28,11 @@ const ngModule = angular.module('services.app-collection', [])
 
 			const getData = _ => {
 				var result = angular.copy(this.data);
+
 				if (onLoadFinishAttr && onLoadFinishAttr.orderBy) {
 					result = globalFactory.sortArray(result, onLoadFinishAttr.orderBy);
 				}
+				
 				return result;
 			}
 
