@@ -89,6 +89,10 @@ api.post("/v1/check-titulos-campanha", (request, response) => {
     initFirebase.call(require('./services/checkTitulosCampanha').callRequest, request, response);
 })
 
+api.post("/v1/generate-dashboard-data", (request, response) => {
+    initFirebase.call(require('./services/generateDashboardData').callRequest, request, response);
+})
+
 const eeb = express();
 
 eeb.use(cors());

@@ -79,21 +79,25 @@ const getNumero = (parm) => {
                 result.idLote = lote;
                 result.pathLote = `${path}/lotes/${lote}`;
 
-                return admin.database().ref(result.pathLote).transaction(data => {
+                const ref = admin.database().ref(result.pathLote);
+
+                return ref.transaction(data => {
+
+                    if (!data) throw new Error(`Nenhum lote localizado no path ${result.pathLote}`);
+
                     if (data.qtdDisponiveis && data.qtdDisponiveis > 0) {
                         data.qtdDisponiveis--;
                         data.qtdUtilizados++;
 
-                        const pos = data.numeros.findIndex(f => { return f.t === 0; });
+                        const pos = data.numeros.findIndex(f => {
+                            return f.t === 0;
+                        });
 
-                        if (pos >= 0) {
-                            result.lote = data.codigo;
-                            result.numero = data.codigo.toString().padStart(gruposLength, '0') +
-                                data.numeros[pos].n.toString().padStart(NumerosPorGrupoLength, '0');
-                            data.numeros[pos].t = idTitulo;
-                        } else {
-                            throw new Error('Lote esgotado. Nenhum número encontrado para ser utilizado.');
-                        }
+                        if (pos < 0) throw new Error('Lote esgotado. Nenhum número encontrado para ser utilizado.');
+
+                        result.lote = data.codigo;
+                        result.numero = data.codigo.toString().padStart(gruposLength, '0') + data.numeros[pos].n.toString().padStart(NumerosPorGrupoLength, '0');
+                        data.numeros[pos].t = idTitulo;
                     }
 
                     result.qtdDisponiveis = data.qtdDisponiveis;
@@ -104,9 +108,7 @@ const getNumero = (parm) => {
             })
 
             .then(transactionResult => {
-                if (!transactionResult.committed) {
-                    throw new Error('Transaction error...');
-                }
+                if (!transactionResult.committed) throw new Error('Transaction error...');
 
                 return resolve(result);
             })
@@ -207,7 +209,7 @@ class Service extends eebService {
 
                     // Atualização de Contadores
                     return Promise.all([
-                        admin.firestore().collection('titulo').doc(result.data.premioTitulo.idTitulo).set({
+                        admin.firestore().collection('titulos').doc(result.data.premioTitulo.idTitulo).set({
                             qtdNumerosGerados: FieldValue.increment(1)
                         }, { merge: true }),
                         admin.firestore().collection('titulosCompras').doc(result.data.premioTitulo.idTituloCompra).set({
@@ -215,19 +217,17 @@ class Service extends eebService {
                             qtdTotalProcessosConcluidos: FieldValue.increment(1)
                         }, { merge: true })
                     ])
-
                 })
 
                 .then(_ => {
-
                     // Verifica se tudo já foi gerado
                     return collectionTitulosCompras.getDoc(result.data.premioTitulo.idTituloCompra);
                 })
 
                 .then(tituloCompra => {
 
-                    if (tituloCompra.qtdTotalProcessos === tituloCompra.qtdTotalProcessosConcluidos) {
-                        // Tudo foi gerado. Solicita a validação da compra.
+                    // Tudo foi gerado. Solicita a validação da compra.
+                    if (tituloCompra.qtdTotalProcessos === tituloCompra.qtdTotalPsrocessosConcluidos) {
                         return checkTituloCompra.call({
                             idTituloCompra: result.data.premioTitulo.idTituloCompra
                         });

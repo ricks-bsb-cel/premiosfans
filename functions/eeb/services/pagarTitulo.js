@@ -64,6 +64,7 @@ class Service extends eebService {
                     };
 
                     global.setDateTime(result.data.updateTitulo, 'dtPagamento');
+                    global.setDateTime(result.data.updateTitulo, 'dtInicioGeracao');
 
                     return collectionTitulos.set(result.data.titulo.id, result.data.updateTitulo, true);
                 })

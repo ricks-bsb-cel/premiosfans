@@ -241,11 +241,14 @@ class Service extends eebService {
                     };
 
                     global.setDateTime(saveError, 'errosDtCheck');
+                    global.setDateTime(saveError, 'dtFinalGeracao');
 
                     return collectionTituloCompra.set(result.data.idTituloCompra, saveError, true);
                 })
 
                 .then(_ => {
+
+                    // Gera Estatísticas do Título
 
                     // Simplifica o resultado
                     delete result.data.tituloCompra;

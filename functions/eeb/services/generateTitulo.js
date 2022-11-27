@@ -10,6 +10,8 @@ https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
+const dashboardData = require('./generateDashboardData');
+
 const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionCampanhas = firestoreDAL.campanhas();
@@ -74,7 +76,8 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let promise
+            let promise;
+            const dashboarDataPromise = [];
 
             const result = {
                 success: true,
@@ -142,6 +145,7 @@ class Service extends eebService {
                         situacao: 'aguardando-pagamento',
                         guidCompra: global.guid(),
                         qtdTitulosCompra: result.qtdTitulos,
+                        vlTotalCompra: (result.qtdTitulos * result.data.campanha.vlTitulo).toFixed(2),
                         uidComprador: this.parm.attributes.user_uid,
                         qtdNumerosGerados: 0,
                         qtdTotalProcessos:
@@ -170,6 +174,28 @@ class Service extends eebService {
 
                     global.setDateTime(result.data.compra, 'dtInclusao');
 
+                    // Contador geral de Vendas
+                    dashboarDataPromise.push(
+                        dashboardData.call({
+                            path: `/${result.data.titulo.idCampanha}/totalTitulosCompras`,
+                            data: { qtdCompras: 1, qtdTitulos: result.qtdTitulos, vlTotal: result.data.compra.vlTotalCompra }
+                        })
+                    );
+
+                    dashboarDataPromise.push(
+                        dashboardData.call({
+                            path: `/${result.data.titulo.idCampanha}/titulosComprasDia/{date}`,
+                            data: { qtdCompras: 1, qtdTitulos: result.qtdTitulos, vlTotal: result.data.compra.vlTotalCompra }
+                        })
+                    );
+
+                    dashboarDataPromise.push(
+                        dashboardData.call({
+                            path: `/${result.data.titulo.idCampanha}/titulosComprasDiaInfluencer/${result.data.titulo.idInfluencer}/{date}`,
+                            data: { qtdCompras: 1, qtdTitulos: result.qtdTitulos, vlTotal: result.data.compra.vlTotalCompra }
+                        })
+                    );
+
                     return collectionTitulosCompras.add(result.data.compra);
 
                 })
@@ -188,6 +214,7 @@ class Service extends eebService {
                     result.data.titulo.uidComprador = this.parm.attributes.user_uid;
                     result.data.titulo.situacao = 'aguardando-pagamento';
                     result.data.titulo.qtdNumerosGerados = 0;
+                    result.data.titulo.gerado = false;
 
                     result.data.titulo.idTituloCompra = result.data.compra.id;
                     result.data.titulo.keywords = result.data.compra.keywords;
@@ -218,6 +245,11 @@ class Service extends eebService {
                         titulos: resultTitulos
                     }
 
+                    // Estatísticas do Dashboard
+                    return Promise.all(dashboarDataPromise);
+                })
+
+                .then(_ => {
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 

@@ -232,6 +232,30 @@
   cursor: pointer;
 }
 
+.font-plus-05 {
+  font-size: 1.05em;
+}
+
+.font-plus-10 {
+  font-size: 1.1em;
+}
+
+.font-plus-15 {
+  font-size: 1.15em;
+}
+
+.font-plus-25 {
+  font-size: 1.25em;
+}
+
+.font-plus-50 {
+  font-size: 1.5em;
+}
+
+.font-plus-75 {
+  font-size: 1.75em;
+}
+
 .monospace {
   font-family: monospace;
 }
