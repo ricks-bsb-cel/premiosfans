@@ -37,6 +37,10 @@ api.post("/v1/setSuperUser/:uid", (request, response) => {
     return initFirebase.call(require('./users').requestSetSuperUser, request, response);
 })
 
+api.get("/v1/setAdminUser/:uid", (request, response) => {
+    return initFirebase.call(require('./users').requestSetAdminUser, request, response);
+})
+
 api.post("/v1/empresa", (request, response) => {
     return initFirebase.call(require('./users').setEmpresaToUser, request, response);
 })

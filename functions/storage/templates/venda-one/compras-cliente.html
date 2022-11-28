@@ -1,0 +1,58 @@
+<div
+	class="compras-cliente"
+	ng-if="userCompras().length>0"
+>
+	<article class="pt-20 pb-20 mb-0">
+		<hgroup class="mt-10">
+			<h2>Suas compras</h2>
+			<p>Veja abaixo a sua lista de títulos adquiridos.</p>
+			<p>Criamos uma identificação única para o seu dispositivo e só você pode ver suas compras.</p>
+		</hgroup>
+
+		<details ng-repeat="c in userCompras() | orderBy:'dtInclusao_js_desc'">
+			<summary>
+				<strong>em {{c.dtInclusao | ddmmhhmm}}</strong>
+				<small>
+					~
+					<strong>{{c.qtdTitulosCompra}}</strong>
+					Titulo(s)
+				</small>
+			</summary>
+			<table class="label-description">
+				<tbody>
+					<tr>
+						<td>Nome:</td>
+						<td>{{c.nome}}</td>
+					</tr>
+					<tr>
+						<td>Email:</td>
+						<td>{{c.email_hide}}</td>
+					</tr>
+					<tr>
+						<td>CPF:</td>
+						<td>{{c.cpf_hide}}</td>
+					</tr>
+					<tr>
+						<td>Celular:</td>
+						<td>{{c.celular_hide}}</td>
+					</tr>
+					<tr ng-if="c.situacao==='pago'">
+						<td>Pago em:</td>
+						<td>{{c.dtPagamento | ddmmhhmm}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<a 
+				ng-if="c.situacao=='aguardando-pagamento'"
+				href="#"
+				role="button"
+				class="contrast"
+			>
+				Pagar
+			</a>
+
+			<div class="mb-40"></div>
+		</details>
+
+	</article>
+</div>

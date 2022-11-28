@@ -29,6 +29,19 @@ html {
     padding-top: 5px;
 }
 
+.monospace{
+    font-family: 'Courier New', Courier, monospace;
+}
+
+table.label-description tr td:nth-child(1){
+    font-size: 0.9em;
+    width: 110px;
+}
+
+table.label-description tr td:nth-child(2){
+    font-family: 'Courier New', Courier, monospace;
+}
+
 
 /* Typography */
 h2,
@@ -268,6 +281,10 @@ summary.hamburguer i.bi {
     margin-bottom: 20px;
 }
 
+.mb-40 {
+    margin-bottom: 40px;
+}
+
 .pt-0 {
     padding-top: 0;
 }
@@ -306,6 +323,10 @@ summary.hamburguer i.bi {
 
 .pb-20 {
     padding-bottom: 20px;
+}
+
+.pb-50 {
+    padding-bottom: 50px;
 }
 
 .ribbon {

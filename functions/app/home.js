@@ -72,18 +72,28 @@ const fakeData = {
     config: defaultTemplateConfig
 }
 
+const getAppToken = (request, response) => {
+    const Cookies = require("cookies");
+    const cookies = new Cookies(request, response);
+
+    let token = cookies.get("__anonymousSession") || null;
+
+    return token;
+}
+
 exports.getApp = (request, response) => {
     const idInfluencer = request.params.idInfluencer || null;
     const idCampanha = request.params.idCampanha || null;
+    const token = getAppToken(request, response);
+
+    console.info('token>', token);
 
     const storageFile = `app/${idInfluencer}/${idCampanha}/index.html`;
 
     const bucket = admin.storage().bucket(bucketName);
     const file = bucket.file(storageFile);
 
-    const render = {
-        storageFile: storageFile
-    };
+    const render = { storageFile: storageFile };
 
     return file.getMetadata()
         .then(getMetadataResponse => {

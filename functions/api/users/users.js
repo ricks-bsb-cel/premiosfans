@@ -80,9 +80,7 @@ exports.requestSetSuperUser = (request, response) => {
     const idConfigProfile = request.body.idConfigProfile || request.body.idProfile || null;
 
     if (!token || !uid) {
-        return response.status(500).json(
-            global.defaultResult({ code: 500, error: 'invalid request' }, true)
-        );
+        return response.status(500).json(global.defaultResult({ code: 500, error: 'invalid request' }, true));
     }
 
     let result = {}, customClaims;
@@ -131,6 +129,63 @@ exports.requestSetSuperUser = (request, response) => {
         })
 
 };
+
+
+exports.requestSetAdminUser = (request, response) => {
+
+    const token = global.getUserTokenFromRequest(request, response);
+    const uid = request.params.uid;
+
+    if (!token || !uid) {
+        return response.status(500).json(global.defaultResult({ code: 500, error: 'invalid request' }, true));
+    }
+
+    let result = {}, customClaims;
+
+    return getUserInfoWithToken(token)
+
+        .then(currentUser => {
+            result.currentUser = currentUser;
+
+            if (!result.currentUser.data.superUser) throw new Error('Apenas super usuários podem conceder acessos para outros usuários');
+
+            return admin.auth().getUser(uid);
+        })
+
+        .then(resultUserInfo => {
+            result.userToChange = resultUserInfo;
+
+            if (result.userToChange.providerData.length !== 1) throw new Error('Usuários Administraticos só podem ter um provedor de conexão');
+            if (result.userToChange.providerData[0].providerId !== 'google.com') throw new Error('O provedor de conexão de usuários administrativos tem que ser google.com');
+            if (result.userToChange.uid === result.currentUser.uid) throw new Error('O superuser não precisa de acesso administrativo 😁');
+
+            customClaims = result.userToChange.customClaims || {};
+
+            if (customClaims.adminUser) {
+                delete customClaims.adminUser;
+            } else {
+                customClaims.adminUser = true;
+            }
+
+            return admin.auth().setCustomUserClaims(uid, customClaims);
+        })
+
+        .then(_ => {
+            result = { success: true };
+
+            return response.status(200).json(
+                global.defaultResult({ data: customClaims }, true)
+            );
+        })
+
+        .catch(e => {
+            console.error(e);
+
+            return response.status(500).json(global.defaultResult({ error: e.message }, true));
+        })
+
+};
+
 
 const toUserProfile = doc => {
 

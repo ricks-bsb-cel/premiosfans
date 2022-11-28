@@ -104,7 +104,7 @@ const uploadTemplates = env => {
 
     if (env === 'prod') {
         console.clear();
-        console.info(`Uploading to Prod ~ Bucket ${bucketName} ~ Path: ${prodVersionConfig.path}}`);
+        console.info(`Uploading to Prod ~ Bucket ${bucketName} ~ Path: ${prodVersionConfig.path}`);
     }
 
     return backupProdFiles(env) // Será ignorado se env !== prod

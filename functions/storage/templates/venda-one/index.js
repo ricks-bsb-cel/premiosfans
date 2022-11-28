@@ -2,6 +2,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
@@ -14,8 +15,7 @@ const firebaseConfig = {
     measurementId: "G-XTRQ740MSL"
 };
 
-angular.module('app', [
-])
+angular.module('app', [])
 
     .run(function (init) {
         init.init();
@@ -54,7 +54,9 @@ angular.module('app', [
     })
 
     .factory('init', function (global) {
-        let app = null;
+        let app = null,
+            token = null,
+            userData = {};
 
         const init = _ => {
             app = initializeApp(firebaseConfig);
@@ -63,19 +65,60 @@ angular.module('app', [
         }
 
         const getToken = _ => {
+            return token;
+        }
+
+        const setCookie = token => {
+            document.cookie = `__anonymousSession=${token}; path=/`;
+        }
+
+        const checkTokenChange = () => {
             const auth = getAuth();
-            return auth.currentUser ? auth.currentUser.accessToken : null;
+            auth.onIdTokenChanged(user => {
+                token = user.accessToken;
+                setCookie(token);
+            });
+        }
+
+        const getCurrentUser = _ => {
+            const auth = getAuth();
+            return auth.currentUser;
         }
 
         const stateChanged = _ => {
             const auth = getAuth();
             onAuthStateChanged(auth, user => {
-                if (!user) {
-                    return signIn();
-                }
-
-                console.info(getToken());
+                if (!user) return signIn();
+                token = auth.currentUser.accessToken || null;
+                setCookie(token);
+                checkTokenChange();
+                loadUserData();
             })
+        }
+
+        const getUserCompras = _ => {
+            return userData.compras || [];
+        }
+
+        const loadUserData = _ => {
+            const user = getCurrentUser(),
+                db = getFirestore(app);
+            let q = collection(db, "titulosCompras");
+
+            q = query(q, where("idCampanha", "==", _idCampanha));
+            q = query(q, where("uidComprador", "==", user.uid));
+
+            return getDocs(q)
+                .then(docs => {
+                    userData.compras = [];
+
+                    docs.forEach(d => {
+                        userData.compras.push(angular.merge(d.data(), { id: d.id }));
+                    })
+                })
+                .catch(e => {
+                    console.error(e);
+                })
         }
 
         const signIn = _ => {
@@ -91,12 +134,14 @@ angular.module('app', [
 
         return {
             init: init,
-            getToken: getToken
+            getToken: getToken,
+            loadUserData: loadUserData,
+            getUserCompras: getUserCompras
         }
 
     })
 
-    .factory('httpCalls', function ($http, $q, global) {
+    .factory('httpCalls', function ($http, $q, global, init) {
         const auth = getAuth();
 
         const getUrlEndPoint = url => {
@@ -104,6 +149,10 @@ angular.module('app', [
             const gatewayUrl = 'https://premios-fans-a8fj1dkb.uc.gateway.dev';
 
             return (window.location.hostname === 'localhost' ? localUrl : gatewayUrl) + url;
+        }
+
+        const loadUserData = _ =>{
+            init.loadUserData();
         }
 
         const generateTitulo = data => {
@@ -146,6 +195,8 @@ angular.module('app', [
                         function (response) {
                             global.unblockUi();
                             Swal.fire('Título Gerado', `Código da Compra: ${response.data.result.data.compra.id}`, 'info');
+                            
+                            loadUserData();
 
                             return resolve(response);
                         },
@@ -216,7 +267,21 @@ angular.module('app', [
                 scope.initDelegates(element);
             }
         };
+    })
 
+    .directive('comprasCliente', function () {
+        return {
+            restrict: 'E',
+            controller: function ($scope, init) {
+                $scope.userCompras = _ => {
+                    return init.getUserCompras();
+                }
+            },
+            templateUrl: `/templates/venda-one/compras-cliente.html?v=` + _version,
+            link: function (scope, element) {
+                scope.e = element;
+            }
+        };
     })
 
     .controller('mainController', function ($scope, formClienteFactory) {
@@ -245,4 +310,20 @@ angular.module('app', [
             formClienteFactory.delegate.send($scope.qtd);
         }
 
+    })
+
+    .filter('ddmmhhmm', function () {
+        return function (v) {
+            if (v) {
+                if (typeof v === 'object') {
+                    return moment(v.toDate()).format("DD/MM HH:mm");
+                } else if (v.substr(10, 1) === 'T' || (v.length === 19 && v.substr(10, 1) === ' ')) {
+                    return moment(v).format("DD/MM HH:mm");
+                } else {
+                    return moment.unix(v).format("DD/MM HH:mm");
+                }
+            } else {
+                return null;
+            }
+        }
     });

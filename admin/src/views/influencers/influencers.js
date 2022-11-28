@@ -25,17 +25,19 @@ ngModule = angular.module('views.influencers', [
 			influencersEditFactory.edit(e);
 		}
 
+		const loadData = termo => {
+			var attrFilter = {};
+
+			if (termo) {
+				attrFilter.filter = `keywords array-contains ${termo}`;
+			}
+
+			$scope.collectionEmpresas.collection.startSnapshot(attrFilter);
+		}
+
 		$scope.filter = {
 			run: function (termo) {
-
-				var attrFilter = {};
-
-				if (termo) {
-					attrFilter.filter = `keywords array-contains ${termo}`;
-				}
-
-				$scope.collectionEmpresas.collection.startSnapshot(attrFilter);
-
+				loadData(termo);
 			}
 		}
 
@@ -49,14 +51,7 @@ ngModule = angular.module('views.influencers', [
 
 		appAuthHelper.ready()
 			.then(_ => {
-				$scope.isSuperUser = appAuthHelper.profile.user.superUser;
-
-				if (!$scope.isSuperUser) {
-					$scope.collectionEmpresas.collection.startSnapshot({
-						id:appAuthHelper.profile.user.idEmpresa
-					});
-				}
-
+				loadData();
 			})
 
 		$scope.$on('$destroy', function () {
