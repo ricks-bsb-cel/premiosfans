@@ -2,7 +2,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
@@ -53,15 +53,29 @@ angular.module('app', [])
         }
     })
 
-    .factory('init', function (global) {
+    .factory('init', function ($q, global, $timeout) {
         let app = null,
             token = null,
+            isReady = false,
             userData = {};
 
         const init = _ => {
             app = initializeApp(firebaseConfig);
             global.unblockUi();
             stateChanged();
+        }
+
+        const ready = _ => {
+            return $q((resolve) => {
+                const checkIsReady = _ => {
+                    if (isReady) return resolve(app);
+                    $timeout(_ => { checkIsReady(); }, 200);
+                }
+
+                if (checkIsReady()) {
+                    return resolve(app);
+                }
+            })
         }
 
         const getToken = _ => {
@@ -92,39 +106,12 @@ angular.module('app', [])
                 token = auth.currentUser.accessToken || null;
                 setCookie(token);
                 checkTokenChange();
-                loadUserData();
+                isReady = true;
             })
-        }
-
-        const getUserCompras = _ => {
-            return userData.compras || [];
-        }
-
-        const loadUserData = _ => {
-            const user = getCurrentUser(),
-                db = getFirestore(app);
-            let q = collection(db, "titulosCompras");
-
-            q = query(q, where("idCampanha", "==", _idCampanha));
-            q = query(q, where("uidComprador", "==", user.uid));
-
-            return getDocs(q)
-                .then(docs => {
-                    userData.compras = [];
-
-                    docs.forEach(d => {
-                        userData.compras.push(angular.merge(d.data(), { id: d.id }));
-                    })
-                })
-                .catch(e => {
-                    console.error(e);
-                })
         }
 
         const signIn = _ => {
             const auth = getAuth();
-
-            console.info('New user...');
 
             signInAnonymously(auth)
                 .catch((e) => {
@@ -133,10 +120,11 @@ angular.module('app', [])
         }
 
         return {
+            app: app,
             init: init,
             getToken: getToken,
-            loadUserData: loadUserData,
-            getUserCompras: getUserCompras
+            getCurrentUser: getCurrentUser,
+            ready: ready
         }
 
     })
@@ -149,10 +137,6 @@ angular.module('app', [])
             const gatewayUrl = 'https://premios-fans-a8fj1dkb.uc.gateway.dev';
 
             return (window.location.hostname === 'localhost' ? localUrl : gatewayUrl) + url;
-        }
-
-        const loadUserData = _ =>{
-            init.loadUserData();
         }
 
         const generateTitulo = data => {
@@ -195,8 +179,6 @@ angular.module('app', [])
                         function (response) {
                             global.unblockUi();
                             Swal.fire('Título Gerado', `Código da Compra: ${response.data.result.data.compra.id}`, 'info');
-                            
-                            loadUserData();
 
                             return resolve(response);
                         },
@@ -216,6 +198,62 @@ angular.module('app', [])
 
     })
 
+    .directive('comprasCliente', function () {
+        return {
+            restrict: 'E',
+            controller: function ($scope, init, pagarCompraFactory, detalhesCompraFactory, $timeout) {
+                let unsubscribeSnapshot = null, refreshTimeout;
+                $scope.compras = [];
+
+                const initSnapshot = _ => {
+                    init.ready().then(app => {
+                        const db = getFirestore(app), user = init.getCurrentUser();
+
+                        let q = collection(db, "titulosCompras");
+
+                        q = query(q, where("idCampanha", "==", _idCampanha));
+                        q = query(q, where("uidComprador", "==", user.uid));
+
+                        unsubscribeSnapshot = onSnapshot(q, querySnapshot => {
+
+                            querySnapshot.docChanges().forEach(change => {
+                                const doc = angular.merge(change.doc.data(), { id: change.doc.id });
+                                if (change.type === 'removed') {
+                                    $scope.compras = $scope.compras.filter(f => { return f.id !== doc.id; });
+                                } else {
+                                    const pos = $scope.compras.findIndex(f => { return f.id === doc.id; });
+                                    if (pos < 0) {
+                                        $scope.compras.push(doc);
+                                    } else {
+                                        $scope.compras[pos] = doc;
+                                    }
+                                }
+                            })
+
+                            if (refreshTimeout) $timeout.cancel(refreshTimeout);
+
+                            refreshTimeout = $timeout(_ => {
+                                $scope.compras = angular.copy($scope.compras);
+                            }, 250);
+                        })
+
+                    })
+                }
+
+                initSnapshot();
+
+                $scope.pagar = tituloCompra => {
+                    pagarCompraFactory.delegate.show(tituloCompra);
+                }
+
+                $scope.detalhes = tituloCompra => {
+                    detalhesCompraFactory.delegate.show(tituloCompra);
+                }
+            },
+            templateUrl: `/templates/venda-one/compras-cliente.html?v=` + _version
+        };
+    })
+
     .factory('formClienteFactory', function () {
         let delegate = {};
 
@@ -227,11 +265,7 @@ angular.module('app', [])
     .directive('formCliente', function () {
         return {
             restrict: 'E',
-            controller: function (
-                $scope,
-                formClienteFactory,
-                httpCalls
-            ) {
+            controller: function ($scope, formClienteFactory, httpCalls) {
                 let element = null;
 
                 $scope.titulo = {};
@@ -251,7 +285,6 @@ angular.module('app', [])
 
                 $scope.initDelegates = e => {
                     element = e;
-
                     formClienteFactory.delegate = {
                         showFormCliente: _ => {
                             $("#form-cliente").show();
@@ -269,20 +302,97 @@ angular.module('app', [])
         };
     })
 
-    .directive('comprasCliente', function () {
+
+
+    .factory('pagarCompraFactory', function () {
+        let delegate = {};
+
+        return {
+            delegate: delegate
+        }
+    })
+    .directive('pagarCompra', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, init) {
-                $scope.userCompras = _ => {
-                    return init.getUserCompras();
+            controller: function ($scope, pagarCompraFactory, modal) {
+                $scope.visible = false;
+                let element = null;
+
+                $scope.close = _ => {
+                    modal.close();
+                    $scope.visible = false;
+                }
+
+                $scope.initDelegates = e => {
+                    element = e;
+
+                    pagarCompraFactory.delegate = {
+                        show: tituloCompra => {
+                            $scope.visible = true;
+                            modal.open("pagar-compra");
+                        }
+                    }
                 }
             },
-            templateUrl: `/templates/venda-one/compras-cliente.html?v=` + _version,
+            templateUrl: `/templates/venda-one/pagar-compra.html?v=` + _version,
             link: function (scope, element) {
-                scope.e = element;
+                scope.initDelegates(element);
             }
         };
     })
+
+
+    .directive('openDetail', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attr) {
+                if (attr.openDetail === 'true') {
+                    element.attr('open', 'true');
+                } else {
+                    element.removeAttr('open');
+                }
+            }
+        }
+    })
+
+
+    .factory('detalhesCompraFactory', function () {
+        let delegate = {};
+
+        return {
+            delegate: delegate
+        }
+    })
+    .directive('detalhesCompra', function () {
+        return {
+            restrict: 'E',
+            controller: function ($scope, detalhesCompraFactory, modal) {
+                $scope.visible = false;
+                let element = null;
+
+                $scope.close = _ => {
+                    modal.close();
+                    $scope.visible = false;
+                }
+
+                $scope.initDelegates = e => {
+                    element = e;
+
+                    detalhesCompraFactory.delegate = {
+                        show: tituloCompra => {
+                            $scope.visible = true;
+                            modal.open("detalhes-compra");
+                        }
+                    }
+                }
+            },
+            templateUrl: `/templates/venda-one/detalhes-compra.html?v=` + _version,
+            link: function (scope, element) {
+                scope.initDelegates(element);
+            }
+        };
+    })
+
 
     .controller('mainController', function ($scope, formClienteFactory) {
         $scope.selected = null;
@@ -308,6 +418,114 @@ angular.module('app', [])
             }
 
             formClienteFactory.delegate.send($scope.qtd);
+        }
+
+    })
+
+    .factory('modal', function () {
+        // Config
+        const isOpenClass = 'modal-is-open';
+        const openingClass = 'modal-is-opening';
+        const closingClass = 'modal-is-closing';
+        const animationDuration = 400; // ms
+
+        let visibleModal = null,
+            initiated = false,
+            currentModal = null;
+
+        const toggleModalByEvent = event => {
+            event.preventDefault();
+            currentModal = document.getElementById(event.currentTarget.getAttribute('data-target'));
+            (typeof (currentModal) !== 'undefined' && currentModal != null)
+                && isModalOpen(currentModal) ? closeModal(currentModal) : openModal(currentModal);
+        }
+
+        const toggleModalById = id => {
+            currentModal = document.getElementById(id);
+            (typeof (currentModal) !== 'undefined' && currentModal != null) && isModalOpen(currentModal) ? closeModal(currentModal) : openModal(currentModal);
+        }
+
+        const isModalOpen = modal => {
+            return modal.hasAttribute('open') && modal.getAttribute('open') != 'false' ? true : false;
+        }
+
+        const openModal = modal => {
+            if (isScrollbarVisible()) {
+                document.documentElement.style.setProperty('--scrollbar-width', `${getScrollbarWidth()}px`);
+            }
+            document.documentElement.classList.add(isOpenClass, openingClass);
+            setTimeout(() => {
+                visibleModal = modal;
+                document.documentElement.classList.remove(openingClass);
+            }, animationDuration);
+            modal.setAttribute('open', true);
+        }
+
+        const closeModal = modal => {
+            modal = modal || currentModal;
+            visibleModal = null;
+            document.documentElement.classList.add(closingClass);
+            setTimeout(() => {
+                document.documentElement.classList.remove(closingClass, isOpenClass);
+                document.documentElement.style.removeProperty('--scrollbar-width');
+                modal.removeAttribute('open');
+            }, animationDuration);
+        }
+
+        const init = _ => {
+            if (initiated) return;
+            initiated = true;
+
+            // Close with a click outside
+            document.addEventListener('click', event => {
+                if (visibleModal != null) {
+                    const modalContent = visibleModal.querySelector('article');
+                    const isClickInside = modalContent.contains(event.target);
+                    !isClickInside && closeModal(visibleModal);
+                }
+            });
+
+            // Close with Esc key
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && visibleModal != null) {
+                    closeModal(visibleModal);
+                }
+            });
+
+        }
+
+        const getScrollbarWidth = () => {
+
+            // Creating invisible container
+            const outer = document.createElement('div');
+            outer.style.visibility = 'hidden';
+            outer.style.overflow = 'scroll'; // forcing scrollbar to appear
+            outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
+            document.body.appendChild(outer);
+
+            // Creating inner element and placing it in the container
+            const inner = document.createElement('div');
+            outer.appendChild(inner);
+
+            // Calculating difference between container's full width and the child width
+            const scrollbarWidth = (outer.offsetWidth - inner.offsetWidth);
+
+            // Removing temporary elements from the DOM
+            outer.parentNode.removeChild(outer);
+
+            return scrollbarWidth;
+        }
+
+        const isScrollbarVisible = () => {
+            return document.body.scrollHeight > screen.height;
+        }
+
+        init();
+
+        return {
+            show: toggleModalByEvent,
+            open: toggleModalById,
+            close: closeModal
         }
 
     })

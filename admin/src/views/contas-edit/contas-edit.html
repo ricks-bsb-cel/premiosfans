@@ -1,0 +1,27 @@
+<section class="content contas-edit">
+    <search-filter title="title"></search-filter>
+    <wait-overlay ready="ready" class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Informações da Conta
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form novalidate>
+                            <formly-form
+                                class="row" model="conta"
+                                fields="forms.conta.fields"
+                                form="forms.conta.form"
+                                novalidate
+                            >
+                            </formly-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

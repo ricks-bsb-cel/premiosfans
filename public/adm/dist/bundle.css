@@ -1114,6 +1114,10 @@ sorteio-campanha-premios table input.right {
   margin-left: 10px;
   display: initial;
 }
+
+.contas table .actions {
+  width: 160px;
+}
 .dashboard-clientes-cobrancas td.valor {
   width: 100px;
 }

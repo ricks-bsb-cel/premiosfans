@@ -35,11 +35,23 @@ html {
 
 table.label-description tr td:nth-child(1){
     font-size: 0.9em;
-    width: 110px;
+    min-width: 110px;
 }
 
 table.label-description tr td:nth-child(2){
     font-family: 'Courier New', Courier, monospace;
+}
+
+table.label-description tr td:nth-child(2) span{
+    display: block;
+    width: calc(100% - 45px);
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+}
+
+.full-width{
+    width: 100%;
 }
 
 
