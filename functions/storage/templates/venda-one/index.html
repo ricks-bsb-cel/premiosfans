@@ -44,8 +44,8 @@
     <link rel="stylesheet" href="/templates/venda-one/custom.css?v={{version}}">
 
     <style>
-        .wait{
-            background: rgba(0,0,0,0.4);
+        .wait {
+            background: rgba(0, 0, 0, 0.4);
             position: fixed;
             height: 100%;
             width: 100%;
@@ -53,7 +53,7 @@
             cursor: wait;
         }
 
-        .wait svg{
+        .wait svg {
             background: transparent;
             position: fixed;
             width: 120px;
@@ -274,17 +274,190 @@
         <svg class="wait" version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
             enable-background="new 0 0 100 100" xml:space="preserve">
-            <path fill="yellow" d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3 c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">
-                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="2s" from="0 50 50" to="360 50 50" repeatCount="indefinite" />
+            <path fill="yellow"
+                d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3 c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="2s" from="0 50 50"
+                    to="360 50 50" repeatCount="indefinite" />
             </path>
-            <path fill="yellow" d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7 c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">
-                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="0 50 50" to="-360 50 50" repeatCount="indefinite" />
+            <path fill="yellow"
+                d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7 c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="0 50 50"
+                    to="-360 50 50" repeatCount="indefinite" />
             </path>
-            <path fill="yellow" d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5 L82,35.7z">
-                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="2s" from="0 50 50" to="360 50 50" repeatCount="indefinite" />
+            <path fill="yellow"
+                d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5 L82,35.7z">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="2s" from="0 50 50"
+                    to="360 50 50" repeatCount="indefinite" />
             </path>
         </svg>
     </div>
+
+    <script type="text/ng-template" id="form-cliente.htm">
+        <article
+            id="form-cliente"
+            class="pt-20 pb-20 mb-0 mt-5"
+            style="display: none;"
+        >
+            <hgroup class="mt-10">
+                <h2>Informe seus dados</h2>
+                <h3>
+                    Preenche direitinho, se não como vamos te encontrar quando você ganhar?
+                </h3>
+            </hgroup>
+            <form form="form" ng-controller="formClienteController" autocomplete="on" novalidate>
+                <div class="row">
+                    <label class="col-md-6" for="nome">
+                        Nome *
+                        <input type="text" ng-model="titulo.nome" name="name" autocomplete="name" placeholder="Nome completo">
+                    </label>
+
+                    <label class="col-md-6" for="email">
+                        Email *
+                        <input type="text" ng-model="titulo.email" name="email" autocomplete="email" placeholder="Seu melhor email">
+                    </label>
+                </div>
+
+                <div class="row">
+                    <label class="col-md-6" for="celular">
+                        Celular *
+                        <input type="tel" ng-model="titulo.celular" autocomplete="mobile" name="celular">
+                    </label>
+
+                    <label class="col-md-6" for="cpf">
+                        CPF *
+                        <input type="tel" ng-model="titulo.cpf" name="cpf">
+                    </label>
+                </div>
+
+                <fieldset>
+                    <label for="idade">
+                        <input ng-model="titulo.idade" type="checkbox" id="idade" name="idade">
+                        Declaro que tenho mais que 16 anos completos
+                    </label>
+                    <label for="termos">
+                        <input ng-model="titulo.termos" type="checkbox" id="termos" name="termos">
+                        Concordo com os Termos e Condições de Uso do Premios Fans
+                    </label>
+                </fieldset>
+            </form>
+
+        </article>
+	</script>
+
+    <script type="text/ng-template" id="compras-cliente.htm">
+        <div
+            class="compras-cliente"
+            ng-if="compras.length>0"
+        >
+            <article class="pt-20 pb-20 mb-0">
+                <hgroup class="mt-10">
+                    <h2>Suas compras</h2>
+                    <p>Veja abaixo a sua lista de títulos adquiridos.</p>
+                    <p>Criamos uma identificação única para o seu dispositivo e só você pode ver suas compras.</p>
+                </hgroup>
+
+                <details
+                    ng-repeat="c in compras | orderBy:'dtInclusao_js_desc'"
+                    id-titulo-compra="[[c.id]]"
+                    open-detail="[[c.situacao==='aguardando-pagamento']]"
+                >
+                    <summary>
+                        em
+                        <strong ng-bind="::c.dtInclusao | ddmmhhmm"></strong>
+                        <small>
+                            ~
+                            <strong ng-bind="::c.qtdTitulosCompra"></strong>
+                            Titulo(s)
+                        </small>
+                    </summary>
+
+                    <table class="label-description">
+                        <tbody>
+                            <tr>
+                                <td>Nome:</td>
+                                <td>
+                                    <span ng-bind="::c.nome"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Email:</td>
+                                <td>
+                                    <span ng-bind="::c.email_hide"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CPF:</td>
+                                <td>
+                                    <span ng-bind="::c.cpf_hide"></span>
+                                </td>
+                            </tr>
+                            <tr ng-if="c.situacao==='pago'">
+                                <td>Pago em:</td>
+                                <td>
+                                    <span ng-bind="::c.dtPagamento | ddmmhhmm"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <button 
+                        ng-if="c.situacao=='aguardando-pagamento'"
+                        ng-click="pagar(c)"
+                        class="full-width"
+                    >Pagar</button>
+
+                    <button 
+                        ng-if="c.situacao=='pago'"
+                        ng-click="detalhes(c)"
+                        class="full-width outline"
+                    >Detalhes da Compra</button>
+
+                    <div ng-if="!$last" class="mb-40"></div>
+                </details>
+            </article>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="modal-detalhe-compra.htm">
+        <dialog
+            ng-show="visible"
+            id="detalhes-compra"
+        >
+            <article class="pt-20">
+                <h3 class="mb-20">Detalhes Compra</h3>
+                <p>
+                    Cras sit amet maximus risus.
+                    Pellentesque sodales odio sit amet augue finibus pellentesque.
+                    Nullam finibus risus non semper euismod.
+                </p>
+                <footer>
+                    <button class="mb-0" ng-click="close()">
+                        Fechar
+                    </button>
+                </footer>
+            </article>
+        </dialog>
+    </script>
+
+    <script type="text/ng-template" id="modal-pagar-compra.htm">
+        <dialog
+            ng-show="visible"
+            id="pagar-compra"
+        >
+            <article class="pt-20">
+                <h3 class="mb-20">Pagamento da Compra</h3>
+                <p>
+                    Cras sit amet maximus risus.
+                    Pellentesque sodales odio sit amet augue finibus pellentesque.
+                    Nullam finibus risus non semper euismod.
+                </p>
+                <footer>
+                    <button class="mb-0" ng-click="close()">
+                        Fechar
+                    </button>
+                </footer>
+            </article>
+        </dialog>
+    </script>
 
     <script>
         var _version = "{{version}}";

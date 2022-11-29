@@ -250,7 +250,7 @@ angular.module('app', [])
                     detalhesCompraFactory.delegate.show(tituloCompra);
                 }
             },
-            templateUrl: `/templates/venda-one/compras-cliente.html?v=` + _version
+            templateUrl: 'compras-cliente.htm'
         };
     })
 
@@ -295,7 +295,7 @@ angular.module('app', [])
                 }
 
             },
-            templateUrl: `/templates/venda-one/form-cliente.html?v=` + _version,
+            templateUrl: 'form-cliente.htm',
             link: function (scope, element) {
                 scope.initDelegates(element);
             }
@@ -334,7 +334,7 @@ angular.module('app', [])
                     }
                 }
             },
-            templateUrl: `/templates/venda-one/pagar-compra.html?v=` + _version,
+            templateUrl: 'modal-pagar-compra.htm',
             link: function (scope, element) {
                 scope.initDelegates(element);
             }
@@ -386,7 +386,7 @@ angular.module('app', [])
                     }
                 }
             },
-            templateUrl: `/templates/venda-one/detalhes-compra.html?v=` + _version,
+            templateUrl: 'modal-detalhe-compra.htm',
             link: function (scope, element) {
                 scope.initDelegates(element);
             }

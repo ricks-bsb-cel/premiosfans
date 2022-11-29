@@ -307,7 +307,11 @@ const compileApp = (sourceData, obj) => {
                 render.campanha.subTitulo ||
                 render.campanha.titulo;
 
-            const compiled = global.compile(sourceData, render);
+            let compiled = global.compile(sourceData, render);
+
+            // Substitui os marcadores do AngularJS (que foram criados com [[ e ]] e náo {{ e }}
+            compiled = compiled.split('[[').join('{{');
+            compiled = compiled.split(']]').join('}}');
 
             return resolve(compiled);
         } catch (e) {
