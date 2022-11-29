@@ -17,17 +17,26 @@
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                    <th class="id">ID Conta</th>
+                                    <th class="nome">Nome</th>
+                                    <th class="cnpj">CNPJ</th>
+                                    <th class="representante">Representante</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="c in collectionContas.collection.data | orderBy:'dtInclusao_js_desc'">
-                                    <td class="id">
+                                    <td class="nome">
                                         <a ng-href="#!/contas-edit/{{c.id}}">
-                                            <strong class="monospace">
-                                                {{c.id}}
-                                            </strong>
+                                            {{c.companyName}}
                                         </a>
+                                    </td>
+                                    <td class="cnpj">
+                                        <small class="monospace">
+                                            {{c.documentNumber_formatted}}
+                                        </small>
+                                    </td>
+
+                                    <td class="representante">
+                                        {{c.companyRepresentative.name}}
                                     </td>
                                 </tr>
                             </tbody>

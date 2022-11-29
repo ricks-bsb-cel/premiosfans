@@ -7,7 +7,8 @@ const ngModule = angular.module('services.premios-fans', [])
             appAuthHelper,
             $http,
             blockUiFactory,
-            toastrFactory
+            toastrFactory,
+            globalFactory
         ) {
 
             const getUrlEndPoint = url => {
@@ -180,11 +181,65 @@ const ngModule = angular.module('services.premios-fans', [])
                     );
             }
 
+            const cep = attrs => {
+                attrs = attrs || {};
+                attrs.data = attrs.data || {};
+                attrs.data.cep = attrs.data.cep || null;
+
+                if (!attrs.data.cep) throw new Error('Invalid parms');
+
+                attrs.data.cep = globalFactory.onlyNumbers(attrs.data.cep);
+
+                if (attrs.data.cep.length !== 8) throw new Error('Invalid parms');
+
+                $http({
+                    url: `https://brasilapi.com.br/api/cep/v2/${attrs.data.cep}`,
+                    method: 'get'
+                })
+
+                    .then(
+                        function (response) {
+                            (typeof attrs.success === 'function') && attrs.success(response.data);
+                        },
+                        function (e) {
+                            (typeof attrs.error === 'function') && attrs.error(e);
+                        }
+                    );
+            }
+
+            const cnpj = attrs => {
+                attrs = attrs || {};
+                attrs.data = attrs.data || {};
+                attrs.data.cnpj = attrs.data.cnpj || null;
+
+                if (!attrs.data.cnpj) throw new Error('Invalid parms');
+
+                attrs.data.cnpj = globalFactory.onlyNumbers(attrs.data.cnpj);
+
+                if (attrs.data.cnpj.length !== 14) throw new Error('Invalid parms');
+
+                $http({
+                    url: `https://brasilapi.com.br/api/cnpj/v1/${attrs.data.cnpj}`,
+                    method: 'get'
+                })
+
+                    .then(
+                        function (response) {
+                            (typeof attrs.success === 'function') && attrs.success(response.data);
+                        },
+                        function (e) {
+                            (typeof attrs.error === 'function') && attrs.error(e);
+                        }
+                    );
+            }
+
             return {
                 generateTemplates: generateTemplates,
                 pagarTituloCompra: pagarTituloCompra,
                 checkTituloCompra: checkTituloCompra,
-                ativarCampanha: ativarCampanha
+                ativarCampanha: ativarCampanha,
+                cep: cep,
+                cnpj: cnpj
             };
 
         });

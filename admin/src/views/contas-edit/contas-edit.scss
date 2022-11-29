@@ -1,2 +1,14 @@
-.contas-edit{
+.contas-edit {
+    ng-form {
+        .document-number {
+            input {
+                width: 240px;
+            }
+        }
+        .postal-code{
+            input {
+                width: 120px;
+            }
+        }
+    }
 }

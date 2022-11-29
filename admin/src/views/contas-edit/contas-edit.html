@@ -2,7 +2,8 @@
     <search-filter title="title"></search-filter>
     <wait-overlay ready="ready" class="container-fluid">
         <div class="row">
-            <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+            <div ng-if="ready" class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
@@ -12,7 +13,8 @@
                     <div class="card-body">
                         <form novalidate>
                             <formly-form
-                                class="row" model="conta"
+                                class="row"
+                                model="conta"
                                 fields="forms.conta.fields"
                                 form="forms.conta.form"
                                 novalidate
@@ -22,6 +24,51 @@
                     </div>
                 </div>
             </div>
+
+            <div ng-if="ready" class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Endereço Empresarial
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form novalidate>
+                            <formly-form
+                                class="row"
+                                model="conta"
+                                fields="forms.enderecoEmpresa.fields"
+                                form="forms.enderecoEmpresa.form"
+                                novalidate
+                            >
+                            </formly-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div ng-if="ready" class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Responsável
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form novalidate>
+                            <formly-form
+                                class="row"
+                                model="conta"
+                                fields="forms.representante.fields"
+                                form="forms.representante.form"
+                                novalidate
+                            >
+                            </formly-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </wait-overlay>
 </section>

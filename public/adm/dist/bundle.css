@@ -1114,7 +1114,12 @@ sorteio-campanha-premios table input.right {
   margin-left: 10px;
   display: initial;
 }
-
+.contas-edit ng-form .document-number input {
+  width: 240px;
+}
+.contas-edit ng-form .postal-code input {
+  width: 120px;
+}
 .contas table .actions {
   width: 160px;
 }

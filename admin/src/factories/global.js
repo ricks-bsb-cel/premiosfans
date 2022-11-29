@@ -7,7 +7,8 @@ let ngModule = angular.module('factories.global', [])
 	.factory('globalFactory',
 		function (
 			$window,
-			$sce
+			$sce,
+			appFirestoreHelper
 		) {
 
 			let defaultDiacriticsRemovalMapChanges;
@@ -531,6 +532,21 @@ let ngModule = angular.module('factories.global', [])
 				return expression.test(String(email).toLowerCase())
 			}
 
+			const setDateTime = (obj, prefixo, addValue, addType) => {
+				const currentTimeStamp = appFirestoreHelper.currentTimestamp();
+				const hoje = moment(currentTimeStamp.toDate());
+
+				if (addValue) {
+					hoje.add(addValue, addType || 'minutes');
+				}
+
+				obj[(prefixo || "inclusao")] = hoje.format("YYYY-MM-DD HH:mm:ss");
+
+				obj[(prefixo || "inclusao") + "_js"] = hoje.unix();
+				obj[(prefixo || "inclusao") + "_js_desc"] = 0 - hoje.unix();
+				obj[(prefixo || "inclusao") + "_timestamp"] = currentTimeStamp;
+			}
+
 			return {
 				guid: guid,
 				rgbToHex: rgbToHex,
@@ -556,7 +572,8 @@ let ngModule = angular.module('factories.global', [])
 				sanitize: sanitize,
 				capitalize: capitalize,
 				isValidDtNascimento: isValidDtNascimento,
-				emailIsValid: emailIsValid
+				emailIsValid: emailIsValid,
+				setDateTime: setDateTime
 			};
 
 		}

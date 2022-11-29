@@ -5,11 +5,13 @@ const ngModule = angular.module('collection.contas', [])
     .factory('collectionContas', function (
         appCollection,
         appFirestoreHelper,
+        appAuthHelper,
+        globalFactory,
         $q
     ) {
 
         const attr = {
-            collection: 'campanhas',
+            collection: 'contas',
             filterEmpresa: false
         };
 
@@ -38,16 +40,28 @@ const ngModule = angular.module('collection.contas', [])
                 let result = {},
                     toSave = { ...conta };
 
-                toSave = sanitize(toSave);
-
                 let id = toSave.id || 'new';
+
+                toSave.keywords = globalFactory.generateKeywords(
+                    toSave.companyName,
+                    toSave.companyRepresentative.name,
+                    toSave.contact.email,
+                    toSave.documentNumber
+                );
+
+                if (id === 'new') {
+                    toSave.uidInclusao = appAuthHelper.user.uid;
+                    globalFactory.setDateTime(toSave, 'dtInclusao');
+                }
+
+                toSave.uidAlteracao = appAuthHelper.user.uid;
+                globalFactory.setDateTime(toSave, 'dtAlteracao');
 
                 delete toSave.id;
 
                 firebaseCollection.addOrUpdateDoc(id, toSave)
 
                     .then(contaSaved => {
-
                         result.conta = contaSaved;
 
                         return resolve(result);
@@ -60,15 +74,6 @@ const ngModule = angular.module('collection.contas', [])
                     })
 
             })
-        }
-
-        const sanitize = conta => {
-
-            let result = {
-                id: conta.id || 'new'
-            };
-
-            return result;
         }
 
         return {
