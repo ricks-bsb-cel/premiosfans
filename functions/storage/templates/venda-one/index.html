@@ -88,7 +88,10 @@
                         <i class="bi bi-list white"></i>
                     </summary>
                     <ul role="listbox">
+                        <li><a href="../recuperar/" class="primary">Recuperar Compras</a></li>
+                        <!--
                         <li><a href="../preview/" class="primary">Seja um Revendedor</a></li>
+                        -->
                         <li><a href="../preview-rtl/">Regulamento</a></li>
                         <li><a href="../preview-rtl/">Sobre a Empresa</a></li>
                         <li><a href="../classless/">Contato</a></li>
@@ -135,7 +138,7 @@
                 {{/if}}
             </hgroup>
             {{#if campanha.detalhes}}
-            <p>{{campanha.detalhes}}</p>
+            {{{campanha.detalhes}}}
             {{/if}}
         </section>
 
@@ -225,9 +228,9 @@
                                     </h2>
 
                                     {{#each this.premios}}
-                                    <footer class="pt-10">
-                                        {{this.descricao}}
-                                    </footer>
+                                        <footer data-id-premio="{{this.id}}" class="pt-10">
+                                            {{this.descricao}}
+                                        </footer>
                                     {{/each}}
 
                                 </div>
@@ -248,6 +251,8 @@
 
         <pagar-compra></pagar-compra>
         <detalhes-compra></detalhes-compra>
+
+        <faq></faq>
 
     </main>
 
@@ -457,6 +462,26 @@
                 </footer>
             </article>
         </dialog>
+    </script>
+
+    <script type="text/ng-template" id="faq.htm">
+        <section>
+            <div class="container p-0">
+                <article class="pt-20 pb-20 mb-0">
+                    <hgroup class="mt-10">
+                        <h2>Perguntas Frequentes</h2>
+                        <h3>Resolva suas dúvidas:</h3>
+                    </hgroup>
+
+                    <div class="row">
+                        <details ng-repeat="f in list">
+                            <summary ng-bind="::f.p"></summary>
+                            <p ng-bind="::f.r"></p>
+                        </details>
+                    </div>
+                </article>
+            </div>
+        </section>
     </script>
 
     <script>

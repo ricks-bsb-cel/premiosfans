@@ -394,6 +394,20 @@ angular.module('app', [])
     })
 
 
+    .directive('faq', function () {
+        return {
+            restrict: 'E',
+            controller: function ($scope,) {
+                $scope.list = [
+                    { p: "Quais são as Formas de Pagamento?", r: "No momento aceitamos apenas PIX como forma de pagamento." },
+                    { p: "Como recuperar minhas compras?", r: "Você pode ver todos os títulos comprados no mesmo dispositivo onde você realizou a compra, ou, procure a opção 'Recuperar Compras' no menu e informe seu email ou número do celular." },
+                ]
+            },
+            templateUrl: 'faq.htm'
+        };
+    })
+
+
     .controller('mainController', function ($scope, formClienteFactory) {
         $scope.selected = null;
         $scope.vlCompra = null;

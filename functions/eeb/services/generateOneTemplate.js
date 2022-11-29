@@ -60,9 +60,22 @@ class Service extends eebService {
                 collectionFrontTemplates.getDoc(idTemplate),
                 collectionInfluencers.getDoc(idInfluencer),
                 collectionCampanhas.getDoc(idCampanha),
-                collectionCampanhasInfluencers.get({ idCampanha: idCampanha, idInfluencer: idInfluencer }),
-                collectionCampanhasSorteios.get({ idCampanha: idCampanha }),
-                collectionCampanhasSorteiosPremios.get({ idCampanha: idCampanha })
+                collectionCampanhasInfluencers.get({
+                    filter: [
+                        { field: "idCampanha", condition: "==", value: idCampanha },
+                        { field: "idInfluencer", condition: "==", value: idInfluencer }
+                    ]
+                }),
+                collectionCampanhasSorteios.get({
+                    filter: [
+                        { field: "idCampanha", condition: "==", value: idCampanha },
+                    ]
+                }),
+                collectionCampanhasSorteiosPremios.get({
+                    filter: [
+                        { field: "idCampanha", condition: "==", value: idCampanha },
+                    ]
+                })
             ];
 
             return Promise.all(promises)

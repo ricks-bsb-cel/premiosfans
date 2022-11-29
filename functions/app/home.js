@@ -309,7 +309,7 @@ const compileApp = (sourceData, obj) => {
 
             let compiled = global.compile(sourceData, render);
 
-            // Substitui os marcadores do AngularJS (que foram criados com [[ e ]] e náo {{ e }}
+            // Substitui os marcadores do AngularJS (que foram criados com [[ e ]] e não {{ e }}
             compiled = compiled.split('[[').join('{{');
             compiled = compiled.split(']]').join('}}');
 
