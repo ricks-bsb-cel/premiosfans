@@ -1158,8 +1158,14 @@ sorteio-campanha-premios table input.right {
   padding: 0 5px 5px 55px;
 }
 
+.faq table .pergunta {
+  width: 40%;
+}
 .faq table .resposta {
-  margin-bottom: 0;
+  width: 50%;
+  word-break: break-word;
+  white-space: pre-wrap;
+  -moz-white-space: pre-wrap;
 }
 .faq table .resposta p {
   margin-bottom: 0;

@@ -162,16 +162,6 @@ const ngModule = angular.module('views.contratos-edit', [
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
 						{
-							key: 'detalhes',
-							templateOptions: {
-								label: 'Detalhes',
-								type: 'text',
-								height: 240
-							},
-							type: 'html-editor',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
-						},
-						{
 							key: 'template',
 							templateOptions: {
 								label: 'Template',
@@ -225,6 +215,58 @@ const ngModule = angular.module('views.contratos-edit', [
 							type: 'integer',
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
+					],
+					form: null
+				},
+				detalhes:{
+					fields:[
+						{
+							key: 'detalhes',
+							templateOptions: {
+								type: 'text',
+								height: 240
+							},
+							type: 'html-editor'
+						}
+					],
+					form: null
+				},
+				termos:{
+					fields:[
+						{
+							key: 'termos',
+							templateOptions: {
+								type: 'text',
+								height: 240
+							},
+							type: 'html-editor'
+						}
+					],
+					form: null
+				},
+				politica:{
+					fields:[
+						{
+							key: 'politica',
+							templateOptions: {
+								type: 'text',
+								height: 240
+							},
+							type: 'html-editor'
+						}
+					],
+					form: null
+				},
+				rodape:{
+					fields:[
+						{
+							key: 'rodape',
+							templateOptions: {
+								type: 'text',
+								height: 240
+							},
+							type: 'html-editor'
+						}
 					],
 					form: null
 				}

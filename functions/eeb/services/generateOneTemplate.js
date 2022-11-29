@@ -25,6 +25,8 @@ const collectionFrontTemplates = firestoreDAL.frontTemplates();
 const collectionInfluencers = firestoreDAL.influencers();
 const collectionAppLinks = firestoreDAL.appLinks();
 
+const collectionFaq = firestoreDAL.faq();
+
 const storage = new Storage();
 
 class Service extends eebService {
@@ -75,7 +77,8 @@ class Service extends eebService {
                     filter: [
                         { field: "idCampanha", condition: "==", value: idCampanha },
                     ]
-                })
+                }),
+                collectionFaq.get()
             ];
 
             return Promise.all(promises)
@@ -86,6 +89,7 @@ class Service extends eebService {
                     result.campanhaInfluencer = promisesResult[3];
                     result.campanhaSorteios = promisesResult[4];
                     result.campanhaSorteiosPremios = promisesResult[5];
+                    result.faq = promisesResult[6];
 
                     if (!result.template) throw new Error('Template not found');
                     if (!result.influencer) throw new Error('Influencer not found');

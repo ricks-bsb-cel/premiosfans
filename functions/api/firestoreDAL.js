@@ -305,3 +305,7 @@ exports.titulosPremios = _ => {
 exports.titulosCompras = _ => {
     return new collectionClass('titulosCompras');
 }
+
+exports.faq = _ => {
+    return new collectionClass('faq');
+}

@@ -32,8 +32,7 @@
 
                     <div class="card-body p-3">
                         <form novalidate>
-                            <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.main.fields"
-                                form="forms.main.form" novalidate>
+                            <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.main.fields" form="forms.main.form" novalidate>
                             </formly-form>
                         </form>
                     </div>
@@ -41,7 +40,6 @@
             </div>
 
             <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
-
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
@@ -79,6 +77,129 @@
                     </div>
                     <div class="card-footer pb-0" ng-if="qtdNumeros() > 0">
                         <p>Números de 0 (zero) a {{qtdNumeros()}}</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Conteúdos
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                        <ul
+                            class="nav nav-tabs"
+                            id="tab-conteudo"
+                            role="tablist"
+                        >
+                            <li class="nav-item">
+                                <a
+                                    id="tab-content-1-tab"
+                                    data-bs-target="#tab-content-1"
+                                    aria-controls="tab-content-1-tab"
+                                    class="nav-link active"
+                                    data-bs-toggle="tab"
+                                    role="tab"
+                                    aria-selected="true"
+                                >
+                                    Detalhes da Campanha
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a
+                                    id="tab-content-2-tab"
+                                    data-bs-target="#tab-content-2"
+                                    aria-controls="tab-content-2-tab"
+                                    class="nav-link"
+                                    data-bs-toggle="tab"
+                                    role="tab"
+                                    aria-selected="true"
+                                >
+                                    Termos de Uso
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a
+                                    id="tab-content-politica-tab"
+                                    data-bs-target="#tab-content-politica"
+                                    aria-controls="tab-content-politica-tab"
+                                    class="nav-link"
+                                    data-bs-toggle="tab"
+                                    role="tab"
+                                    aria-selected="true"
+                                >
+                                    Política de Privacidade
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a
+                                    id="tab-content-3-tab"
+                                    data-bs-target="#tab-content-3"
+                                    aria-controls="tab-content-3-tab"
+                                    class="nav-link"
+                                    data-bs-toggle="tab"
+                                    role="tab"
+                                    aria-selected="true"
+                                >
+                                    Rodapé
+                                </a>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content">
+                            <div
+                                id="tab-content-1"
+                                aria-labelledby="tab-content-1-tab"
+                                class="tab-pane fade pt-3 show active"
+                                role="tabpanel"
+                            >
+                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.detalhes.fields" form="forms.detalhes.form" novalidate>
+                                </formly-form>
+                            </div>
+                
+                            <div
+                                id="tab-content-2"
+                                aria-labelledby="tab-content-2-tab"
+                                class="tab-pane fade pt-3"
+                                role="tabpanel"
+                            >
+                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.termos.fields" form="forms.termos.form" novalidate>
+                                </formly-form>
+                            </div>
+
+                            <div
+                                id="tab-content-politica"
+                                aria-labelledby="tab-content-politica-tab"
+                                class="tab-pane fade pt-3"
+                                role="tabpanel"
+                            >
+                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.politica.fields" form="forms.politica.form" novalidate>
+                                </formly-form>
+                            </div>
+
+                            <div
+                                id="tab-content-3"
+                                aria-labelledby="tab-content-3-tab"
+                                class="tab-pane fade pt-3"
+                                role="tabpanel"
+                            >
+                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.rodape.fields" form="forms.rodape.form" novalidate>
+                                </formly-form>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
