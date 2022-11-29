@@ -34,6 +34,8 @@ import collectionTitulosPremios from './collections/collection.titulosPremios';
 
 import collectionContas from './collections/collection.contas';
 
+import collectionFaq from './collections/collection.faq';
+
 let ngModule = angular.module('firebase.collections', [
 	collectionCrud.name,
 
@@ -63,7 +65,8 @@ let ngModule = angular.module('firebase.collections', [
 	collectionTitulosCompras.name,
 	collectionTitulosPremios.name,
 
-	collectionContas.name
+	collectionContas.name,
+	collectionFaq.name
 ]);
 
 export default ngModule;

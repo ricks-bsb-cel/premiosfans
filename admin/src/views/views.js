@@ -32,6 +32,8 @@ import viewTitulosPremios from './titulos-premios/titulos-premios';
 import viewContas from './contas/contas';
 import viewContasEdit from './contas-edit/contas-edit';
 
+import viewFaq from './faq/faq';
+
 let ngModule = angular.module('views', [
 	viewAdmConfigPath.name,
 	viewAdmConfigProfiles.name,
@@ -67,7 +69,8 @@ let ngModule = angular.module('views', [
 	viewTitulosPremios.name,
 
 	viewContas.name,
-	viewContasEdit.name
+	viewContasEdit.name,
+	viewFaq.name
 ]);
 
 export default ngModule;

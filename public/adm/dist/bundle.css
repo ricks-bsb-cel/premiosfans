@@ -1158,6 +1158,12 @@ sorteio-campanha-premios table input.right {
   padding: 0 5px 5px 55px;
 }
 
+.faq table .resposta {
+  margin-bottom: 0;
+}
+.faq table .resposta p {
+  margin-bottom: 0;
+}
 .global-config .card-footer {
   line-height: 16px;
 }

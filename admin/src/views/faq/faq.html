@@ -1,0 +1,41 @@
+<section class="content faq">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay ready="collectionFaq.collection.isReady()" class="container-fluid">
+        <div class="row">
+
+            <div ng-if="collectionFaq.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhum registro encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="pergunta">Pergunta</th>
+                                    <th class="resposta">Resposta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionFaq.collection.data">
+                                    <td class="pergunta">
+                                        <a href="#" ng-click="edit(c)">
+                                            {{c.pergunta}}
+                                        </a>
+                                    </td>
+                                    <td class="resposta" ng-bind-html="c.resposta | unsafe">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>
