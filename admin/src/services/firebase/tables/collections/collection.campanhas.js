@@ -158,7 +158,8 @@ const ngModule = angular.module('collection.campanhas', [])
                 qtdNumerosPorGrupo: campanha.qtdNumerosPorGrupo,
                 termos: campanha.termos || null,
                 politica: campanha.politica || null,
-                rodape: campanha.rodape || null
+                rodape: campanha.rodape || null,
+                regulamento: campanha.regulamento || null
             };
 
             campanha.sorteios.forEach(s => {

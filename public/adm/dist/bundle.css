@@ -316,7 +316,8 @@ label.selector-input {
   color: white;
   line-height: 24px;
 }
-.main-header .navbar-nav .btn:hover, .main-header .navbar-nav .btn:focus {
+.main-header .navbar-nav .btn:hover,
+.main-header .navbar-nav .btn:focus {
   color: gold;
 }
 
@@ -324,7 +325,8 @@ label.selector-input {
   padding-top: 5px;
 }
 
-.card-body.table-responsive th.right, .card-body.table-responsive td.right {
+.card-body.table-responsive th.right,
+.card-body.table-responsive td.right {
   text-align: right;
 }
 
@@ -458,16 +460,18 @@ badge-true-false.link .badge {
   cursor: not-allowed !important;
 }
 
-.modal-dialog iframe, .modal-dialog .ekko-lightbox-item.show {
+.modal-dialog iframe,
+.modal-dialog .ekko-lightbox-item.show {
   height: 100%;
   width: 100%;
 }
 
+/*
 .note-editable * {
-  line-height: inherit !important;
-  font-size: initial !important;
-}
-
+    line-height: inherit !important;
+    font-size: initial !important;
+ }
+ */
 @media (max-width: 576px) {
   .hide-xs {
     display: none;
@@ -583,6 +587,53 @@ div.selector-container.disabled {
   background: #e9ecef;
   color: black;
   opacity: 0.8;
+}
+
+.note-editor.note-airframe .note-editing-area .note-editable,
+.note-editor.note-frame .note-editing-area .note-editable {
+  background: white;
+}
+
+.note-editor .note-toolbar .note-dropdown-menu,
+.note-popover .popover-content .note-dropdown-menu {
+  min-width: 220px;
+}
+
+.note-editor .dropdown-toggle::after {
+  display: none;
+}
+
+.note-editor .dropdown-toggle {
+  padding-right: 0;
+}
+
+.note-editor .note-fontname .dropdown-toggle {
+  padding-right: 10px;
+}
+
+.note-editor .note-editable h1 {
+  font-size: 1.7rem;
+  margin-top: 1em;
+}
+.note-editor .note-editable h2 {
+  font-size: 1.55rem;
+  margin-top: 0.9em;
+}
+.note-editor .note-editable h3 {
+  font-size: 1.4rem;
+  margin-top: 0.8em;
+}
+.note-editor .note-editable h4 {
+  font-size: 1.35rem;
+  margin-top: 0.7em;
+}
+.note-editor .note-editable h5 {
+  font-size: 1.2rem;
+  margin-top: 0.6em;
+}
+.note-editor .note-editable h6 {
+  font-size: 1.05rem;
+  margin-top: 0.5em;
 }
 .bell {
   display: block;

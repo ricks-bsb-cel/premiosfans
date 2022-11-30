@@ -49,6 +49,11 @@ const ngModule = angular.module('views.contratos-edit', [
 
 		const save = _ => {
 
+			if (!$scope.forms.main.form.$valid) {
+				alertFactory.error('Existe um ou mais campos obrigatórios não preenchidos. Verifique.');
+				return;
+			}
+
 			if (typeof $scope.campanha.ativo === 'undefined') $scope.campanha.ativo = false;
 
 			if ($scope.campanha.influencers.filter(f => { return f.selected; }).length === 0) {
@@ -77,10 +82,12 @@ const ngModule = angular.module('views.contratos-edit', [
 			});
 		}
 
-		const ativar = _ => {
-			premiosFansService.ativarCampanha({
-				idCampanha: $scope.campanha.id
-			});
+		$scope.ativar = _ => {
+			alertFactory.yesno('Tem certeza que deseja ativar a Campanha?', _ => {
+				premiosFansService.ativarCampanha({
+					idCampanha: $scope.campanha.id
+				});
+			})
 		}
 
 		const showNavbar = _ => {
@@ -113,7 +120,9 @@ const ngModule = angular.module('views.contratos-edit', [
 						{
 							id: 'ativar',
 							label: 'Ativar',
-							onClick: ativar,
+							onClick: _ => {
+								$scope.ativar();
+							},
 							icon: 'fa fa-check'
 						}
 					);
@@ -203,7 +212,7 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							defaultValue: _qtdGrupos,
 							type: 'integer',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6'
 						},
 						{
 							key: 'qtdNumerosPorGrupo',
@@ -213,13 +222,13 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							defaultValue: _qtdNumerosPorGrupo,
 							type: 'integer',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6'
 						},
 					],
 					form: null
 				},
-				detalhes:{
-					fields:[
+				detalhes: {
+					fields: [
 						{
 							key: 'detalhes',
 							templateOptions: {
@@ -231,8 +240,8 @@ const ngModule = angular.module('views.contratos-edit', [
 					],
 					form: null
 				},
-				termos:{
-					fields:[
+				termos: {
+					fields: [
 						{
 							key: 'termos',
 							templateOptions: {
@@ -244,8 +253,8 @@ const ngModule = angular.module('views.contratos-edit', [
 					],
 					form: null
 				},
-				politica:{
-					fields:[
+				politica: {
+					fields: [
 						{
 							key: 'politica',
 							templateOptions: {
@@ -257,10 +266,23 @@ const ngModule = angular.module('views.contratos-edit', [
 					],
 					form: null
 				},
-				rodape:{
-					fields:[
+				rodape: {
+					fields: [
 						{
 							key: 'rodape',
+							templateOptions: {
+								type: 'text',
+								height: 240
+							},
+							type: 'html-editor'
+						}
+					],
+					form: null
+				},
+				regulamento: {
+					fields: [
+						{
+							key: 'regulamento',
 							templateOptions: {
 								type: 'text',
 								height: 240

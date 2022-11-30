@@ -4,13 +4,8 @@
 
     <wait-overlay ready="ready" class="container-fluid">
         <div class="row">
+            
             <div ng-if="campanha" class="col-12">
-                <div ng-if="!campanha.ativo" class="alert alert-success">
-                    Esta campanha não está ativa e ainda não pode ser comercializada. Clique
-                    <button class="btn btn-default btn-xs" href="#">aqui</button>
-                    para ativar esta campanha.
-                </div>
-
                 <div ng-if="campanha.ativo" class="alert alert-danger">
                     Esta campanha está ativa e não pode ser alterada!
                 </div>
@@ -104,9 +99,9 @@
                         >
                             <li class="nav-item">
                                 <a
-                                    id="tab-content-1-tab"
-                                    data-bs-target="#tab-content-1"
-                                    aria-controls="tab-content-1-tab"
+                                    id="tab-content-detalhes-tab"
+                                    data-bs-target="#tab-content-detalhes"
+                                    aria-controls="tab-content-detalhes-tab"
                                     class="nav-link active"
                                     data-bs-toggle="tab"
                                     role="tab"
@@ -118,9 +113,23 @@
 
                             <li class="nav-item">
                                 <a
-                                    id="tab-content-2-tab"
-                                    data-bs-target="#tab-content-2"
-                                    aria-controls="tab-content-2-tab"
+                                    id="tab-content-regulamento-tab"
+                                    data-bs-target="#tab-content-regulamento"
+                                    aria-controls="tab-content-regulamento-tab"
+                                    class="nav-link"
+                                    data-bs-toggle="tab"
+                                    role="tab"
+                                    aria-selected="true"
+                                >
+                                    Regulamento
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a
+                                    id="tab-content-termos-tab"
+                                    data-bs-target="#tab-content-termos"
+                                    aria-controls="tab-content-termos-tab"
                                     class="nav-link"
                                     data-bs-toggle="tab"
                                     role="tab"
@@ -146,9 +155,9 @@
 
                             <li class="nav-item">
                                 <a
-                                    id="tab-content-3-tab"
-                                    data-bs-target="#tab-content-3"
-                                    aria-controls="tab-content-3-tab"
+                                    id="tab-content-rodape-tab"
+                                    data-bs-target="#tab-content-rodape"
+                                    aria-controls="tab-content-rodape-tab"
                                     class="nav-link"
                                     data-bs-toggle="tab"
                                     role="tab"
@@ -161,18 +170,28 @@
                         
                         <div class="tab-content">
                             <div
-                                id="tab-content-1"
-                                aria-labelledby="tab-content-1-tab"
+                                id="tab-content-detalhes"
+                                aria-labelledby="tab-content-detalhes-tab"
                                 class="tab-pane fade pt-3 show active"
                                 role="tabpanel"
                             >
                                 <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.detalhes.fields" form="forms.detalhes.form" novalidate>
                                 </formly-form>
                             </div>
+
+                            <div
+                                id="tab-content-regulamento"
+                                aria-labelledby="tab-content-regulamento-tab"
+                                class="tab-pane fade pt-3"
+                                role="tabpanel"
+                            >
+                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.regulamento.fields" form="forms.regulamento.form" novalidate>
+                                </formly-form>
+                            </div>
                 
                             <div
-                                id="tab-content-2"
-                                aria-labelledby="tab-content-2-tab"
+                                id="tab-content-termos"
+                                aria-labelledby="tab-content-termos-tab"
                                 class="tab-pane fade pt-3"
                                 role="tabpanel"
                             >
@@ -191,8 +210,8 @@
                             </div>
 
                             <div
-                                id="tab-content-3"
-                                aria-labelledby="tab-content-3-tab"
+                                id="tab-content-rodape"
+                                aria-labelledby="tab-content-rodape-tab"
                                 class="tab-pane fade pt-3"
                                 role="tabpanel"
                             >

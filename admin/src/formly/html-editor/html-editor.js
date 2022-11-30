@@ -23,6 +23,7 @@ const ngModule = angular.module('admin.formly.html-editor', [])
                     lang: 'pt-BR',
                     disableDragAndDrop: true,
                     disableResizeEditor: true,
+                    /*
                     toolbar: $scope.options.templateOptions.toolbar || [
                         ['style', ['style']],
                         ['font', ['bold', 'italic', 'underline', 'clear']],
@@ -30,6 +31,20 @@ const ngModule = angular.module('admin.formly.html-editor', [])
                         ['para', ['ul', 'ol', 'paragraph']],
                         ['table', ['table']],
                         ['insert', ['link', 'picture', 'video']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                    */
+                    tollbar: [
+                        ['edit', ['undo', 'redo']],
+                        ['headline', ['style']],
+                        ['style', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+                        ['fontface', ['fontname']],
+                        ['textsize', ['fontsize']],
+                        ['fontclr', ['color']],
+                        ['alignment', ['ul', 'ol', 'paragraph', 'lineheight']],
+                        ['height', ['height']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video', 'hr']],
                         ['view', ['fullscreen', 'codeview']]
                     ]
                 };
