@@ -1,10 +1,9 @@
 "use strict";
 
 const path = require('path');
+const admin = require("firebase-admin");
 const eebService = require('../../eventBusService').abstract;
 const Joi = require('joi');
-
-const { getAuth } = require("firebase-admin/auth");
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
@@ -12,12 +11,14 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
 const getUserProfile = require("./getUserProfile");
+const firestoreDAL = require("../../../api/firestoreDAL");
+const collectionConfigProfiles = firestoreDAL.admConfigProfiles();
 
 const schema = _ => {
     const schema = Joi.object({
-        uid: Joi.string().token().min(18).max(22).required(),
-        isAdmin: Joi.boolean().optional(),
-        isSuperUser: Joi.boolean().optional(),
+        uid: Joi.string().token().min(18).max(32).required(),
+        adminUser: Joi.boolean().optional(),
+        superUser: Joi.boolean().optional(),
         idConfigProfile: Joi.string().token().min(18).max(22).optional()
     });
 
@@ -35,30 +36,68 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            const result = {
-                success: true
-            };
+            let configProfile,
+                result = {
+                    success: true
+                };
 
             return schema().validateAsync(this.parm.data)
                 .then(dataResult => {
-                    result.request = dataResult;
+                    result.uid = dataResult.uid;
+                    result.custom = dataResult;
+
+                    delete result.custom.uid;
+
+                    if (result.custom.superUser && result.custom.adminUser) {
+                        throw new Error(`Configuração inválida`);
+                    }
 
                     // Verifica acesso do usuário do token atual
-                    return getUserProfile.call(this.parm.user_uid);
+                    return getUserProfile.get(this.parm.user_uid);
                 })
 
                 .then(currentUser => {
                     result.currentUser = currentUser;
 
-                    if (!currentUserResult.customClaims.superUser) {
-                        throw new Error(`O usuário atual não é Administrador ou SuperUsuário`)
+                    if (!result.currentUser.customClaims.superUser) {
+                        throw new Error(`O usuário atual ${result.currentUser.email} não é Administrador ou SuperUsuário`)
                     }
 
-                    return getUserProfile.call(result.request.uid)
+                    return getUserProfile.get(result.uid)
                 })
 
                 .then(userToChange => {
                     result.userToChange = userToChange;
+
+                    if (result.userToChange.isAnonymous) {
+                        throw new Error(`Não é possível aplicar configurações para usuários anônimos`)
+                    }
+
+                    if (result.custom.idConfigProfile) {
+                        return collectionConfigProfiles.getDoc(result.custom.idConfigProfile);
+                    } else {
+                        return true;
+                    }
+                })
+                .then(configProfileResult => {
+                    configProfile = configProfileResult;
+
+                    return admin.auth().setCustomUserClaims(result.uid, result.custom);
+                })
+
+                .then(_ => {
+                    return getUserProfile.get(result.uid)
+                })
+
+                .then(getUserProfileResult => {
+                    result = {
+                        success: true,
+                        data: getUserProfileResult,
+                    }
+
+                    if (typeof configProfile === 'object') {
+                        result.data.ConfigProfile = configProfile;
+                    }
 
                     return resolve(this.parm.async ? { success: true } : result);
                 })

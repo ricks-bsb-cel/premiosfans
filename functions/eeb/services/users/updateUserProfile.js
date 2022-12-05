@@ -1,17 +1,16 @@
-ß"use strict";
+"use strict";
 
 const path = require('path');
 const eebService = require('../../eventBusService').abstract;
 const global = require("../../../global");
-
-const { getAuth } = require("firebase-admin/auth");
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
-const firestoreDAL = require('../../api/firestoreDAL');
+const getUserProfile = require('./getUserProfile');
+const firestoreDAL = require('../../../api/firestoreDAL');
 
 const collectionUserProfile = firestoreDAL.userProfile();
 
@@ -33,18 +32,14 @@ class Service extends eebService {
 
             let updateUserProfile;
 
-            return getAuth().getUser(result.uid)
-                .then(getUserResult => {
+            return getUserProfile.get(result.uid)
 
-                    updateUserProfile = {
-                        ativo: !getUserResult.disabled,
-                        disabled: getUserResult.disabled,
-                        displayName: getUserResult.displayName || null,
-                        email: getUserResult.email || null,
-                        emailVerified: getUserResult.emailVerified,
-                        uid: getUserResult.uid,
-                        photoURL: getUserResult.photoURL
-                    };
+                .then(getUserResult => {
+                    updateUserProfile = getUserResult;
+
+                    if (updateUserProfile.isAnonymous) {
+                        throw new Error(`Usuários anonimos não podem ser atualizados`);
+                    }
 
                     global.setDateTime(updateUserProfile, 'dtAlteracao');
 
@@ -53,13 +48,17 @@ class Service extends eebService {
                         updateUserProfile.email
                     );
 
+                    delete updateUserProfile.customClaims;
+
                     updateUserProfile.keywords.push(updateUserProfile.uid);
 
-                    return collectionUserProfile.set(result.uid, updateUserProfile, true);
+                    return collectionUserProfile.set(updateUserProfile.uid, updateUserProfile, true);
                 })
 
                 .then(_ => {
                     result.data = updateUserProfile;
+
+                    delete result.data.keywords;
 
                     return resolve(this.parm.async ? { success: true } : result);
                 })

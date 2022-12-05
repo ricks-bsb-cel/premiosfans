@@ -5,24 +5,43 @@ const eebService = require('../../eventBusService').abstract;
 
 const { getAuth } = require("firebase-admin/auth");
 
+const idSuperUser = "RaxbGarlPwgSeM64PKr0lpMBlHb2";
+
 const _get = uid => {
     return new Promise((resolve, reject) => {
 
-        return getAuth().getUser(result.uid)
+        return getAuth().getUser(uid)
 
-            .then(result => {
-                resultata.isAnonymous = result.providerData.filter(f => {
-                    return f.providerId === 'google.com';
-                }).length === 0;
+            .then(getUserResult => {
 
-                delete result.metadata;
+                let result = {
+                    uid: getUserResult.uid,
+                    email: getUserResult.email || null,
+                    emailVerified: getUserResult.emailVerified,
+                    displayName: getUserResult.displayName || null,
+                    photoURL: getUserResult.photoURL || null,
+                    phoneNumber: getUserResult.phoneNumber || null,
+                    disabled: getUserResult.disabled,
+                    customClaims: getUserResult.customClaims || {},
+                    isAnonymous: getUserResult.providerData.filter(f => {
+                        return f.providerId === 'google.com';
+                    }).length === 0
+                };
+
+                if (result.uid === idSuperUser) {
+                    result.customClaims.superUser = true;
+                }
+
+                if (Object.keys(result.customClaims).length === 0) {
+                    delete result.customClaims;
+                }
 
                 return resolve(result);
             })
 
             .catch(e => {
                 return reject(e);
-            })
+            });
 
     })
 }
@@ -44,6 +63,10 @@ class Service extends eebService {
                 uid: this.parm.data.uid
             };
 
+            if (result.uid === 'current') {
+                result.uid = this.parm.user_uid;
+            }
+
             return _get(result.uid)
 
                 .then(getResult => {
@@ -54,7 +77,7 @@ class Service extends eebService {
 
                 .catch(e => {
                     return reject(e);
-                })
+                });
 
         })
     }
