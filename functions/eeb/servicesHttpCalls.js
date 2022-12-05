@@ -97,6 +97,18 @@ api.post("/v1/purge-campanha", (request, response) => {
     initFirebase.call(require('./services/purgeCampanha').callRequest, request, response);
 })
 
+api.get("/v1/user/get-profile/:uid", (request, response) => {
+    initFirebase.call(require('./services/users/getUserProfile').callRequest, request, response);
+})
+
+api.post("/v1/user/update-profile", (request, response) => {
+    initFirebase.call(require('./services/users/updateUserProfile').callRequest, request, response);
+})
+
+api.post("/v1/user/update-custom-config", (request, response) => {
+    initFirebase.call(require('./services/users/updateUserCustomConfig').callRequest, request, response);
+})
+
 const eeb = express();
 
 eeb.use(cors());

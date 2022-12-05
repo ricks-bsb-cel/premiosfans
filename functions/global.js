@@ -232,14 +232,9 @@ const defaultResult = (parm, ignoreIdEmpresa) => {
 
         const dtHoje = Timestamp.now();
 
-        if (!parm.idEmpresa && !ignoreIdEmpresa) {
-            throw new Error('O result deve ter idEmpresa na resposta...');
-        }
-
         let result = {};
 
         if (parm.id) { result.id = parm.id; }
-        if (parm.idEmpresa) { result.idEmpresa = parm.idEmpresa; }
         if (parm.cpf) { result.cpf = parm.cpf; }
         if (parm.idUser) { result.idUser = parm.idUser; }
         if (parm.message) { result.message = parm.message; }
@@ -261,7 +256,7 @@ const defaultResult = (parm, ignoreIdEmpresa) => {
 
             result.data = parm.data;
 
-            if (!result.id && result.data.id) {
+            if (!result.id && result.data && result.data.id) {
                 result.id = result.data.id;
             }
 

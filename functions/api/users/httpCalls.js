@@ -21,10 +21,6 @@ api.post("/v1/user/find", (request, response) => {
     return initFirebase.call(require('./users').requestFindUserProfileByCpfCelular, request, response);
 })
 
-api.post("/v1/appUser/init", (request, response) => {
-    return initFirebase.call(require('./users').requestInitAppUser, request, response);
-})
-
 api.post("/v1/user/update", (request, response) => {
     return initFirebase.call(require('./users').updateUserProfile, request, response);
 })
@@ -33,16 +29,27 @@ api.get("/v1/user/:uid", (request, response) => {
     return initFirebase.call(require('./users').requestUserInfo, request, response);
 })
 
-api.post("/v1/setSuperUser/:uid", (request, response) => {
+api.post("/v1/set-super-user/:uid", (request, response) => {
     return initFirebase.call(require('./users').requestSetSuperUser, request, response);
 })
 
-api.get("/v1/setAdminUser/:uid", (request, response) => {
+api.post("/v1/remove-super-user/:uid", (request, response) => {
+    return initFirebase.call(require('./users').requestRemoveSuperUser, request, response);
+})
+
+api.post("/v1/set-admim-user/:uid", (request, response) => {
     return initFirebase.call(require('./users').requestSetAdminUser, request, response);
 })
 
 api.post("/v1/empresa", (request, response) => {
     return initFirebase.call(require('./users').setEmpresaToUser, request, response);
+})
+
+
+/* ------------------------------------------------------- */
+
+api.post("/v2/get-users", (request, response) => {
+    return initFirebase.call(require('./users-v2').requestGetUsers, request, response);
 })
 
 const users = express();

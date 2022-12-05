@@ -12,8 +12,7 @@ const ngModule = angular.module('directives.loginBox', [])
 			newPasswordFactory,
 			globalFactory,
 			newUserFactory,
-			$window,
-			$timeout
+			$window
 		) {
 
 			blockUiFactory.start();
@@ -119,7 +118,7 @@ const ngModule = angular.module('directives.loginBox', [])
 			appAuthHelper.ready()
 				.then(_ => {
 					$scope.appProfile = appConfig.appProfile();
-					$scope.login = appConfig.get("/login");
+					$scope.login = appConfig.get("/login");ß
 
 					if (appAuthHelper.user) {
 						$window.location.href = '/adm/home';

@@ -94,13 +94,17 @@ const getUserTokenFromRequest = (request, response) => {
     const Cookies = require("cookies");
     const cookies = new Cookies(request, response);
 
-    let token =
-        request.headers['x-forwarded-authorization'] ||
-        request.headers['authorization'] ||
-        request.headers['token'] ||
-        cookies.get("__session") ||
-        (request.query && request.query.token ? request.query.token : null) ||
-        null;
+    let token = null;
+
+    if (request) {
+        token = request.headers['x-forwarded-authorization'] ||
+            request.headers['authorization'] ||
+            request.headers['token'] ||
+            (request.query && request.query.token ? request.query.token : null) ||
+            null;
+    }
+
+    token = token || cookies.get("__session");
 
     if (token && token.startsWith("Bearer ")) {
         token = token.substr(7);
