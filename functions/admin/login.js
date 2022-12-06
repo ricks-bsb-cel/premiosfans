@@ -3,8 +3,8 @@
 const path = require('path');
 const global = require('../global');
 const adminController = require('./adminController');
-const users = require('../api/users/users');
 
+const updateUserProfile = require('../eeb/services/users/updateUserProfile');
 const hbsPath = path.join(__dirname, '/hbs');
 const hbsFile = path.join(hbsPath, 'login.hbs');
 const hbsPartials = path.join(hbsPath, 'partials/login');
@@ -15,13 +15,14 @@ exports.get = (request, response) => {
 
     const clearLogin = Object.keys(request.query).includes('clear');
 
-    return users.checkUserProfile(request, response)
+    return updateUserProfile.updateWithToken(request, response)
 
-        .then(user => {
-            return adminController.getPermissions(user, request);
+        .then(updateUserProfileResult => {
+            return adminController.getPermissions(updateUserProfileResult);
         })
 
         .then(result => {
+            console.info('login', result.redirect);
             if (clearLogin || result.redirect === '/adm/login') {
                 return response.render(hbsFile, result);
             } else {

@@ -18,7 +18,6 @@ const ngModule = angular.module('directives.navbar-right', [])
 						firebaseProvider.signout();
 						
 						$timeout(function () {
-							debugger;
 							window.location.href = '/adm/login';
 						}, 1000)
 					});

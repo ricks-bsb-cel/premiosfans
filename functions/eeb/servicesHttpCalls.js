@@ -97,11 +97,13 @@ api.post("/v1/purge-campanha", (request, response) => {
     initFirebase.call(require('./services/purgeCampanha').callRequest, request, response);
 })
 
+/* Users */
+
 api.get("/v1/user/get-profile/:uid", (request, response) => {
     initFirebase.call(require('./services/users/getUserProfile').callRequest, request, response);
 })
 
-api.post("/v1/user/update-profile", (request, response) => {
+api.get("/v1/user/update-profile", (request, response) => {
     initFirebase.call(require('./services/users/updateUserProfile').callRequest, request, response);
 })
 

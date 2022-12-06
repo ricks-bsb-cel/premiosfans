@@ -799,7 +799,7 @@ exports.updateUser = (request, response) => {
 
 exports.checkUserProfile = (request, response) => {
 
-    // Verifica se o Profile do usuário já existe em userProfile e o adiciona se não existir. Não cria o Perfil de acesso...
+    // Verifica se o Profile do usuário já existe em userProfile e o adiciona/atualiza se não existir. Não cria o Perfil de acesso...
     return new Promise((resolve, reject) => {
 
         const Cookies = require("cookies");

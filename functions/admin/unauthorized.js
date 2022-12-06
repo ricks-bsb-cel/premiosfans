@@ -4,7 +4,7 @@ const path = require('path');
 const global = require('../global');
 const adminController = require('./adminController');
 
-const users = require('../api/users/users');
+const updateUserProfile = require('../eeb/services/users/updateUserProfile');
 const hbsPath = path.join(__dirname, '/hbs');
 const hbsFile = path.join(hbsPath, '/unauthorized.hbs');
 const hbsPartials = path.join(hbsPath, '/partials/unauthorized');
@@ -13,10 +13,10 @@ exports.get = (request, response) => {
 
     global.mapHandlebarDir(hbsPartials);
 
-    users.getCurrentUserFromCookie(request, response)
+    return updateUserProfile.updateWithToken(request, response)
 
-        .then(user => {
-            return adminController.getPermissions(user, request);
+        .then(updateUserProfileResult => {
+            return adminController.getPermissions(updateUserProfileResult);
         })
 
         .then(result => {

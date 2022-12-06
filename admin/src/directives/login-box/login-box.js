@@ -118,7 +118,7 @@ const ngModule = angular.module('directives.loginBox', [])
 			appAuthHelper.ready()
 				.then(_ => {
 					$scope.appProfile = appConfig.appProfile();
-					$scope.login = appConfig.get("/login");ß
+					$scope.login = appConfig.get("/login");
 
 					if (appAuthHelper.user) {
 						$window.location.href = '/adm/home';

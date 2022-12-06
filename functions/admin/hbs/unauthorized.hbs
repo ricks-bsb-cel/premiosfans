@@ -22,7 +22,12 @@
         </div>
 
         <div class="help-block text-center mt-2">
-            Verifique suas permissões com o<br />administrador da sua empresa ou com nossa equipe de Suporte ao Usuário.
+            <p>
+                Verifique suas permissões com o<br />administrador da sua empresa ou com nossa equipe de Suporte ao Usuário.
+            </p>
+            {{#if message}}
+                <p>{{message}}</p>
+            {{/if}}
             <br/><br/><code>{{user.uid}}</code>
         </div>
 
