@@ -30,10 +30,9 @@ exports.get = (request, response) => {
         })
 
         .then(getPermissionsResult => {
-
             result = getPermissionsResult;
 
-            if (!result.user.userProfile || !result.user.userProfile.groups) return null;
+            if (!result.user || !result.user.userProfile || !result.user.userProfile.groups) return null;
 
             result.user.userProfile.groups.forEach(g => {
                 g.options.forEach(o => {

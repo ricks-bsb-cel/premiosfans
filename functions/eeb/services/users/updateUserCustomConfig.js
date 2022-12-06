@@ -59,7 +59,7 @@ class Service extends eebService {
                 .then(currentUser => {
                     result.currentUser = currentUser;
 
-                    if (!result.currentUser.customClaims.superUser) {
+                    if (result.currentUser.customClaims && !result.currentUser.customClaims.superUser) {
                         throw new Error(`O usuário atual ${result.currentUser.email} não é Administrador ou SuperUsuário`)
                     }
 

@@ -111,6 +111,10 @@ api.post("/v1/user/update-custom-config", (request, response) => {
     initFirebase.call(require('./services/users/updateUserCustomConfig').callRequest, request, response);
 })
 
+api.get("/v1/user/revoke-token/:uid", (request, response) => {
+    initFirebase.call(require('./services/users/revokeUserToken').callRequest, request, response);
+})
+
 const eeb = express();
 
 eeb.use(cors());

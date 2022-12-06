@@ -9,6 +9,16 @@ html {
     scroll-behavior: smooth;
 }
 
+section#rodape * {
+    font-size: 0.8em;
+    line-height: 1.1em;
+    margin: 0;
+}
+
+a.link{
+    cursor: pointer;
+}
+
 @media (max-width: 420px) {
     :root {
         --spacing-company: 10rem;
@@ -21,7 +31,22 @@ html {
     }
 }
 
-.roller-counter{
+dialog#modal-regulamento .content * {
+    font-size: 0.9em;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 1.3em;
+}
+
+dialog#modal-regulamento .content h1,
+dialog#modal-regulamento .content h2,
+dialog#modal-regulamento .content h3,
+dialog#modal-regulamento .content h4 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.roller-counter {
     font-size: 1.4em;
     font-weight: bold;
     color: green;
@@ -29,20 +54,20 @@ html {
     padding-top: 5px;
 }
 
-.monospace{
+.monospace {
     font-family: 'Courier New', Courier, monospace;
 }
 
-table.label-description tr td:nth-child(1){
+table.label-description tr td:nth-child(1) {
     font-size: 0.9em;
     min-width: 110px;
 }
 
-table.label-description tr td:nth-child(2){
+table.label-description tr td:nth-child(2) {
     font-family: 'Courier New', Courier, monospace;
 }
 
-table.label-description tr td:nth-child(2) span{
+table.label-description tr td:nth-child(2) span {
     display: block;
     width: calc(100% - 45px);
     white-space: nowrap;
@@ -50,7 +75,7 @@ table.label-description tr td:nth-child(2) span{
     text-overflow: ellipsis;
 }
 
-.full-width{
+.full-width {
     width: 100%;
 }
 
@@ -77,19 +102,21 @@ small {
     background-size: cover;
 }
 
-h2.valor{
+h2.valor {
     position: relative;
     letter-spacing: -1px;
     font-weight: bold;
 }
-h2.valor small.currency{
+
+h2.valor small.currency {
     font-size: 0.4em;
     bottom: 1px;
     position: relative;
     left: 2px;
     font-weight: 300;
 }
-h2.valor small.cents{
+
+h2.valor small.cents {
     font-size: 0.45em;
     position: relative;
     font-weight: 400;
@@ -399,7 +426,11 @@ summary.hamburguer i.bi {
 }
 
 
-[role=button], button, input[type=button], input[type=reset], input[type=submit] {
+[role=button],
+button,
+input[type=button],
+input[type=reset],
+input[type=submit] {
     --background-color: green;
     font-size: 1.2rem;
 }

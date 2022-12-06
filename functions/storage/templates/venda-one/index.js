@@ -394,6 +394,45 @@ angular.module('app', [])
     })
 
 
+
+    .factory('modalRegulamentoFactory', function () {
+        let delegate = {};
+
+        return {
+            delegate: delegate
+        }
+    })
+    .directive('modalRegulamento', function () {
+        return {
+            restrict: 'E',
+            controller: function ($scope, modalRegulamentoFactory, modal) {
+                $scope.visible = false;
+                let element = null;
+
+                $scope.close = _ => {
+                    modal.close();
+                    $scope.visible = false;
+                }
+
+                $scope.initDelegates = e => {
+                    element = e;
+
+                    modalRegulamentoFactory.delegate = {
+                        show: _ => {
+                            $scope.visible = true;
+                            modal.open("modal-regulamento");
+                        }
+                    }
+                }
+            },
+            templateUrl: 'modal-regulamento.htm',
+            link: function (scope, element) {
+                scope.initDelegates(element);
+            }
+        };
+    })
+
+
     .directive('faq', function () {
         return {
             restrict: 'E',
@@ -408,7 +447,11 @@ angular.module('app', [])
     })
 
 
-    .controller('mainController', function ($scope, formClienteFactory) {
+    .controller('mainController', function (
+        $scope,
+        formClienteFactory,
+        modalRegulamentoFactory
+    ) {
         $scope.selected = null;
         $scope.vlCompra = null;
         $scope.swiperPremios = null;
@@ -425,13 +468,16 @@ angular.module('app', [])
         }
 
         $scope.openSell = _ => {
-
             if (!$scope.vlCompra) {
                 Swal.fire('Ooops!', 'Selecione uma quantidade de títulos desejada!', 'info');
                 return;
             }
 
             formClienteFactory.delegate.send($scope.qtd);
+        }
+
+        $scope.showRegulamento = _ => {
+            modalRegulamentoFactory.delegate.show();
         }
 
     })

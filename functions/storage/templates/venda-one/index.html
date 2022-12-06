@@ -89,10 +89,7 @@
                     </summary>
                     <ul role="listbox">
                         <li><a href="../recuperar/" class="primary">Recuperar Compras</a></li>
-                        <!--
-                        <li><a href="../preview/" class="primary">Seja um Revendedor</a></li>
-                        -->
-                        <li><a href="../preview-rtl/">Regulamento</a></li>
+                        <li><a class="link" ng-click="showRegulamento()">Regulamento</a></li>
                         <li><a href="../preview-rtl/">Sobre a Empresa</a></li>
                         <li><a href="../classless/">Contato</a></li>
                     </ul>
@@ -121,14 +118,14 @@
         </ul>
         <ul>
             <li class="p-10">
-                <a href="/regulamento" class="primary">
+                <a class="link" ng-click="showRegulamento()" class="primary">
                     Regulamento
                 </a>
             </li>
         </ul>
     </nav>
 
-    <main class="container pt-20">
+    <main class="container pt-20 pb-0">
 
         <section id="campanha">
             <hgroup>
@@ -274,16 +271,21 @@
 
         <pagar-compra></pagar-compra>
         <detalhes-compra></detalhes-compra>
+        <modal-regulamento></modal-regulamento>
+
+        {{#if campanha.rodape}}
+        <section id="rodape">
+            {{{campanha.rodape}}}
+        </section>
+        {{/if}}
 
     </main>
 
-    <footer class="container text-center">
+    <footer class="container text-center pt-0">
         <small>
-            <a href="#top">Seja um Revendedor</a>
-            •
             <a href="#top">Resultados</a>
             •
-            <a href="#top">Regulamento</a>
+            <a class="link" ng-click="showRegulamento()">Regulamento</a>
             •
             <a href="#top">Sobre a Empresa</a>
             •
@@ -292,7 +294,9 @@
             <a href="#top">Topo</a>
         </small>
         <p>
-            v {{version}}
+            <small style="font-family:monospace;">
+                v {{version}}
+            </small>
         </p>
     </footer>
 
@@ -503,6 +507,25 @@
                 </article>
             </div>
         </section>
+    </script>
+
+    <script type="text/ng-template" id="modal-regulamento.htm">
+        <dialog
+            ng-show="visible"
+            id="modal-regulamento"
+        >
+            <article class="pt-20">
+                <h3 class="mb-20">Regulamento da Campanha</h3>
+                <div class=content>
+                    {{{campanha.regulamento}}}
+                </div>
+                <footer>
+                    <button class="mb-0" ng-click="close()">
+                        Fechar
+                    </button>
+                </footer>
+            </article>
+        </dialog>
     </script>
 
     <script>

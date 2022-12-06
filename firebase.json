@@ -44,7 +44,6 @@
         "rewrites":[
 			{ "source": "/adm/**", "function": "mainAdm" },
             { "source": "/api/auth/**", "function": "auth" },
-            { "source": "/api/users/**", "function": "users" },
             { "source": "/api/eeb/**", "function": "eeb" },
             { "source": "/**", "function": "app" }
         ]
