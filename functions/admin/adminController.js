@@ -29,7 +29,7 @@ exports.getPermissions = user => {
                 }
 
                 if (!user.customClaims || !user.customClaims.idConfigProfile) {
-                    result.message = `O usuário não está configurado para nenhum perfil de acesso.`;
+                    result.message = `Usuário não configurado para nenhum perfil de acesso`;
                     return resolve(result);
                 }
 
