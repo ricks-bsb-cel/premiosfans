@@ -3,10 +3,8 @@
 const path = require('path');
 const global = require('../global');
 const adminController = require('./adminController');
-// const users = require('../api/users/users');
 
 const updateUserProfile = require('../eeb/services/users/updateUserProfile');
-const helper = require('../eeb/eventBusServiceHelper');
 
 const hbsPath = path.join(__dirname, '/hbs');
 const hbsFile = path.join(hbsPath, '/home.hbs');
@@ -19,9 +17,8 @@ exports.get = (request, response) => {
 
     global.mapHandlebarDir(hbsPartials);
 
-    helper.getUserTokenFromRequest(request, response)
-
-    let result, promissesPerfis = [];
+    let result = null;
+    const promissesPerfis = [];
 
     return updateUserProfile.updateWithToken(request, response)
 
@@ -71,8 +68,11 @@ exports.get = (request, response) => {
         })
 
         .catch(e => {
-            console.error(e);
-            return response.send(e);
+            if (e.code === 'invalid-anonymous-user') {
+                response.redirect('/adm/login');
+            } else {
+                return response.send(e);
+            }
         })
 
 }

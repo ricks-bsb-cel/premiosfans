@@ -192,6 +192,62 @@ paths:
         '200':
           description: Success
 
+  /api/eeb/v1/whr/{source}/{type}:
+    post:
+      tags:
+      - eeb
+      summary: eeb
+      description: |
+        WebHooks
+      operationId: post-eeb-webhook-source-type
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      produces:
+      - application/json
+      parameters:
+        - in: path
+          name: source
+          description: Source
+          required: true
+          type: string
+        - in: path
+          name: type
+          description: Type
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+    options:
+      tags:
+        - eeb
+      summary: CORS
+      description: Habilitação do Cors no Google Gateway Api.
+      operationId: cors-post-eeb-webhook-source-type
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - in: path
+          name: source
+          description: Source
+          required: true
+          type: string
+        - in: path
+          name: type
+          description: Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+
+
 securityDefinitions:
   firebase:
     authorizationUrl: ""

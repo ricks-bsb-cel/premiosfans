@@ -61,7 +61,9 @@ const _updateWithUid = (uid, withProfile) => {
                 updateUserProfile = getUserResult;
 
                 if (updateUserProfile.isAnonymous) {
-                    throw new Error(`Usuários anonimos não podem ser atualizados`);
+                    const e = Error(`Usuários anonimos não podem ser atualizados`);
+                    e.code = 'invalid-anonymous-user'
+                    throw e;
                 }
 
                 global.setDateTime(updateUserProfile, 'dtAlteracao');

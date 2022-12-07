@@ -178,7 +178,7 @@ const ngModule = angular.module('services.app-auth-helper', [])
 				appAuth.onAuthStateChanged(auth, user => {
 					currentUser = user;
 
-					if (!currentUser) {
+					if (!currentUser || currentUser.isAnonymous) {
 						clearSessions();
 						authReady = true;
 						return;

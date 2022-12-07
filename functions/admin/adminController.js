@@ -1,7 +1,10 @@
 "use strict";
 
+const admin = require("firebase-admin");
+
 const global = require('../global');
 const secret = require('../secretManager');
+const helper = require('../eeb/eventBusServiceHelper');
 
 exports.getPermissions = user => {
     return new Promise(resolve => {
@@ -70,5 +73,36 @@ exports.getPermissions = user => {
 
 
     })
+}
 
+exports.checkToken = (request, response) => {
+    return new Promise(resolve => {
+        const token = helper.getUserTokenFromRequest(request, response);
+
+        const version = global.getVersionId();
+
+        const result = {
+            redirect: '/adm/login',
+            _config: { v: version },
+            version: version
+        };
+
+        if (!token) {
+            return resolve(result)
+        }
+
+        return admin.auth().verifyIdToken(token)
+            .then(user => {
+                if (user.provider_id === 'anonymous') {
+                    return resolve(result);
+                } else {
+                    result.redirect = '/adm/home';
+                    return resolve(result);
+                }
+            })
+            .catch(e => {
+                console.error(e);
+                return resolve(result);
+            })
+    })
 }

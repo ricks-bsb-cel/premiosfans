@@ -43,13 +43,14 @@ class Service extends eebService {
 exports.Service = Service;
 
 exports.callRequest = (request, response) => {
+    const eebAuthTypes = require('../eventBusService').authType;
 
     const parm = {
         name: 'webhook',
-        noAuth: true,
         async: request.query.async ? request.query.async === 'true' : true,
         debug: request.query.debug ? request.query.debug === 'true' : false,
         data: request.body || {},
+        auth: eebAuthTypes.noAuth,
         attributes: {
             source: request.params.source
         }

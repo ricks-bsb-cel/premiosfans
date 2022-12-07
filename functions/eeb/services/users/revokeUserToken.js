@@ -23,7 +23,7 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let result = {
+            const result = {
                 success: true,
                 uid: this.parm.data.uid
             };
@@ -38,7 +38,7 @@ class Service extends eebService {
 
                 .then(_ => {
                     result.revoked = true;
-                    
+
                     delete result.user;
 
                     return resolve(this.parm.async ? { success: true } : result);
