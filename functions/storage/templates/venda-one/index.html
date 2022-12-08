@@ -274,9 +274,9 @@
         <modal-regulamento></modal-regulamento>
 
         {{#if campanha.rodape}}
-        <section id="rodape">
-            {{{campanha.rodape}}}
-        </section>
+            <section id="rodape">
+                {{{campanha.rodape}}}
+            </section>
         {{/if}}
 
     </main>
@@ -390,6 +390,7 @@
                     ng-repeat="c in compras | orderBy:'dtInclusao_js_desc'"
                     id-titulo-compra="[[c.id]]"
                     open-detail="[[c.situacao==='aguardando-pagamento']]"
+                    ng-class="{last:$last}"
                 >
                     <summary>
                         em

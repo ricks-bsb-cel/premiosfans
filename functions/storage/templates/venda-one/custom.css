@@ -183,6 +183,11 @@ h2.valor small.cents {
     background-color: var(--switch-background-color);
 }
 
+.compras-cliente details.last{
+    border-bottom: initial;
+    margin-bottom: initial;
+}
+
 header {
     padding: var(--spacing-company) 0;
 }

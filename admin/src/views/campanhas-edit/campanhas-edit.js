@@ -212,7 +212,7 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							defaultValue: _qtdGrupos,
 							type: 'integer',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6'
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6'
 						},
 						{
 							key: 'qtdNumerosPorGrupo',
@@ -222,7 +222,7 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							defaultValue: _qtdNumerosPorGrupo,
 							type: 'integer',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6'
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6'
 						},
 					],
 					form: null

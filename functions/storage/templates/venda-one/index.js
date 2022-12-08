@@ -2,7 +2,8 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
+import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-messaging.js";
+import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
@@ -14,6 +15,8 @@ const firebaseConfig = {
     appId: "1:801994869227:web:188d640a390d22aa4831ae",
     measurementId: "G-XTRQ740MSL"
 };
+
+const messagingKey = "BIY0gJcJ_octWgJgtcayla50bdJrhDetP6iekjYBkU93_tolz0Kw1HLa4tScldEWkHcrgxzolAqBpV7GkeceN3g";
 
 angular.module('app', [])
 
@@ -53,16 +56,35 @@ angular.module('app', [])
         }
     })
 
-    .factory('init', function ($q, global, $timeout) {
+    .factory('init', function ($q, global, comprasClienteFactory, $timeout) {
         let app = null,
             token = null,
             isReady = false,
-            userData = {};
+            user = null,
+            messaging = null;
 
         const init = _ => {
             app = initializeApp(firebaseConfig);
+            messaging = getMessaging(app);
             global.unblockUi();
             stateChanged();
+        }
+
+        const initMessaging = _ => {
+            const messaging = getMessaging();
+
+            getToken(messaging, { vapidKey: messagingKey }).then(currentToken => {
+                if (currentToken) {
+                    Swal.fire('Token', currentToken, 'success');
+                } else {
+                    // Show permission request UI
+                    Swal.fire('Token', 'No registration token available. Request permission to generate one.', 'success');
+                }
+            }).catch(e => {
+                console.error(e);
+
+                Swal.fire('Error', e.message, 'error');
+            });
         }
 
         const ready = _ => {
@@ -78,10 +100,6 @@ angular.module('app', [])
             })
         }
 
-        const getToken = _ => {
-            return token;
-        }
-
         const setCookie = token => {
             document.cookie = `__anonymousSession=${token}; path=/`;
         }
@@ -90,6 +108,7 @@ angular.module('app', [])
             const auth = getAuth();
             auth.onIdTokenChanged(user => {
                 token = user.accessToken;
+
                 setCookie(token);
             });
         }
@@ -99,13 +118,25 @@ angular.module('app', [])
             return auth.currentUser;
         }
 
+        const initUser = user => {
+            user = user;
+            token = user.accessToken;
+
+            setCookie(token);
+            checkTokenChange();
+
+            comprasClienteFactory.delegate.refresh();
+        }
+
         const stateChanged = _ => {
             const auth = getAuth();
             onAuthStateChanged(auth, user => {
-                if (!user) return signIn();
-                token = auth.currentUser.accessToken || null;
-                setCookie(token);
-                checkTokenChange();
+                if (user) {
+                    initUser(user);
+                }
+
+                initMessaging();
+
                 isReady = true;
             })
         }
@@ -113,18 +144,32 @@ angular.module('app', [])
         const signIn = _ => {
             const auth = getAuth();
 
-            signInAnonymously(auth)
-                .catch((e) => {
-                    console.info(e.code, e.message);
-                });
+            return $q((resolve, reject) => {
+                if (token) {
+                    return resolve(token);
+                }
+
+                signInAnonymously(auth)
+                    .then(user => {
+                        initUser(user);
+
+                        return resolve(token);
+                    })
+                    .catch((e) => {
+                        console.info(e.code, e.message);
+                        return reject(e);
+                    });
+
+            })
+
         }
 
         return {
             app: app,
             init: init,
-            getToken: getToken,
             getCurrentUser: getCurrentUser,
-            ready: ready
+            ready: ready,
+            signIn: signIn
         }
 
     })
@@ -140,40 +185,41 @@ angular.module('app', [])
         }
 
         const generateTitulo = data => {
-            const token = auth.currentUser ? auth.currentUser.accessToken : null;
+            let token = null;
 
             return $q(function (resolve, reject) {
 
-                if (!token) {
-                    Swal.fire('Ooops!', 'Não foi possível iniciar a compra...', 'error');
-                    return reject();
-                }
-
-                if (!data || !data.nome || !data.email || !data.celular || !data.cpf) {
-                    Swal.fire('Ooops!', 'Verifique seus dados...', 'error');
-                    return reject();
-                }
-
                 global.blockUi();
 
-                data = {
-                    idCampanha: _idCampanha,
-                    idInfluencer: _idInfluencer,
-                    nome: data.nome,
-                    email: data.email,
-                    celular: data.celular.replace(/\D/g, ""),
-                    cpf: data.cpf.replace(/\D/g, ""),
-                    qtdTitulos: data.qtdTitulos
-                };
+                init.signIn()
+                    .then(signInResult => {
+                        token = signInResult;
 
-                $http({
-                    url: getUrlEndPoint('/api/eeb/v1/generate-titulo?async=false'),
-                    method: 'post',
-                    data: data,
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                })
+                        if (!data || !data.nome || !data.email || !data.celular || !data.cpf) {
+                            Swal.fire('Ooops!', 'Verifique seus dados...', 'error');
+                            return reject();
+                        }
+
+                        data = {
+                            idCampanha: _idCampanha,
+                            idInfluencer: _idInfluencer,
+                            nome: data.nome,
+                            email: data.email,
+                            celular: data.celular.replace(/\D/g, ""),
+                            cpf: data.cpf.replace(/\D/g, ""),
+                            qtdTitulos: data.qtdTitulos
+                        };
+
+                        return $http({
+                            url: getUrlEndPoint('/api/eeb/v1/generate-titulo?async=false'),
+                            method: 'post',
+                            data: data,
+                            headers: {
+                                'Authorization': 'Bearer ' + token
+                            }
+                        })
+
+                    })
 
                     .then(
                         function (response) {
@@ -198,21 +244,34 @@ angular.module('app', [])
 
     })
 
+    .factory('comprasClienteFactory', function () {
+        let delegate = {};
+
+        return {
+            delegate: delegate
+        }
+    })
     .directive('comprasCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, init, pagarCompraFactory, detalhesCompraFactory, $timeout) {
-                let unsubscribeSnapshot = null, refreshTimeout;
+            controller: function ($scope, init, comprasClienteFactory, pagarCompraFactory, detalhesCompraFactory, $timeout) {
+                let refreshTimeout, unsubscribeSnapshot;
+
                 $scope.compras = [];
 
                 const initSnapshot = _ => {
-                    init.ready().then(app => {
-                        const db = getFirestore(app), user = init.getCurrentUser();
+                    const user = init.getCurrentUser();
+                    if (!user) return;
 
-                        let q = collection(db, "titulosCompras");
+                    init.ready().then(app => {
+                        let
+                            db = getFirestore(app),
+                            q = collection(db, "titulosCompras");
 
                         q = query(q, where("idCampanha", "==", _idCampanha));
                         q = query(q, where("uidComprador", "==", user.uid));
+
+                        if (unsubscribeSnapshot) unsubscribeSnapshot();
 
                         unsubscribeSnapshot = onSnapshot(q, querySnapshot => {
 
@@ -238,6 +297,12 @@ angular.module('app', [])
                         })
 
                     })
+                }
+
+                comprasClienteFactory.delegate = {
+                    refresh: _ => {
+                        initSnapshot();
+                    }
                 }
 
                 initSnapshot();
