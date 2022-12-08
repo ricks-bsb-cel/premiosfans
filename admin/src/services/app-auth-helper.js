@@ -4,11 +4,10 @@
 const ngModule = angular.module('services.app-auth-helper', [])
 
 	.factory('appAuthHelper', function (
-		globalFactory,
 		appConfig,
 		appErrors,
 		appAuth,
-		appDatabaseHelper,
+		appFirestoreHelper,
 		$rootScope,
 		$cookies,
 		$http,
@@ -43,6 +42,7 @@ const ngModule = angular.module('services.app-auth-helper', [])
 
 		const checkTokenChange = () => {
 			const auth = appAuth.getAuth();
+			
 			auth.onIdTokenChanged(user => {
 				console.info('IdTokenChanged');
 
@@ -59,6 +59,22 @@ const ngModule = angular.module('services.app-auth-helper', [])
 		}
 
 		const loadUserProfile = user => {
+
+			return appFirestoreHelper.getDoc('userProfile', user.uid)
+
+				.then(userProfileResult => {
+					$timeout(_ => {
+						userProfile = userProfileResult;
+
+						authReady = true;
+					})
+				})
+
+				.catch(e => {
+					console.error(e);
+				})
+
+			/*
 			appDatabaseHelper.once('/usuario/' + user.uid)
 				.then(data => {
 					userProfile = data;
@@ -76,6 +92,7 @@ const ngModule = angular.module('services.app-auth-helper', [])
 
 					authReady = true;
 				})
+				*/
 		}
 
 		const token = _ => {

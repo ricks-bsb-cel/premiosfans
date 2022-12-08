@@ -122,21 +122,11 @@ label.selector-input {
     }
 }
 
-.user-panel {
-    margin-top: 5px !important;
-
-    .info {
-        height: 40px;
-        line-height: 16px;
-    }
-
-    p {
+user-panel {
+    margin-left: 20px;
+    opacity: 0.7;
+    * {
         color: white;
-        opacity: 0.8;
-
-        small {
-            color: white;
-        }
     }
 }
 

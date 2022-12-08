@@ -1,8 +1,7 @@
-<div class="info" ng-if="ready">
+<div class="info">
     <p class="d-block">
-        {{userProfile.user.displayName}}
-        <span ng-if="superUser" class="badge badge-danger ml-1">Super User</span>
+        <span ng-bind="::userName"></span>
         <br/>
-        <small>{{userProfile.user.email}}</small>
+        <small ng-bind="::email"></small>
     </p>
 </div>

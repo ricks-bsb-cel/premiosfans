@@ -28,24 +28,7 @@ const ngModule = angular.module('views.usuarios', [
 		$scope.showSearch = false;
 
 		$scope.edit = function (doc) {
-
-			collectionUserProfile.getEmpresas(doc.id, false)
-			
-				.then(perfis => {
-					doc.perfilEmpresas = [];
-
-					perfis.forEach(p => {
-						doc.perfilEmpresas.push({
-							data: { idEmpresa: p.idEmpresa, idPerfil: p.idPerfil }
-						});
-					})
-
-					usuarioEditFactory.edit(doc);
-				})
-
-				.catch(e => {
-					console.error(e);
-				})
+			usuarioEditFactory.edit(doc);
 		}
 
 		$scope.filter = {
@@ -55,7 +38,7 @@ const ngModule = angular.module('views.usuarios', [
 					filter: [
 					]
 				};
-				
+
 				if (termo) {
 					attrFilter.filter.push({
 						field: "keywords",
@@ -70,13 +53,9 @@ const ngModule = angular.module('views.usuarios', [
 
 		appAuthHelper.ready()
 			.then(_ => {
-				if (!appAuthHelper.profile.user.superUser) {
-					$scope.collectionUserProfile.collection.startSnapshot({
-						orderBy: "displayName"
-					})
-				} else {
-					$scope.showSearch = true;
-				}
+				$scope.collectionUserProfile.collection.startSnapshot({
+					orderBy: "displayName"
+				})
 
 				$scope.ready = true;
 			})

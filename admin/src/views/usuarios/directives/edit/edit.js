@@ -108,73 +108,12 @@ let ngModule = angular.module('view.usuarios.edit', [
                 }
             ];
 
-            $ctrl.data.perfilEmpresas = $ctrl.data.perfilEmpresas || [{}];
-            $ctrl.data.idEmpresaAtual = $ctrl.data.idEmpresaAtual || null;
-
-            if (!$ctrl.data.idEmpresaAtual) {
-                appAuthHelper.getUserInfo({
-                    uid: $ctrl.data.id,
-                    full: true,
-                    success: userInfo => {
-                        if (userInfo.extraInfo.empresaAtual) {
-                            $ctrl.data.idEmpresaAtual = userInfo.extraInfo.empresaAtual.id || null;
-                        }
-                        $ctrl.ready = true;
-                    }
-                })
-            } else {
-                $ctrl.ready = true;
-            }
-
-            $ctrl.blockUsuarioDelegate = {
-
-                addEmpresa: function () {
-                    $ctrl.data.perfilEmpresas.push({});
-                },
-
-                setEmpresa: function (empresa) {
-                    appAuthHelper.setEmpresaUser(empresa.idEmpresa, $ctrl.data.id);
-                    $ctrl.data.idEmpresaAtual = empresa.idEmpresa;
-                },
-
-                removeEmpresa: function (empresa, pos) {
-
-                    const remove = function () {
-                        $ctrl.data.perfilEmpresas.splice(pos, 1);
-                        if ($ctrl.data.perfilEmpresas.length === 0) {
-                            this.addEmpresa();
-                        }
-                    }
-
-                    if (!empresa.idEmpresa && !empresa.idPerfil) {
-                        remove();
-                    } else {
-                        alertFactory.yesno('Tem certeza que deseja remover a empresa?').then(_ => {
-                            remove();
-                        })
-                    }
-
-                }
-            }
-
             $ctrl.ok = function () {
 
                 var error = false;
 
                 if ($ctrl.form.$invalid) {
                     alertFactory.error('Dados inválidos... Verifique!')
-                    return;
-                }
-
-                // Valida se não existe mais de um perfil para a mesma empresa
-                $ctrl.data.perfilEmpresas.forEach(p => {
-                    if (!error) {
-                        error = $ctrl.data.perfilEmpresas.filter(f => { return f.data.idEmpresa === p.data.idEmpresa; }).length > 1;
-                    }
-                })
-
-                if (error) {
-                    alertFactory.error('Existe mais do que um perfil adicionado para a mesma empresa... Verifique!')
                     return;
                 }
 

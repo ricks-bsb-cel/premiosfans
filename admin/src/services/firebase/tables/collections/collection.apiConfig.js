@@ -135,7 +135,6 @@ const ngModule = angular.module('collection.api-config', [])
         const remove = data => {
             alertFactory.yesno('O registro será removido e não poderá ser recuperado.').then(_ => {
                 firebaseCollection.removeDoc(data.id);
-
             })
         }
 

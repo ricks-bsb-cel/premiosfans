@@ -41,7 +41,7 @@ const ngModule = angular.module('collection.userProfile', [])
 
         const save = function (data) {
 
-            var queryKeys, setApiKey;
+            var setApiKey;
 
             return $q(function (resolve, reject) {
 
