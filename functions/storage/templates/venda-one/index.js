@@ -73,18 +73,22 @@ angular.module('app', [])
         const initMessaging = _ => {
             const messaging = getMessaging();
 
-            getToken(messaging, { vapidKey: messagingKey }).then(currentToken => {
-                if (currentToken) {
-                    Swal.fire('Token', currentToken, 'success');
-                } else {
-                    // Show permission request UI
-                    Swal.fire('Token', 'No registration token available. Request permission to generate one.', 'success');
-                }
-            }).catch(e => {
-                console.error(e);
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    getToken(messaging, { vapidKey: messagingKey }).then(currentToken => {
+                        if (currentToken) {
+                            Swal.fire('Token', currentToken, 'success');
+                        } else {
+                            Swal.fire('Token', 'No registration token available. Request permission to generate one.', 'success');
+                        }
+                    }).catch(e => {
+                        console.error(e);
 
-                Swal.fire('Error', e.message, 'error');
-            });
+                        Swal.fire('Error', e.message, 'error');
+                    });
+                }
+            })
+
         }
 
         const ready = _ => {
@@ -135,8 +139,6 @@ angular.module('app', [])
                     initUser(user);
                 }
 
-                initMessaging();
-
                 isReady = true;
             })
         }
@@ -169,7 +171,8 @@ angular.module('app', [])
             init: init,
             getCurrentUser: getCurrentUser,
             ready: ready,
-            signIn: signIn
+            signIn: signIn,
+            initMessaging: initMessaging
         }
 
     })
@@ -515,7 +518,8 @@ angular.module('app', [])
     .controller('mainController', function (
         $scope,
         formClienteFactory,
-        modalRegulamentoFactory
+        modalRegulamentoFactory,
+        init
     ) {
         $scope.selected = null;
         $scope.vlCompra = null;
@@ -527,6 +531,8 @@ angular.module('app', [])
             $scope.vlCompra = vlTotal;
 
             $("#vl-total").show();
+
+            // init.initMessaging();
 
             if (formClienteFactory && formClienteFactory.delegate && typeof formClienteFactory.delegate.showFormCliente === 'function')
                 formClienteFactory.delegate.showFormCliente();
