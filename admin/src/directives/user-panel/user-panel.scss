@@ -1,0 +1,24 @@
+user-panel {
+    opacity: 0.7;
+    position: relative;
+
+    height: 45px;
+    margin: 15px;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+
+    .info{
+        line-height: 18px;
+    }
+
+    * {
+        color: white;
+    }
+
+    i.fa.fa-refresh{
+        position: absolute;
+        opacity: 0.5;
+        top: 2px;
+        left: 0px;
+    }
+}

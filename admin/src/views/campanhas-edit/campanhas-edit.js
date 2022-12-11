@@ -22,7 +22,7 @@ const ngModule = angular.module('views.contratos-edit', [
 		premiosFansService
 	) {
 
-		/* não há nada mais apavorante do que alguem que acredita em sua própria luta, e é fanático por ela */
+		/* não há nada mais apavorante do que alguém que acredita em sua própria luta, e é fanático por ela */
 
 		const _qtdGrupos = 1000;
 		const _qtdNumerosPorGrupo = 100;
@@ -83,11 +83,12 @@ const ngModule = angular.module('views.contratos-edit', [
 		}
 
 		$scope.ativar = _ => {
-			alertFactory.yesno('Tem certeza que deseja ativar a Campanha?', _ => {
-				premiosFansService.ativarCampanha({
-					idCampanha: $scope.campanha.id
-				});
-			})
+			alertFactory.yesno('Tem certeza que deseja ativar a Campanha?')
+				.then(_ => {
+					premiosFansService.ativarCampanha({
+						idCampanha: $scope.campanha.id
+					});
+				})
 		}
 
 		const showNavbar = _ => {

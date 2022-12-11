@@ -5,7 +5,7 @@ const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
 const sendGridKey = "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";
-const templateId = "";
+const templateId = "d-87d6aef6ec6147a59481030d3018f61a";
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
@@ -49,55 +49,43 @@ class Service extends eebService {
 
                 .then(buTituloResult => {
                     result.titulo = buTituloResult;
+                    result.email = buTituloResult.email;
 
-                    if (result.data.showDataOnly) return {
-                        message: "ignored"
-                    };
+                    if (result.data.showDataOnly) {
+                        return {
+                            message: "ignored"
+                        };
+                    }
 
                     const sgMail = require('@sendgrid/mail');
 
                     sgMail.setApiKey(sendGridKey);
 
-                    let parm = {
+                    const parm = {
                         from: {
-                            email: "nao-responda@premios.fans",
-                            name: 'Notificação Premios.Fans'
+                            email: 'nao-responda@premios.fans',
+                            name: 'Premios.Fans'
                         },
-                        personalizations: [],
-                        template_id: this.parm.data.template_id
-                    };
-
-                    if (!Array.isArray(this.parm.data.to)) {
-                        this.parm.data.to = [this.parm.data.to];
-                    }
-
-                    this.parm.data.to.forEach(t => {
-                        parm.personalizations.push({
+                        personalizations: [{
                             to: [
                                 {
-                                    email: t.email,
-                                    name: t.name
+                                    email: buTituloResult.email,
+                                    name: buTituloResult.nome
                                 }
                             ],
-                            dynamic_template_data: t.data
-                        })
-                    });
+                            dynamic_template_data: buTituloResult
+                        }],
+                        subject: 'Seus Números da Sorte ~ Certificado ' + buTituloResult.id,
+                        template_id: templateId
+                    };
 
-                    const msg = {
-                        to: result.tituloCompra.email,
-                        from: 'nao-responda@premios.fans',
-                        subject: 'Sending with SendGrid is Fun',
-                        text: 'and easy to do anywhere, even with Node.js',
-                        html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-                    }
-
-                    return sgMail.send(msg);
+                    return sgMail.send(parm);
                 })
 
                 .then(sendResult => {
                     result.sendResult = sendResult;
 
-                    return resolve(this.parm.async ? { success: true } : result);
+                    return resolve(this.parm.async ? { success: true, email: result.email } : result);
                 })
 
                 .catch(e => {

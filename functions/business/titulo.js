@@ -27,7 +27,6 @@ const getById = idTitulo => {
                 const result = {
                     idCampanha: titulo.idCampanha,
                     campanhaNome: titulo.campanhaNome,
-                    qtdPremios: titulo.qtdPremios,
                     vlTitulo: titulo.campanhaVlTitulo,
                     uidComprador: titulo.uidComprador,
                     campanhaDetalhes: titulo.campanhaDetalhes,
@@ -68,7 +67,11 @@ const getById = idTitulo => {
                     }
                 });
 
-                result.sorteios = _.sortBy(result.sorteios, ['sorteioDtSorteio_yyyymmdd']);
+                result.sorteios = _.sortBy(result.sorteios, ['sorteioDtSorteio_yyyymmdd'])
+                    .map((s, i) => {
+                        s.pos = i + 1;
+                        return s;
+                    });
 
                 return resolve(result);
             })

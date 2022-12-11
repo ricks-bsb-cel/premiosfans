@@ -134,9 +134,11 @@ const ngModule = angular.module('services.app-collection', [])
 
 							var q = appFirestore.query(c);
 
+							/*
 							if (attr.filterEmpresa) {
 								var q = appFirestore.query(q, appFirestore.where("idEmpresa", "==", appAuthHelper.profile.user.idEmpresa));
 							}
+							*/
 
 							if (parms.filter) {
 								if (Array.isArray(parms.filter)) {

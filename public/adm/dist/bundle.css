@@ -330,14 +330,6 @@ label.selector-input {
   text-align: right;
 }
 
-user-panel {
-  margin-left: 20px;
-  opacity: 0.7;
-}
-user-panel * {
-  color: white;
-}
-
 .brand-link img {
   position: absolute;
 }
@@ -1048,6 +1040,26 @@ sorteio-campanha-premios table td.actions a.disabled {
 }
 sorteio-campanha-premios table input.right {
   text-align: right;
+}
+user-panel {
+  opacity: 0.7;
+  position: relative;
+  height: 45px;
+  margin: 15px;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+user-panel .info {
+  line-height: 18px;
+}
+user-panel * {
+  color: white;
+}
+user-panel i.fa.fa-refresh {
+  position: absolute;
+  opacity: 0.5;
+  top: 2px;
+  left: 0px;
 }
 .image-chooser-modal .slim {
   height: 1px;

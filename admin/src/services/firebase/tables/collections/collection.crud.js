@@ -32,7 +32,7 @@ const ngModule = angular.module('collection.crud', [])
                             ativo: typeof data.ativo === 'boolean' ? data.ativo : true,
                             situacao: data.situacao || null,
                             dtAlteracao: appFirestoreHelper.currentTimestamp(),
-                            idUser: appAuthHelper.profile.user.uid
+                            idUser: appAuthHelper.user.uid
                         };
 
                         if (id === 'new') {

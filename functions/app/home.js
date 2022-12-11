@@ -257,6 +257,7 @@ const getParam = (request, name) => {
 
 const compileApp = (sourceData, obj) => {
     return new Promise((resolve, reject) => {
+
         const render = { ...obj };
 
         try {
@@ -301,6 +302,8 @@ const compileApp = (sourceData, obj) => {
 
                 return s;
             })
+
+            render.campanhaSorteios = _.orderBy(render.campanhaSorteios, ['dtSorteio_yyyymmdd']);
 
             render.campanha.description =
                 render.campanha.detalhes ||

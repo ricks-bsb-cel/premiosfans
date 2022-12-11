@@ -21,6 +21,8 @@ const collectionTitulo = firestoreDAL.titulos();
 const collectionTituloCompra = firestoreDAL.titulosCompras();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
+const sendEmailTitulo = require('./sendEmailTitulo');
+
 const dashboardData = require('./generateDashboardData');
 
 const tituloCompra = _ => {
@@ -93,7 +95,7 @@ class Service extends eebService {
                 });
 
                 result.data.qtdErrors = result.data.errors.length;
-            }
+            };
 
             return tituloCompra().validateAsync(this.parm.data)
 
@@ -112,7 +114,6 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
-
                     // Carrega os dados
                     return Promise.all([
                         collectionTituloCompra.getDoc(result.data.idTituloCompra),
@@ -146,7 +147,6 @@ class Service extends eebService {
                 })
 
                 .then(promiseResult => {
-
                     if (!promiseResult) return [];
 
                     result.data.campanha = promiseResult[0]; // Campanha
@@ -214,7 +214,6 @@ class Service extends eebService {
                 })
 
                 .then(resultCheckNumeros => {
-
                     result.data.resultCheckNumeros = resultCheckNumeros.filter(f => {
                         return f.error;
                     });
@@ -235,6 +234,7 @@ class Service extends eebService {
                         })
                     })
 
+
                     // Salva as estatísticas de erro no titulo Compra
                     const saveError = {
                         errorsExists: result.data.qtdErrors > 0,
@@ -245,10 +245,23 @@ class Service extends eebService {
                     global.setDateTime(saveError, 'errosDtCheck');
                     global.setDateTime(saveError, 'dtFinalGeracao');
 
-                    return collectionTituloCompra.set(result.data.idTituloCompra, saveError, true);
+                    // Garante que as estatística serão geradas apenas uma vez, e apenas se não existir erros...
+                    result.data.gerarEstatisticas = !saveError.errorsExists && !result.data.tituloCompra.errosDtCheck;
+
+                    const promise = [collectionTituloCompra.set(result.data.idTituloCompra, saveError, true)];
+
+                    if (!saveError.errorsExists) {
+                        result.data.titulos.forEach(t => {
+                            promise.push(sendEmailTitulo.call({ idTitulo: t.id }));
+                        })
+                    }
+
+                    return Promise.all(promise);
                 })
 
                 .then(_ => {
+
+                    if (!result.data.gerarEstatisticas) return null;
 
                     // Gera Estatísticas (contadores) do Dashboard
                     const counters = {
@@ -300,7 +313,7 @@ const call = (data, request, response) => {
         name: 'check-titulo-compra',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        auth: eebAuthTypes.internal,
+        auth: eebAuthTypes.tokenNotAnonymous,
         data: data
     }
 
@@ -317,15 +330,5 @@ const call = (data, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-
-    const host = global.getHost(request);
-
-    if (!request.body || host !== 'localhost') {
-        return response.status(500).json({
-            success: false,
-            error: 'Invalid parms'
-        })
-    }
-
     return call(request.body, request, response);
 }

@@ -43,30 +43,13 @@
                 </span>
             </a>
 
-            <!--
-            <i
-                id="sidebar-content-wait" 
-                class="fas fa-3x fa-sync-alt fa-spin"
-                style="color:gray;margin-top:80px;margin-left: calc(50% - 32px);"
-            >
-            </i>
-            -->
-
             <div
                 id="sidebar-content"
                 class="sidebar"
-                style="overflow-y:auto;overflow-x:hidden;"
+                style="overflow-y:auto;overflow-x:hidden;height: calc(100% - 125px);border-bottom: 1px solid #4b545c;"
             >
 
-                <user-panel class="mt-3 pb-3 mb-3 d-flex" style="height:50px;">
-                </user-panel>
-
-                <!--
-                <select-empresa></select-empresa>
-                -->
-
                 <nav class="mt-3">
-
                     <ul 
                         class="nav nav-pills nav-sidebar flex-column nav-flat nav-legacy"
                         data-widget="treeview"
@@ -106,10 +89,12 @@
                         {{/each}}
 
                     </ul>
-
                 </nav>
-
             </div>
+
+            <user-panel class="mt-3 pb-3 mb-3 d-flex" style="height:50px;">
+            </user-panel>
+
         </aside>
 
         <div class="content-wrapper" ng-view></div>

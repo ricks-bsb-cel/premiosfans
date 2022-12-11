@@ -127,7 +127,7 @@ const call = (data, request, response) => {
         name: 'pagar-compra',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        auth: eebAuthTypes.internal,
+        auth: eebAuthTypes.superUser,
         data: data
     });
 
@@ -137,16 +137,5 @@ const call = (data, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-
-    // Só pode ser chamado em testes ou entre rotinas
-    const host = global.getHost(request);
-
-    if (!request.body || host !== 'localhost') {
-        return response.status(500).json({
-            success: false,
-            error: 'Invalid parms'
-        })
-    }
-
     return call(request.body, request, response);
 }

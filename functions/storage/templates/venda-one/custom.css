@@ -9,6 +9,14 @@ html {
     scroll-behavior: smooth;
 }
 
+details summary {
+    line-height: 1.4rem;
+}
+
+details p{
+    font-size: 0.9em;
+}
+
 section#rodape * {
     font-size: 0.8em;
     line-height: 1.1em;
@@ -56,6 +64,14 @@ dialog#modal-regulamento .content h4 {
 
 .monospace {
     font-family: 'Courier New', Courier, monospace;
+}
+
+#premios .sorteio {
+    position: relative;
+}
+
+#premios .sorteio footer{
+    font-size: 0.9em;
 }
 
 table.label-description tr td:nth-child(1) {

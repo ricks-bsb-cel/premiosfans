@@ -2,10 +2,7 @@
 
     <search-filter filter="filter"></search-filter>
 
-    <wait-overlay 
-        ready="collectionTitulos.collection.isReady()"
-        class="container-fluid"
-    >
+    <wait-overlay ready="collectionTitulos.collection.isReady()" class="container-fluid">
         <div class="row">
 
             <div ng-if="collectionTitulos.collection.isEmpty()" class="col-12">
@@ -39,7 +36,7 @@
                                         {{t.campanhaNome}}
                                     </td>
                                     <td class="nome">
-                                            {{t.nome}}
+                                        {{t.nome}}
                                     </td>
                                     <td class="cpf">
                                         {{t.cpf_formated}}

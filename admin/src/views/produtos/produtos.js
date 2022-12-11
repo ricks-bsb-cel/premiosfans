@@ -55,7 +55,7 @@ const ngModule = angular.module('views.produtos', [
 
 		appAuthHelper.ready()
 			.then(_ => {
-				$scope.user = appAuthHelper.profile.user;
+				$scope.user = appAuthHelper.user;
 				showMenu();
 			})
 

@@ -76,7 +76,7 @@ const ngModule = angular.module('collection.api-config', [])
                             descricao: data.descricao,
                             ativo: typeof data.ativo === 'boolean' ? data.ativo : true,
                             dtAlteracao: appFirestoreHelper.currentTimestamp(),
-                            idUser: appAuthHelper.profile.user.uid,
+                            idUser: appAuthHelper.profile.uid,
                             publicKey: data.publicKey || null,
                             privateKey: data.privateKey || null
                         };

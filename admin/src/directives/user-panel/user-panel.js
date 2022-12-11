@@ -11,6 +11,8 @@ const ngModule = angular.module('directives.user-panel', [])
 				.then(_ => {
 					$scope.userName = appAuthHelper.user.displayName || appAuthHelper.user.email;
 					$scope.email = appAuthHelper.user.email;
+
+					$scope.element.find('.fa.fa-refresh').hide();
 				})
 
 		}
@@ -20,7 +22,10 @@ const ngModule = angular.module('directives.user-panel', [])
 		return {
 			restrict: 'E',
 			templateUrl: 'user-panel/user-panel.html',
-			controller: 'userPanelController'
+			controller: 'userPanelController',
+			link: function (scope, element, attr) {
+				scope.element = element;
+			}
 		};
 	});
 
