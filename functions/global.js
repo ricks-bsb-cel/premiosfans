@@ -9,34 +9,34 @@ const path = require('path');
 const _ = require("lodash");
 const fs = require("fs");
 
-/*
-String.prototype.splitReplace = function (search, replacement) {
-    let target = this;
-    return target.split(search).join(replacement);
+
+const encryptString = (value, secret) => {
+    try {
+        const Cryptr = require('cryptr');
+        const cryptr = new Cryptr(secret);
+
+        return cryptr.encrypt(value);
+    }
+    catch (e) {
+        throw global.newError(e);
+    }
 }
+exports.encryptString = encryptString;
 
-String.prototype.replaceAll = function (search, replacement) {
-    let target = this;
-    return target.replace(new RegExp(search, 'g'), replacement);
-};
 
-String.prototype.onlyNumbers = function () {
-    let target = this;
-    if (target) { target = target.replace(/\D/g, ""); }
-    return target;
-};
+const decryptString = (value, secret) => {
+    try {
+        const Cryptr = require('cryptr');
+        const cryptr = new Cryptr(secret);
 
-String.prototype.isNumber = function () {
-    return /^\d+$/.test(this);
+        return cryptr.decrypt(value);
+    }
+    catch (e) {
+        throw global.newError(e);
+    }
 }
+exports.decryptString = decryptString;
 
-String.prototype.between = function (min, max) {
-    let target = this;
-    if (!target && min > 0) { return false; }
-    target = target.trim();
-    return target.length >= min && target.length <= max;
-}
-*/
 
 const newError = (msg, code, details) => {
     const e = new Error(msg);

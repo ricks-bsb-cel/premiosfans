@@ -246,6 +246,10 @@ exports.log = () => {
     return new collectionClass('_log');
 }
 
+exports.serviceUserCredential = () => {
+    return new collectionClass('serviceUserCredential');
+}
+
 exports.appUsers = () => {
     return new collectionClass('appUsers');
 }
