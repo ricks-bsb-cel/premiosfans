@@ -8,6 +8,7 @@ const secretManager = require('../../../secretManager');
 const eebHelper = require('../../eventBusServiceHelper');
 
 const serviceUserCredential = require('../../../business/serviceUserCredential');
+const { executionAsyncResource } = require('async_hooks');
 
 const schema = _ => {
     const schema = Joi.object({
@@ -47,7 +48,9 @@ const login = (cpf, password) => {
             })
 
             .then(loginResult => {
-                if (!loginResult.statusCode === 200) throw new Error(`Invalid cartos login result [${JSON.stringify(loginResult)}]`);
+                if (!loginResult.statusCode === 200) {
+                    throw new Error(`Invalid cartos login result [${JSON.stringify(loginResult)}]`);
+                }
 
                 const result = {
                     token: loginResult.data.token,
@@ -58,7 +61,6 @@ const login = (cpf, password) => {
                 const path = getPathAccountToken(cpf, 'login')
 
                 return admin.database().ref(path).set(result);
-
             })
 
             .then(_ => {
@@ -84,7 +86,7 @@ class Service extends eebService {
         return new Promise((resolve, reject) => {
 
             const result = {
-                success: true
+                success: false
             };
 
             const nowMilliseconds = global.nowMilliseconds();
@@ -110,35 +112,35 @@ class Service extends eebService {
                     ) {
                         result.accountResult = resultRefToken;
                         result.accountResult.origin = 'buffer';
+                        result.success = true;
 
                         return null;
                     } else {
-                        return this.changeAccount(uid, accountId);
+                        return serviceUserCredential.getByCpf(result.parm.tipo, result.parm.cpf);
                     }
 
-                    return serviceUserCredential.getByCpf(result.parm.tipo, result.parm.cpf);
                 })
+
                 .then(getByCpfResult => {
-                    result.data = getByCpfResult;
+                    if (result.success) return null;
 
-                    return global.config.get('cartos/endpoint');
-                }
-                .then(cartosEndPoint => {
+                    return login(getByCpfResult.user, getByCpfResult.password);
+                })
 
-                    const username = result.data.user;
-                    const password = result.data.password;
-
-
-
+                .then(loginResult => {
+                    if (loginResult) {
+                        result = loginResult;
+                        result.success = true;
+                    }
 
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 
-                        .catch(e => {
-                            console.error(e);
+                .catch(e => {
+                    console.error(e);
 
-                            return reject(e);
-                        })
+                    return reject(e);
+                })
 
         })
     }
@@ -152,7 +154,7 @@ const call = (data, request, response) => {
 
     const service = new Service(request, response, {
         name: 'get-user-credential',
-        async: request && request.query.async ? request.query.async === 'true' : false,
+        async: false, // Este evento nunca é assincrono
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,
         data: data
