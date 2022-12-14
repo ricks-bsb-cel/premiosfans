@@ -4,6 +4,8 @@ const path = require('path');
 const eebService = require('../../eventBusService').abstract;
 const Joi = require('joi');
 const global = require('../../../global');
+const secretManager = require('../../../secretManager');
+const eebHelper = require('../../eventBusServiceHelper');
 
 const serviceUserCredential = require('../../../business/serviceUserCredential');
 
@@ -17,23 +19,54 @@ const schema = _ => {
     return schema;
 }
 
+const getPathAccountToken = (cpf, accountId) => {
+    return `/tokens/${result.parm.cpf}/cartos/${result.parm.accountId}`;
+}
+
 const login = (cpf, password) => {
     return new Promise((resolve, reject) => {
-        return global.config.get('cartos/endpoint')
-            .then(cartosEndPoint=>{
-                const endPoint = `${cartosEndPoint}/users/v1/login`;
+
+        let result;
+
+        return secretManager.get('cartos-api-config')
+            .then(cartosConfig => {
+                const endPoint = `${cartosConfig.endpoint_url_production}/users/v1/login`;
 
                 const payload = {
-                    username: username,
+                    username: cpf,
                     password: password,
                     migrate: false
                 }
 
                 const headers = {
-                    "x-api-key": this.config.api_key,
-                    "device_id": uid
+                    "x-api-key": cartosConfig.api_key,
+                    "device_id": cpf
                 };
 
+                return eebHelper.http.post(endPoint, payload, headers);
+            })
+
+            .then(loginResult => {
+                if (!loginResult.statusCode === 200) throw new Error(`Invalid cartos login result [${JSON.stringify(loginResult)}]`);
+
+                const result = {
+                    token: loginResult.data.token,
+                    refreshToken: loginResult.data.opaqueRefreshTokenId,
+                    expire: global.nowMilliseconds(10, 'minutes'), // Salva por 10 minutos...
+                };
+
+                const path = getPathAccountToken(cpf, 'login')
+
+                return admin.database().ref(path).set(result);
+
+            })
+
+            .then(_ => {
+                return resolve(result);
+            })
+
+            .catch(e => {
+                return reject(e);
             })
 
     })
