@@ -4,6 +4,7 @@ const { Logging } = require('@google-cloud/logging');
 const projectId = 'premios-fans';
 const logging = new Logging({ projectId });
 const log = logging.log('premiosfansbackend');
+const needle = require('needle');
 
 const logType = {
     default: 'DEFAULT',
@@ -117,9 +118,103 @@ const getUserTokenFromRequest = (request, response) => {
     return token;
 }
 
+const callNeddleGet = (endpoint, headers) => {
+    return new Promise((resolve, reject) => {
+        return needle(
+            'get',
+            endpoint,
+            { headers: headers }
+        )
+            .then(needleResult => {
+                let result = {
+                    data: needleResult.body,
+                    statusCode: needleResult.statusCode
+                }
+
+                if (needleResult.message && result.statusCode !== 200) {
+                    result.message = needleResult.message;
+                }
+
+                return resolve(result);
+            })
+            .catch(e => {
+                return reject(e);
+            })
+    })
+}
+
+const callNeddlePost = (endpoint, payload, headers) => {
+    return new Promise((resolve, reject) => {
+        return needle(
+            'post',
+            endpoint,
+            payload,
+            {
+                json: true,
+                headers: headers
+            }
+        )
+            .then(needleResult => {
+
+                let result = {
+                    data: needleResult.body,
+                    statusCode: needleResult.statusCode
+                }
+
+                if (needleResult.message && result.statusCode !== 200) {
+                    result.message = needleResult.message;
+                }
+
+                return resolve(result);
+
+            })
+
+            .catch(e => {
+                return reject(e);
+            })
+    })
+}
+
+const callNeddleDelete = (endpoint, headers) => {
+    return new Promise((resolve, reject) => {
+        return needle(
+            'delete',
+            endpoint,
+            {
+                json: true,
+                headers: headers
+            }
+        )
+            .then(needleResult => {
+
+                let result = {
+                    data: needleResult.body,
+                    statusCode: needleResult.statusCode
+                }
+
+                if (needleResult.message && result.statusCode !== 200) {
+                    result.message = needleResult.message;
+                }
+
+                return resolve(result);
+
+            })
+
+            .catch(e => {
+                return reject(e);
+            })
+    })
+}
+
 exports.getHost = getHost;
 exports.base64ToJson = base64ToJson;
 exports.logType = logType;
 exports.log = writeLog;
 exports.setDateTime = setDateTime;
 exports.getUserTokenFromRequest = getUserTokenFromRequest;
+
+exports.http = {
+    get: callNeddleGet,
+    post: callNeddlePost,
+    delete: callNeddleDelete
+}

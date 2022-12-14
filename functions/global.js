@@ -1356,7 +1356,6 @@ exports.generateKeywords = function (v1, v2, v3, v4, v5, v6, v7) {
 
 exports.config = {
     get: path => {
-
         path = splitReplace(path, '.', '_');
 
         if (path.startsWith('/')) {

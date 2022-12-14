@@ -101,10 +101,6 @@ api.post("/v1/send-email-titulo", (request, response) => {
     initFirebase.call(require('./services/sendEmailTitulo').callRequest, request, response);
 })
 
-api.post("/v1/get-user-credential", (request, response) => {
-    initFirebase.call(require('./services/getUserCredential').callRequest, request, response);
-})
-
 /* Users */
 
 api.get("/v1/user/get-profile/:uid", (request, response) => {
@@ -122,6 +118,13 @@ api.post("/v1/user/update-custom-config", (request, response) => {
 api.get("/v1/user/revoke-token/:uid", (request, response) => {
     initFirebase.call(require('./services/users/revokeUserToken').callRequest, request, response);
 })
+
+/* Cartos */
+
+api.post("/v1/get-user-credential", (request, response) => {
+    initFirebase.call(require('./services/cartos/getUserCredential').callRequest, request, response);
+})
+
 
 const eeb = express();
 
