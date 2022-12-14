@@ -129,6 +129,14 @@ api.post("/v1/pay/account-list", (request, response) => {
     initFirebase.call(require('./services/cartos/accountList').callRequest, request, response);
 })
 
+api.post("/v1/pay/pix-keys-list", (request, response) => {
+    initFirebase.call(require('./services/cartos/pixKeysList').callRequest, request, response);
+})
+
+api.post("/v1/pay/pix-key-delete", (request, response) => {
+    initFirebase.call(require('./services/cartos/pixKeysDelete').callRequest, request, response);
+})
+
 
 const eeb = express();
 

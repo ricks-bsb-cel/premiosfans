@@ -10,19 +10,30 @@ const userCredentials = require('./getUserCredential');
 
 const schema = _ => {
     const schema = Joi.object({
-        cpf: Joi.string().length(11).required()
+        cpf: Joi.string().length(11).required(),
+        accountId: Joi.string().required(),
+        type: Joi.string().valid('EMAIL', 'CPF_CNPJ', 'PHONE', 'EVP').required(),
+        key: Joi
+            .when('type', {
+                switch: [
+                    { is: 'CPF_CNPJ', then: Joi.string().required().min(11).max(14) },
+                    { is: 'EMAIL', then: Joi.string().email()},
+                    { is: 'PHONE', then: Joi.string().length(10).pattern(/^[0-9]+$/).required() }
+                ],
+                otherwise: Joi.forbidden()
+            })
     });
 
     return schema;
 }
 
-const accounts = cpf => {
+const createPixKey = (cpf, accountId, pixKey) => {
     return new Promise((resolve, reject) => {
-
         let userLogin;
 
         return userCredentials.call({
-            cpf: cpf
+            cpf: cpf,
+            accountId: accountId
         })
             .then(userCredentialsResult => {
                 if (!userCredentialsResult) throw new Error(`Credential not found for ${cpf}`);
@@ -33,22 +44,22 @@ const accounts = cpf => {
             })
 
             .then(cartosConfig => {
-                const endPoint = `${cartosConfig.endpoint_url_production}/digital-account/v1/accounts?typeRequest=byCpfHash`;
+                const endPoint = `${cartosConfig.endpoint_url_production}/digital-account/v1/pix-keys/${pixKey}`;
 
                 const headers = {
                     "Authorization": `Bearer ${userLogin.token}`,
                     "x-api-key": cartosConfig.api_key,
-                    "device_id": cpf
+                    "device_id": `id-${cpf}`
                 };
 
-                console.info(headers);
-
-                return eebHelper.http.get(endPoint, headers);
+                return eebHelper.http.delete(endPoint, headers);
             })
 
             .then(getResult => {
-                if (!getResult.statusCode === 200) {
-                    throw new Error(`Invalid cartos login result [${JSON.stringify(getResult)}]`);
+                console.info('getResult', getResult);
+
+                if (getResult.statusCode !== 200) {
+                    throw new Error(`Invalid cartos login result: ${JSON.stringify(getResult)}`);
                 }
 
                 return resolve(getResult.data);
@@ -57,7 +68,6 @@ const accounts = cpf => {
             .catch(e => {
                 return reject(e);
             })
-
     })
 }
 
@@ -82,16 +92,18 @@ class Service extends eebService {
                 .then(dataResult => {
                     result.parm = dataResult;
 
-                    return accounts(result.parm.cpf);
+                    return deletePixKey(
+                        result.parm.cpf,
+                        result.parm.accountId,
+                        result.parm.pixKey
+                    );
                 })
 
-                .then(accountsResult => {
-                    return resolve(accountsResult);
+                .then(deletePixKeyResult => {
+                    return resolve(deletePixKeyResult);
                 })
 
                 .catch(e => {
-                    console.error(e);
-
                     return reject(e);
                 })
 
@@ -106,7 +118,7 @@ const call = (data, request, response) => {
     const eebAuthTypes = require('../../eventBusService').authType;
 
     const service = new Service(request, response, {
-        name: 'account-list',
+        name: 'pix-keys-delete',
         async: false, // Este evento nunca é assincrono
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,

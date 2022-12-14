@@ -10,6 +10,7 @@ const eebHelper = require('../../eventBusServiceHelper');
 const eebService = require('../../eventBusService').abstract;
 
 const serviceUserCredential = require('../../../business/serviceUserCredential');
+const { head } = require("lodash");
 
 const schema = _ => {
     const schema = Joi.object({
@@ -28,10 +29,12 @@ const getPathAccountToken = (cpf, accountId) => {
 const login = (cpf, password) => {
     return new Promise((resolve, reject) => {
 
-        let result;
+        let result, cartosConfig;
 
         return secretManager.get('cartos-api-config')
-            .then(cartosConfig => {
+            .then(secretManagerResult => {
+                cartosConfig = secretManagerResult;
+
                 const endPoint = `${cartosConfig.endpoint_url_production}/users/v1/login`;
 
                 const payload = {
@@ -49,7 +52,7 @@ const login = (cpf, password) => {
             })
 
             .then(loginResult => {
-                if (!loginResult.statusCode === 200) {
+                if (loginResult.statusCode !== 200) {
                     throw new Error(`Invalid cartos login result [${JSON.stringify(loginResult)}]`);
                 }
 
@@ -72,6 +75,59 @@ const login = (cpf, password) => {
                 return reject(e);
             })
 
+    })
+}
+
+const changeAccount = (cpf, password, accountId) => {
+    return new Promise((resolve, reject) => {
+        let userLogin, cartosConfig, result;
+
+        return login(cpf, password)
+            .then(loginResult => {
+                userLogin = loginResult;
+
+                return secretManager.get('cartos-api-config');
+            })
+
+            .then(secretManagerResult => {
+                cartosConfig = secretManagerResult;
+
+                const endPoint = `${cartosConfig.endpoint_url_production}/users/v1/login/change-account`;
+
+                const payload = {
+                    accountId: accountId
+                }
+
+                const headers = {
+                    "Authorization": `Bearer ${userLogin.token}`,
+                    "x-api-key": cartosConfig.api_key,
+                    "device_id": cpf
+                };
+
+                return eebHelper.http.post(endPoint, payload, headers);
+
+            })
+
+            .then(changeAccountResult => {
+                if (!changeAccountResult.statusCode === 200) {
+                    throw new Error(`Invalid cartos login result [${JSON.stringify(loginResult)}]`);
+                }
+
+                result = changeAccountResult.data;
+                result.expire = global.nowMilliseconds(10, 'minutes');
+
+                const path = getPathAccountToken(cpf, accountId)
+
+                return admin.database().ref(path).set(result);
+            })
+
+            .then(_ => {
+                return resolve(result);
+            })
+
+            .catch(e => {
+                return reject(e);
+            })
     })
 }
 
@@ -122,6 +178,8 @@ class Service extends eebService {
 
                         return null;
                     } else {
+                        console.info('serviceUserCredential.getByCpf');
+
                         return serviceUserCredential.getByCpf(result.parm.tipo, result.parm.cpf);
                     }
 
@@ -130,7 +188,11 @@ class Service extends eebService {
                 .then(getByCpfResult => {
                     if (result.success) return null;
 
-                    return login(getByCpfResult.user, getByCpfResult.password);
+                    if (result.parm.accountId === 'login') {
+                        return login(getByCpfResult.user, getByCpfResult.password);
+                    } else {
+                        return changeAccount(getByCpfResult.user, getByCpfResult.password, result.parm.accountId);
+                    }
                 })
 
                 .then(loginResult => {
@@ -148,8 +210,6 @@ class Service extends eebService {
                 })
 
                 .catch(e => {
-                    console.error(e);
-
                     return reject(e);
                 })
 
