@@ -1,14 +1,15 @@
 "use strict";
 
+const admin = require("firebase-admin");
+
 const path = require('path');
-const eebService = require('../../eventBusService').abstract;
 const Joi = require('joi');
 const global = require('../../../global');
 const secretManager = require('../../../secretManager');
 const eebHelper = require('../../eventBusServiceHelper');
+const eebService = require('../../eventBusService').abstract;
 
 const serviceUserCredential = require('../../../business/serviceUserCredential');
-const { executionAsyncResource } = require('async_hooks');
 
 const schema = _ => {
     const schema = Joi.object({
@@ -21,7 +22,7 @@ const schema = _ => {
 }
 
 const getPathAccountToken = (cpf, accountId) => {
-    return `/tokens/${result.parm.cpf}/cartos/${result.parm.accountId}`;
+    return `/tokens/${cpf}/cartos/${accountId}`;
 }
 
 const login = (cpf, password) => {
@@ -52,7 +53,7 @@ const login = (cpf, password) => {
                     throw new Error(`Invalid cartos login result [${JSON.stringify(loginResult)}]`);
                 }
 
-                const result = {
+                result = {
                     token: loginResult.data.token,
                     refreshToken: loginResult.data.opaqueRefreshTokenId,
                     expire: global.nowMilliseconds(10, 'minutes'), // Salva por 10 minutos...
@@ -85,7 +86,7 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            const result = {
+            let result = {
                 success: false
             };
 
@@ -96,23 +97,28 @@ class Service extends eebService {
                 .then(dataResult => {
                     result.parm = dataResult;
 
-                    result.refAccountToken = `/tokens/${result.parm.cpf}/cartos/${result.parm.accountId}`;
+                    result.refAccountToken = getPathAccountToken(result.parm.cpf, result.parm.accountId);
 
                     return admin.database().ref(result.refAccountToken).once("value");
                 })
 
                 .then(refAccountTokenResult => {
 
-                    resultRefToken = refAccountTokenResult.val() || null;
+                    refAccountTokenResult = refAccountTokenResult.val() || null;
 
-                    if (resultRefToken && // Existe um token no cache
-                        resultRefToken.expire && // Existe data de expiração
-                        nowMilliseconds < resultRefToken.expire && // Não expirou
-                        resultRefToken.accountId === result.parm.accountId // O token é da mesma conta
+                    if (
+                        refAccountTokenResult &&
+                        refAccountTokenResult.token && // Existe um token no cache
+                        refAccountTokenResult.expire && // Existe data de expiração
+                        nowMilliseconds < refAccountTokenResult.expire // O token é da mesma conta
                     ) {
-                        result.accountResult = resultRefToken;
-                        result.accountResult.origin = 'buffer';
+                        result = {
+                            ...result.parm,
+                            ...refAccountTokenResult
+                        };
+
                         result.success = true;
+                        result.origin = 'buffer';
 
                         return null;
                     } else {
@@ -129,11 +135,16 @@ class Service extends eebService {
 
                 .then(loginResult => {
                     if (loginResult) {
-                        result = loginResult;
+                        result = {
+                            ...result.parm,
+                            ...loginResult
+                        };
+
                         result.success = true;
+                        result.origin = result.tipo;
                     }
 
-                    return resolve(this.parm.async ? { success: true } : result);
+                    return resolve(result);
                 })
 
                 .catch(e => {

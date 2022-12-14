@@ -386,7 +386,13 @@ class eventBusService {
             return this.run(this.admin)
 
                 .then(runResult => {
-                    result = { result: runResult, code: 200 }
+
+                    console.info('runresult', runResult);
+
+                    result = {
+                        result: runResult,
+                        code: 200
+                    };
 
                     if (this.parm.debug) { result.debug = this.parm; }
 
