@@ -10,6 +10,7 @@ const eebHelper = require('../../eventBusServiceHelper');
 const eebService = require('../../eventBusService').abstract;
 
 const userCredentials = require('./getUserCredential');
+const { head } = require("lodash");
 
 const schema = _ => {
     const schema = Joi.object({
@@ -29,8 +30,6 @@ const accounts = cpf => {
         })
             .then(userCredentialsResult => {
                 if (!userCredentialsResult) throw new Error(`Credential not found for ${cpf}`);
-                
-                console.info(userCredentialsResult);
 
                 userLogin = userCredentialsResult.result;
 
@@ -41,12 +40,12 @@ const accounts = cpf => {
                 const endPoint = `${cartosConfig.endpoint_url_production}/digital-account/v1/accounts?typeRequest=byCpfHash`;
 
                 const headers = {
-                    "Authorization": `Bearer ${userLogin.userToken}`,
+                    "Authorization": `Bearer ${userLogin.token}`,
                     "x-api-key": cartosConfig.api_key,
                     "device_id": cpf
                 };
 
-                return eebHelper.http.get(endPoint, payload, headers);
+                return eebHelper.http.get(endPoint, headers);
             })
 
             .then(getResult => {

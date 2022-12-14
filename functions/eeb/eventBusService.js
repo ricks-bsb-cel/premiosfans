@@ -13,6 +13,7 @@ const { CloudTasksClient } = require('@google-cloud/tasks');
 const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
 const helper = require('./eventBusServiceHelper');
+const { resultSuccess } = require("../global");
 
 const projectName = 'premios-fans';
 const projectLocation = 'us-central1';
@@ -230,7 +231,11 @@ class eventBusService {
                     result = startResult;
                     result.async = this.parm.async;
 
-                    return resolve(this.response ? this.response.status(200).json(result) : null);
+                    return resolve(
+                        this.response ?
+                            this.response.status(200).json(result) :
+                            (result.async ? null : result)
+                    );
                 })
 
                 .catch(e => {
@@ -386,9 +391,6 @@ class eventBusService {
             return this.run(this.admin)
 
                 .then(runResult => {
-
-                    console.info('runresult', runResult);
-
                     result = {
                         result: runResult,
                         code: 200
