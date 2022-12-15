@@ -1,3 +1,6 @@
  git push --set-upstream origin rf/messaging
  
  git config alias.acp '! acp() { git add . && git add -A && git commit -a -m "$1" && git push ; } ; acp'
+
+ depois, é só executar:
+ git acp "message"

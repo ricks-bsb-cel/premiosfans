@@ -1,14 +1,11 @@
 "use strict";
 
 const path = require('path');
-const DecimalExtension = require('joi-decimal');
-const Joi = require('joi').extend(DecimalExtension);
+const Joi = require('joi');
 
 const secretManager = require('../../../secretManager');
 const eebHelper = require('../../eventBusServiceHelper');
 const eebService = require('../../eventBusService').abstract;
-
-
 
 const userCredentials = require('./getUserCredential');
 
@@ -21,8 +18,8 @@ const schema = _ => {
         merchantCity: Joi.string().required(),
         value: Joi.when('type', {
             switch: [
-                { is: 'STATIC', then: Joi.decimal().greater(0).optional() },
-                { is: 'DYNAMIC', then: Joi.decimal().greater(0).required() }
+                { is: 'STATIC', then: Joi.number().positive().optional() },
+                { is: 'DYNAMIC', then: Joi.number().positive().required() }
             ]
         }),
         additionalInfo: Joi.string().required()

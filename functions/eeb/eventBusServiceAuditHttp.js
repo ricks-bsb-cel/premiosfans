@@ -9,7 +9,7 @@ const moment = require("moment-timezone");
 
 const location = 'southamerica-east1';
 const datasetId = 'premiosfans';
-const auditTableName = 'eebAudit_v5';
+const auditTableName = 'eebHttp_v1';
 const fullTableName = `premiosfans.${datasetId}.${auditTableName}`;
 
 const schemaPayload = [
@@ -19,74 +19,30 @@ const schemaPayload = [
         "mode": "REQUIRED"
     },
     {
-        "name": "serviceId",
-        "type": "STRING",
-        "mode": "REQUIRED",
-        "maxLength": "36"
-    },
-    {
-        "name": "topic",
+        "name": "verb",
         "type": "STRING",
         "mode": "REQUIRED",
         "maxLength": "64"
     },
     {
-        "name": "event",
+        "name": "type", // Result or Request
         "type": "STRING",
         "mode": "REQUIRED",
         "maxLength": "64"
     },
     {
-        "name": "messageId",
+        "name": "url",
         "type": "STRING",
         "mode": "NULLABLE",
         "maxLength": "36"
     },
     {
-        "name": "async",
-        "type": "BOOLEAN",
-        "mode": "REQUIRED"
-    },
-    {
-        "name": "idEmpresa",
-        "type": "STRING",
-        "mode": "NULLABLE",
-        "maxLength": "64"
-    },
-    {
-        "name": "uid",
-        "type": "STRING",
-        "mode": "NULLABLE",
-        "maxLength": "64"
-    },
-    {
-        "name": "ordered",
-        "type": "BOOLEAN",
-        "mode": "REQUIRED"
-    },
-    {
-        "name": "noAuth",
-        "type": "BOOLEAN",
-        "mode": "REQUIRED"
-    },
-    {
-        "name": "error",
-        "type": "BOOLEAN",
-        "mode": "REQUIRED"
-    },
-    {
-        "name": "orderingKey",
-        "type": "STRING",
-        "mode": "NULLABLE",
-        "maxLength": "64"
-    },
-    {
-        "name": "attributes",
+        "name": "payload",
         "type": "JSON",
         "mode": "NULLABLE"
     },
     {
-        "name": "data",
+        "name": "headers",
         "type": "JSON",
         "mode": "NULLABLE"
     },
@@ -97,54 +53,7 @@ const schemaPayload = [
     }
 ];
 
-
-const auditPath = messageId => {
-    const hoje = moment().tz("America/Sao_Paulo").format('YYYY-MM-DD');
-    return `/eebAudit/${hoje}/${messageId}`;
-}
-
-
-const addAuditMessageId = (messageId, field) => {
-    return new Promise((resolve, reject) => {
-
-        // Se não houver messageId, quer dizer que a msg não veio do pubsub
-        if (!messageId) { return resolve(); }
-
-        const path = auditPath(messageId) + '/' + field;
-
-        return admin.database().ref(path).set(
-            moment().tz("America/Sao_Paulo").format('YYYY-MM-DD HH:mm:ss.SSS')
-        )
-            .then(_ => {
-                return resolve();
-            })
-            .catch(e => {
-                return reject(e);
-            })
-    })
-}
-
-
-const startAuditMessageId = messageId => { return addAuditMessageId(messageId, 'start'); }
-const endAuditMessageId = messageId => { return addAuditMessageId(messageId, 'end'); }
-
-
-const auditMessageIdExists = messageId => {
-    return new Promise((resolve, reject) => {
-        const path = `${auditPath()}/${messageId}/start`;
-
-        return admin.database().ref(path).once("value")
-            .then(result => {
-                return resolve(Boolean(result.val()));
-            })
-            .catch(e => {
-                return reject(e);
-            })
-    })
-}
-
-
-const savePayload = (payload, event, result) => {
+const save = (payload, event, result) => {
     return new Promise((resolve, reject) => {
 
         const

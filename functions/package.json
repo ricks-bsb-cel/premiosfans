@@ -35,7 +35,6 @@
     "glob": "^8.0.3",
     "handlebars": "^4.7.7",
     "joi": "^17.6.4",
-    "joi-decimal": "^1.1.2",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
