@@ -137,6 +137,13 @@ api.post("/v1/pay/pix-key-delete", (request, response) => {
     initFirebase.call(require('./services/cartos/pixKeysDelete').callRequest, request, response);
 })
 
+api.post("/v1/pay/pix-key-create", (request, response) => {
+    initFirebase.call(require('./services/cartos/pixKeysCreate').callRequest, request, response);
+})
+
+api.post("/v1/pay/pix-create", (request, response) => {
+    initFirebase.call(require('./services/cartos/pixCreate').callRequest, request, response);
+})
 
 const eeb = express();
 

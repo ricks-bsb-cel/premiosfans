@@ -7,6 +7,7 @@ const eebHelper = require('../../eventBusServiceHelper');
 const eebService = require('../../eventBusService').abstract;
 
 const userCredentials = require('./getUserCredential');
+const accountList = require('./accountList');
 
 const schema = _ => {
     const schema = Joi.object({
@@ -16,25 +17,27 @@ const schema = _ => {
         key: Joi
             .when('type', {
                 switch: [
-                    { is: 'CPF_CNPJ', then: Joi.string().required().min(11).max(14) },
-                    { is: 'EMAIL', then: Joi.string().email()},
+                    { is: 'CPF_CNPJ', then: Joi.string().min(11).max(14).required() },
+                    { is: 'EMAIL', then: Joi.string().email().required() },
                     { is: 'PHONE', then: Joi.string().length(10).pattern(/^[0-9]+$/).required() }
                 ],
                 otherwise: Joi.forbidden()
-            })
+            }),
+        typeAccount: Joi.string().valid('CACC', 'SVGS', 'SLRY').default('CACC').optional()
     });
 
     return schema;
 }
 
-const createPixKey = (cpf, accountId, pixKey) => {
+const createPixKey = (parm, accountData) => {
     return new Promise((resolve, reject) => {
-        let userLogin;
+        let userLogin, endPoint;
 
         return userCredentials.call({
-            cpf: cpf,
-            accountId: accountId
+            cpf: parm.cpf,
+            accountId: accountData.accountId
         })
+
             .then(userCredentialsResult => {
                 if (!userCredentialsResult) throw new Error(`Credential not found for ${cpf}`);
 
@@ -44,22 +47,32 @@ const createPixKey = (cpf, accountId, pixKey) => {
             })
 
             .then(cartosConfig => {
-                const endPoint = `${cartosConfig.endpoint_url_production}/digital-account/v1/pix-keys/${pixKey}`;
+                endPoint = `${cartosConfig.endpoint_url_production}/digital-account/v1/pix-keys`;
+
+                let payload = {
+                    type: parm.type,
+                    agency: accountData.agency,
+                    openingDate: accountData.createdAt,
+                    typeAccount: parm.typeAccount,
+                    typeOwner: accountData.personType === "PJ" ? "LEGAL_PERSON" : "NATURAL_PERSON"
+                };
+
+                if (parm.type !== "EVP") {
+                    payload.key = parm.key;
+                }
 
                 const headers = {
                     "Authorization": `Bearer ${userLogin.token}`,
                     "x-api-key": cartosConfig.api_key,
-                    "device_id": `id-${cpf}`
+                    "device_id": `id-${payload.cpf}`
                 };
 
-                return eebHelper.http.delete(endPoint, headers);
+                return eebHelper.http.post(endPoint, payload, headers);
             })
 
             .then(getResult => {
-                console.info('getResult', getResult);
-
                 if (getResult.statusCode !== 200) {
-                    throw new Error(`Invalid cartos login result: ${JSON.stringify(getResult)}`);
+                    throw new Error(`Invalid result: ${JSON.stringify(getResult)}`);
                 }
 
                 return resolve(getResult.data);
@@ -92,15 +105,25 @@ class Service extends eebService {
                 .then(dataResult => {
                     result.parm = dataResult;
 
-                    return deletePixKey(
-                        result.parm.cpf,
-                        result.parm.accountId,
-                        result.parm.pixKey
+                    return accountList.call({
+                        cpf: result.parm.cpf,
+                        accountId: result.parm.accountId
+                    });
+                })
+
+                .then(accountListResult => {
+                    if (!accountListResult.result) {
+                        throw new Error(`Conta [${result.parm.accountId}] não encontrada`);
+                    }
+
+                    return createPixKey(
+                        result.parm,
+                        accountListResult.result
                     );
                 })
 
-                .then(deletePixKeyResult => {
-                    return resolve(deletePixKeyResult);
+                .then(createPixKeyResult => {
+                    return resolve(createPixKeyResult);
                 })
 
                 .catch(e => {
@@ -118,7 +141,7 @@ const call = (data, request, response) => {
     const eebAuthTypes = require('../../eventBusService').authType;
 
     const service = new Service(request, response, {
-        name: 'pix-keys-delete',
+        name: 'pix-keys-create',
         async: false, // Este evento nunca é assincrono
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,

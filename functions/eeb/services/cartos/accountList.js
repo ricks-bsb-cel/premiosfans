@@ -10,7 +10,8 @@ const userCredentials = require('./getUserCredential');
 
 const schema = _ => {
     const schema = Joi.object({
-        cpf: Joi.string().length(11).required()
+        cpf: Joi.string().length(11).required(),
+        accountId: Joi.string().optional()
     });
 
     return schema;
@@ -41,14 +42,12 @@ const accounts = cpf => {
                     "device_id": cpf
                 };
 
-                console.info(headers);
-
                 return eebHelper.http.get(endPoint, headers);
             })
 
             .then(getResult => {
-                if (!getResult.statusCode === 200) {
-                    throw new Error(`Invalid cartos login result [${JSON.stringify(getResult)}]`);
+                if (getResult.statusCode !== 200) {
+                    throw new Error(`Invalid result [${JSON.stringify(getResult)}]`);
                 }
 
                 return resolve(getResult.data);
@@ -60,7 +59,6 @@ const accounts = cpf => {
 
     })
 }
-
 
 class Service extends eebService {
 
@@ -86,12 +84,22 @@ class Service extends eebService {
                 })
 
                 .then(accountsResult => {
+                    if (result.parm.accountId) {
+                        accountsResult = accountsResult.filter(f => {
+                            return f.accountId === result.parm.accountId;
+                        })
+
+                        if (accountsResult.length) {
+                            accountsResult = accountsResult[0];
+                        } else {
+                            accountsResult = null;
+                        }
+                    }
+
                     return resolve(accountsResult);
                 })
 
                 .catch(e => {
-                    console.error(e);
-
                     return reject(e);
                 })
 
