@@ -2,160 +2,69 @@
 
 // https://googleapis.dev/nodejs/bigquery/latest/index.html#samples
 
-const admin = require("firebase-admin");
 const { BigQuery } = require('@google-cloud/bigquery');
 const bigquery = new BigQuery();
-const moment = require("moment-timezone");
 
-const location = 'southamerica-east1';
-const datasetId = 'premiosfans';
-const auditTableName = 'eebHttp_v1';
-const fullTableName = `premiosfans.${datasetId}.${auditTableName}`;
+const datasetId = 'http';
+const tableName = 'calls';
 
-const schemaPayload = [
-    {
-        "name": "date",
-        "type": "DATETIME",
-        "mode": "REQUIRED"
-    },
-    {
-        "name": "verb",
-        "type": "STRING",
-        "mode": "REQUIRED",
-        "maxLength": "64"
-    },
-    {
-        "name": "type", // Result or Request
-        "type": "STRING",
-        "mode": "REQUIRED",
-        "maxLength": "64"
-    },
-    {
-        "name": "url",
-        "type": "STRING",
-        "mode": "NULLABLE",
-        "maxLength": "36"
-    },
-    {
-        "name": "payload",
-        "type": "JSON",
-        "mode": "NULLABLE"
-    },
-    {
-        "name": "headers",
-        "type": "JSON",
-        "mode": "NULLABLE"
-    },
-    {
-        "name": "result",
-        "type": "JSON",
-        "mode": "NULLABLE"
-    }
-];
+/*
+CREATE TABLE http.calls (
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    verb STRING NOT NULL,
+    type STRING NOT NULL,
+    url STRING NOT NULL,
+    payload JSON,
+    headers JSON,
+    result JSON,
+    error JSON
+);
+*/
 
-const save = (payload, event, result) => {
+const save = data => {
     return new Promise((resolve, reject) => {
 
-        const
-            dtHoje = moment().tz("America/Sao_Paulo"),
-            idEmpresa =
-                (payload.data || {}).idEmpresa ||
-                (payload.data.newDoc || {}).idEmpresa ||
-                (payload.data.oldDoc || {}).idEmpresa ||
-                'not-set',
-            uid = (payload.attributes || {}).uid || 'not-set';
+        if (!data || !data.verb || !data.type || !data.url) {
+            throw new Error('Invalid call for eventBusServiceAuditHttp');
+        }
 
-        const rows = [
-            {
-                "date": dtHoje.format('YYYY-MM-DD HH:mm:ss.SSS'),
-                "serviceId": payload.serviceId || 'not-set',
-                "messageId": payload.messageId || null,
-                "topic": payload.topic || 'not-set',
-                "idEmpresa": idEmpresa,
-                "uid": uid,
-                "ordered": typeof payload.ordered === 'boolean' ? payload.ordered : false,
-                "noAuth": typeof payload.noAuth === 'boolean' ? payload.noAuth : false,
-                "error": event.includes('error'),
-                "async": typeof payload.async === 'boolean' ? payload.async : false,
-                "orderingKey": payload.orderingKey || null,
-                "event": event || 'not-set',
-                "attributes": payload.attributes ? JSON.stringify(payload.attributes) : null,
-                "data": payload.data ? JSON.stringify(payload.data) : null,
-                "result": result ? JSON.stringify(result) : null
-            }
-        ];
+        let row = {
+            verb: data.verb,
+            type: data.type,
+            url: data.url
+        };
 
-        bigquery.dataset(datasetId).table(auditTableName).insert(rows)
+        if (data.payload && typeof data.payload === 'object') row.payload = { ...data.payload };
+        if (data.headers && typeof data.headers === 'object') row.headers = { ...data.headers };
+        if (data.result && typeof data.result === 'object') row.result = { ...data.result };
+        if (data.error && typeof data.error === 'object') row.error = { ...data.error };
+
+        if (row.payload) delete row.payload.password;
+        if (row.headers) delete row.headers.password;
+        if (row.headers) delete row.headers['x-api-key'];
+        if (row.resolve) delete row.result.password;
+        if (row.error) delete row.error.password;
+
+        if (row.payload) row.payload = JSON.stringify(row.payload);
+        if (row.headers) row.headers = JSON.stringify(row.headers);
+        if (row.result) row.result = JSON.stringify(row.result);
+        if (row.error) row.error = JSON.stringify(row.error);
+
+        const rows = [row];
+
+        bigquery.dataset(datasetId).table(tableName).insert(rows)
 
             .then(_ => {
                 return resolve(null);
             })
 
             .catch(e => {
-                if (e.code === 404) {
-                    console.info(`Creating table ${auditTableName}`);
-                    createAuditTable();
-                }
-                return reject(new Error(e.message));
-            })
+                console.error(e);
 
-    })
-}
-
-
-const eventMessageExists = function (event, messageId) {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT count(*) AS qtd FROM \`${fullTableName}\` WHERE messageId='${messageId}' AND event='${event}'`;
-
-        const options = {
-            query: query,
-            location: location,
-        };
-
-        bigquery.createQueryJob(options)
-            .then(([job]) => {
-                return job.getQueryResults();
-            })
-            .then(([rows]) => {
-                return resolve(rows[0].qtd > 0);
-            })
-            .catch(e => {
-                return reject(e);
-            })
-    })
-}
-
-
-const createAuditTable = _ => {
-    return new Promise((resolve, reject) => {
-
-        const options = {
-            schema: schemaPayload,
-            location: location
-        };
-
-        bigquery
-            .dataset(datasetId)
-            .createTable(auditTableName, options)
-            .then(_ => {
-                console.error('createAuditTable', 'Created')
-                return resolve();
-            })
-            .catch(e => {
-                console.error('createAuditTable', e)
                 return reject(e);
             })
 
     })
 }
 
-
-exports.startAuditMessageId = startAuditMessageId;
-exports.endAuditMessageId = endAuditMessageId;
-exports.auditMessageIdExists = auditMessageIdExists;
-
-
-exports.savePayload = savePayload;
-
-
-exports.eventMessageExists = eventMessageExists;
+exports.save = save;

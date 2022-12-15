@@ -10,7 +10,7 @@ const eebHelper = require('../../eventBusServiceHelper');
 const eebService = require('../../eventBusService').abstract;
 
 const serviceUserCredential = require('../../../business/serviceUserCredential');
-const { head } = require("lodash");
+const resultPassword = true;
 
 const schema = _ => {
     const schema = Joi.object({
@@ -68,6 +68,10 @@ const login = (cpf, password) => {
             })
 
             .then(_ => {
+                if (resultPassword) {
+                    result.password = password;
+                }
+                
                 return resolve(result);
             })
 
@@ -178,8 +182,6 @@ class Service extends eebService {
 
                         return null;
                     } else {
-                        console.info('serviceUserCredential.getByCpf');
-
                         return serviceUserCredential.getByCpf(result.parm.tipo, result.parm.cpf);
                     }
 

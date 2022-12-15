@@ -120,12 +120,22 @@ const getUserTokenFromRequest = (request, response) => {
 
 const callNeddleGet = (endpoint, headers) => {
     return new Promise((resolve, reject) => {
-        return needle(
-            'get',
-            endpoint,
-            { headers: headers }
-        )
+        const auditHttp = require('./eventBusServiceAuditHttp');
+
+        const audit = {
+            verb: 'get',
+            type: 'request',
+            url: endpoint,
+            headers: headers
+        };
+
+        return needle('get', endpoint, { headers: headers })
+        
             .then(needleResult => {
+
+                audit.result = needleResult.body;
+                audit.type = 'result';
+
                 let result = {
                     data: needleResult.body,
                     statusCode: needleResult.statusCode
@@ -133,11 +143,28 @@ const callNeddleGet = (endpoint, headers) => {
 
                 if (needleResult.message && result.statusCode !== 200) {
                     result.message = needleResult.message;
+
+                    audit.error = {
+                        statusCode: result.statusCode,
+                        message: needleResult.message
+                    };
                 }
+
+                auditHttp.save(audit);
 
                 return resolve(result);
             })
+
             .catch(e => {
+                audit.type = 'error';
+
+                audit.error = {
+                    code: e.code || null,
+                    message: e.message || null
+                }
+
+                auditHttp.save(audit);
+
                 return reject(e);
             })
     })
@@ -145,6 +172,18 @@ const callNeddleGet = (endpoint, headers) => {
 
 const callNeddlePost = (endpoint, payload, headers) => {
     return new Promise((resolve, reject) => {
+        const auditHttp = require('./eventBusServiceAuditHttp');
+
+        const audit = {
+            verb: 'post',
+            type: 'request',
+            url: endpoint,
+            payload: payload,
+            headers: headers
+        };
+
+        auditHttp.save(audit);
+
         return needle(
             'post',
             endpoint,
@@ -161,15 +200,34 @@ const callNeddlePost = (endpoint, payload, headers) => {
                     statusCode: needleResult.statusCode
                 }
 
+                audit.result = needleResult.body;
+                audit.type = 'result';
+
                 if (needleResult.message && result.statusCode !== 200) {
                     result.message = needleResult.message;
+
+                    audit.error = {
+                        statusCode: result.statusCode,
+                        message: needleResult.message
+                    };
                 }
+
+                auditHttp.save(audit);
 
                 return resolve(result);
 
             })
 
             .catch(e => {
+                audit.type = 'error';
+
+                audit.error = {
+                    code: e.code || null,
+                    message: e.message || null
+                }
+
+                auditHttp.save(audit);
+
                 return reject(e);
             })
     })
@@ -177,6 +235,12 @@ const callNeddlePost = (endpoint, payload, headers) => {
 
 const callNeddleDelete = (endpoint, headers) => {
     return new Promise((resolve, reject) => {
+
+        const auditHttp = require('./eventBusServiceAuditHttp');
+        const audit = {
+            verb: 'delete'
+        }
+
         return needle(
             'delete',
             endpoint,
