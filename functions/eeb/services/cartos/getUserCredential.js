@@ -10,7 +10,6 @@ const eebHelper = require('../../eventBusServiceHelper');
 const eebService = require('../../eventBusService').abstract;
 
 const serviceUserCredential = require('../../../business/serviceUserCredential');
-const { head } = require("lodash");
 const resultPassword = true;
 
 const schema = _ => {
@@ -23,12 +22,57 @@ const schema = _ => {
     return schema;
 }
 
-const getPathAccountToken = (cpf, accountId) => {
-    return `/tokens/${cpf}/cartos/${accountId}`;
+const getPathAccountToken = cpf => {
+    return `/tokens/${cpf}/cartos/currentToken`;
 }
 
-const login = (cpf, password) => {
+const getLoginToken = (cpf, password) => {
     return new Promise((resolve, reject) => {
+
+        let result = null;
+
+        // Busca o token corrente (não sei se é de Login ou de Conta)
+        const
+            path = getPathAccountToken(cpf),
+            nowMilliseconds = global.nowMilliseconds();
+
+
+        return admin.database().ref(path).once("value")
+            .then(tokenData => {
+                tokenData = tokenData.val() || null;
+
+                if (
+                    tokenData &&
+                    tokenData.account == 'login' && // É um token de Login
+                    tokenData.token // Existe um token no cache
+                ) {
+                    // O token de Login existe
+
+                    if (
+                        tokenData.expire && // Existe data de expiração
+                        nowMilliseconds < tokenData.expire // O token não expirou
+                    ) {
+                        // O token de login existe e não está expirado
+                        result = tokenData;
+
+                        return null;
+                    } else {
+                        // O token de login existe, mas está expirado. Tenta renova-lo
+                    }
+                }
+
+                // Se o token não existe, cria um novo token de login
+
+
+
+                // Se o token existe, mas está expirado, tenta atualiza-lo
+            })
+
+
+
+
+        // Verifica se 
+
 
         let result, cartosConfig;
 
@@ -106,7 +150,7 @@ const changeAccount = (cpf, password, accountId) => {
                 const headers = {
                     "Authorization": `Bearer ${userLogin.token}`,
                     "x-api-key": cartosConfig.api_key,
-                    "device_id": `id-${cpf}-${accountId.substr(0,8)}`
+                    "device_id": `id-${cpf}-${accountId.substr(0, 8)}`
                 };
 
                 console.info(headers);

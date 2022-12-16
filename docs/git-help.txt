@@ -2,5 +2,8 @@
  
  git config alias.acp '! acp() { git add . && git add -A && git commit -a -m "$1" && git push ; } ; acp'
 
+ git config alias.acp '! acp() { git add . && git add -A && git commit -m "$1" && git push ; } ; acp'
+
+
  depois, é só executar:
  git acp "message"
