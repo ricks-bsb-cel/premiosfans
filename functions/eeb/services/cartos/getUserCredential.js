@@ -10,6 +10,7 @@ const eebHelper = require('../../eventBusServiceHelper');
 const eebService = require('../../eventBusService').abstract;
 
 const serviceUserCredential = require('../../../business/serviceUserCredential');
+const { head } = require("lodash");
 const resultPassword = true;
 
 const schema = _ => {
@@ -45,7 +46,7 @@ const login = (cpf, password) => {
 
                 const headers = {
                     "x-api-key": cartosConfig.api_key,
-                    "device_id": cpf
+                    "device_id": `id-${cpf}`
                 };
 
                 return eebHelper.http.post(endPoint, payload, headers);
@@ -71,7 +72,7 @@ const login = (cpf, password) => {
                 if (resultPassword) {
                     result.password = password;
                 }
-                
+
                 return resolve(result);
             })
 
@@ -105,8 +106,10 @@ const changeAccount = (cpf, password, accountId) => {
                 const headers = {
                     "Authorization": `Bearer ${userLogin.token}`,
                     "x-api-key": cartosConfig.api_key,
-                    "device_id": cpf
+                    "device_id": `id-${cpf}-${accountId.substr(0,8)}`
                 };
+
+                console.info(headers);
 
                 return eebHelper.http.post(endPoint, payload, headers);
 
