@@ -2,7 +2,6 @@
 
 const secretManager = require('../../../secretManager');
 const eebHelper = require('../../eventBusServiceHelper');
-const eebService = require('../../eventBusService').abstract;
 
 const getEndpointConfig = endPoint => {
     return new Promise((resolve, reject) => {
@@ -30,10 +29,17 @@ const getEndpointConfig = endPoint => {
     })
 }
 
-const callPost = (url, payload) => {
+const callPost = (url, payload, headers) => {
     return new Promise((resolve, reject) => {
         return getEndpointConfig(url)
             .then(config => {
+                if (headers) {
+                    config.headers = {
+                        ...config.headers,
+                        ...headers
+                    };
+                }
+
                 return eebHelper.http.post(config.endPoint, payload, config.headers);
             })
 
@@ -89,10 +95,12 @@ const login = (cpf, password) => {
     return callPost('/users/v1/login', parm);
 }
 
-const changeAccount = (accountId) => {
-    return callPost('users/v1/login/change-account', {
-        accountId: accountId
-    })
+const changeAccount = (accountId, token) => {
+    const
+        payload = { accountId: accountId },
+        headers = { Authorization: `Bearer ${token}` };
+
+    return callPost('users/v1/login/change-account', payload, headers);
 }
 
 const accounts = token => {
