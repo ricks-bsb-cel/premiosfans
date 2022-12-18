@@ -119,7 +119,20 @@ api.get("/v1/user/revoke-token/:uid", (request, response) => {
     initFirebase.call(require('./services/users/revokeUserToken').callRequest, request, response);
 })
 
-/* Cartos */
+
+
+/* Cartos  v1 */
+
+api.post("/v1/cartos/user-credential", (request, response) => {
+    initFirebase.call(require('./services/cartos/getUserCredential').callRequest, request, response);
+})
+
+api.post("/v1/cartos/update-account-list", (request, response) => {
+    initFirebase.call(require('./services/cartos/updateAccountList').callRequest, request, response);
+})
+
+
+/* Cartos 
 
 api.post("/v1/pay/user-credential", (request, response) => {
     initFirebase.call(require('./services/cartos/getUserCredential').callRequest, request, response);
@@ -144,6 +157,8 @@ api.post("/v1/pay/pix-key-create", (request, response) => {
 api.post("/v1/pay/pix-create", (request, response) => {
     initFirebase.call(require('./services/cartos/pixCreate').callRequest, request, response);
 })
+
+*/
 
 const eeb = express();
 

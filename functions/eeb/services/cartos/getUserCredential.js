@@ -5,16 +5,13 @@ const admin = require("firebase-admin");
 const path = require('path');
 const Joi = require('joi');
 const global = require('../../../global');
-const secretManager = require('../../../secretManager');
-const eebHelper = require('../../eventBusServiceHelper');
 const eebService = require('../../eventBusService').abstract;
 
 const serviceUserCredential = require('../../../business/serviceUserCredential');
-const resultPassword = true;
+const cartosHttpRequest = require('./cartosHttpRequests');
 
 const schema = _ => {
     const schema = Joi.object({
-        tipo: Joi.string().default('cartos').optional(),
         cpf: Joi.string().length(11).required(),
         accountId: Joi.string().default('login').optional()
     });
@@ -26,97 +23,85 @@ const getPathAccountToken = cpf => {
     return `/tokens/${cpf}/cartos/currentToken`;
 }
 
-const getLoginToken = (cpf, password) => {
+
+const login = cpf => {
     return new Promise((resolve, reject) => {
 
-        let result = null;
+        return serviceUserCredential.getByCpf('cartos', cpf)
+            .then(serviceUserCredential => {
+                if (!serviceUserCredential) throw new Error(`Nenhum usuário encontrado com o cpf ${cpf}`);
 
-        // Busca o token corrente (não sei se é de Login ou de Conta)
+                return cartosHttpRequest.login(
+                    serviceUserCredential.cpf,
+                    serviceUserCredential.password
+                );
+            })
+
+            .then(loginResult => {
+                return resolve(loginResult);
+            })
+
+            .catch(e => {
+                return reject(e);
+            })
+
+    })
+}
+
+
+const getCredential = (cpf, accountId) => {
+    return new Promise((resolve, reject) => {
+
+        let result = {
+            success: false
+        };
+
         const
             path = getPathAccountToken(cpf),
             nowMilliseconds = global.nowMilliseconds();
 
-
+        // Verifica se o token já existe no Buffer (RealTimeDatabase)
         return admin.database().ref(path).once("value")
-            .then(tokenData => {
-                tokenData = tokenData.val() || null;
+            .then(refAccountTokenResult => {
+                refAccountTokenResult = refAccountTokenResult.val() || null;
 
                 if (
-                    tokenData &&
-                    tokenData.account == 'login' && // É um token de Login
-                    tokenData.token // Existe um token no cache
+                    refAccountTokenResult &&
+                    (accountId === 'any' || refAccountTokenResult.accountId === accountId) &&
+                    refAccountTokenResult.token && // Existe um token no cache
+                    refAccountTokenResult.expire && // Existe data de expiração
+                    nowMilliseconds < refAccountTokenResult.expire // O token é da mesma conta
                 ) {
-                    // O token de Login existe
+                    result = refAccountTokenResult;
 
-                    if (
-                        tokenData.expire && // Existe data de expiração
-                        nowMilliseconds < tokenData.expire // O token não expirou
-                    ) {
-                        // O token de login existe e não está expirado
-                        result = tokenData;
+                    result.source = 'buffer';
+                    result.success = true;
 
-                        return null;
-                    } else {
-                        // O token de login existe, mas está expirado. Tenta renova-lo
-                    }
+                    return null
                 }
 
-                // Se o token não existe, cria um novo token de login
+                // Se o tipo de conta for login
+                if (accountId === 'login' || accountId === 'any') {
+                    return login(cpf);
+                }
 
-
-
-                // Se o token existe, mas está expirado, tenta atualiza-lo
+                throw new Error('Tipo de Conta inválido em getUserCredential');
             })
 
+            .then(accountResult => {
+                if (result.success) return;
 
+                accountResult.accountId = accountId;
+                accountResult.expire = global.nowMilliseconds(10, 'minutes');
 
+                result = { ...accountResult };
+                result.success = true;
+                result.source = 'cartos';
 
-        // Verifica se 
-
-
-        let result, cartosConfig;
-
-        return secretManager.get('cartos-api-config')
-            .then(secretManagerResult => {
-                cartosConfig = secretManagerResult;
-
-                const endPoint = `${cartosConfig.endpoint_url_production}/users/v1/login`;
-
-                const payload = {
-                    username: cpf,
-                    password: password,
-                    migrate: false
-                }
-
-                const headers = {
-                    "x-api-key": cartosConfig.api_key,
-                    "device_id": `id-${cpf}`
-                };
-
-                return eebHelper.http.post(endPoint, payload, headers);
-            })
-
-            .then(loginResult => {
-                if (loginResult.statusCode !== 200) {
-                    throw new Error(`Invalid cartos login result [${JSON.stringify(loginResult)}]`);
-                }
-
-                result = {
-                    token: loginResult.data.token,
-                    refreshToken: loginResult.data.opaqueRefreshTokenId,
-                    expire: global.nowMilliseconds(10, 'minutes'), // Salva por 10 minutos...
-                };
-
-                const path = getPathAccountToken(cpf, 'login')
-
-                return admin.database().ref(path).set(result);
+                return admin.database().ref(path).set(accountResult);
             })
 
             .then(_ => {
-                if (resultPassword) {
-                    result.password = password;
-                }
-
                 return resolve(result);
             })
 
@@ -127,60 +112,6 @@ const getLoginToken = (cpf, password) => {
     })
 }
 
-const changeAccount = (cpf, password, accountId) => {
-    return new Promise((resolve, reject) => {
-        let userLogin, cartosConfig, result;
-
-        return login(cpf, password)
-            .then(loginResult => {
-                userLogin = loginResult;
-
-                return secretManager.get('cartos-api-config');
-            })
-
-            .then(secretManagerResult => {
-                cartosConfig = secretManagerResult;
-
-                const endPoint = `${cartosConfig.endpoint_url_production}/users/v1/login/change-account`;
-
-                const payload = {
-                    accountId: accountId
-                }
-
-                const headers = {
-                    "Authorization": `Bearer ${userLogin.token}`,
-                    "x-api-key": cartosConfig.api_key,
-                    "device_id": `id-${cpf}-${accountId.substr(0, 8)}`
-                };
-
-                console.info(headers);
-
-                return eebHelper.http.post(endPoint, payload, headers);
-
-            })
-
-            .then(changeAccountResult => {
-                if (!changeAccountResult.statusCode === 200) {
-                    throw new Error(`Invalid cartos login result [${JSON.stringify(loginResult)}]`);
-                }
-
-                result = changeAccountResult.data;
-                result.expire = global.nowMilliseconds(10, 'minutes');
-
-                const path = getPathAccountToken(cpf, accountId)
-
-                return admin.database().ref(path).set(result);
-            })
-
-            .then(_ => {
-                return resolve(result);
-            })
-
-            .catch(e => {
-                return reject(e);
-            })
-    })
-}
 
 class Service extends eebService {
 
@@ -197,68 +128,20 @@ class Service extends eebService {
                 success: false
             };
 
-            const nowMilliseconds = global.nowMilliseconds();
-
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
                     result.parm = dataResult;
 
-                    result.refAccountToken = getPathAccountToken(result.parm.cpf, result.parm.accountId);
-
-                    return admin.database().ref(result.refAccountToken).once("value");
+                    return getCredential(result.parm.cpf, result.parm.accountId || 'login');
                 })
 
-                .then(refAccountTokenResult => {
-
-                    refAccountTokenResult = refAccountTokenResult.val() || null;
-
-                    if (
-                        refAccountTokenResult &&
-                        refAccountTokenResult.token && // Existe um token no cache
-                        refAccountTokenResult.expire && // Existe data de expiração
-                        nowMilliseconds < refAccountTokenResult.expire // O token é da mesma conta
-                    ) {
-                        result = {
-                            ...result.parm,
-                            ...refAccountTokenResult
-                        };
-
-                        result.success = true;
-                        result.origin = 'buffer';
-
-                        return null;
-                    } else {
-                        return serviceUserCredential.getByCpf(result.parm.tipo, result.parm.cpf);
-                    }
-
-                })
-
-                .then(getByCpfResult => {
-                    if (result.success) return null;
-
-                    if (result.parm.accountId === 'login') {
-                        return login(getByCpfResult.user, getByCpfResult.password);
-                    } else {
-                        return changeAccount(getByCpfResult.user, getByCpfResult.password, result.parm.accountId);
-                    }
-                })
-
-                .then(loginResult => {
-                    if (loginResult) {
-                        result = {
-                            ...result.parm,
-                            ...loginResult
-                        };
-
-                        result.success = true;
-                        result.origin = result.tipo;
-                    }
-
-                    return resolve(result);
+                .then(getCredentialResult => {
+                    return resolve(getCredentialResult);
                 })
 
                 .catch(e => {
+                    console.error('run', JSON.stringify(e));
                     return reject(e);
                 })
 
@@ -284,6 +167,7 @@ const call = (data, request, response) => {
 }
 
 exports.call = call;
+exports.getCredential = getCredential;
 
 exports.callRequest = (request, response) => {
     return call(request.body, request, response);

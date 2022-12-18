@@ -313,3 +313,7 @@ exports.titulosCompras = _ => {
 exports.faq = _ => {
     return new collectionClass('faq');
 }
+
+exports.cartosAccounts = _ => {
+    return new collectionClass('cartosAccounts');
+}
