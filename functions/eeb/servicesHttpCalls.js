@@ -119,8 +119,6 @@ api.get("/v1/user/revoke-token/:uid", (request, response) => {
     initFirebase.call(require('./services/users/revokeUserToken').callRequest, request, response);
 })
 
-
-
 /* Cartos  v1 */
 
 api.post("/v1/cartos/user-credential", (request, response) => {
@@ -147,7 +145,7 @@ api.post("/v1/cartos/generate-pix", (request, response) => {
     initFirebase.call(require('./services/cartos/generatePix').callRequest, request, response);
 })
 
-/* Cartos 
+/* Cartos
 
 api.post("/v1/pay/user-credential", (request, response) => {
     initFirebase.call(require('./services/cartos/getUserCredential').callRequest, request, response);

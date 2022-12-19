@@ -133,51 +133,6 @@ async function getByCpf(tipo, cpf) {
     return credentials;
 }
 
-/*
-const getByCpf = (tipo, cpf) => {
-    return new Promise((resolve, reject) => {
- 
-        if (!tipo || !cpf) {
-            throw new Error('Informe tipo e cpf');
-        }
- 
-        let credentials;
- 
-        return collectionServiceUserCredential.get({
-            filter: { tipo: tipo, cpf: cpf },
-            limit: 1
-        })
- 
-            .then(getResult => {
- 
-                credentials = getResult.length ? getResult[0] : null;
- 
-                if (!credentials) {
-                    return null;
-                }
- 
-                return secretManager.get('service-user-credential-keys');
-            })
- 
-            .then(secretManagerResult => {
- 
-                if (secretManagerResult) {
-                    const secret = secretManagerResult[`r${cpf.slice(-1)}`];
-                    credentials.password = global.decryptString(credentials.password, secret)
-                }
- 
-                return resolve(credentials);
- 
-            })
- 
-            .catch(e => {
-                return reject(e);
-            })
- 
-    })
-}
-*/
-
 const getByUid = (tipo, uid) => {
     return new Promise((resolve, reject) => {
 

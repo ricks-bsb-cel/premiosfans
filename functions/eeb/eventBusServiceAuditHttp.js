@@ -28,7 +28,7 @@ const save = data => {
             throw new Error('Invalid call for eventBusServiceAuditHttp');
         }
 
-        let row = {
+        const row = {
             verb: data.verb,
             type: data.type,
             url: data.url

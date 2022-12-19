@@ -73,7 +73,7 @@ async function getCredential(cpf, accountId) {
 
     if (typeof accountId === 'undefined') accountId = 'login';
 
-    let refAccountTokenResult = (await admin.database().ref(path).once("value")).val();
+    const refAccountTokenResult = (await admin.database().ref(path).once("value")).val();
 
     if (
         refAccountTokenResult &&
@@ -117,7 +117,7 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let result = {
+            const result = {
                 success: false
             };
 
@@ -148,7 +148,7 @@ exports.Service = Service;
 const call = (data, request, response) => {
     const eebAuthTypes = require('../../eventBusService').authType;
 
-    if(!data.cpf) throw new Error('o CPF é obrigatório...');
+    if (!data.cpf) throw new Error('o CPF é obrigatório...');
 
     const service = new Service(request, response, {
         name: 'get-user-credential',

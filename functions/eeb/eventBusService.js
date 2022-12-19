@@ -13,7 +13,6 @@ const { CloudTasksClient } = require('@google-cloud/tasks');
 const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
 const helper = require('./eventBusServiceHelper');
-const { resultSuccess } = require("../global");
 
 const projectName = 'premios-fans';
 const projectLocation = 'us-central1';

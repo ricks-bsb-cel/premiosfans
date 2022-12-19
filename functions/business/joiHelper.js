@@ -344,13 +344,13 @@ const joiHelper = {
                 .description('Complemento do endereço')
         };
 
-        let fields = {};
+        const fields = {};
 
         Object.keys(base).forEach(k => {
             fields[(attrs.prefix || '') + k] = base[k];
         })
 
-        let result = Joi
+        const result = Joi
             .object(fields)
             .messages({
                 'any.required': 'O endereço, se informado, deve conter CEP, rua, bairro, número, cdade e estado. Opcionalmente pode-se informar o complemento.'

@@ -116,7 +116,7 @@ const pixKeys = (token) => {
 const generatePix = (data, token) => {
     const headers = { Authorization: `Bearer ${token}` };
 
-    let payload = {
+    const payload = {
         receiverKey: data.receiverKey,
         merchantCity: data.merchantCity,
         additionalInfo: data.additionalInfo

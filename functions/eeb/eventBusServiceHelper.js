@@ -130,13 +130,12 @@ const callNeddleGet = (endpoint, headers) => {
         };
 
         return needle('get', endpoint, { headers: headers })
-        
             .then(needleResult => {
 
                 audit.result = needleResult.body;
                 audit.type = 'result';
 
-                let result = {
+                const result = {
                     data: needleResult.body,
                     statusCode: needleResult.statusCode
                 }
@@ -195,7 +194,7 @@ const callNeddlePost = (endpoint, payload, headers) => {
         )
             .then(needleResult => {
 
-                let result = {
+                const result = {
                     data: needleResult.body,
                     statusCode: needleResult.statusCode
                 }
@@ -236,11 +235,6 @@ const callNeddlePost = (endpoint, payload, headers) => {
 const callNeddleDelete = (endpoint, headers) => {
     return new Promise((resolve, reject) => {
 
-        const auditHttp = require('./eventBusServiceAuditHttp');
-        const audit = {
-            verb: 'delete'
-        }
-
         return needle(
             'delete',
             endpoint,
@@ -251,7 +245,7 @@ const callNeddleDelete = (endpoint, headers) => {
         )
             .then(needleResult => {
 
-                let result = {
+                const result = {
                     data: needleResult.body,
                     statusCode: needleResult.statusCode
                 }
