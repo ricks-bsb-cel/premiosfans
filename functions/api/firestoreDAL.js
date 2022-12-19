@@ -317,3 +317,19 @@ exports.faq = _ => {
 exports.cartosAccounts = _ => {
     return new collectionClass('cartosAccounts');
 }
+
+exports.cartosPixKeys = _ => {
+    return new collectionClass('cartosPixKeys');
+}
+
+exports.cartosBalance = _ => {
+    return new collectionClass('cartosBalance');
+}
+
+exports.cartosExtract = _ => {
+    return new collectionClass('cartosExtract');
+}
+
+exports.cartosPix = _ => {
+    return new collectionClass('cartosPix');
+}

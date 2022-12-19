@@ -9,40 +9,40 @@ const userCredentials = require('./getUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
 const firestoreDAL = require('../../../api/firestoreDAL');
-const collectionCartosAccounts = firestoreDAL.cartosAccounts();
+const collectionCartosExtract = firestoreDAL.cartosExtract();
 
 /*
-    Busca todas as contas de um CPF na Cartos e atualiza a collection cartosAccounts
+    Busca o Extrato da conta na Cartos e atualiza a collection cartosExtract
 */
 
 const schema = _ => {
     const schema = Joi.object({
-        cpf: Joi.string().length(11).required()
+        cpf: Joi.string().length(11).required(),
+        accountId: Joi.string().length(36).required()
     });
 
     return schema;
 }
 
-async function updateAccountList(cpf) {
+async function getExtract(cpf, accountId) {
+    const credential = await userCredentials.getCredential(cpf, accountId);
+    const extract = await cartosHttpRequest.extract(credential.token);
 
-    const credential = await userCredentials.getCredential(cpf, 'any');
-    const accounts = await cartosHttpRequest.accounts(credential.token);
+    if (Array.isArray(extract.rows) && extract.rows && extract.rows.length) {
+        const promise = [];
 
-    // Atualiza o cartosAccounts com as contas existentes
-    const promise = [];
+        extract.rows.forEach(row => {
+            row.cpf = cpf;
+            global.setDateTime(row, 'dtAtualizacao');
 
-    accounts.forEach(account => {
-        account.cpf = cpf;
-        global.setDtHoje(account, 'dtAtualizacao');
+            promise.push(collectionCartosExtract.set(row.transactionId, row));
+        })
 
-        promise.push(collectionCartosAccounts.merge(account.accountId, account));
-    })
+        await Promise.all(promise);
+    }
 
-    await Promise.all(promise);
-
-    return accounts;
+    return extract;
 }
-
 
 class Service extends eebService {
 
@@ -55,16 +55,14 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let accounts;
-
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return updateAccountList(dataResult.cpf);
+                    return getExtract(dataResult.cpf, dataResult.accountId);
                 })
 
-                .then(accounts => {
-                    return resolve(this.parm.async ? { success: true } : accounts);
+                .then(balance => {
+                    return resolve(this.parm.async ? { success: true } : balance);
                 })
 
                 .catch(e => {

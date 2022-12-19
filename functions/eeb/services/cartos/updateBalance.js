@@ -3,12 +3,13 @@
 const path = require('path');
 const Joi = require('joi');
 const eebService = require('../../eventBusService').abstract;
+const global = require('../../../global');
 
 const userCredentials = require('./getUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
 const firestoreDAL = require('../../../api/firestoreDAL');
-const collectionCartosAccounts = firestoreDAL.cartosAccounts();
+const collectionCartosBalance = firestoreDAL.cartosBalance();
 
 /*
     Busca o Balance da conta na Cartos e atualiza a collection cartosBalance
@@ -25,8 +26,16 @@ const schema = _ => {
 
 async function getBalance(cpf, accountId) {
     const credential = await userCredentials.getCredential(cpf, accountId);
+    const balance = await cartosHttpRequest.balance(credential.token);
 
-    return await cartosHttpRequest.balance(credential.token);
+    balance.cpf = cpf;
+    balance.accountId = accountId;
+
+    global.setDateTime(balance, 'dtAtualizacao');
+
+    await collectionCartosBalance.set(balance.accountId, balance);
+
+    return balance;
 }
 
 class Service extends eebService {
@@ -63,6 +72,8 @@ exports.Service = Service;
 
 const call = (data, request, response) => {
     const eebAuthTypes = require('../../eventBusService').authType;
+
+    if(!data.cpf) throw new Error('o CPF é obrigatório...');
 
     const service = new Service(request, response, {
         name: 'update-cartos-data',

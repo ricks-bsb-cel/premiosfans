@@ -101,8 +101,40 @@ const balance = (token) => {
     return callGet('/account-digital/v1/balance', headers);
 }
 
+const extract = (token) => {
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return callGet('/account-digital/v1/extract', headers);
+}
+
+const pixKeys = (token) => {
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return callGet('/digital-account/v1/pix-keys', headers);
+}
+
+const generatePix = (data, token) => {
+    const headers = { Authorization: `Bearer ${token}` };
+
+    let payload = {
+        receiverKey: data.receiverKey,
+        merchantCity: data.merchantCity,
+        additionalInfo: data.additionalInfo
+    };
+
+    if (data.value) {
+        payload.value = data.value;
+    }
+
+    const url = data.type === 'STATIC' ? '/digital-account/v1/pix-static-qrcodes' : '/digital-account/v1/pix-dynamic-qrcodes';
+
+    return callPost(url, payload, headers);
+}
 
 exports.login = login;
 exports.accounts = accounts;
 exports.changeAccount = changeAccount;
 exports.balance = balance;
+exports.extract = extract;
+exports.pixKeys = pixKeys;
+exports.generatePix = generatePix;

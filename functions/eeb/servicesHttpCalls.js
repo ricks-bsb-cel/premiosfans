@@ -135,6 +135,18 @@ api.post("/v1/cartos/update-account-balance", (request, response) => {
     initFirebase.call(require('./services/cartos/updateBalance').callRequest, request, response);
 })
 
+api.post("/v1/cartos/update-account-extract", (request, response) => {
+    initFirebase.call(require('./services/cartos/updateExtract').callRequest, request, response);
+})
+
+api.post("/v1/cartos/update-pix-keys", (request, response) => {
+    initFirebase.call(require('./services/cartos/updatePixKeys').callRequest, request, response);
+})
+
+api.post("/v1/cartos/generate-pix", (request, response) => {
+    initFirebase.call(require('./services/cartos/generatePix').callRequest, request, response);
+})
+
 /* Cartos 
 
 api.post("/v1/pay/user-credential", (request, response) => {

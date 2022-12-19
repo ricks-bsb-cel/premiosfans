@@ -9,40 +9,41 @@ const userCredentials = require('./getUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
 const firestoreDAL = require('../../../api/firestoreDAL');
-const collectionCartosAccounts = firestoreDAL.cartosAccounts();
+const collectionCartosPix = firestoreDAL.cartosPix();
 
 /*
-    Busca todas as contas de um CPF na Cartos e atualiza a collection cartosAccounts
+    Cria um PIX para pagamento e o salva na collection cartosPix
 */
 
 const schema = _ => {
     const schema = Joi.object({
-        cpf: Joi.string().length(11).required()
+        cpf: Joi.string().length(11).required(),
+        accountId: Joi.string().required(),
+        type: Joi.string().valid('STATIC', 'DYNAMIC').required(),
+        receiverKey: Joi.string().required(),
+        merchantCity: Joi.string().required(),
+        value: Joi.when('type', {
+            switch: [
+                { is: 'STATIC', then: Joi.number().positive().optional() },
+                { is: 'DYNAMIC', then: Joi.number().positive().required() }
+            ]
+        }),
+        additionalInfo: Joi.string().required()
     });
 
     return schema;
 }
 
-async function updateAccountList(cpf) {
+async function generatePix(data) {
+    const credential = await userCredentials.getCredential(data.cpf, data.accountId);
+    const pix = await cartosHttpRequest.generatePix(data, credential.token);
 
-    const credential = await userCredentials.getCredential(cpf, 'any');
-    const accounts = await cartosHttpRequest.accounts(credential.token);
+    global.setDateTime(pix, 'dtInclusao');
 
-    // Atualiza o cartosAccounts com as contas existentes
-    const promise = [];
+    await collectionCartosPix.add(pix)
 
-    accounts.forEach(account => {
-        account.cpf = cpf;
-        global.setDtHoje(account, 'dtAtualizacao');
-
-        promise.push(collectionCartosAccounts.merge(account.accountId, account));
-    })
-
-    await Promise.all(promise);
-
-    return accounts;
+    return pix;
 }
-
 
 class Service extends eebService {
 
@@ -55,16 +56,14 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let accounts;
-
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return updateAccountList(dataResult.cpf);
+                    return generatePix(dataResult);
                 })
 
-                .then(accounts => {
-                    return resolve(this.parm.async ? { success: true } : accounts);
+                .then(balance => {
+                    return resolve(this.parm.async ? { success: true } : balance);
                 })
 
                 .catch(e => {
