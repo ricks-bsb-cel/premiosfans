@@ -2,47 +2,40 @@
 
 const path = require('path');
 const Joi = require('joi');
-const eebService = require('../../eventBusService').abstract;
-const global = require('../../../global');
+const eebService = require('../eventBusService').abstract;
+const global = require('../../global');
 
-const userCredentials = require('./getUserCredential');
+const userCredentials = require('./cartosGetUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
-const firestoreDAL = require('../../../api/firestoreDAL');
-const collectionCartosPix = firestoreDAL.cartosPix();
+const firestoreDAL = require('../../api/firestoreDAL');
+const collectionCartosBalance = firestoreDAL.cartosBalance();
 
 /*
-    Cria um PIX para pagamento e o salva na collection cartosPix
+    Busca o Balance da conta na Cartos e atualiza a collection cartosBalance
 */
 
 const schema = _ => {
     const schema = Joi.object({
         cpf: Joi.string().length(11).required(),
-        accountId: Joi.string().required(),
-        type: Joi.string().valid('STATIC', 'DYNAMIC').required(),
-        receiverKey: Joi.string().required(),
-        merchantCity: Joi.string().required(),
-        value: Joi.when('type', {
-            switch: [
-                { is: 'STATIC', then: Joi.number().positive().optional() },
-                { is: 'DYNAMIC', then: Joi.number().positive().required() }
-            ]
-        }),
-        additionalInfo: Joi.string().required()
+        accountId: Joi.string().length(36).required()
     });
 
     return schema;
 }
 
-async function generatePix(data) {
-    const credential = await userCredentials.getCredential(data.cpf, data.accountId);
-    const pix = await cartosHttpRequest.generatePix(data, credential.token);
+async function getBalance(cpf, accountId) {
+    const credential = await userCredentials.getCredential(cpf, accountId);
+    const balance = await cartosHttpRequest.balance(credential.token);
 
-    global.setDateTime(pix, 'dtInclusao');
+    balance.cpf = cpf;
+    balance.accountId = accountId;
 
-    await collectionCartosPix.add(pix)
+    global.setDateTime(balance, 'dtAtualizacao');
 
-    return pix;
+    await collectionCartosBalance.set(balance.accountId, balance);
+
+    return balance;
 }
 
 class Service extends eebService {
@@ -59,7 +52,7 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return generatePix(dataResult);
+                    return getBalance(dataResult.cpf, dataResult.accountId);
                 })
 
                 .then(balance => {
@@ -78,9 +71,16 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../../eventBusService').authType;
+    const eebAuthTypes = require('../eventBusService').authType;
+    const attributes = {};
 
     if (!data.cpf) throw new Error('o CPF é obrigatório...');
+
+    if (data.saveResultToCollection) {
+        attributes.saveResultToCollection = data.saveResultToCollection;
+        
+        delete data.saveResultToCollection;
+    }
 
     const service = new Service(request, response, {
         name: 'update-cartos-data',
@@ -89,7 +89,8 @@ const call = (data, request, response) => {
         ordered: true,
         orderingKey: data.cpf,
         auth: eebAuthTypes.tokenNotAnonymous,
-        data: data
+        data: data,
+        attributes: attributes
     });
 
     return service.init();

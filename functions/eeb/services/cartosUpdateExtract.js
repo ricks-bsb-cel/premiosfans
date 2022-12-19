@@ -2,13 +2,13 @@
 
 const path = require('path');
 const Joi = require('joi');
-const eebService = require('../../eventBusService').abstract;
-const global = require('../../../global');
+const eebService = require('../eventBusService').abstract;
+const global = require('../../global');
 
-const userCredentials = require('./getUserCredential');
+const userCredentials = require('./cartosGetUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
-const firestoreDAL = require('../../../api/firestoreDAL');
+const firestoreDAL = require('../../api/firestoreDAL');
 const collectionCartosExtract = firestoreDAL.cartosExtract();
 
 /*
@@ -77,7 +77,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../../eventBusService').authType;
+    const eebAuthTypes = require('../eventBusService').authType;
 
     if (!data.cpf) throw new Error('o CPF é obrigatório...');
 

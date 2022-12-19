@@ -11,7 +11,8 @@ const pubSubReceiver = (request, response) => {
         });
     }
 
-    const data = helper.base64ToJson(request.body.message.data) || {},
+    const 
+        data = helper.base64ToJson(request.body.message.data) || {},
         attributes = request.body.message.attributes;
 
     let msgAlreadyProcessed = false;

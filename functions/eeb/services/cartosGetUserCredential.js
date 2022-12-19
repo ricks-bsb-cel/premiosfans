@@ -4,13 +4,13 @@ const admin = require("firebase-admin");
 
 const path = require('path');
 const Joi = require('joi');
-const global = require('../../../global');
-const eebService = require('../../eventBusService').abstract;
+const global = require('../../global');
+const eebService = require('../eventBusService').abstract;
 
-const serviceUserCredential = require('../../../business/serviceUserCredential');
+const serviceUserCredential = require('../../business/serviceUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
-const firestoreDAL = require('../../../api/firestoreDAL');
+const firestoreDAL = require('../../api/firestoreDAL');
 const collectionCartosAccounts = firestoreDAL.cartosAccounts();
 
 const schema = _ => {
@@ -61,6 +61,10 @@ async function changeAccount(cpf, accountId, currentCredentials) {
     return changeAccount;
 }
 
+async function refreshToken(token, opaqueRefreshTokenId) {
+    
+}
+
 async function getCredential(cpf, accountId) {
 
     let result = {
@@ -74,6 +78,23 @@ async function getCredential(cpf, accountId) {
     if (typeof accountId === 'undefined') accountId = 'login';
 
     const refAccountTokenResult = (await admin.database().ref(path).once("value")).val();
+
+    // Se o token expirou
+    if (
+        refAccountTokenResult &&
+        refAccountTokenResult.accountId === accountId &&
+        refAccountTokenResult.token && // Existe um token no cache
+        refAccountTokenResult.expire && // Existe data de expiração
+        nowMilliseconds > refAccountTokenResult.expire // O token expirou
+    ) {
+
+        result = refAccountTokenResult;
+
+        result.source = 'buffer';
+        result.success = true;
+
+        return result
+    }
 
     if (
         refAccountTokenResult &&
@@ -146,7 +167,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../../eventBusService').authType;
+    const eebAuthTypes = require('../eventBusService').authType;
 
     if (!data.cpf) throw new Error('o CPF é obrigatório...');
 

@@ -35,11 +35,6 @@ const authTypeDesc = authType => {
     return result;
 }
 
-/*
-const pubSubRegion = 'us-central1-pubsub.googleapis.com:443';
-const pubSubClient = new PubSub({ apiEndpoint: pubSubRegion });
-*/
-
 const pubSubClient = new PubSub();
 const topicsCache = [];
 
@@ -153,8 +148,8 @@ class eventBusService {
         this.parm.orderingKey = this.parm.orderingKey || null;
         this.parm.attributes = this.parm.attributes || {};
 
-        this.parm.topic = `eeb-${this.parm.name}`
-        this.parm.topicSubscription = `eeb-subscription-${this.parm.name}`
+        this.parm.topic = `eeb-${this.parm.name}`;
+        this.parm.topicSubscription = `eeb-subscription-${this.parm.name}`;
     }
 
     getTopic() {
@@ -216,6 +211,10 @@ class eventBusService {
 
                     // Dispara de acordo com o o tipo.
                     if (this.parm.async) { // Async... envia para o Pub/Sub
+                        if (this.parm.saveResultToCollection) {
+                            this.parm.attributes.saveResultToCollection = this.parm.saveResultToCollection;
+                        }
+
                         if (this.parm.delay) {
                             return this._sentToTask();
                         } else {
@@ -330,7 +329,7 @@ class eventBusService {
                 publishData.orderingKey = this.parm.orderingKey;
             }
 
-            // garante que os attributes contenham apenas strings
+            // Garante que os attributes contenham apenas strings
             Object.keys(publishData.attributes).forEach(k => {
                 if (typeof publishData.attributes[k] !== 'string') {
                     publishData.attributes[k] = publishData.attributes[k].toString();
@@ -395,7 +394,16 @@ class eventBusService {
                         code: 200
                     };
 
-                    if (this.parm.debug) { result.debug = this.parm; }
+                    if (this.parm.debug) {
+                        result.debug = this.parm;
+                    }
+
+                    if (this.parm.attributes.saveResultToCollection) {
+                        runResult.serviceId = this.parm.serviceId;
+
+                        const doc = admin.firestore().collection(this.parm.attributes.saveResultToCollection).doc();
+                        doc.set(runResult);
+                    }
 
                     return resolve(result);
                 })

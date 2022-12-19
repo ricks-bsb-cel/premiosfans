@@ -1,7 +1,7 @@
 "use strict";
 
 const path = require('path');
-const eebService = require('../../eventBusService').abstract;
+const eebService = require('../eventBusService').abstract;
 const { getAuth } = require("firebase-admin/auth");
 
 
@@ -10,7 +10,7 @@ https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
-const getUserProfile = require("./getUserProfile");
+const getUserProfile = require("./usersGetUserProfile");
 
 class Service extends eebService {
 
@@ -56,7 +56,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (uid, request, response) => {
-    const eebAuthTypes = require('../../eventBusService').authType;
+    const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
         name: 'revoke-user-token',

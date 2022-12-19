@@ -1,7 +1,7 @@
 "use strict";
 
-const secretManager = require('../../../secretManager');
-const eebHelper = require('../../eventBusServiceHelper');
+const secretManager = require('../../secretManager');
+const eebHelper = require('../eventBusServiceHelper');
 
 const getEndpointConfig = endPoint => {
     return new Promise((resolve, reject) => {
@@ -113,6 +113,16 @@ const pixKeys = (token) => {
     return callGet('/digital-account/v1/pix-keys', headers);
 }
 
+const refreshToken = (token, opaqueRefreshTokenId) => {
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const payload = {
+        token: opaqueRefreshTokenId
+    };
+
+    return callPost('/users/v1/refresh-token', payload, headers);
+}
+
 const generatePix = (data, token) => {
     const headers = { Authorization: `Bearer ${token}` };
 
@@ -138,3 +148,4 @@ exports.balance = balance;
 exports.extract = extract;
 exports.pixKeys = pixKeys;
 exports.generatePix = generatePix;
+exports.refreshToken = refreshToken;

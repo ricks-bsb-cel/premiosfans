@@ -104,45 +104,45 @@ api.post("/v1/send-email-titulo", (request, response) => {
 /* Users */
 
 api.get("/v1/user/get-profile/:uid", (request, response) => {
-    initFirebase.call(require('./services/users/getUserProfile').callRequest, request, response);
+    initFirebase.call(require('./services/usersGetUserProfile').callRequest, request, response);
 })
 
 api.get("/v1/user/update-profile", (request, response) => {
-    initFirebase.call(require('./services/users/updateUserProfile').callRequest, request, response);
+    initFirebase.call(require('./services/usersUpdateUserProfile').callRequest, request, response);
 })
 
 api.post("/v1/user/update-custom-config", (request, response) => {
-    initFirebase.call(require('./services/users/updateUserCustomConfig').callRequest, request, response);
+    initFirebase.call(require('./services/usersUpdateUserCustomConfig').callRequest, request, response);
 })
 
 api.get("/v1/user/revoke-token/:uid", (request, response) => {
-    initFirebase.call(require('./services/users/revokeUserToken').callRequest, request, response);
+    initFirebase.call(require('./services/usersRevokeUserToken').callRequest, request, response);
 })
 
 /* Cartos  v1 */
 
 api.post("/v1/cartos/user-credential", (request, response) => {
-    initFirebase.call(require('./services/cartos/getUserCredential').callRequest, request, response);
+    initFirebase.call(require('./services/cartosGetUserCredential').callRequest, request, response);
 })
 
 api.post("/v1/cartos/update-account-list", (request, response) => {
-    initFirebase.call(require('./services/cartos/updateAccountList').callRequest, request, response);
+    initFirebase.call(require('./services/cartosUpdateAccountList').callRequest, request, response);
 })
 
 api.post("/v1/cartos/update-account-balance", (request, response) => {
-    initFirebase.call(require('./services/cartos/updateBalance').callRequest, request, response);
+    initFirebase.call(require('./services/cartosUpdateBalance').callRequest, request, response);
 })
 
 api.post("/v1/cartos/update-account-extract", (request, response) => {
-    initFirebase.call(require('./services/cartos/updateExtract').callRequest, request, response);
+    initFirebase.call(require('./services/cartosUpdateExtract').callRequest, request, response);
 })
 
 api.post("/v1/cartos/update-pix-keys", (request, response) => {
-    initFirebase.call(require('./services/cartos/updatePixKeys').callRequest, request, response);
+    initFirebase.call(require('./services/cartosUpdatePixKeys').callRequest, request, response);
 })
 
 api.post("/v1/cartos/generate-pix", (request, response) => {
-    initFirebase.call(require('./services/cartos/generatePix').callRequest, request, response);
+    initFirebase.call(require('./services/cartosGeneratePix').callRequest, request, response);
 })
 
 /* Cartos
