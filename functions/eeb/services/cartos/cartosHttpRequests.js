@@ -29,60 +29,44 @@ const getEndpointConfig = endPoint => {
     })
 }
 
-const callPost = (url, payload, headers) => {
-    return new Promise((resolve, reject) => {
-        return getEndpointConfig(url)
-            .then(config => {
-                if (headers) {
-                    config.headers = {
-                        ...config.headers,
-                        ...headers
-                    };
-                }
+async function callPost(url, payload, headers) {
+    const config = await getEndpointConfig(url);
 
-                return eebHelper.http.post(config.endPoint, payload, config.headers);
-            })
+    if (headers) {
+        config.headers = {
+            ...config.headers,
+            ...headers
+        };
+    }
 
-            .then(requestResult => {
-                if (requestResult.statusCode !== 200) {
-                    throw new Error(JSON.stringify(requestResult));
-                }
+    const requestResult = await eebHelper.http.post(config.endPoint, payload, config.headers);
 
-                return resolve(requestResult.data);
-            })
+    if (requestResult.statusCode !== 200) {
+        console.error('cartosHttpRequest.callPost', config, payload, requestResult);
+        throw new Error(JSON.stringify(requestResult));
+    }
 
-            .catch(e => {
-                return reject(e);
-            })
-    })
+    return requestResult.data;
 }
 
-const callGet = (url, headers) => {
-    return new Promise((resolve, reject) => {
-        return getEndpointConfig(url)
-            .then(config => {
-                if (headers) {
-                    config.headers = {
-                        ...config.headers,
-                        ...headers
-                    };
-                }
+async function callGet(url, headers) {
+    const config = await getEndpointConfig(url);
 
-                return eebHelper.http.get(config.endPoint, config.headers);
-            })
+    if (headers) {
+        config.headers = {
+            ...config.headers,
+            ...headers
+        };
+    }
 
-            .then(requestResult => {
-                if (requestResult.statusCode !== 200) {
-                    throw new Error(JSON.stringify(requestResult));
-                }
+    const requestResult = await eebHelper.http.get(config.endPoint, config.headers);
 
-                return resolve(requestResult.data);
-            })
+    if (requestResult.statusCode !== 200) {
+        console.error('cartosHttpRequest.callGet', config, requestResult);
+        throw new Error(JSON.stringify(requestResult));
+    }
 
-            .catch(e => {
-                return reject(e);
-            })
-    })
+    return requestResult.data;
 }
 
 const login = (cpf, password) => {
@@ -97,10 +81,10 @@ const login = (cpf, password) => {
 
 const changeAccount = (accountId, token) => {
     const
-        payload = { accountId: accountId },
+        parm = { accountId: accountId },
         headers = { Authorization: `Bearer ${token}` };
 
-    return callPost('users/v1/login/change-account', payload, headers);
+    return callPost('/users/v1/login/change-account', parm, headers);
 }
 
 const accounts = token => {
@@ -111,6 +95,14 @@ const accounts = token => {
     return callGet('/digital-account/v1/accounts?typeRequest=byCpfHash', headers);
 }
 
+const balance = (token) => {
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return callGet('/account-digital/v1/balance', headers);
+}
+
+
 exports.login = login;
 exports.accounts = accounts;
 exports.changeAccount = changeAccount;
+exports.balance = balance;

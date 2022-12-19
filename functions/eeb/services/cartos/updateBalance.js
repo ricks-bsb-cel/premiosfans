@@ -23,6 +23,11 @@ const schema = _ => {
     return schema;
 }
 
+async function getBalance(cpf, accountId) {
+    const credential = await userCredentials.getCredential(cpf, accountId);
+
+    return await cartosHttpRequest.balance(credential.token);
+}
 
 class Service extends eebService {
 
@@ -35,33 +40,14 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let accounts;
-
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return userCredentials.getCredential(dataResult.cpf, dataResult.accountId);
+                    return getBalance(dataResult.cpf, dataResult.accountId);
                 })
 
-                .then(credential => {
-                    return cartosHttpRequest.accounts(credential.token);
-                })
-
-                .then(accountsResult => {
-                    accounts = accountsResult;
-
-                    // Atualiza o cartosAccounts com as contas existentes
-                    const promise = [];
-
-                    accounts.forEach(account => {
-                        promise.push(collectionCartosAccounts.merge(account.accountId, account));
-                    })
-
-                    return Promise.all(promise);
-                })
-
-                .then(_ => {
-                    return resolve(this.parm.async ? { success: true } : accounts);
+                .then(balance => {
+                    return resolve(this.parm.async ? { success: true } : balance);
                 })
 
                 .catch(e => {
@@ -83,7 +69,7 @@ const call = (data, request, response) => {
         async: request && request.query.async ? request.query.async === 'true' : false,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         ordered: true,
-        orderingKey: accountId,
+        orderingKey: data.cpf,
         auth: eebAuthTypes.tokenNotAnonymous,
         data: data
     });

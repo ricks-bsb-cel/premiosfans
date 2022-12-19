@@ -26,144 +26,85 @@ const getPathAccountToken = cpf => {
     return `/tokens/${cpf}/cartos/currentToken`;
 }
 
-const login = cpf => {
-    return new Promise((resolve, reject) => {
-        return serviceUserCredential.getByCpf('cartos', cpf)
-            .then(serviceUserCredential => {
-                if (!serviceUserCredential) throw new Error(`Nenhum usuário encontrado com o cpf ${cpf}`);
+async function login(cpf) {
+    const userCredential = await serviceUserCredential.getByCpf('cartos', cpf);
 
-                return cartosHttpRequest.login(
-                    serviceUserCredential.cpf,
-                    serviceUserCredential.password
-                );
-            })
+    if (!userCredential) throw new Error(`Nenhum usuário encontrado com o cpf ${cpf}`);
 
-            .then(loginResult => {
-                return resolve(loginResult);
-            })
+    const loginResult = await cartosHttpRequest.login(
+        userCredential.cpf,
+        userCredential.password
+    );
 
-            .catch(e => {
-                return reject(e);
-            })
-    })
+    return loginResult;
 }
 
-const changeAccount = (cpf, accountId, currentCredentials) => {
-    return new Promise((resolve, reject) => {
-
+async function changeAccount(cpf, accountId, currentCredentials) {
+    if (currentCredentials && currentCredentials.accountId === accountId) {
         // Já foi verificado, mas, se a conta for a mesma do token atual, retorna as mesmas credenciais
-        if (currentCredentials && currentCredentials.accountId === accountId) {
-            return resolve(currentCredentials);
-        }
+        return currentCredentials;
+    }
 
-        // Verifica se a conta existe
-        collectionCartosAccounts.getDoc(accountId)
-            .then(_ => {
+    const cartosAccount = await collectionCartosAccounts.getDoc(accountId, true);
 
-                // Se já existe credenciais (de login ou de outra conta), apenas troca de conta;
-                if (currentCredentials) {
-                    return cartosHttpRequest.changeAccount(accountId, currentCredentials.token)
+    if (cartosAccount.cpf !== cpf) {
+        throw new Error(`A conta não pertence ao cpf ${cpf}`);
+    }
 
-                        .then(loginResult => {
-                            return resolve(loginResult);
-                        })
+    if (currentCredentials) {
+        return await cartosHttpRequest.changeAccount(accountId, currentCredentials.token);
+    }
 
-                        .catch(e => {
-                            return reject(e);
-                        })
-                }
+    const loginResult = await login(cpf);
+    const changeAccount = await cartosHttpRequest.changeAccount(accountId, loginResult.token);
 
-                // Não existem credenciais ou elas são inválidas. Faz o login e muda de conta.
-                return login(cpf)
-
-                    .then(loginResult => {
-                        return cartosHttpRequest.changeAccount(accountId, loginResult.token);
-                    })
-
-                    .then(loginResult => {
-                        return resolve(loginResult);
-                    })
-
-                    .catch(e => {
-                        return reject(e);
-                    })
-            })
-
-            .catch(e => {
-                return reject(e);
-            })
-    })
+    return changeAccount;
 }
 
-const getCredential = (cpf, accountId) => {
-    return new Promise((resolve, reject) => {
+async function getCredential(cpf, accountId) {
 
-        let result = {
-            success: false
-        };
+    let result = {
+        success: false
+    };
 
-        const
-            path = getPathAccountToken(cpf),
-            nowMilliseconds = global.nowMilliseconds();
+    const
+        path = getPathAccountToken(cpf),
+        nowMilliseconds = global.nowMilliseconds();
 
-        if (typeof accountId === 'undefined') accountId = 'login';
+    if (typeof accountId === 'undefined') accountId = 'login';
 
-        // Verifica se o token já existe no Buffer (RealTimeDatabase)
-        return admin.database().ref(path).once("value")
-            .then(refAccountTokenResult => {
-                refAccountTokenResult = refAccountTokenResult.val() || null;
+    let refAccountTokenResult = (await admin.database().ref(path).once("value")).val();
 
-                if (
-                    refAccountTokenResult &&
-                    (accountId === 'any' || refAccountTokenResult.accountId === accountId) &&
-                    refAccountTokenResult.token && // Existe um token no cache
-                    refAccountTokenResult.expire && // Existe data de expiração
-                    nowMilliseconds < refAccountTokenResult.expire // O token é da mesma conta
-                ) {
-                    result = refAccountTokenResult;
+    if (
+        refAccountTokenResult &&
+        (accountId === 'any' || refAccountTokenResult.accountId === accountId) &&
+        refAccountTokenResult.token && // Existe um token no cache
+        refAccountTokenResult.expire && // Existe data de expiração
+        nowMilliseconds < refAccountTokenResult.expire // O token é da mesma conta
+    ) {
+        result = refAccountTokenResult;
 
-                    result.source = 'buffer';
-                    result.success = true;
+        result.source = 'buffer';
+        result.success = true;
 
-                    return null
-                }
+        return result
+    }
 
-                // Em vez disso, experimente usar o opaqueRefreshTokenId
-                refAccountTokenResult = null;
+    const accountResult = accountId === 'login' || accountId === 'any' ?
+        await login(cpf) :
+        await changeAccount(cpf, accountId, refAccountTokenResult);
 
-                // Se o tipo de conta for login
-                if (accountId === 'login' || accountId === 'any') {
-                    return login(cpf);
-                } else {
-                    return changeAccount(cpf, accountId);
-                }
+    accountResult.accountId = accountId;
+    accountResult.expire = global.nowMilliseconds(10, 'minutes');
 
-            })
+    result = { ...accountResult };
+    result.success = true;
+    result.source = 'cartos';
 
-            .then(accountResult => {
-                if (result.success) return;
+    await admin.database().ref(path).set(accountResult);
 
-                accountResult.accountId = accountId;
-                accountResult.expire = global.nowMilliseconds(10, 'minutes');
-
-                result = { ...accountResult };
-                result.success = true;
-                result.source = 'cartos';
-
-                return admin.database().ref(path).set(accountResult);
-            })
-
-            .then(_ => {
-                return resolve(result);
-            })
-
-            .catch(e => {
-                return reject(e);
-            })
-
-    })
+    return result;
 }
-
 
 class Service extends eebService {
 

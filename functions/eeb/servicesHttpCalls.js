@@ -131,6 +131,9 @@ api.post("/v1/cartos/update-account-list", (request, response) => {
     initFirebase.call(require('./services/cartos/updateAccountList').callRequest, request, response);
 })
 
+api.post("/v1/cartos/update-account-balance", (request, response) => {
+    initFirebase.call(require('./services/cartos/updateBalance').callRequest, request, response);
+})
 
 /* Cartos 
 

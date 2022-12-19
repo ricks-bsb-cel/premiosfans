@@ -22,6 +22,25 @@ const schema = _ => {
     return schema;
 }
 
+async function updateAccountList(cpf) {
+
+    const credential = await userCredentials.getCredential(cpf, 'any');
+    const accounts = await cartosHttpRequest.accounts(credential.token);
+
+    // Atualiza o cartosAccounts com as contas existentes
+    const promise = [];
+
+    accounts.forEach(account => {
+        account.cpf = cpf;
+        
+        promise.push(collectionCartosAccounts.merge(account.accountId, account));
+    })
+
+    await Promise.all(promise);
+
+    return accounts;
+}
+
 
 class Service extends eebService {
 
@@ -39,27 +58,10 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return userCredentials.getCredential(dataResult.cpf, 'any');
+                    return updateAccountList(dataResult.cpf);
                 })
 
-                .then(credential => {
-                    return cartosHttpRequest.accounts(credential.token);
-                })
-
-                .then(accountsResult => {
-                    accounts = accountsResult;
-
-                    // Atualiza o cartosAccounts com as contas existentes
-                    const promise = [];
-
-                    accounts.forEach(account => {
-                        promise.push(collectionCartosAccounts.merge(account.accountId, account));
-                    })
-
-                    return Promise.all(promise);
-                })
-
-                .then(_ => {
+                .then(accounts => {
                     return resolve(this.parm.async ? { success: true } : accounts);
                 })
 
