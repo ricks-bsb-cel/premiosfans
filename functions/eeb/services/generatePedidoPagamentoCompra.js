@@ -59,6 +59,7 @@ class Service extends eebService {
                         cpf: '57372209153',  // Alterar
                         accountId: '1f59ffdd-48ae-4103-bce0-84d6d6b35d36', // Alterar!
                         receiverKey: '8ca86459-8f27-4552-9309-9e37da8703b4', // Alterar!
+
                         type: 'STATIC',
                         merchantCity: 'João Pessoa/PB',
                         value: result.tituloCompra.vlTotalCompra * 100,
@@ -68,8 +69,11 @@ class Service extends eebService {
 
                     return cartosGeneratePix.call(pixData);
                 })
+
                 .then(cartosGeneratePixResult => {
 
+                    console.info(cartosGeneratePixResult);
+                    
                     result = {
                         success: true,
                         idTituloCompra: result.tituloCompra.id,

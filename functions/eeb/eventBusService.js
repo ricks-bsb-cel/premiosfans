@@ -17,6 +17,8 @@ const helper = require('./eventBusServiceHelper');
 const projectName = 'premios-fans';
 const projectLocation = 'us-central1';
 
+const showConsoleInfoMsgs = true;
+
 // check noAuth
 const _authType = {
     noAuth: 1, // Pode ser executada livremente, sem nenhum tipo de token
@@ -43,6 +45,14 @@ O eventBusService é um "envelope" de disparo de métodos utilizando o PubSub
 - Os métodos devem ser "registrados" como classes herdadas do serviceRunner
 - A classe é reinstanciada pelo PubSub e executada de acordo com os parametros
 */
+
+const consoleInfo = (msg, m1) => {
+    if (!showConsoleInfoMsgs) return;
+
+    if (m1) return console.info(msg, m1);
+    return console.info(msg);
+}
+
 
 const checkAuthentication = (request, response, authType) => {
     return new Promise((resolve, reject) => {
@@ -191,6 +201,8 @@ class eventBusService {
                 .then(app => {
                     this.admin = app;
 
+                    consoleInfo('eventBusService Start');
+
                     return eventBusServiceParmSchema().validateAsync(this.parm, { abortEarly: false });
                 })
 
@@ -205,9 +217,12 @@ class eventBusService {
                 })
 
                 .then(userInfoResult => {
-                    this.parm = { ...this.parm, ...userInfoResult };
+                    consoleInfo('userInfoResult', userInfoResult);
 
+                    this.parm = { ...this.parm, ...userInfoResult };
                     this.parm.attributes.user_uid = userInfoResult.user_uid;
+
+                    consoleInfo('this.parm', this.parm);
 
                     // Dispara de acordo com o o tipo.
                     if (this.parm.async) { // Async... envia para o Pub/Sub
@@ -225,6 +240,7 @@ class eventBusService {
                     result = startResult;
                     result.async = this.parm.async;
 
+                    // Ajustar aqui!
                     return resolve(
                         this.response ?
                             this.response.status(200).json(result) :
@@ -234,7 +250,7 @@ class eventBusService {
 
                 .catch(e => {
                     console.error(e);
-                    
+
                     const error = e.message || e.details || 'unknow';
                     this.log('error', helper.logType.error, { error: { code: e.code, message: error } });
 
@@ -309,6 +325,7 @@ class eventBusService {
 
     publish() {
         return new Promise((resolve, reject) => {
+            consoleInfo('publish');
 
             const publishData = {
                 data: this.parm.data ? Buffer.from(JSON.stringify(this.parm.data), 'utf8') : null,
@@ -337,12 +354,16 @@ class eventBusService {
 
             this.log('publish-start');
 
+            consoleInfo('publishMessage Data', publishData);
+
             return topic.publishMessage(publishData)
 
                 .then(messageId => {
                     this.parm.messageId = messageId;
 
                     this.log('publish-success');
+
+                    consoleInfo('publishMessage messageId', messageId);
 
                     return {
                         topic: this.parm.topic,
@@ -367,6 +388,8 @@ class eventBusService {
                 })
 
                 .then(result => {
+                    consoleInfo('publishMessage result', result);
+
                     return resolve(result);
                 })
 
@@ -407,6 +430,7 @@ class eventBusService {
 
     _startPublish() {
         return new Promise((resolve, reject) => {
+            consoleInfo('StartPublish');
 
             this.publish()
                 .then(result => {
