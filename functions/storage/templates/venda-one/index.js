@@ -60,7 +60,6 @@ angular.module('app', [])
         let app = null,
             token = null,
             isReady = false,
-            user = null,
             messaging = null;
 
         const init = _ => {

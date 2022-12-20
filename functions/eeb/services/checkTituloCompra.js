@@ -35,6 +35,8 @@ const tituloCompra = _ => {
 
 const checkNumeroTituloPremio = (idCampanha, idTitulo, idPremio, idTituloPremio, numero) => {
     return new Promise((resolve, reject) => {
+
+        // Procura outros premios com o mesmo número da sorte
         return collectionTitulosPremios.get({
             filter: [
                 { field: "idCampanha", condition: "==", value: idCampanha },
@@ -44,6 +46,7 @@ const checkNumeroTituloPremio = (idCampanha, idTitulo, idPremio, idTituloPremio,
         })
             .then(resultTitulosPremios => {
 
+                // Remove o premio do próprio título
                 resultTitulosPremios = resultTitulosPremios.filter(f => {
                     return f.id !== idTituloPremio;
                 });
@@ -169,7 +172,7 @@ class Service extends eebService {
                         addError(`campanha`, `A quantidade de premios informado na campanha [${result.data.campanha.qtdPremios}] não coincide com a quantidade de prêmios existente [${qtdPremios}]`);
                     }
 
-                    // Verifica cada título
+                    // Verifica cada um dos títulos envolvidos na Compra
                     result.data.titulos.forEach(t => {
                         // Total de premios lançado para o título
                         const qtdPremiosTitulo = result.data.titulosPremios.filter(f => { return f.idTitulo === t.id; }).length;
@@ -188,7 +191,6 @@ class Service extends eebService {
                         if (qtdPremiosTitulo !== result.data.qtdPremiosCampanha) {
                             addError(`titulos`, `A total de premios [${qtdPremiosTitulo}] do título [${t.id}] não coincide com o total de premios da campanha [${result.data.qtdPremiosCampanha}]`)
                         }
-
                     })
 
                     const promiseCheckNumeros = [];
@@ -199,14 +201,9 @@ class Service extends eebService {
                             addError(`titulosPremios`, `A quantidade de números da sorte [${p.numerosDaSorte.length}] do idTitulo [${p.idTitulo}], idPremio [${p.idPremio}], idPremioTitulo [${p.id}] não coincide com a quantidade solicitada na campanha [${result.data.campanha.qtdNumerosDaSortePorTitulo}]`);
                         }
 
+                        // Verifica os números da sorte (descobre se já não existe em qualquer outro título)
                         p.numerosDaSorte.forEach(n => {
-                            promiseCheckNumeros.push(checkNumeroTituloPremio(
-                                p.idCampanha,
-                                p.idTitulo,
-                                p.idPremio,
-                                p.id,
-                                n
-                            ))
+                            promiseCheckNumeros.push(checkNumeroTituloPremio(p.idCampanha, p.idTitulo, p.idPremio, p.id, n));
                         })
                     })
 
@@ -234,7 +231,6 @@ class Service extends eebService {
                         })
                     })
 
-
                     // Salva as estatísticas de erro no titulo Compra
                     const saveError = {
                         errorsExists: result.data.qtdErrors > 0,
@@ -250,6 +246,7 @@ class Service extends eebService {
 
                     const promise = [collectionTituloCompra.set(result.data.idTituloCompra, saveError, true)];
 
+                    // Se nenhum erro, envia o email com o certificado
                     if (!saveError.errorsExists) {
                         result.data.titulos.forEach(t => {
                             promise.push(sendEmailTitulo.call({ idTitulo: t.id }));

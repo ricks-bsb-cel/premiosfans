@@ -101,6 +101,10 @@ api.post("/v1/send-email-titulo", (request, response) => {
     initFirebase.call(require('./services/sendEmailTitulo').callRequest, request, response);
 })
 
+api.post("/v1/generate-pedido-pagamento-compra", (request, response) => {
+    initFirebase.call(require('./services/generatePedidoPagamentoCompra').callRequest, request, response);
+})
+
 /* Users */
 
 api.get("/v1/user/get-profile/:uid", (request, response) => {

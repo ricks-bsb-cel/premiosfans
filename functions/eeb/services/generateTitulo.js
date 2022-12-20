@@ -34,11 +34,11 @@ const clienteSchema = _ => {
     const schema = Joi.object({
         idCampanha: Joi.string().token().min(18).max(22).required(),
         idInfluencer: Joi.string().token().min(18).max(22).required(),
-        nome: Joi.string().min(6).max(120).required(),
-        email: Joi.string().email().required(),
-        celular: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(),
-        cpf: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(),
-        qtdTitulos: Joi.number().min(1).max(6).required()
+        nome: Joi.string().min(6).max(120).required(), // O nome do Cliente
+        email: Joi.string().email().required(), // O email do Cliente
+        celular: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(), // O celular do Cliente (apenas números)
+        cpf: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(), // O CPF do Cliente (apenas números)
+        qtdTitulos: Joi.number().min(1).max(6).required() // A quantidade de títulos que o cliente deseja
     });
 
     return schema;
@@ -220,6 +220,8 @@ class Service extends eebService {
                         compra: result.data.compra,
                         titulos: resultTitulos
                     }
+
+                    // Adição concluída. Momento de gerar o pedido de pagamento...
 
                     return resolve(this.parm.async ? { success: true } : result);
                 })

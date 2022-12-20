@@ -233,6 +233,8 @@ class eventBusService {
                 })
 
                 .catch(e => {
+                    console.error(e);
+                    
                     const error = e.message || e.details || 'unknow';
                     this.log('error', helper.logType.error, { error: { code: e.code, message: error } });
 
@@ -242,7 +244,6 @@ class eventBusService {
                             error: e.toString()
                         })
                     } else {
-
                         return reject(new Error(error));
                     }
                 })

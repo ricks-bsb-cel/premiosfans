@@ -28,7 +28,8 @@ const schema = _ => {
                 { is: 'DYNAMIC', then: Joi.number().positive().required() }
             ]
         }),
-        additionalInfo: Joi.string().required()
+        additionalInfo: Joi.string().required(),
+        user_uid: Joi.string().min(1).max(128).optional()
     });
 
     return schema;
@@ -68,8 +69,8 @@ class Service extends eebService {
                     return generatePix(dataResult, this.parm.serviceId);
                 })
 
-                .then(balance => {
-                    return resolve(this.parm.async ? { success: true } : balance);
+                .then(generatePixResult => {
+                    return resolve(this.parm.async ? { success: true } : generatePixResult);
                 })
 
                 .catch(e => {
@@ -90,11 +91,11 @@ const call = (data, request, response) => {
 
     const service = new Service(request, response, {
         name: 'update-cartos-data',
-        async: request && request.query.async ? request.query.async === 'true' : false,
+        async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         ordered: true,
         orderingKey: data.cpf,
-        auth: eebAuthTypes.tokenNotAnonymous,
+        auth: eebAuthTypes.internal,
         data: data
     });
 

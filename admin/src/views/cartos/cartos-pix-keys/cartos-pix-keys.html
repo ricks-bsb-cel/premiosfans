@@ -20,9 +20,11 @@
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                    <th class="number monospace">Chave</th>
+                                    <th class="number monospace">Chave PIX</th>
                                     <th class="Doc">Documento</th>
                                     <th class="Nome">Nome</th>
+                                    <th class="cpf">CPF Conta</th>
+                                    <th class="accountId">AccountID</th>
                                     <th class="criacao right">Criação</th>
                                     <th class="actions right"></th>
                                 </tr>
@@ -30,13 +32,19 @@
                             <tbody>
                                 <tr ng-repeat="c in collectionCartosPixKeys.collection.data  | orderBy: 'numer'">
                                     <td class="number monospace">
-                                        {{c.key}}
+                                        <small class="monospace">{{c.key}}</small>
                                     </td>
                                     <td class="doc monospace">
                                         {{c.owner.cpf_cnpj | cpfCnpj}}
                                     </td>
                                     <td class="Nome">
                                         {{c.owner.name}}
+                                    </td>
+                                    <td class="cpf">
+                                        {{c.cpf | cpfCnpj}}
+                                    </td>
+                                    <td class="Account ID">
+                                        <small class="monospace">{{c.accountId}}</small>
                                     </td>
                                     <td class="criacao right">
                                         {{c.createdAt | ddmmyyyyhhmm}}
