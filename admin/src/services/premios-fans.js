@@ -181,6 +181,35 @@ const ngModule = angular.module('services.premios-fans', [])
                     );
             }
 
+            const refreshCartosPixKeys = attrs => {
+                if (!attrs.data.cpf || !attrs.data.accountId) throw new Error('Invalid parms');
+
+                toastrFactory.info(`Solicitando atualizações de Chaves PIX...`);
+
+                $http({
+                    url: getUrlEndPoint('/api/eeb/v1/cartos/update-pix-keys?async=true'),
+                    method: 'post',
+                    data: attrs.data,
+                    headers: {
+                        'Authorization': 'Bearer ' + appAuthHelper.token
+                    }
+                })
+
+                    .then(
+                        function (response) {
+                            toastrFactory.info(`Atualização de Chaves PIX em andamento...`);
+                            typeof attrs.success === 'function' && attrs.success(response.data.data);
+
+                        },
+                        function (e) {
+                            console.error(e);
+                            toastrFactory.error(`Erro solicitando atualização de Chaves PIX...`);
+                            typeof attrs.error === 'function' && attrs.error(e);
+                        }
+                    );
+            }
+
+
             const cep = attrs => {
                 attrs = attrs || {};
                 attrs.data = attrs.data || {};
@@ -239,7 +268,8 @@ const ngModule = angular.module('services.premios-fans', [])
                 checkTituloCompra: checkTituloCompra,
                 ativarCampanha: ativarCampanha,
                 cep: cep,
-                cnpj: cnpj
+                cnpj: cnpj,
+                refreshCartosPixKeys: refreshCartosPixKeys
             };
 
         });

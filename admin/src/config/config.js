@@ -99,6 +99,8 @@ const ngModule = angular.module('config', [apiUrls.name])
 			if (v) {
 				if (typeof v === 'object') {
 					return moment(v.toDate()).format(displayMask);
+				} else if (v.length === 24 && v.endsWith('Z')) {
+					return moment(v).format(displayMask);
 				} else {
 					return moment.unix(v).format(displayMask);
 				}
@@ -114,6 +116,8 @@ const ngModule = angular.module('config', [apiUrls.name])
 			if (v) {
 				if (typeof v === 'object') {
 					return moment(v.toDate()).format(displayMask);
+				} else if (v.length === 24 && v.endsWith('Z')) {
+					return moment(v).format(displayMask);
 				} else {
 					return moment.unix(v).format(displayMask);
 				}
@@ -129,6 +133,8 @@ const ngModule = angular.module('config', [apiUrls.name])
 			if (v) {
 				if (typeof v === 'object') {
 					return moment(v.toDate()).format(displayMask);
+				} else if (v.length === 24 && v.endsWith('Z')) {
+					return moment(v).format(displayMask);
 				} else {
 					return moment.unix(v).format(displayMask);
 				}
