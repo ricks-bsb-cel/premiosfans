@@ -14,7 +14,7 @@ const firestoreDAL = require('../../api/firestoreDAL');
 const collectionCartosAccounts = firestoreDAL.cartosAccounts();
 
 const tokenExpireMinutes = 10;
-const showInfo = true;
+const showInfo = false;
 
 const schema = _ => {
     const schema = Joi.object({
@@ -95,7 +95,7 @@ async function refreshToken(cpf, token, opaqueRefreshTokenId) {
 
     try {
         if (showInfo) console.info(`refreshToken Call...`);
-        let refreshTokenResult = await cartosHttpRequest.refreshToken(token, opaqueRefreshTokenId);
+        const refreshTokenResult = await cartosHttpRequest.refreshToken(token, opaqueRefreshTokenId);
         if (showInfo) console.info(`refreshToken Success...`);
 
         refreshTokenResult.expire = global.nowMilliseconds(10, 'minutes');

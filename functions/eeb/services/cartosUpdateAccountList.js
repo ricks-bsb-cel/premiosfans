@@ -9,7 +9,6 @@ const userCredentials = require('./cartosGetUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
 const firestoreDAL = require('../../api/firestoreDAL');
-const { at } = require('lodash');
 const collectionCartosAccounts = firestoreDAL.cartosAccounts();
 
 /*

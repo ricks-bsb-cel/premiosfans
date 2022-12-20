@@ -34,11 +34,17 @@ const schema = _ => {
     return schema;
 }
 
-async function generatePix(data) {
+async function generatePix(data, serviceId) {
     const credential = await userCredentials.getCredential(data.cpf, data.accountId);
-    const pix = await cartosHttpRequest.generatePix(data, credential.token);
+    let pix = await cartosHttpRequest.generatePix(data, credential.token);
 
-    global.setDateTime(pix, 'dtInclusao');
+    let update = { ...data };
+
+    update.serviceId = serviceId;
+    delete update.accountId;
+    global.setDateTime(update, 'dtInclusao');
+
+    pix = { ...pix, ...update };
 
     await collectionCartosPix.add(pix)
 
@@ -59,7 +65,7 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return generatePix(dataResult);
+                    return generatePix(dataResult, this.parm.serviceId);
                 })
 
                 .then(balance => {

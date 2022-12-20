@@ -11,7 +11,7 @@ const pubSubReceiver = (request, response) => {
         });
     }
 
-    const 
+    const
         data = helper.base64ToJson(request.body.message.data) || {},
         attributes = request.body.message.attributes;
 
