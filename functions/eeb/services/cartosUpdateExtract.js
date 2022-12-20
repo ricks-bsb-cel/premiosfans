@@ -24,8 +24,8 @@ const schema = _ => {
     return schema;
 }
 
-async function getExtract(cpf, accountId) {
-    const credential = await userCredentials.getCredential(cpf, accountId);
+async function getExtract(cpf, accountId, serviceId) {
+    const credential = await userCredentials.getCredential(cpf, accountId, serviceId);
     const extract = await cartosHttpRequest.extract(credential.token);
 
     if (Array.isArray(extract.rows) && extract.rows && extract.rows.length) {
@@ -33,6 +33,8 @@ async function getExtract(cpf, accountId) {
 
         extract.rows.forEach(row => {
             row.cpf = cpf;
+            row.serviceId = serviceId;
+
             global.setDateTime(row, 'dtAtualizacao');
 
             promise.push(collectionCartosExtract.set(row.transactionId, row));
@@ -58,7 +60,7 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return getExtract(dataResult.cpf, dataResult.accountId);
+                    return getExtract(dataResult.cpf, dataResult.accountId, this.parm.serviceId);
                 })
 
                 .then(balance => {

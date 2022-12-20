@@ -24,12 +24,13 @@ const schema = _ => {
     return schema;
 }
 
-async function getBalance(cpf, accountId) {
+async function getBalance(cpf, accountId, serviceId) {
     const credential = await userCredentials.getCredential(cpf, accountId);
     const balance = await cartosHttpRequest.balance(credential.token);
 
     balance.cpf = cpf;
     balance.accountId = accountId;
+    balance.serviceId = serviceId;
 
     global.setDateTime(balance, 'dtAtualizacao');
 
@@ -52,7 +53,7 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return getBalance(dataResult.cpf, dataResult.accountId);
+                    return getBalance(dataResult.cpf, dataResult.accountId, this.parm.serviceId);
                 })
 
                 .then(balance => {
@@ -72,15 +73,8 @@ exports.Service = Service;
 
 const call = (data, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
-    const attributes = {};
 
     if (!data.cpf) throw new Error('o CPF é obrigatório...');
-
-    if (data.saveResultToCollection) {
-        attributes.saveResultToCollection = data.saveResultToCollection;
-        
-        delete data.saveResultToCollection;
-    }
 
     const service = new Service(request, response, {
         name: 'update-cartos-data',
@@ -89,8 +83,7 @@ const call = (data, request, response) => {
         ordered: true,
         orderingKey: data.cpf,
         auth: eebAuthTypes.tokenNotAnonymous,
-        data: data,
-        attributes: attributes
+        data: data
     });
 
     return service.init();

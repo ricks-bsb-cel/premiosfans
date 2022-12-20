@@ -9,6 +9,7 @@ const userCredentials = require('./cartosGetUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
 const firestoreDAL = require('../../api/firestoreDAL');
+const { at } = require('lodash');
 const collectionCartosAccounts = firestoreDAL.cartosAccounts();
 
 /*
@@ -23,7 +24,7 @@ const schema = _ => {
     return schema;
 }
 
-async function updateAccountList(cpf) {
+async function updateAccountList(cpf, serviceId) {
 
     const credential = await userCredentials.getCredential(cpf, 'any');
     const accounts = await cartosHttpRequest.accounts(credential.token);
@@ -33,6 +34,8 @@ async function updateAccountList(cpf) {
 
     accounts.forEach(account => {
         account.cpf = cpf;
+        account.serviceId = serviceId;
+
         global.setDtHoje(account, 'dtAtualizacao');
 
         promise.push(collectionCartosAccounts.merge(account.accountId, account));
@@ -58,7 +61,7 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return updateAccountList(dataResult.cpf);
+                    return updateAccountList(dataResult.cpf, this.parm.serviceId);
                 })
 
                 .then(accounts => {

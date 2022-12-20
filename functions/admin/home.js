@@ -4,7 +4,7 @@ const path = require('path');
 const global = require('../global');
 const adminController = require('./adminController');
 
-const updateUserProfile = require('../eeb/services/users/updateUserProfile');
+const updateUserProfile = require('../eeb/services/usersUpdateUserProfile');
 
 const hbsPath = path.join(__dirname, '/hbs');
 const hbsFile = path.join(hbsPath, '/home.hbs');

@@ -13,6 +13,9 @@ const cartosHttpRequest = require('./cartosHttpRequests');
 const firestoreDAL = require('../../api/firestoreDAL');
 const collectionCartosAccounts = firestoreDAL.cartosAccounts();
 
+const tokenExpireMinutes = 10;
+const showInfo = true;
+
 const schema = _ => {
     const schema = Joi.object({
         cpf: Joi.string().length(11).required(),
@@ -27,6 +30,8 @@ const getPathAccountToken = cpf => {
 }
 
 async function login(cpf) {
+    if (showInfo) console.info(`login ${cpf}`);
+
     const userCredential = await serviceUserCredential.getByCpf('cartos', cpf);
 
     if (!userCredential) throw new Error(`Nenhum usuário encontrado com o cpf ${cpf}`);
@@ -36,33 +41,76 @@ async function login(cpf) {
         userCredential.password
     );
 
+    if (showInfo) console.info(`login success. Token ${loginResult.token}`);
+
     return loginResult;
 }
 
 async function changeAccount(cpf, accountId, currentCredentials) {
-    if (currentCredentials && currentCredentials.accountId === accountId) {
-        // Já foi verificado, mas, se a conta for a mesma do token atual, retorna as mesmas credenciais
+    if (showInfo) console.info(`changeAccount. CPF ${cpf}, accountId ${accountId}`);
+
+    const expire = global.nowMilliseconds(tokenExpireMinutes, 'minutes');
+
+    if (
+        currentCredentials &&
+        currentCredentials.accountId === accountId &&
+        currentCredentials.expire > expire
+    ) {
+        if (showInfo) console.info(`Same credentials, not expired...`);
+
         return currentCredentials;
     }
 
+    // Verifica se o accountId pertence ao CPF
     const cartosAccount = await collectionCartosAccounts.getDoc(accountId, true);
 
-    if (cartosAccount.cpf !== cpf) {
-        throw new Error(`A conta não pertence ao cpf ${cpf}`);
-    }
+    if (cartosAccount.cpf !== cpf) throw new Error(`A conta não pertence ao cpf ${cpf}`);
 
     if (currentCredentials) {
-        return await cartosHttpRequest.changeAccount(accountId, currentCredentials.token);
+        try {
+            if (showInfo) console.info(`Changing account...`);
+            const result = await cartosHttpRequest.changeAccount(accountId, currentCredentials.token);
+            if (showInfo) console.info(`Change account success...`);
+
+            return result;
+        }
+        catch (e) {
+            if (showInfo) console.info(`Change account error. Refreshing token...`);
+            const refreshCredentials = await refreshToken(cpf, currentCredentials.token, currentCredentials.opaqueRefreshTokenId);
+            if (showInfo) console.info(`Changing account...`);
+
+            return await cartosHttpRequest.changeAccount(accountId, refreshCredentials.token);
+        }
     }
 
     const loginResult = await login(cpf);
-    const changeAccount = await cartosHttpRequest.changeAccount(accountId, loginResult.token);
-
-    return changeAccount;
+    return await cartosHttpRequest.changeAccount(accountId, loginResult.token);
 }
 
-async function refreshToken(token, opaqueRefreshTokenId) {
-    
+/* O refresh pode ser feito com um token antigo, passando-se o opaqueRefreshTokenId */
+async function refreshToken(cpf, token, opaqueRefreshTokenId) {
+    if (showInfo) console.info(`refreshToken ${cpf}`);
+
+    const path = getPathAccountToken(cpf);
+
+    try {
+        if (showInfo) console.info(`refreshToken Call...`);
+        let refreshTokenResult = await cartosHttpRequest.refreshToken(token, opaqueRefreshTokenId);
+        if (showInfo) console.info(`refreshToken Success...`);
+
+        refreshTokenResult.expire = global.nowMilliseconds(10, 'minutes');
+
+        await admin.database().ref(path).set(refreshTokenResult);
+
+        return refreshTokenResult;
+    }
+    catch (e) {
+        // Erro na tentativa de refresh... refaz o login
+        if (showInfo) console.info(`refreshToken erro. Login...`);
+
+        return await login(cpf);
+    }
+
 }
 
 async function getCredential(cpf, accountId) {
@@ -79,15 +127,14 @@ async function getCredential(cpf, accountId) {
 
     const refAccountTokenResult = (await admin.database().ref(path).once("value")).val();
 
-    // Se o token expirou
+    // Se existe um token não expirado ativo na mesma conta
     if (
-        refAccountTokenResult &&
-        refAccountTokenResult.accountId === accountId &&
+        refAccountTokenResult && // A autenticação existe no cache
+        (accountId === 'any' || refAccountTokenResult.accountId === accountId) && // Token da mesma conta
         refAccountTokenResult.token && // Existe um token no cache
         refAccountTokenResult.expire && // Existe data de expiração
-        nowMilliseconds > refAccountTokenResult.expire // O token expirou
+        nowMilliseconds < refAccountTokenResult.expire // O token não expirou
     ) {
-
         result = refAccountTokenResult;
 
         result.source = 'buffer';
@@ -96,19 +143,23 @@ async function getCredential(cpf, accountId) {
         return result
     }
 
+    // Tentativa de Refresh do Token Antigo
     if (
-        refAccountTokenResult &&
-        (accountId === 'any' || refAccountTokenResult.accountId === accountId) &&
-        refAccountTokenResult.token && // Existe um token no cache
+        refAccountTokenResult && // A autenticação existe no cache
+        refAccountTokenResult.token && // Existe token
+        refAccountTokenResult.opaqueRefreshTokenId && // Existe o token de renovação
+        refAccountTokenResult.accountId === accountId && // O token é da mesma conta
         refAccountTokenResult.expire && // Existe data de expiração
-        nowMilliseconds < refAccountTokenResult.expire // O token é da mesma conta
+        nowMilliseconds > refAccountTokenResult.expire // O token está expirado
     ) {
-        result = refAccountTokenResult;
+        result = await refreshToken(cpf, refAccountTokenResult.token, refAccountTokenResult.opaqueRefreshTokenId);
 
-        result.source = 'buffer';
-        result.success = true;
+        if (result) {
+            result.success = true;
+            result.source = 'refresh';
 
-        return result
+            return result;
+        }
     }
 
     const accountResult = accountId === 'login' || accountId === 'any' ?

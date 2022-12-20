@@ -24,7 +24,7 @@ const schema = _ => {
     return schema;
 }
 
-async function getPixKeys(cpf, accountId) {
+async function getPixKeys(cpf, accountId, serviceId) {
     const credential = await userCredentials.getCredential(cpf, accountId);
     const pixKeys = await cartosHttpRequest.pixKeys(credential.token);
 
@@ -33,6 +33,8 @@ async function getPixKeys(cpf, accountId) {
 
         pixKeys.forEach(row => {
             row.cpf = cpf;
+            row.serviceId = serviceId;
+
             global.setDateTime(row, 'dtAtualizacao');
 
             promise.push(collectionCartosPixKeys.set(row.key, row));
@@ -58,7 +60,7 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return getPixKeys(dataResult.cpf, dataResult.accountId);
+                    return getPixKeys(dataResult.cpf, dataResult.accountId, this.parm.serviceId);
                 })
 
                 .then(balance => {

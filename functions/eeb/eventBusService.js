@@ -211,10 +211,6 @@ class eventBusService {
 
                     // Dispara de acordo com o o tipo.
                     if (this.parm.async) { // Async... envia para o Pub/Sub
-                        if (this.parm.saveResultToCollection) {
-                            this.parm.attributes.saveResultToCollection = this.parm.saveResultToCollection;
-                        }
-
                         if (this.parm.delay) {
                             return this._sentToTask();
                         } else {
@@ -396,13 +392,6 @@ class eventBusService {
 
                     if (this.parm.debug) {
                         result.debug = this.parm;
-                    }
-
-                    if (this.parm.attributes.saveResultToCollection) {
-                        runResult.serviceId = this.parm.serviceId;
-
-                        const doc = admin.firestore().collection(this.parm.attributes.saveResultToCollection).doc();
-                        doc.set(runResult);
                     }
 
                     return resolve(result);
