@@ -38,7 +38,7 @@ async function generatePix(data, serviceId) {
     const credential = await userCredentials.getCredential(data.cpf, data.accountId);
     let pix = await cartosHttpRequest.generatePix(data, credential.token);
 
-    let update = { ...data };
+    const update = { ...data };
 
     update.serviceId = serviceId;
     delete update.accountId;
