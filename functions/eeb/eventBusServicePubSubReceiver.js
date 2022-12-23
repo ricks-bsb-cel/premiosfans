@@ -25,7 +25,8 @@ const pubSubReceiver = (request, response) => {
         serviceId: attributes.serviceId,
         method: attributes.method,
         messageId: request.body.message.messageId,
-        topic: 'eeb-' + attributes.method
+        topic: 'eeb-' + attributes.method,
+        source: 'pub-sub'
     };
 
     return audit.auditMessageIdExists(parm.messageId)

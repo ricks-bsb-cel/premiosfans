@@ -10,6 +10,7 @@ const cartosHttpRequest = require('./cartosHttpRequests');
 
 const firestoreDAL = require('../../api/firestoreDAL');
 const collectionCartosPix = firestoreDAL.cartosPix();
+const collectionTituloCompra = firestoreDAL.titulosCompras();
 
 /*
     Cria um PIX para pagamento e o salva na collection cartosPix
@@ -29,7 +30,8 @@ const schema = _ => {
             ]
         }),
         additionalInfo: Joi.string().required(),
-        user_uid: Joi.string().min(1).max(128).optional()
+        user_uid: Joi.string().min(1).max(128).optional(),
+        idTituloCompra: Joi.string().token().min(18).max(22).optional()
     });
 
     return schema;
@@ -47,7 +49,16 @@ async function generatePix(data, serviceId) {
 
     pix = { ...pix, ...update };
 
+    // Salva os dados na Collection PIX
     await collectionCartosPix.add(pix)
+
+    // Se existir idTituloCompra
+    if (data.idTituloCompra) {
+        const tituloCompra = await collectionTituloCompra.getDoc(data.idTituloCompra);
+        if (tituloCompra) {
+            collectionTituloCompra.merge(tituloCompra.id, { pix: pix });
+        }
+    }
 
     return pix;
 }

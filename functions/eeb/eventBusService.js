@@ -4,6 +4,8 @@
 // https://www.npmjs.com/package/@google-cloud/pubsub
 // https://cloud.google.com/nodejs/docs/reference/tasks/latest
 
+// $env:NODE_OPTIONS = "--openssl-legacy-provider"
+
 const admin = require("firebase-admin");
 
 const initFirebase = require("../initFirebase");
@@ -16,8 +18,6 @@ const helper = require('./eventBusServiceHelper');
 
 const projectName = 'premios-fans';
 const projectLocation = 'us-central1';
-
-const showConsoleInfoMsgs = true;
 
 // check noAuth
 const _authType = {
@@ -45,14 +45,6 @@ O eventBusService é um "envelope" de disparo de métodos utilizando o PubSub
 - Os métodos devem ser "registrados" como classes herdadas do serviceRunner
 - A classe é reinstanciada pelo PubSub e executada de acordo com os parametros
 */
-
-const consoleInfo = (msg, m1) => {
-    if (!showConsoleInfoMsgs) return;
-
-    if (m1) return console.info(msg, m1);
-    return console.info(msg);
-}
-
 
 const checkAuthentication = (request, response, authType) => {
     return new Promise((resolve, reject) => {
@@ -160,6 +152,8 @@ class eventBusService {
 
         this.parm.topic = `eeb-${this.parm.name}`;
         this.parm.topicSubscription = `eeb-subscription-${this.parm.name}`;
+
+        this.parm.source = this.parm.source || 'run';
     }
 
     getTopic() {
@@ -201,8 +195,6 @@ class eventBusService {
                 .then(app => {
                     this.admin = app;
 
-                    consoleInfo('eventBusService Start');
-
                     return eventBusServiceParmSchema().validateAsync(this.parm, { abortEarly: false });
                 })
 
@@ -217,12 +209,8 @@ class eventBusService {
                 })
 
                 .then(userInfoResult => {
-                    consoleInfo('userInfoResult', userInfoResult);
-
                     this.parm = { ...this.parm, ...userInfoResult };
                     this.parm.attributes.user_uid = userInfoResult.user_uid;
-
-                    consoleInfo('this.parm', this.parm);
 
                     // Dispara de acordo com o o tipo.
                     if (this.parm.async) { // Async... envia para o Pub/Sub
@@ -240,12 +228,15 @@ class eventBusService {
                     result = startResult;
                     result.async = this.parm.async;
 
-                    // Ajustar aqui!
-                    return resolve(
-                        this.response ?
-                            this.response.status(200).json(result) :
-                            (result.async ? null : result)
-                    );
+                    if (this.response) { // A chamada foi REST
+                        if (this.parm.source === 'run') {
+                            return resolve(this.response.status(200).json(result));
+                        } else {
+                            return resolve(this.response.status(200));
+                        }
+                    } else { // Chamada interna, sem reponse
+                        return resolve(result);
+                    }
                 })
 
                 .catch(e => {
@@ -325,8 +316,6 @@ class eventBusService {
 
     publish() {
         return new Promise((resolve, reject) => {
-            consoleInfo('publish');
-
             const publishData = {
                 data: this.parm.data ? Buffer.from(JSON.stringify(this.parm.data), 'utf8') : null,
                 attributes: Object.assign(
@@ -354,16 +343,12 @@ class eventBusService {
 
             this.log('publish-start');
 
-            consoleInfo('publishMessage Data', publishData);
-
             return topic.publishMessage(publishData)
 
                 .then(messageId => {
                     this.parm.messageId = messageId;
 
                     this.log('publish-success');
-
-                    consoleInfo('publishMessage messageId', messageId);
 
                     return {
                         topic: this.parm.topic,
@@ -388,8 +373,6 @@ class eventBusService {
                 })
 
                 .then(result => {
-                    consoleInfo('publishMessage result', result);
-
                     return resolve(result);
                 })
 
@@ -430,8 +413,6 @@ class eventBusService {
 
     _startPublish() {
         return new Promise((resolve, reject) => {
-            consoleInfo('StartPublish');
-
             this.publish()
                 .then(result => {
                     const r = { result: result, code: 200 }
@@ -470,7 +451,8 @@ const eventBusServiceParmSchema = _ => {
             orderingKey: Joi.string().allow(null),
             delay: Joi.number().integer().min(0).default(0),
             taskQueueName: Joi.string().default('eeb'),
-            auth: Joi.number().integer().min(1).max(6).required() // Tipo de Autenticação
+            auth: Joi.number().integer().min(1).max(6).required(), // Tipo de Autenticação
+            source: Joi.string().valid('run', 'pub-sub', 'task').required()
         });
 
     /*

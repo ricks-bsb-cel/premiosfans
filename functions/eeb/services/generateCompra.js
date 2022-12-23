@@ -19,6 +19,8 @@ const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios
 const collectionTitulos = firestoreDAL.titulos();
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 
+const generatePedidoPagamentoCompra = require('./generatePedidoPagamentoCompra');
+
 /*
     generateTitulo
     - Valida o token do cliente
@@ -222,8 +224,22 @@ class Service extends eebService {
                     }
 
                     // Adição concluída. Momento de gerar o pedido de pagamento...
+                    return generatePedidoPagamentoCompra.call({
+                        idTituloCompra: result.data.compra.id
+                    });
+                })
+                .then(pedidoPagamentoResult => {
+                    result.data.pedidoPagamento = pedidoPagamentoResult.result;
 
-                    return resolve(this.parm.async ? { success: true } : result);
+                    // Retornando só o que interessa
+                    result.data = {
+                        compra: {
+                            id: result.data.compra.id
+                        },
+                        pedidoPagamento: result.data.pedidoPagamento
+                    };
+
+                    return resolve(result);
                 })
 
                 .catch(e => {

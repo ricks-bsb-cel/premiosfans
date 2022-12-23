@@ -61,8 +61,8 @@ api.post("/v1/generate-ns-premio", (request, response) => {
     initFirebase.call(require('./services/generateNumerosDaSortePremio').callRequest, request, response);
 })
 
-api.post("/v1/generate-titulo", (request, response) => {
-    initFirebase.call(require('./services/generateTitulo').callRequest, request, response);
+api.post("/v1/generate-compra", (request, response) => {
+    initFirebase.call(require('./services/generateCompra').callRequest, request, response);
 })
 
 api.post("/v1/pagar-compra", (request, response) => {
@@ -148,6 +148,7 @@ api.post("/v1/cartos/update-pix-keys", (request, response) => {
 api.post("/v1/cartos/generate-pix", (request, response) => {
     initFirebase.call(require('./services/cartosGeneratePix').callRequest, request, response);
 })
+
 
 /* Cartos
 

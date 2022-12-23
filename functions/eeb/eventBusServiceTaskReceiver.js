@@ -22,7 +22,8 @@ const taskReceiver = (request, response) => {
         attributes: attributes,
         serviceId: attributes.serviceId,
         method: attributes.method,
-        topic: 'eeb-' + attributes.method
+        topic: 'eeb-' + attributes.method,
+        source: 'task'
     };
 
     helper.log('task-run-init', helper.logType.info, {

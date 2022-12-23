@@ -2,7 +2,6 @@
 
 const path = require('path');
 const eebService = require('../eventBusService').abstract;
-const global = require("../../global");
 const Joi = require('joi');
 
 /*
@@ -44,8 +43,6 @@ class Service extends eebService {
                 .then(dataResult => {
                     result.parm = dataResult;
 
-                    console.info(result);
-
                     return collectionTitulosCompras.getDoc(result.parm.idTituloCompra);
                 })
 
@@ -56,24 +53,22 @@ class Service extends eebService {
 
                     // Geração do PIX
                     const pixData = {
-                        cpf: '57372209153',  // Alterar
+                        cpf: '57372209153', // Alterar
                         accountId: '1f59ffdd-48ae-4103-bce0-84d6d6b35d36', // Alterar!
                         receiverKey: '8ca86459-8f27-4552-9309-9e37da8703b4', // Alterar!
 
                         type: 'STATIC',
                         merchantCity: 'João Pessoa/PB',
                         value: result.tituloCompra.vlTotalCompra * 100,
-                        additionalInfo: `Premios Fans Compra ${result.tituloCompra.id}`,
-                        user_uid: result.tituloCompra.uidComprador
+                        additionalInfo: `PremiosFans ${result.tituloCompra.id}`,
+                        user_uid: result.tituloCompra.uidComprador,
+                        idTituloCompra: result.parm.idTituloCompra
                     };
 
                     return cartosGeneratePix.call(pixData);
                 })
 
                 .then(cartosGeneratePixResult => {
-
-                    console.info(cartosGeneratePixResult);
-                    
                     result = {
                         success: true,
                         idTituloCompra: result.tituloCompra.id,

@@ -145,7 +145,9 @@ angular.module('app', [])
         const signIn = _ => {
             const auth = getAuth();
 
-            return $q((resolve, reject) => {
+            debugger;
+
+            return $q((resolve, reject) => { 
                 if (token) {
                     return resolve(token);
                 }
@@ -186,12 +188,14 @@ angular.module('app', [])
             return (window.location.hostname === 'localhost' ? localUrl : gatewayUrl) + url;
         }
 
-        const generateTitulo = data => {
+        const generateCompra = data => {
             let token = null;
 
             return $q(function (resolve, reject) {
 
                 global.blockUi();
+
+                debugger;
 
                 init.signIn()
                     .then(signInResult => {
@@ -213,7 +217,7 @@ angular.module('app', [])
                         };
 
                         return $http({
-                            url: getUrlEndPoint('/api/eeb/v1/generate-titulo?async=false'),
+                            url: getUrlEndPoint('/api/eeb/v1/generate-compra?async=false'),
                             method: 'post',
                             data: data,
                             headers: {
@@ -241,7 +245,7 @@ angular.module('app', [])
         }
 
         return {
-            generateTitulo: generateTitulo
+            generateCompra: generateCompra
         }
 
     })
@@ -339,7 +343,7 @@ angular.module('app', [])
 
                 const send = qtdTitulos => {
                     $scope.titulo.qtdTitulos = qtdTitulos;
-                    httpCalls.generateTitulo($scope.titulo);
+                    httpCalls.generateCompra($scope.titulo);
                 }
 
                 const initMasks = _ => {
