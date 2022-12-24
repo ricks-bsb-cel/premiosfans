@@ -331,7 +331,7 @@ angular.module('app', [])
     .directive('formCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, formClienteFactory, pagarCompraFactory, httpCalls) {
+            controller: function ($scope, formClienteFactory, pagarCompraFactory) {
                 let element = null;
 
                 $scope.compra = {};
@@ -353,7 +353,6 @@ angular.module('app', [])
                     // Abre a modal de confirmação dos dados, pedido da compra, etc.
                     pagarCompraFactory.delegate.show($scope.compra);
 
-                    // httpCalls.generateCompra($scope.titulo);
                 }
 
                 const initMasks = _ => {
@@ -395,9 +394,10 @@ angular.module('app', [])
     .directive('pagarCompra', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, pagarCompraFactory, modal) {
+            controller: function ($scope, pagarCompraFactory, modal, httpCalls) {
                 $scope.visible = false;
                 $scope.compra = null;
+
                 let element = null;
 
                 $scope.close = _ => {
@@ -411,8 +411,21 @@ angular.module('app', [])
                     element.find('.adquirir').hide();
                     element.find('.send-compra-wait').show();
 
-                    debugger;
+                    httpCalls.generateCompra($scope.compra)
+                        .then(generateCompraResult => {
+                            debugger;
+                            element.find('.pedido-compra').hide();
+                            element.find('.gerando-pix').show();
 
+                            const idTituloCompra = generateCompraResult.data.result.data.pedidoPagamento.idTituloCompra;
+                            
+                            // Inicia o snapshot do tituloCompra e aguarda aparecer o PIX
+
+
+                        })
+                        .catch(e => {
+                            debugger;
+                        })
 
                 }
 
@@ -421,6 +434,9 @@ angular.module('app', [])
 
                     pagarCompraFactory.delegate = {
                         show: compra => {
+                            element.find('.send-compra-wait').hide();
+                            element.find('.adquirir').show();
+            
                             $scope.compra = compra;
                             $scope.visible = true;
 

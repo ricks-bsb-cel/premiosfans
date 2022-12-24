@@ -468,10 +468,10 @@
 
     <script type="text/ng-template" id="modal-pagar-compra.htm">
         <dialog ng-show="visible" id="pagar-compra">
-            <article class="pt-20">
-                <h3 class="mb-20">Compra do Seu Título</h3>
+            <article class="pt-20 pedido-compra">
+                <h3 class="mb-20">Pedido do Seu Título</h3>
 
-                <p class="mb-2">Por favor, verifique seus dados antes de continuar...</p>
+                <p>Por favor, verifique seus dados antes de continuar...</p>
                 
                 <div class="row" style="margin-top:20px;">
                     <label class="col-md-6" for="nome">
@@ -512,9 +512,15 @@
                     <button class="send-compra-wait" aria-busy="true" style="display:none;">
                         Um momento...
                     </button>
-
                 </footer>
+            </article>
 
+            <article class="pt-20 gerando-pix" style="display:none;">
+                <h3 class="mb-20">
+                    Gerando seu PIX
+                </h3>
+
+                <a href="#" aria-busy="true">Um momento. Estamos gerando um PIX exclusivo para o pagamento da sua Compra...</a>
             </article>
         </dialog>
     </script>
