@@ -145,9 +145,7 @@ angular.module('app', [])
         const signIn = _ => {
             const auth = getAuth();
 
-            debugger;
-
-            return $q((resolve, reject) => { 
+            return $q((resolve, reject) => {
                 if (token) {
                     return resolve(token);
                 }
@@ -164,7 +162,6 @@ angular.module('app', [])
                     });
 
             })
-
         }
 
         return {
@@ -194,8 +191,6 @@ angular.module('app', [])
             return $q(function (resolve, reject) {
 
                 global.blockUi();
-
-                debugger;
 
                 init.signIn()
                     .then(signInResult => {
@@ -336,14 +331,29 @@ angular.module('app', [])
     .directive('formCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, formClienteFactory, httpCalls) {
+            controller: function ($scope, formClienteFactory, pagarCompraFactory, httpCalls) {
                 let element = null;
 
-                $scope.titulo = {};
+                $scope.compra = {};
 
                 const send = qtdTitulos => {
-                    $scope.titulo.qtdTitulos = qtdTitulos;
-                    httpCalls.generateCompra($scope.titulo);
+                    if (!$scope.compra ||
+                        !$scope.compra.nome ||
+                        !$scope.compra.email ||
+                        !$scope.compra.celular ||
+                        !$scope.compra.cpf
+                    ) {
+                        Swal.fire('Dados inválidos', 'Por favor, preencha corretamente todos os campos para realizar a compra.', 'error');
+
+                        return;
+                    }
+
+                    $scope.compra.qtdTitulos = qtdTitulos;
+
+                    // Abre a modal de confirmação dos dados, pedido da compra, etc.
+                    pagarCompraFactory.delegate.show($scope.compra);
+
+                    // httpCalls.generateCompra($scope.titulo);
                 }
 
                 const initMasks = _ => {
@@ -387,6 +397,7 @@ angular.module('app', [])
             restrict: 'E',
             controller: function ($scope, pagarCompraFactory, modal) {
                 $scope.visible = false;
+                $scope.compra = null;
                 let element = null;
 
                 $scope.close = _ => {
@@ -394,12 +405,25 @@ angular.module('app', [])
                     $scope.visible = false;
                 }
 
+                $scope.sendCompra = _ => {
+                    console.info('done');
+
+                    element.find('.adquirir').hide();
+                    element.find('.send-compra-wait').show();
+
+                    debugger;
+
+
+                }
+
                 $scope.initDelegates = e => {
                     element = e;
 
                     pagarCompraFactory.delegate = {
-                        show: tituloCompra => {
+                        show: compra => {
+                            $scope.compra = compra;
                             $scope.visible = true;
+
                             modal.open("pagar-compra");
                         }
                     }

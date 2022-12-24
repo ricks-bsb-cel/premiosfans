@@ -218,7 +218,7 @@ const ngModule = angular.module('views.contratos-edit', [
 						{
 							key: 'qtdNumerosPorGrupo',
 							templateOptions: {
-								label: 'Números por Grupo',
+								label: 'Números',
 								required: true
 							},
 							defaultValue: _qtdNumerosPorGrupo,
