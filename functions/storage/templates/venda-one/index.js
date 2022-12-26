@@ -56,7 +56,7 @@ angular.module('app', [])
         }
     })
 
-    .factory('init', function ($q, global, comprasClienteFactory, $timeout) {
+    .factory('init', function ($q, global, $timeout) {
         let app = null,
             token = null,
             isReady = false,
@@ -127,8 +127,6 @@ angular.module('app', [])
 
             setCookie(token);
             checkTokenChange();
-
-            comprasClienteFactory.delegate.refresh();
         }
 
         const stateChanged = _ => {
@@ -175,7 +173,91 @@ angular.module('app', [])
 
     })
 
-    .factory('httpCalls', function ($http, $q, global, init) {
+    .factory('observeTitulosCompras', function (init, $timeout) {
+        const refreshTimeoutDelay = 1000;
+
+        let
+            initiated = false,
+            unsubscribeSnapshot = null,
+            docs = [],
+            refreshTimeout = null,
+            listeners = [];
+
+        const initSnapshot = _ => {
+            if (initiated) {
+                callListeners();
+                return;
+            }
+
+            init.ready().then(app => {
+                if (initiated) return;
+
+                const user = init.getCurrentUser();
+                if (!user) return;
+
+                initiated = true;
+
+                let
+                    db = getFirestore(app),
+                    q = collection(db, "titulosCompras");
+
+                q = query(q, where("idCampanha", "==", _idCampanha));
+                q = query(q, where("uidComprador", "==", user.uid));
+
+                console.info('onSnapshot titulosCompra', _idCampanha, user.uid);
+
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
+
+                unsubscribeSnapshot = onSnapshot(q, querySnapshot => {
+                    querySnapshot.docChanges().forEach(change => {
+                        const doc = angular.merge(change.doc.data(), { id: change.doc.id });
+
+                        if (change.type === 'removed') {
+                            docs = docs.filter(f => { return f.id !== doc.id; });
+                        } else {
+                            const pos = docs.findIndex(f => { return f.id === doc.id; });
+                            if (pos < 0) {
+                                docs.push(doc);
+                            } else {
+                                docs[pos] = doc;
+                            }
+                        }
+                    })
+
+                    if (refreshTimeout) $timeout.cancel(refreshTimeout);
+                    refreshTimeout = $timeout(_ => { callListeners(); }, refreshTimeoutDelay);
+                })
+            })
+        }
+
+        const callListeners = _ => {
+            listeners.forEach(l => {
+                l.f(docs);
+            })
+        }
+
+        const registerListener = parm => {
+            if (typeof parm !== 'object' || typeof parm.id !== 'string' || typeof parm.f !== 'function') {
+                throw new Error('observeTitulosCompras registerListener invalid call');
+            }
+
+            if (listeners.findIndex(f => { return f.id === parm.id }) >= 0) return;
+
+            listeners.push(parm);
+
+            initSnapshot();
+        }
+
+        initSnapshot();
+
+        return {
+            registerListener: registerListener,
+            initSnapshot: initSnapshot
+        }
+
+    })
+
+    .factory('httpCalls', function ($http, $q, global, init, observeTitulosCompras) {
         const auth = getAuth();
 
         const getUrlEndPoint = url => {
@@ -194,6 +276,8 @@ angular.module('app', [])
 
                 init.signIn()
                     .then(signInResult => {
+                        observeTitulosCompras.initSnapshot();
+
                         token = signInResult;
 
                         if (!data || !data.nome || !data.email || !data.celular || !data.cpf) {
@@ -225,7 +309,6 @@ angular.module('app', [])
                     .then(
                         function (response) {
                             global.unblockUi();
-                            Swal.fire('Título Gerado', `Código da Compra: ${response.data.result.data.compra.id}`, 'info');
 
                             return resolve(response);
                         },
@@ -255,58 +338,17 @@ angular.module('app', [])
     .directive('comprasCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, init, comprasClienteFactory, pagarCompraFactory, detalhesCompraFactory, $timeout) {
-                let refreshTimeout, unsubscribeSnapshot;
-
+            controller: function ($scope, pagarCompraFactory, detalhesCompraFactory, observeTitulosCompras) {
                 $scope.compras = [];
 
-                const initSnapshot = _ => {
-                    const user = init.getCurrentUser();
-                    if (!user) return;
-
-                    init.ready().then(app => {
-                        let
-                            db = getFirestore(app),
-                            q = collection(db, "titulosCompras");
-
-                        q = query(q, where("idCampanha", "==", _idCampanha));
-                        q = query(q, where("uidComprador", "==", user.uid));
-
-                        if (unsubscribeSnapshot) unsubscribeSnapshot();
-
-                        unsubscribeSnapshot = onSnapshot(q, querySnapshot => {
-
-                            querySnapshot.docChanges().forEach(change => {
-                                const doc = angular.merge(change.doc.data(), { id: change.doc.id });
-                                if (change.type === 'removed') {
-                                    $scope.compras = $scope.compras.filter(f => { return f.id !== doc.id; });
-                                } else {
-                                    const pos = $scope.compras.findIndex(f => { return f.id === doc.id; });
-                                    if (pos < 0) {
-                                        $scope.compras.push(doc);
-                                    } else {
-                                        $scope.compras[pos] = doc;
-                                    }
-                                }
-                            })
-
-                            if (refreshTimeout) $timeout.cancel(refreshTimeout);
-
-                            refreshTimeout = $timeout(_ => {
-                                $scope.compras = angular.copy($scope.compras);
-                            }, 250);
-                        })
-
-                    })
-                }
-
-                comprasClienteFactory.delegate = {
-                    refresh: _ => {
-                        initSnapshot();
+                const observer = {
+                    id: 'comprasCliente',
+                    f: docs => {
+                        $scope.compras = docs;
                     }
                 }
 
-                initSnapshot();
+                observeTitulosCompras.registerListener(observer);
 
                 $scope.pagar = tituloCompra => {
                     pagarCompraFactory.delegate.show(tituloCompra);
@@ -337,6 +379,7 @@ angular.module('app', [])
                 $scope.compra = {};
 
                 const send = qtdTitulos => {
+
                     if (!$scope.compra ||
                         !$scope.compra.nome ||
                         !$scope.compra.email ||
@@ -348,7 +391,13 @@ angular.module('app', [])
                         return;
                     }
 
-                    $scope.compra.qtdTitulos = qtdTitulos;
+                    $scope.compra = {
+                        nome: $scope.compra.nome,
+                        email: $scope.compra.email,
+                        celular: $scope.compra.celular,
+                        cpf: $scope.compra.cpf,
+                        qtdTitulos: $scope.compra.qtdTitulos
+                    };
 
                     // Abre a modal de confirmação dos dados, pedido da compra, etc.
                     pagarCompraFactory.delegate.show($scope.compra);
@@ -394,11 +443,41 @@ angular.module('app', [])
     .directive('pagarCompra', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, pagarCompraFactory, modal, httpCalls) {
+            controller: function ($scope, pagarCompraFactory, modal, httpCalls, observeTitulosCompras) {
                 $scope.visible = false;
                 $scope.compra = null;
 
-                let element = null;
+                let element = null,
+                    idTituloCompra = null,
+                    titulosCompras = null
+
+                const observer = {
+                    id: 'pagarCompra',
+                    f: docs => {
+                        titulosCompras = docs;
+                        showPixData();
+                    }
+                }
+
+                const showPixData = _ => {
+                    if (!idTituloCompra || !titulosCompras) return;
+
+                    const pos = titulosCompras.findIndex(f => { 
+                        return f.id === idTituloCompra && f.pix && f.pix.QRCode;
+                    });
+                    
+                    if (pos >= 0) {
+                        $scope.compra = titulosCompras[pos];
+                        showArticle('dados-pix');
+                    }
+                }
+
+                const showArticle = c => {
+                    element.find('article.pagar-compra').hide();
+                    element.find('.' + c).show();
+                }
+
+                observeTitulosCompras.registerListener(observer);
 
                 $scope.close = _ => {
                     modal.close();
@@ -406,22 +485,12 @@ angular.module('app', [])
                 }
 
                 $scope.sendCompra = _ => {
-                    console.info('done');
-
-                    element.find('.adquirir').hide();
-                    element.find('.send-compra-wait').show();
+                    showArticle('info-gerando-pix');
 
                     httpCalls.generateCompra($scope.compra)
                         .then(generateCompraResult => {
-                            debugger;
-                            element.find('.pedido-compra').hide();
-                            element.find('.gerando-pix').show();
-
-                            const idTituloCompra = generateCompraResult.data.result.data.pedidoPagamento.idTituloCompra;
-                            
-                            // Inicia o snapshot do tituloCompra e aguarda aparecer o PIX
-
-
+                            idTituloCompra = generateCompraResult.data.result.data.pedidoPagamento.idTituloCompra;
+                            showPixData();
                         })
                         .catch(e => {
                             debugger;
@@ -429,21 +498,63 @@ angular.module('app', [])
 
                 }
 
+                const bindPixCopiaCola = _ => {
+                    const e = document.getElementById('pix-copia-cola');
+
+                    e.addEventListener('click', () => {
+                        if ('clipboard' in navigator) {
+                            navigator.clipboard.writeText($scope.compra.pix.QRCode.EMV)
+                                .then(_ => {
+                                    Swal.fire({
+                                        title: 'Código copiado!',
+                                        html: 'Agora é só colar na opção PIX Copia e Cola do seu banco preferido.',
+                                        timer: 5000,
+                                        showConfirmButton: false
+                                    });
+                                })
+                                .catch(e => {
+                                    Swal.fire({
+                                        title: 'Oops',
+                                        icon: 'error',
+                                        html: e.message,
+                                        timer: 5000,
+                                        showConfirmButton: false
+                                    });
+                                })
+                        } else {
+                            Swal.fire({
+                                title: 'Oops',
+                                html: 'Seu browser não permite o uso do recurso de copiar e colar. Você terá que selecionar, copiar e colar o código manualmente.',
+                                timer: 5000,
+                                showConfirmButton: false
+                            });
+
+                            e.removeEventListener('click');
+                        };
+                    });
+                }
+
                 $scope.initDelegates = e => {
                     element = e;
 
                     pagarCompraFactory.delegate = {
                         show: compra => {
-                            element.find('.send-compra-wait').hide();
-                            element.find('.adquirir').show();
-            
                             $scope.compra = compra;
+
+                            if ($scope.compra.pix) {
+                                showArticle('dados-pix');
+                            } else {
+                                showArticle('confirmar-dados');
+                            }
+
                             $scope.visible = true;
 
                             modal.open("pagar-compra");
                         }
                     }
                 }
+
+                bindPixCopiaCola();
             },
             templateUrl: 'modal-pagar-compra.htm',
             link: function (scope, element) {
@@ -639,6 +750,7 @@ angular.module('app', [])
             modal = modal || currentModal;
             visibleModal = null;
             document.documentElement.classList.add(closingClass);
+
             setTimeout(() => {
                 document.documentElement.classList.remove(closingClass, isOpenClass);
                 document.documentElement.style.removeProperty('--scrollbar-width');
@@ -650,6 +762,7 @@ angular.module('app', [])
             if (initiated) return;
             initiated = true;
 
+            /*
             // Close with a click outside
             document.addEventListener('click', event => {
                 if (visibleModal != null) {
@@ -658,6 +771,7 @@ angular.module('app', [])
                     !isClickInside && closeModal(visibleModal);
                 }
             });
+            */
 
             // Close with Esc key
             document.addEventListener('keydown', event => {

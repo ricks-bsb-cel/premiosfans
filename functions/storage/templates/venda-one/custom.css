@@ -39,6 +39,16 @@ a.link{
     }
 }
 
+.pix-copia-cola{
+    font-family: monospace;
+    text-align: center;
+    display: block;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
 dialog#modal-regulamento .content * {
     font-size: 0.9em;
     margin-top: 0;

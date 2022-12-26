@@ -430,14 +430,12 @@
                     <button 
                         ng-if="c.situacao=='aguardando-pagamento'"
                         ng-click="pagar(c)"
-                        class="full-width"
-                    >Pagar</button>
+                        class="full-width">Pagar</button>
 
                     <button 
                         ng-if="c.situacao=='pago'"
                         ng-click="detalhes(c)"
-                        class="full-width outline"
-                    >Detalhes da Compra</button>
+                        class="full-width outline">Detalhes da Compra</button>
 
                     <div ng-if="!$last" class="mb-40"></div>
                 </details>
@@ -468,7 +466,7 @@
 
     <script type="text/ng-template" id="modal-pagar-compra.htm">
         <dialog ng-show="visible" id="pagar-compra">
-            <article class="pt-20 pedido-compra">
+            <article class="pt-20 pagar-compra confirmar-dados">
                 <h3 class="mb-20">Pedido do Seu Título</h3>
 
                 <p>Por favor, verifique seus dados antes de continuar...</p>
@@ -515,13 +513,47 @@
                 </footer>
             </article>
 
-            <article class="pt-20 gerando-pix" style="display:none;">
+            <article class="pt-20 pagar-compra info-gerando-pix" style="display:none;">
                 <h3 class="mb-20">
                     Gerando seu PIX
                 </h3>
 
                 <a href="#" aria-busy="true">Um momento. Estamos gerando um PIX exclusivo para o pagamento da sua Compra...</a>
             </article>
+
+            <article class="pt-20 pagar-compra dados-pix" style="display:none;">
+
+                <h3 class="mb-20">
+                    PIX
+                </h3>
+
+                <p class="text-center">Clique abaixo para utilizar o <strong>PIX Copia e Cola</strong> do seu banco preferido</p>
+                
+                <p
+                    id="pix-copia-cola"
+                    ng-bind="compra.pix.QRCode.EMV"
+                    class="pix-copia-cola"
+                ></p>
+
+                <p class="p-10 m-0 text-center">ou utilize o QRCode abaixo:</p>
+
+                <img
+                    ng-if="compra.pix.QRCode.Imagem"
+                    ng-src="data:image/png;base64,[[compra.pix.QRCode.Imagem]]" />
+
+                <p class="pb-20 text-center">
+                    Após o pagamento, você receberá uma confirmação no seu email
+                    <strong ng-bind="::compra.email"></strong> e, se possível, 
+                    aqui mesmo nesta janela! Basta voltar aqui depois... 
+                </p>
+
+                <footer class="mt-0">
+                    <button class="mb-0" ng-click="close()">
+                        Fechar
+                    </button>
+                </footer>
+            </article>
+
         </dialog>
     </script>
 
