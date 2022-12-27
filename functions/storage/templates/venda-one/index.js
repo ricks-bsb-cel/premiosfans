@@ -396,7 +396,7 @@ angular.module('app', [])
                         email: $scope.compra.email,
                         celular: $scope.compra.celular,
                         cpf: $scope.compra.cpf,
-                        qtdTitulos: $scope.compra.qtdTitulos
+                        qtdTitulos: qtdTitulos || 1
                     };
 
                     // Abre a modal de confirmação dos dados, pedido da compra, etc.
@@ -462,10 +462,10 @@ angular.module('app', [])
                 const showPixData = _ => {
                     if (!idTituloCompra || !titulosCompras) return;
 
-                    const pos = titulosCompras.findIndex(f => { 
+                    const pos = titulosCompras.findIndex(f => {
                         return f.id === idTituloCompra && f.pix && f.pix.QRCode;
                     });
-                    
+
                     if (pos >= 0) {
                         $scope.compra = titulosCompras[pos];
                         showArticle('dados-pix');
@@ -539,7 +539,9 @@ angular.module('app', [])
 
                     pagarCompraFactory.delegate = {
                         show: compra => {
-                            $scope.compra = compra;
+                            $scope.compra = { ...compra };
+
+                            $scope.compra.qtdTitulos = $scope.compra.qtdTitulos || $scope.compra.qtdTitulosCompra || 1;
 
                             if ($scope.compra.pix) {
                                 showArticle('dados-pix');
