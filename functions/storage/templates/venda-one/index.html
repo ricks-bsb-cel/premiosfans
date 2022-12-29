@@ -385,6 +385,7 @@
 
                 <details
                     ng-repeat="c in compras | orderBy:'dtInclusao_js_desc'"
+                    id="titulo-compra-[[c.id]]"
                     id-titulo-compra="[[c.id]]"
                     open-detail="[[c.situacao==='aguardando-pagamento']]"
                     ng-class="{last:$last}"
@@ -466,62 +467,7 @@
 
     <script type="text/ng-template" id="modal-pagar-compra.htm">
         <dialog ng-show="visible" id="pagar-compra">
-            <article class="pt-20 pagar-compra confirmar-dados">
-                <h3 class="mb-20">Pedido do Seu Título</h3>
-
-                <p>Por favor, verifique seus dados antes de continuar...</p>
-                
-                <div class="row" style="margin-top:20px;">
-                    <label class="col-md-6" for="nome">
-                        Nome
-                        <input type="text" ng-model="compra.nome" readonly>
-                    </label>
-
-                    <label class="col-md-6" for="email">
-                        Email
-                        <input type="text" ng-model="compra.email" readonly>
-                    </label>
-                </div>
-
-                <div class="row">
-                    <label class="col-md-6" for="celular">
-                        Celular
-                        <input type="tel" ng-model="compra.celular" readonly>
-                    </label>
-
-                    <label class="col-md-6" for="cpf">
-                        CPF
-                        <input type="tel" ng-model="compra.cpf" readonly>
-                    </label>
-                </div>
-
-                <footer class="mt-0">
-                    <button
-                        ng-if="option===options._confirmarDados"
-                        class="adquirir mb-0"
-                        ng-click="sendCompra()"
-                    >
-                        Adquirir
-                        <strong ng-bind="::compra.qtdTitulos"></strong>
-                        <span ng-if="compra.qtdTitulos===1">Título</span>
-                        <span ng-if="compra.qtdTitulos>1">Títulos</span>
-                    </button>
-
-                    <button class="send-compra-wait" aria-busy="true" style="display:none;">
-                        Um momento...
-                    </button>
-                </footer>
-            </article>
-
-            <article class="pt-20 pagar-compra info-gerando-pix" style="display:none;">
-                <h3 class="mb-20">
-                    Gerando seu PIX
-                </h3>
-
-                <a href="#" aria-busy="true">Um momento. Estamos gerando um PIX exclusivo para o pagamento da sua Compra...</a>
-            </article>
-
-            <article class="pt-20 pagar-compra dados-pix" style="display:none;">
+            <article class="pt-20">
 
                 <h3 class="mb-20">
                     PIX

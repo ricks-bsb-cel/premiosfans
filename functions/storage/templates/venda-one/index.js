@@ -49,10 +49,17 @@ angular.module('app', [])
             $('#wait').hide()
         }
 
+        const scrollToId = id => {
+            return $("html, body").animate({
+                scrollTop: $(`#${id}`).offset().top
+            }, 500);
+        }
+
         return {
             guid: guid,
             blockUi: blockUi,
-            unblockUi: unblockUi
+            unblockUi: unblockUi,
+            scrollToId: scrollToId
         }
     })
 
@@ -373,19 +380,22 @@ angular.module('app', [])
     .directive('formCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, formClienteFactory, pagarCompraFactory) {
+            controller: function ($scope, global, formClienteFactory, httpCalls) {
                 let element = null;
 
                 $scope.compra = {};
 
-                const send = qtdTitulos => {
+                const scrollToCompra = compra =>{
+                    // Exibir que o pedido de compra foi realizado com sucesso
+                    // Enviar o cliente para o registro da compra
+                    debugger;
+                    global.scrollToId(`titulo-compra-${TituloCompra.id}`);
 
-                    if (!$scope.compra ||
-                        !$scope.compra.nome ||
-                        !$scope.compra.email ||
-                        !$scope.compra.celular ||
-                        !$scope.compra.cpf
-                    ) {
+                }
+
+                const sendPedidoCompra = qtdTitulos => {
+
+                    if (!$scope.compra || !$scope.compra.nome || !$scope.compra.email || !$scope.compra.celular || !$scope.compra.cpf) {
                         Swal.fire('Dados inválidos', 'Por favor, preencha corretamente todos os campos para realizar a compra.', 'error');
 
                         return;
@@ -399,8 +409,61 @@ angular.module('app', [])
                         qtdTitulos: qtdTitulos || 1
                     };
 
+                    Swal.fire({
+                        title: 'Verifique seu dados antes de prosseguir',
+                        icon: 'info',
+                        html: `
+                            <h4 class="m-5">${$scope.compra.nome}</h4>
+                            <p class="m-5">${$scope.compra.email}</p>
+                            <p class="m-5"><small>Celular: </small>${$scope.compra.celular}</p>
+                            <p class="m-5"><small>CPF: </small>${$scope.compra.cpf}</p>
+                        `,
+                        showCancelButton: true,
+                        focusConfirm: true,
+                        confirmButtonText: `Comprar ${$scope.compra.qtdTitulos} títulos`,
+                        cancelButtonText: 'Corrigir',
+                        // showLoaderOnConfirm: false,
+                        preConfirm: _ => {
+
+                            Swal.update({
+                                title: 'Criando sua compra',
+                                html: `
+                                <img src="/assets/imgs/wait.svg" />
+                                <p>Um momento...</p>
+                                `,
+                                showCancelButton: false,
+                                showConfirmButton: false
+                            });
+
+                            return httpCalls.generateCompra($scope.compra)
+                                .then(response => {
+                                    if (response.data.code !== 200) throw new Error('Erro solicitando compra');
+
+                                    Swal.close();
+
+                                    return scrollToCompra(response.data.result);
+                                })
+                                .catch(error => {
+                                    Swal.showValidationMessage(
+                                        `Request failed: ${error}`
+                                    )
+                                })
+                        },
+                        allowOutsideClick: () => !Swal.isLoading()
+                    })
+                    .then(result => {
+                        debugger;
+
+                        console.info(result);
+
+                        if (!result.isConfirmed) {
+                            return global.scrollToId('form-cliente');
+                        }
+
+                    })
+
                     // Abre a modal de confirmação dos dados, pedido da compra, etc.
-                    pagarCompraFactory.delegate.show($scope.compra);
+                    // pagarCompraFactory.delegate.show($scope.compra);
 
                 }
 
@@ -415,11 +478,11 @@ angular.module('app', [])
                 $scope.initDelegates = e => {
                     element = e;
                     formClienteFactory.delegate = {
+                        sendPedidoCompra: sendPedidoCompra,
                         showFormCliente: _ => {
                             $("#form-cliente").show();
                             initMasks();
-                        },
-                        send: send
+                        }
                     }
                 }
 
@@ -443,59 +506,16 @@ angular.module('app', [])
     .directive('pagarCompra', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, pagarCompraFactory, modal, httpCalls, observeTitulosCompras) {
+            controller: function ($scope, pagarCompraFactory, modal) {
                 $scope.visible = false;
                 $scope.compra = null;
 
-                let element = null,
-                    idTituloCompra = null,
-                    titulosCompras = null
-
-                const observer = {
-                    id: 'pagarCompra',
-                    f: docs => {
-                        titulosCompras = docs;
-                        showPixData();
-                    }
-                }
-
-                const showPixData = _ => {
-                    if (!idTituloCompra || !titulosCompras) return;
-
-                    const pos = titulosCompras.findIndex(f => {
-                        return f.id === idTituloCompra && f.pix && f.pix.QRCode;
-                    });
-
-                    if (pos >= 0) {
-                        $scope.compra = titulosCompras[pos];
-                        showArticle('dados-pix');
-                    }
-                }
-
-                const showArticle = c => {
-                    element.find('article.pagar-compra').hide();
-                    element.find('.' + c).show();
-                }
-
-                observeTitulosCompras.registerListener(observer);
+                let element = null;
 
                 $scope.close = _ => {
                     modal.close();
+                    $scope.compra = null;
                     $scope.visible = false;
-                }
-
-                $scope.sendCompra = _ => {
-                    showArticle('info-gerando-pix');
-
-                    httpCalls.generateCompra($scope.compra)
-                        .then(generateCompraResult => {
-                            idTituloCompra = generateCompraResult.data.result.data.pedidoPagamento.idTituloCompra;
-                            showPixData();
-                        })
-                        .catch(e => {
-                            debugger;
-                        })
-
                 }
 
                 const bindPixCopiaCola = _ => {
@@ -540,15 +560,6 @@ angular.module('app', [])
                     pagarCompraFactory.delegate = {
                         show: compra => {
                             $scope.compra = { ...compra };
-
-                            $scope.compra.qtdTitulos = $scope.compra.qtdTitulos || $scope.compra.qtdTitulosCompra || 1;
-
-                            if ($scope.compra.pix) {
-                                showArticle('dados-pix');
-                            } else {
-                                showArticle('confirmar-dados');
-                            }
-
                             $scope.visible = true;
 
                             modal.open("pagar-compra");
@@ -700,7 +711,7 @@ angular.module('app', [])
                 return;
             }
 
-            formClienteFactory.delegate.send($scope.qtd);
+            formClienteFactory.delegate.sendPedidoCompra($scope.qtd);
         }
 
         $scope.showRegulamento = _ => {
