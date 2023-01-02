@@ -110,6 +110,7 @@ class Service extends eebService {
                     if (!result.campanhaSorteiosPremios || result.campanhaSorteiosPremios === 0) throw new Error('Premios da not found');
 
                     result.version = version;
+                    result.versionDate = global.todayMoment().toString('DD/MM HH:mm:ss');
 
                     // Ordenações
                     result.campanhaSorteios = _.orderBy(result.campanhaSorteios, ['dtSorteio_yyyymmdd']);

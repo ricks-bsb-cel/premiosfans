@@ -47,6 +47,16 @@ a.link{
     overflow-wrap: break-word;
     margin-bottom: 10px;
     cursor: pointer;
+    font-size: 0.8em;
+    border: 1px solid silver;
+    padding: 5px;
+    background-color: lightgoldenrodyellow;
+}
+
+.pix-qrcode{
+    max-width: 180px;
+    margin: 0 auto;
+    display: block;
 }
 
 dialog#modal-regulamento .content * {

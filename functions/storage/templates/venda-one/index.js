@@ -3,7 +3,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
 import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-messaging.js";
-import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
@@ -140,6 +140,7 @@ angular.module('app', [])
             const auth = getAuth();
             onAuthStateChanged(auth, user => {
                 if (user) {
+                    console.info('user uid', user.uid);
                     initUser(user);
                 }
 
@@ -156,8 +157,8 @@ angular.module('app', [])
                 }
 
                 signInAnonymously(auth)
-                    .then(user => {
-                        initUser(user);
+                    .then(signInAnonymouslyResult => {
+                        initUser(signInAnonymouslyResult.user);
 
                         return resolve(token);
                     })
@@ -169,17 +170,72 @@ angular.module('app', [])
             })
         }
 
+        const queryTitulosComprasCliente = _ => {
+            return $q((resolve, reject) => {
+                ready()
+                    .then(app => {
+                        const user = getCurrentUser();
+                        if (!user) return reject(new Error(`Não foi possível preparar a query`));
+
+                        let
+                            db = getFirestore(app),
+                            q = collection(db, "titulosCompras");
+
+                        q = query(q, where("idCampanha", "==", _idCampanha));
+                        q = query(q, where("uidComprador", "==", user.uid));
+
+                        return resolve(q);
+                    })
+                    .catch(e => {
+                        return reject(e);
+                    })
+            })
+        }
+
+        const getComprasCliente = _ => {
+            return $q((resolve, reject) => {
+                let compras = [];
+
+                return ready()
+                    .then(_ => {
+                        const user = getCurrentUser();
+                        if (!user) return null;
+
+                        return queryTitulosComprasCliente();
+                    })
+                    .then(query => {
+                        if (!query) return [];
+
+                        return getDocs(query);
+                    })
+                    .then(docs => {
+                        docs.forEach(c => {
+                            c = angular.merge(c.data(), { id: c.id });
+                            compras.push(c);
+                        });
+
+                        return resolve(compras);
+                    })
+                    .catch(e => {
+                        return reject(e);
+                    })
+            })
+        }
+
         return {
             app: app,
             init: init,
             getCurrentUser: getCurrentUser,
             ready: ready,
             signIn: signIn,
-            initMessaging: initMessaging
+            initMessaging: initMessaging,
+            getComprasCliente: getComprasCliente,
+            queryTitulosComprasCliente: queryTitulosComprasCliente
         }
 
     })
 
+    /*
     .factory('observeTitulosCompras', function (init, $timeout) {
         const refreshTimeoutDelay = 1000;
 
@@ -263,8 +319,9 @@ angular.module('app', [])
         }
 
     })
+    */
 
-    .factory('httpCalls', function ($http, $q, global, init, observeTitulosCompras) {
+    .factory('httpCalls', function ($http, $q, global, init) {
         const auth = getAuth();
 
         const getUrlEndPoint = url => {
@@ -283,7 +340,6 @@ angular.module('app', [])
 
                 init.signIn()
                     .then(signInResult => {
-                        observeTitulosCompras.initSnapshot();
 
                         token = signInResult;
 
@@ -340,22 +396,52 @@ angular.module('app', [])
 
         return {
             delegate: delegate
-        }
+        };
     })
     .directive('comprasCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, pagarCompraFactory, detalhesCompraFactory, observeTitulosCompras) {
+            controller: function ($scope, global, init, comprasClienteFactory, pagarCompraFactory, detalhesCompraFactory, $timeout) {
                 $scope.compras = [];
 
-                const observer = {
-                    id: 'comprasCliente',
-                    f: docs => {
-                        $scope.compras = docs;
+                const addCompra = compra => {
+                    if (Array.isArray(compra)) {
+                        compra.forEach(c => {
+                            addCompra(c);
+                        })
+                        return;
+                    }
+
+                    const pos = $scope.compras.findIndex(f => { f.id === compra.id });
+
+                    if (pos >= 0) {
+                        $scope.compras[pos] = compra;
+                    } else {
+                        $scope.compras.push(compra);
                     }
                 }
 
-                observeTitulosCompras.registerListener(observer);
+                const scrollToCompra = idCompra => {
+                    $timeout(_ => {
+                        global.scrollToId(`titulo-compra-${idCompra}`);
+                    })
+                }
+
+                const loadComprasClientes = idCompra => {
+                    init.getComprasCliente()
+                        .then(compras => {
+                            addCompra(compras);
+
+                            if (idCompra) scrollToCompra(idCompra);
+                        })
+                        .catch(e => {
+                            console.error(e);
+                        })
+                }
+
+                comprasClienteFactory.delegate = {
+                    loadComprasClientes: loadComprasClientes
+                }
 
                 $scope.pagar = tituloCompra => {
                     pagarCompraFactory.delegate.show(tituloCompra);
@@ -364,6 +450,8 @@ angular.module('app', [])
                 $scope.detalhes = tituloCompra => {
                     detalhesCompraFactory.delegate.show(tituloCompra);
                 }
+
+                loadComprasClientes();
             },
             templateUrl: 'compras-cliente.htm'
         };
@@ -380,18 +468,12 @@ angular.module('app', [])
     .directive('formCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, global, formClienteFactory, httpCalls) {
-                let element = null;
+            controller: function ($scope, init, global, formClienteFactory, httpCalls, pagarCompraFactory, comprasClienteFactory) {
+                let element = null,
+                    idTituloCompra,
+                    unsubscribeSnapshot;
 
                 $scope.compra = {};
-
-                const scrollToCompra = compra =>{
-                    // Exibir que o pedido de compra foi realizado com sucesso
-                    // Enviar o cliente para o registro da compra
-                    debugger;
-                    global.scrollToId(`titulo-compra-${TituloCompra.id}`);
-
-                }
 
                 const sendPedidoCompra = qtdTitulos => {
 
@@ -411,59 +493,71 @@ angular.module('app', [])
 
                     Swal.fire({
                         title: 'Verifique seu dados antes de prosseguir',
-                        icon: 'info',
+                        icon: 'question',
                         html: `
                             <h4 class="m-5">${$scope.compra.nome}</h4>
                             <p class="m-5">${$scope.compra.email}</p>
                             <p class="m-5"><small>Celular: </small>${$scope.compra.celular}</p>
                             <p class="m-5"><small>CPF: </small>${$scope.compra.cpf}</p>
                         `,
+                        timer: 0,
                         showCancelButton: true,
                         focusConfirm: true,
                         confirmButtonText: `Comprar ${$scope.compra.qtdTitulos} títulos`,
                         cancelButtonText: 'Corrigir',
-                        // showLoaderOnConfirm: false,
+                        allowOutsideClick: false,
                         preConfirm: _ => {
 
                             Swal.update({
                                 title: 'Criando sua compra',
-                                html: `
-                                <img src="/assets/imgs/wait.svg" />
-                                <p>Um momento...</p>
-                                `,
+                                html: `<img src="/assets/imgs/wait.svg" /><p>Um momento...</p>`,
+                                icon: 'info',
                                 showCancelButton: false,
                                 showConfirmButton: false
                             });
 
-                            return httpCalls.generateCompra($scope.compra)
+                            httpCalls.generateCompra($scope.compra)
                                 .then(response => {
+
                                     if (response.data.code !== 200) throw new Error('Erro solicitando compra');
 
-                                    Swal.close();
+                                    idTituloCompra = response.data.result.data.compra.id;
 
-                                    return scrollToCompra(response.data.result);
+                                    Swal.update({
+                                        title: 'Preparando PIX',
+                                        html: `<img src="/assets/imgs/wait.svg" /><p>Um momento. Seu PIX exclusivo para pagamento está sendo gerado...</p>`,
+                                        icon: 'info',
+                                        showCancelButton: false,
+                                        showConfirmButton: false
+                                    });
+
+                                    // Aguarda o PIX estar pronto
+                                    return init.ready();
                                 })
-                                .catch(error => {
-                                    Swal.showValidationMessage(
-                                        `Request failed: ${error}`
-                                    )
+                                .then(app => {
+                                    const db = getFirestore(app);
+                                    const docRef = doc(db, "titulosCompras", idTituloCompra);
+
+                                    unsubscribeSnapshot = onSnapshot(docRef, docSnapshot => {
+                                        docSnapshot = docSnapshot.data();
+
+                                        if (docSnapshot.pix) {
+                                            unsubscribeSnapshot(); // Remove o Listenner
+
+                                            Swal.close();
+                                            pagarCompraFactory.delegate.show(docSnapshot);
+                                            comprasClienteFactory.delegate.loadComprasClientes(idTituloCompra);
+                                        }
+                                    })
+
                                 })
-                        },
-                        allowOutsideClick: () => !Swal.isLoading()
-                    })
-                    .then(result => {
-                        debugger;
+                                .catch(e => {
+                                    console.error(e);
+                                })
 
-                        console.info(result);
-
-                        if (!result.isConfirmed) {
-                            return global.scrollToId('form-cliente');
+                            return false;
                         }
-
                     })
-
-                    // Abre a modal de confirmação dos dados, pedido da compra, etc.
-                    // pagarCompraFactory.delegate.show($scope.compra);
 
                 }
 
@@ -482,6 +576,7 @@ angular.module('app', [])
                         showFormCliente: _ => {
                             $("#form-cliente").show();
                             initMasks();
+                            global.scrollToId('form-cliente');
                         }
                     }
                 }
@@ -528,7 +623,7 @@ angular.module('app', [])
                                     Swal.fire({
                                         title: 'Código copiado!',
                                         html: 'Agora é só colar na opção PIX Copia e Cola do seu banco preferido.',
-                                        timer: 5000,
+                                        timer: 2000,
                                         showConfirmButton: false
                                     });
                                 })
@@ -699,10 +794,9 @@ angular.module('app', [])
 
             $("#vl-total").show();
 
-            // init.initMessaging();
-
-            if (formClienteFactory && formClienteFactory.delegate && typeof formClienteFactory.delegate.showFormCliente === 'function')
+            if (formClienteFactory && formClienteFactory.delegate && typeof formClienteFactory.delegate.showFormCliente === 'function') {
                 formClienteFactory.delegate.showFormCliente();
+            }
         }
 
         $scope.openSell = _ => {

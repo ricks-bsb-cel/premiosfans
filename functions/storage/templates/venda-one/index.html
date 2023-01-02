@@ -292,7 +292,8 @@
         </small>
         <p>
             <small style="font-family:monospace;font-size:0.7em;margin-top:20px;display:block;">
-                v {{version}}
+                v {{version}}<br/>
+                {{versionDate}}
             </small>
         </p>
     </footer>
@@ -469,11 +470,11 @@
         <dialog ng-show="visible" id="pagar-compra">
             <article class="pt-20">
 
-                <h3 class="mb-20">
-                    PIX
+                <h3 class="mb-20 text-center">
+                    Pagar Compra
                 </h3>
 
-                <p class="text-center">Clique abaixo para utilizar o <strong>PIX Copia e Cola</strong> do seu banco preferido</p>
+                <p class="text-center">Clique no código abaixo para utilizar o <strong>PIX Copia e Cola</strong> do seu banco preferido</p>
                 
                 <p
                     id="pix-copia-cola"
@@ -481,16 +482,15 @@
                     class="pix-copia-cola"
                 ></p>
 
-                <p class="p-10 m-0 text-center">ou utilize o QRCode abaixo:</p>
+                <p class="p-10 m-0 text-center">ou abre o aplicativo do seu banco e utilize o QRCode abaixo:</p>
 
                 <img
+                    class="pix-qrcode"
                     ng-if="compra.pix.QRCode.Imagem"
                     ng-src="data:image/png;base64,[[compra.pix.QRCode.Imagem]]" />
 
                 <p class="pb-20 text-center">
-                    Após o pagamento, você receberá uma confirmação no seu email
-                    <strong ng-bind="::compra.email"></strong> e, se possível, 
-                    aqui mesmo nesta janela! Basta voltar aqui depois... 
+                    Após o pagamento, você receberá um eMail com o seus <strong>Números da Sorte</strong>.
                 </p>
 
                 <footer class="mt-0">

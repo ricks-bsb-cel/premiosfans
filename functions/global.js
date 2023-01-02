@@ -633,6 +633,7 @@ const todayMoment = _ => {
     result.hour(0).minute(0).second(0).millisecond(0);
     return result;
 }
+exports.todayMoment = todayMoment;
 
 
 const dateToMoment = (value, br) => {

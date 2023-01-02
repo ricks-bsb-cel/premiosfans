@@ -4,3 +4,9 @@ https://www.twilio.com          adm@zoepay.app      lastpass                    
 
 SendGrid key
 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
+
+WebHooks da Conpay
+
+PixPago:
+URL: https://premios-fans-a8fj1dkb.uc.gateway.dev/api/eeb/v1/whr/conpay/pix-pago
+Chave: 704f1c01-49c1-42c4-8b59-b756bd361c2d

@@ -72,22 +72,9 @@ const fakeData = {
     config: defaultTemplateConfig
 }
 
-/*
-const getAppToken = (request, response) => {
-    const Cookies = require("cookies");
-    const cookies = new Cookies(request, response);
-
-    let token = cookies.get("__anonymousSession") || null;
-
-    return token;
-}
-*/
-
 exports.getApp = (request, response) => {
     const idInfluencer = request.params.idInfluencer || null;
     const idCampanha = request.params.idCampanha || null;
-
-    // const token = getAppToken(request, response);
 
     const storageFile = `app/${idInfluencer}/${idCampanha}/index.html`;
 
