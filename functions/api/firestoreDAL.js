@@ -333,3 +333,7 @@ exports.cartosExtract = _ => {
 exports.cartosPix = _ => {
     return new collectionClass('cartosPix');
 }
+
+exports.cartosPixPago = _ => {
+    return new collectionClass('cartosPixPago');
+}

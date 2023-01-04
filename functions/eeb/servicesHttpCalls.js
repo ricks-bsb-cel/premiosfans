@@ -12,6 +12,12 @@ api.use(cookieParser());
 api.use(cors());
 api.options('*', cors());
 
+// Subscrição que recebe o pagamento do PIX e confirma a compra
+api.post("/v1/receiver/pagar-compra", (request, response) => {
+    const receiver = require('./services/receiverPagarCompra');
+    initFirebase.call(receiver.pubSubReceiver, request, response);
+})
+
 // Subscrições apontam para cá...
 api.post("/v1/receiver/:method", (request, response) => {
     const receiver = require('./eventBusServicePubSubReceiver');
@@ -39,10 +45,10 @@ api.post("/v1/test", (request, response) => {
     initFirebase.call(require('./services/tests/test').callRequest, request, response);
 })
 
+// WebHooks apontam para cá!
 api.post("/v1/whr/:source/:type?", (request, response) => {
     initFirebase.call(require('./services/webhook').callRequest, request, response);
 })
-
 
 api.post("/v1/generate-templates", (request, response) => {
     initFirebase.call(require('./services/generateTemplates').callRequest, request, response);
