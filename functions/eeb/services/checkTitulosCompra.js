@@ -1,6 +1,5 @@
 "use strict";
 
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 const Joi = require('joi');
@@ -25,7 +24,7 @@ const sendEmailTitulo = require('./sendEmailTitulo');
 
 const dashboardData = require('./generateDashboardData');
 
-const tituloCompra = _ => {
+const schema = _ => {
     const schema = Joi.object({
         idTituloCompra: Joi.string().token().min(18).max(22).required()
     });
@@ -72,7 +71,7 @@ const checkNumeroTituloPremio = (idCampanha, idTitulo, idPremio, idTituloPremio,
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -100,7 +99,7 @@ class Service extends eebService {
                 result.data.qtdErrors = result.data.errors.length;
             };
 
-            return tituloCompra().validateAsync(this.parm.data)
+            return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
                     result.data.idTituloCompra = dataResult.idTituloCompra;
@@ -310,7 +309,7 @@ const call = (data, request, response) => {
         name: 'check-titulo-compra',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        auth: eebAuthTypes.tokenNotAnonymous,
+        auth: eebAuthTypes.internal,
         data: data
     }
 

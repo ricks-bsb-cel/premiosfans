@@ -1,55 +1,54 @@
 "use strict";
 
-const path = require('path');
 const Joi = require('joi');
-const eebService = require('../eventBusService').abstract;
-const global = require('../../global');
+const eebService = require('../../eventBusService').abstract;
+const global = require('../../../global');
 
 const userCredentials = require('./cartosGetUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
-const firestoreDAL = require('../../api/firestoreDAL');
-const collectionCartosAccounts = firestoreDAL.cartosAccounts();
+const firestoreDAL = require('../../../api/firestoreDAL');
+const collectionCartosPixKeys = firestoreDAL.cartosPixKeys();
 
 /*
-    Busca todas as contas de um CPF na Cartos e atualiza a collection cartosAccounts
+    Busca as chaves PIX da conta na Cartos e atualiza a collection cartosAccountsPixKeys
 */
 
 const schema = _ => {
     const schema = Joi.object({
-        cpf: Joi.string().length(11).required()
+        cpf: Joi.string().length(11).required(),
+        accountId: Joi.string().length(36).required()
     });
 
     return schema;
 }
 
-async function updateAccountList(cpf, serviceId) {
+async function getPixKeys(cpf, accountId, serviceId) {
+    const credential = await userCredentials.getCredential(cpf, accountId);
+    const pixKeys = await cartosHttpRequest.pixKeys(credential.token);
 
-    const credential = await userCredentials.getCredential(cpf, 'any');
-    const accounts = await cartosHttpRequest.accounts(credential.token);
+    if (Array.isArray(pixKeys) && pixKeys.length) {
+        const promise = [];
 
-    // Atualiza o cartosAccounts com as contas existentes
-    const promise = [];
+        pixKeys.forEach(row => {
+            row.cpf = cpf;
+            row.serviceId = serviceId;
 
-    accounts.forEach(account => {
-        account.cpf = cpf;
-        account.serviceId = serviceId;
+            global.setDateTime(row, 'dtAtualizacao');
 
-        global.setDtHoje(account, 'dtAtualizacao');
+            promise.push(collectionCartosPixKeys.set(row.key, row));
+        })
 
-        promise.push(collectionCartosAccounts.merge(account.accountId, account));
-    })
+        await Promise.all(promise);
+    }
 
-    await Promise.all(promise);
-
-    return accounts;
+    return pixKeys;
 }
-
 
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -60,11 +59,11 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return updateAccountList(dataResult.cpf, this.parm.serviceId);
+                    return getPixKeys(dataResult.cpf, dataResult.accountId, this.parm.serviceId);
                 })
 
-                .then(accounts => {
-                    return resolve(this.parm.async ? { success: true } : accounts);
+                .then(balance => {
+                    return resolve(this.parm.async ? { success: true } : balance);
                 })
 
                 .catch(e => {
@@ -79,7 +78,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../eventBusService').authType;
+    const eebAuthTypes = require('../../eventBusService').authType;
 
     if (!data.cpf) throw new Error('o CPF é obrigatório...');
 

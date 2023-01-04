@@ -1,7 +1,7 @@
 "use strict";
 
-const secretManager = require('../../secretManager');
-const eebHelper = require('../eventBusServiceHelper');
+const secretManager = require('../../../secretManager');
+const eebHelper = require('../../eventBusServiceHelper');
 
 const getEndpointConfig = endPoint => {
     return new Promise((resolve, reject) => {

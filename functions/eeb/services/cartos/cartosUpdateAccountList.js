@@ -1,48 +1,54 @@
 "use strict";
 
-const path = require('path');
 const Joi = require('joi');
-const eebService = require('../eventBusService').abstract;
-const global = require('../../global');
+const eebService = require('../../eventBusService').abstract;
+const global = require('../../../global');
 
 const userCredentials = require('./cartosGetUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
-const firestoreDAL = require('../../api/firestoreDAL');
-const collectionCartosBalance = firestoreDAL.cartosBalance();
+const firestoreDAL = require('../../../api/firestoreDAL');
+const collectionCartosAccounts = firestoreDAL.cartosAccounts();
 
 /*
-    Busca o Balance da conta na Cartos e atualiza a collection cartosBalance
+    Busca todas as contas de um CPF na Cartos e atualiza a collection cartosAccounts
 */
 
 const schema = _ => {
     const schema = Joi.object({
-        cpf: Joi.string().length(11).required(),
-        accountId: Joi.string().length(36).required()
+        cpf: Joi.string().length(11).required()
     });
 
     return schema;
 }
 
-async function getBalance(cpf, accountId, serviceId) {
-    const credential = await userCredentials.getCredential(cpf, accountId);
-    const balance = await cartosHttpRequest.balance(credential.token);
+async function updateAccountList(cpf, serviceId) {
 
-    balance.cpf = cpf;
-    balance.accountId = accountId;
-    balance.serviceId = serviceId;
+    const credential = await userCredentials.getCredential(cpf, 'any');
+    const accounts = await cartosHttpRequest.accounts(credential.token);
 
-    global.setDateTime(balance, 'dtAtualizacao');
+    // Atualiza o cartosAccounts com as contas existentes
+    const promise = [];
 
-    await collectionCartosBalance.set(balance.accountId, balance);
+    accounts.forEach(account => {
+        account.cpf = cpf;
+        account.serviceId = serviceId;
 
-    return balance;
+        global.setDtHoje(account, 'dtAtualizacao');
+
+        promise.push(collectionCartosAccounts.merge(account.accountId, account));
+    })
+
+    await Promise.all(promise);
+
+    return accounts;
 }
+
 
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -53,11 +59,11 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return getBalance(dataResult.cpf, dataResult.accountId, this.parm.serviceId);
+                    return updateAccountList(dataResult.cpf, this.parm.serviceId);
                 })
 
-                .then(balance => {
-                    return resolve(this.parm.async ? { success: true } : balance);
+                .then(accounts => {
+                    return resolve(this.parm.async ? { success: true } : accounts);
                 })
 
                 .catch(e => {
@@ -72,7 +78,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../eventBusService').authType;
+    const eebAuthTypes = require('../../eventBusService').authType;
 
     if (!data.cpf) throw new Error('o CPF é obrigatório...');
 

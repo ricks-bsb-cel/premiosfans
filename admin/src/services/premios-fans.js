@@ -111,7 +111,7 @@ const ngModule = angular.module('services.premios-fans', [])
                 if (attrs.blockUi) blockUiFactory.start();
 
                 $http({
-                    url: getUrlEndPoint('/api/eeb/v1/check-one-titulo-compra'),
+                    url: getUrlEndPoint('/api/eeb/v1/check-titulos-compra'),
                     method: 'post',
                     data: attrs.data,
                     headers: {

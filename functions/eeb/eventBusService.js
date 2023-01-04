@@ -7,6 +7,7 @@
 // $env:NODE_OPTIONS = "--openssl-legacy-provider"
 
 const admin = require("firebase-admin");
+const path = require('path');
 
 const initFirebase = require("../initFirebase");
 const { PubSub } = require('@google-cloud/pubsub');
@@ -156,6 +157,15 @@ class eventBusService {
         this.parm.source = this.parm.source || 'run';
     }
 
+    static getMethod(fullFileName) {
+        fullFileName = path.normalize(fullFileName);
+
+        const pos = fullFileName.indexOf('services');
+        const result = fullFileName.substr(pos).replace(/\\/g, '/').replace('.js', '');
+
+        return result;
+    }
+
     getTopic() {
         const i = topicsCache.findIndex(f => { return f.name === this.parm.topic });
 
@@ -281,7 +291,7 @@ class eventBusService {
                     headers: { 'Content-Type': 'text/plain' },
                     httpMethod: 'POST',
                     body: Buffer.from(JSON.stringify(payload)),
-                    url: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/task-receiver/${this.parm.method}`
+                    url: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/task-receiver/${this.parm.name}`
                 },
                 scheduleTime: {
                     seconds: parseInt(this.parm.delay) + Date.now() / 1000

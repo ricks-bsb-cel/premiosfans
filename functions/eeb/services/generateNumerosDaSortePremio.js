@@ -1,7 +1,6 @@
 "use strict";
 
 const admin = require('firebase-admin');
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 
@@ -13,7 +12,6 @@ Esta rotina recebe
     O Código do Premio
     Quantidade de Grupos ~ se não informado 100, começando de 0 (zero)
     Quantidade de Números por Grupo ~ se não informado 1000, começando de 0 (zero)
-
 
     E gera os lotes de números no RealTime Database, em
     /numerosDaSorte/<idCampanha>/<idPremio>
@@ -98,7 +96,7 @@ const createLotes = (qtdGrupos, qtdNumerosPorGrupo) => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }

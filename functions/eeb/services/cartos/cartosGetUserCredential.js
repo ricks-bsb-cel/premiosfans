@@ -2,15 +2,14 @@
 
 const admin = require("firebase-admin");
 
-const path = require('path');
 const Joi = require('joi');
-const global = require('../../global');
-const eebService = require('../eventBusService').abstract;
+const global = require('../../../global');
+const eebService = require('../../eventBusService').abstract;
 
-const serviceUserCredential = require('../../business/serviceUserCredential');
+const serviceUserCredential = require('../../../business/serviceUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
-const firestoreDAL = require('../../api/firestoreDAL');
+const firestoreDAL = require('../../../api/firestoreDAL');
 const collectionCartosAccounts = firestoreDAL.cartosAccounts();
 
 const tokenExpireMinutes = 10;
@@ -181,7 +180,7 @@ async function getCredential(cpf, accountId) {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -218,7 +217,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../eventBusService').authType;
+    const eebAuthTypes = require('../../eventBusService').authType;
 
     if (!data.cpf) throw new Error('o CPF é obrigatório...');
 

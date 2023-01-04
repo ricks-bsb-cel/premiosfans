@@ -1,6 +1,5 @@
 "use strict";
 
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
@@ -11,7 +10,7 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
-const checkTituloCompra = require('./checkTituloCompra');
+const checkTituloCompra = require('./checkTitulosCompra');
 
 const collectionCampanhas = firestoreDAL.campanhas();
 const collectionTituloCompra = firestoreDAL.titulosCompras();
@@ -27,7 +26,7 @@ const parmsSchema = _ => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -61,9 +60,7 @@ class Service extends eebService {
 
                 .then(resultTitulosCompra => {
 
-                    if (resultTitulosCompra.length === 0) {
-                        throw new Error(`Nenhuma compra encontrada para a campanha ${result.data.idCampanha}`);
-                    }
+                    if (resultTitulosCompra.length === 0) throw new Error(`Nenhuma compra encontrada para a campanha ${result.data.idCampanha}`);
 
                     const promise = [];
 

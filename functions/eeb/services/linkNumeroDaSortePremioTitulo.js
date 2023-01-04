@@ -1,7 +1,6 @@
 "use strict";
 
 const admin = require('firebase-admin');
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
@@ -22,7 +21,7 @@ const collectionCampanha = firestoreDAL.campanhas();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 
-const checkTituloCompra = require('./checkTituloCompra');
+const checkTitulosCompra = require('./checkTitulosCompra');
 
 // Receber no parametro um guidTitulo e idInfluencer (obrigatórios)
 // Pesquisar e criar o título se não existir
@@ -145,7 +144,7 @@ const updatePremioTitulo = async (idPremioTitulo, numeroDaSorte) => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -209,13 +208,8 @@ class Service extends eebService {
 
                     // Atualização de Contadores
                     return Promise.all([
-                        admin.firestore().collection('titulos').doc(result.data.premioTitulo.idTitulo).set({
-                            qtdNumerosGerados: FieldValue.increment(1)
-                        }, { merge: true }),
-                        admin.firestore().collection('titulosCompras').doc(result.data.premioTitulo.idTituloCompra).set({
-                            qtdNumerosGerados: FieldValue.increment(1),
-                            qtdTotalProcessosConcluidos: FieldValue.increment(1)
-                        }, { merge: true })
+                        admin.firestore().collection('titulos').doc(result.data.premioTitulo.idTitulo).set({ qtdNumerosGerados: FieldValue.increment(1) }, { merge: true }),
+                        admin.firestore().collection('titulosCompras').doc(result.data.premioTitulo.idTituloCompra).set({ qtdNumerosGerados: FieldValue.increment(1), qtdTotalProcessosConcluidos: FieldValue.increment(1) }, { merge: true })
                     ])
                 })
 
@@ -231,9 +225,7 @@ class Service extends eebService {
 
                     // Tudo foi gerado. Solicita a validação da compra.
                     if (tituloCompra.qtdTotalProcessos === tituloCompra.qtdTotalProcessosConcluidos) {
-                        return checkTituloCompra.call({
-                            idTituloCompra: result.data.premioTitulo.idTituloCompra
-                        });
+                        return checkTitulosCompra.call({ idTituloCompra: result.data.premioTitulo.idTituloCompra });
                     } else {
                         return null;
                     }

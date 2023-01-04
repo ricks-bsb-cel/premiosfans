@@ -25,7 +25,6 @@ const pubSubReceiver = (request, response) => {
         serviceId: attributes.serviceId,
         method: attributes.method,
         messageId: request.body.message.messageId,
-        topic: 'eeb-' + attributes.method,
         source: 'pub-sub'
     };
 
@@ -47,7 +46,7 @@ const pubSubReceiver = (request, response) => {
 
             helper.log('async-run-init', helper.logType.info, { method: parm.method, serviceId: parm.serviceId });
 
-            const req = require(`./services/${attributes.method}`);
+            const req = require(`./${attributes.method}`);
             const service = new req.Service(null, null, parm);
 
             return service.run();

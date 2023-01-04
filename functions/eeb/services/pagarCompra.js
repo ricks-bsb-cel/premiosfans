@@ -1,6 +1,5 @@
 "use strict";
 
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 const Joi = require('joi');
@@ -28,7 +27,7 @@ const tituloCompraSchema = _ => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -127,7 +126,7 @@ const call = (data, request, response) => {
         name: 'pagar-compra',
         async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        auth: eebAuthTypes.superUser,
+        auth: eebAuthTypes.internal,
         data: data
     });
 

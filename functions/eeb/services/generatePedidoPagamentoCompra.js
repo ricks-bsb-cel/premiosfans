@@ -1,6 +1,5 @@
 "use strict";
 
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
@@ -13,7 +12,7 @@ const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 
-const cartosGeneratePix = require('./cartosGeneratePix');
+const cartosGeneratePix = require('./cartos/cartosGeneratePix');
 
 const schema = _ => {
     const schema = Joi.object({
@@ -26,7 +25,7 @@ const schema = _ => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }

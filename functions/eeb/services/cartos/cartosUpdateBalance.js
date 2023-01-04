@@ -1,18 +1,17 @@
 "use strict";
 
-const path = require('path');
 const Joi = require('joi');
-const eebService = require('../eventBusService').abstract;
-const global = require('../../global');
+const eebService = require('../../eventBusService').abstract;
+const global = require('../../../global');
 
 const userCredentials = require('./cartosGetUserCredential');
 const cartosHttpRequest = require('./cartosHttpRequests');
 
-const firestoreDAL = require('../../api/firestoreDAL');
-const collectionCartosPixKeys = firestoreDAL.cartosPixKeys();
+const firestoreDAL = require('../../../api/firestoreDAL');
+const collectionCartosBalance = firestoreDAL.cartosBalance();
 
 /*
-    Busca as chaves PIX da conta na Cartos e atualiza a collection cartosAccountsPixKeys
+    Busca o Balance da conta na Cartos e atualiza a collection cartosBalance
 */
 
 const schema = _ => {
@@ -24,32 +23,25 @@ const schema = _ => {
     return schema;
 }
 
-async function getPixKeys(cpf, accountId, serviceId) {
+async function getBalance(cpf, accountId, serviceId) {
     const credential = await userCredentials.getCredential(cpf, accountId);
-    const pixKeys = await cartosHttpRequest.pixKeys(credential.token);
+    const balance = await cartosHttpRequest.balance(credential.token);
 
-    if (Array.isArray(pixKeys) && pixKeys.length) {
-        const promise = [];
+    balance.cpf = cpf;
+    balance.accountId = accountId;
+    balance.serviceId = serviceId;
 
-        pixKeys.forEach(row => {
-            row.cpf = cpf;
-            row.serviceId = serviceId;
+    global.setDateTime(balance, 'dtAtualizacao');
 
-            global.setDateTime(row, 'dtAtualizacao');
+    await collectionCartosBalance.set(balance.accountId, balance);
 
-            promise.push(collectionCartosPixKeys.set(row.key, row));
-        })
-
-        await Promise.all(promise);
-    }
-
-    return pixKeys;
+    return balance;
 }
 
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -60,7 +52,7 @@ class Service extends eebService {
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return getPixKeys(dataResult.cpf, dataResult.accountId, this.parm.serviceId);
+                    return getBalance(dataResult.cpf, dataResult.accountId, this.parm.serviceId);
                 })
 
                 .then(balance => {
@@ -79,7 +71,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../eventBusService').authType;
+    const eebAuthTypes = require('../../eventBusService').authType;
 
     if (!data.cpf) throw new Error('o CPF é obrigatório...');
 
