@@ -90,13 +90,7 @@ class Service extends eebService {
                     promise = [];
 
                     result.data.titulos.forEach(p => {
-                        promise.push(
-                            pagarTitulo.call(
-                                {
-                                    "idTitulo": p.id
-                                }
-                            )
-                        );
+                        promise.push(pagarTitulo.call({ "idTitulo": p.id }));
                     });
 
                     return Promise.all(promise);
