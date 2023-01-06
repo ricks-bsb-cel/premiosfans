@@ -11,12 +11,14 @@ const firestoreDAL = require('../../../api/firestoreDAL');
 const collectionCartosPix = firestoreDAL.cartosPix();
 const collectionTituloCompra = firestoreDAL.titulosCompras();
 
+const acompanhamentoTituloCompra = require('../acompanhamentoTituloCompra');
+
 /*
     Cria um PIX para pagamento e o salva na collection cartosPix
 */
 
 const schema = _ => {
-    const schema = Joi.object({
+    return Joi.object({
         cpf: Joi.string().length(11).required(),
         accountId: Joi.string().required(),
         type: Joi.string().valid('STATIC', 'DYNAMIC').required(),
@@ -32,8 +34,6 @@ const schema = _ => {
         user_uid: Joi.string().min(1).max(128).optional(),
         idTituloCompra: Joi.string().token().min(18).max(22).optional()
     });
-
-    return schema;
 }
 
 async function generatePix(data, serviceId) {
@@ -50,12 +50,14 @@ async function generatePix(data, serviceId) {
 
     // Salva os dados na Collection PIX
     await collectionCartosPix.add(pix)
+    await acompanhamentoTituloCompra.setPixData(data.idTituloCompra, pix);
 
     // Se existir idTituloCompra
     if (data.idTituloCompra) {
         const tituloCompra = await collectionTituloCompra.getDoc(data.idTituloCompra);
+
         if (tituloCompra) {
-            collectionTituloCompra.merge(tituloCompra.id, { pix: pix });
+            await collectionTituloCompra.merge(tituloCompra.id, { pix: pix });
         }
     }
 

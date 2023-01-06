@@ -235,92 +235,6 @@ angular.module('app', [])
 
     })
 
-    /*
-    .factory('observeTitulosCompras', function (init, $timeout) {
-        const refreshTimeoutDelay = 1000;
-
-        let
-            initiated = false,
-            unsubscribeSnapshot = null,
-            docs = [],
-            refreshTimeout = null,
-            listeners = [];
-
-        const initSnapshot = _ => {
-            if (initiated) {
-                callListeners();
-                return;
-            }
-
-            init.ready().then(app => {
-                if (initiated) return;
-
-                const user = init.getCurrentUser();
-                if (!user) return;
-
-                initiated = true;
-
-                let
-                    db = getFirestore(app),
-                    q = collection(db, "titulosCompras");
-
-                q = query(q, where("idCampanha", "==", _idCampanha));
-                q = query(q, where("uidComprador", "==", user.uid));
-
-                console.info('onSnapshot titulosCompra', _idCampanha, user.uid);
-
-                if (unsubscribeSnapshot) unsubscribeSnapshot();
-
-                unsubscribeSnapshot = onSnapshot(q, querySnapshot => {
-                    querySnapshot.docChanges().forEach(change => {
-                        const doc = angular.merge(change.doc.data(), { id: change.doc.id });
-
-                        if (change.type === 'removed') {
-                            docs = docs.filter(f => { return f.id !== doc.id; });
-                        } else {
-                            const pos = docs.findIndex(f => { return f.id === doc.id; });
-                            if (pos < 0) {
-                                docs.push(doc);
-                            } else {
-                                docs[pos] = doc;
-                            }
-                        }
-                    })
-
-                    if (refreshTimeout) $timeout.cancel(refreshTimeout);
-                    refreshTimeout = $timeout(_ => { callListeners(); }, refreshTimeoutDelay);
-                })
-            })
-        }
-
-        const callListeners = _ => {
-            listeners.forEach(l => {
-                l.f(docs);
-            })
-        }
-
-        const registerListener = parm => {
-            if (typeof parm !== 'object' || typeof parm.id !== 'string' || typeof parm.f !== 'function') {
-                throw new Error('observeTitulosCompras registerListener invalid call');
-            }
-
-            if (listeners.findIndex(f => { return f.id === parm.id }) >= 0) return;
-
-            listeners.push(parm);
-
-            initSnapshot();
-        }
-
-        initSnapshot();
-
-        return {
-            registerListener: registerListener,
-            initSnapshot: initSnapshot
-        }
-
-    })
-    */
-
     .factory('httpCalls', function ($http, $q, global, init) {
         const auth = getAuth();
 
@@ -362,9 +276,7 @@ angular.module('app', [])
                             url: getUrlEndPoint('/api/eeb/v1/generate-compra?async=false'),
                             method: 'post',
                             data: data,
-                            headers: {
-                                'Authorization': 'Bearer ' + token
-                            }
+                            headers: { 'Authorization': 'Bearer ' + token }
                         })
 
                     })
@@ -492,9 +404,10 @@ angular.module('app', [])
                     };
 
                     Swal.fire({
-                        title: 'Verifique seu dados antes de prosseguir',
-                        icon: 'question',
+                        title: 'Atenção!',
+                        icon: 'info',
                         html: `
+                            <small style="display:block;margin-bottom:20px;">Verifique se os seus dados estão corretos antes de prosseguir com a compra</small>
                             <h4 class="m-5">${$scope.compra.nome}</h4>
                             <p class="m-5">${$scope.compra.email}</p>
                             <p class="m-5"><small>Celular: </small>${$scope.compra.celular}</p>
@@ -503,7 +416,7 @@ angular.module('app', [])
                         timer: 0,
                         showCancelButton: true,
                         focusConfirm: true,
-                        confirmButtonText: `Comprar ${$scope.compra.qtdTitulos} títulos`,
+                        confirmButtonText: `Comprar ${$scope.compra.qtdTitulos} título${$scope.compra.qtdTitulos > 1 ? 's' : ''}s`,
                         cancelButtonText: 'Corrigir',
                         allowOutsideClick: false,
                         preConfirm: _ => {
@@ -518,10 +431,11 @@ angular.module('app', [])
 
                             httpCalls.generateCompra($scope.compra)
                                 .then(response => {
-
                                     if (response.data.code !== 200) throw new Error('Erro solicitando compra');
 
                                     idTituloCompra = response.data.result.data.compra.id;
+
+                                    // Depois que a compra está gerada, o backend cria um PIX e cola no documento
 
                                     Swal.update({
                                         title: 'Preparando PIX',
@@ -538,15 +452,18 @@ angular.module('app', [])
                                     const db = getFirestore(app);
                                     const docRef = doc(db, "titulosCompras", idTituloCompra);
 
+                                    // Vigia as alterações no documento, aguardando a presença do PIX
                                     unsubscribeSnapshot = onSnapshot(docRef, docSnapshot => {
                                         docSnapshot = docSnapshot.data();
 
                                         if (docSnapshot.pix) {
+                                            // o PIX foi criado para a Compra
+
                                             unsubscribeSnapshot(); // Remove o Listenner
 
-                                            Swal.close();
-                                            pagarCompraFactory.delegate.show(docSnapshot);
-                                            comprasClienteFactory.delegate.loadComprasClientes(idTituloCompra);
+                                            Swal.close(); // Fecha o SweatAlert
+                                            pagarCompraFactory.delegate.show(docSnapshot); // Exibe os dados do PIX para pagamento
+                                            comprasClienteFactory.delegate.loadComprasClientes(idTituloCompra); // Rola a tela até a nova compra
                                         }
                                     })
 
@@ -649,14 +566,26 @@ angular.module('app', [])
                     });
                 }
 
+                const startCheckTitulosCompras = _ => {
+                    // "Vigia" a compra aguardando o seu pagamento.
+                    // Quando um pagamento é feito, as atualizações são lançados no RTDB (pois o Firestore está ocupado criando montes de coisas!)
+                    // Caminho: /titulosCompras/<id>/data
+
+                    return null;
+                }
+
                 $scope.initDelegates = e => {
                     element = e;
 
                     pagarCompraFactory.delegate = {
                         show: compra => {
+                            // Exibição de dados de uma compra, com ou sem pagamento
                             $scope.compra = { ...compra };
                             $scope.visible = true;
 
+                            startCheckTitulosCompras()
+
+                            // Exibe o PIX, copia e cola, etc...
                             modal.open("pagar-compra");
                         }
                     }

@@ -20,6 +20,7 @@ const collectionTitulos = firestoreDAL.titulos();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
 const linkNumeroDaSorte = require('./linkNumeroDaSortePremioTitulo');
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 
 /*
     generatePremioTitulo
@@ -152,6 +153,9 @@ class Service extends eebService {
                 .then(_ => {
                     result.data = { tituloPremio: result.data.tituloPremio };
 
+                    return acompanhamentoTituloCompra.incrementProcessosConcluidos(result.data.tituloPremio.idTituloCompra);
+                })
+                .then(_ => {
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 

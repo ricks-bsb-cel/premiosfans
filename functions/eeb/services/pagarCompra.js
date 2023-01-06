@@ -16,6 +16,8 @@ const pagarTitulo = require('./pagarTitulo');
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 const collectionTitulos = firestoreDAL.titulos();
 
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
+
 const tituloCompraSchema = _ => {
     const schema = Joi.object({
         idTituloCompra: Joi.string().token().min(18).max(22).required()
@@ -87,7 +89,9 @@ class Service extends eebService {
                 .then(_ => {
 
                     // Solicita o pagamento de cada um dos Títulos (que vai solicitar a geração dos números)
-                    promise = [];
+                    promise = [
+                        acompanhamentoTituloCompra.setPago(result.data.tituloCompra.id)
+                    ];
 
                     result.data.titulos.forEach(p => {
                         promise.push(pagarTitulo.call({ "idTitulo": p.id }));

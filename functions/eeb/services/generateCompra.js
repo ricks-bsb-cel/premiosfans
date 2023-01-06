@@ -19,6 +19,7 @@ const collectionTitulos = firestoreDAL.titulos();
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 
 const generatePedidoPagamentoCompra = require('./generatePedidoPagamentoCompra');
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 
 /*
     generateTitulo
@@ -31,8 +32,8 @@ const generatePedidoPagamentoCompra = require('./generatePedidoPagamentoCompra')
     * Lembre-se! Cada vez que esta rotina é executada um novo títuo é gerado!
 */
 
-const clienteSchema = _ => {
-    const schema = Joi.object({
+const schema = _ => {
+    return Joi.object({
         idCampanha: Joi.string().token().min(18).max(22).required(),
         idInfluencer: Joi.string().token().min(18).max(22).required(),
         nome: Joi.string().min(6).max(120).required(), // O nome do Cliente
@@ -41,8 +42,6 @@ const clienteSchema = _ => {
         cpf: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(), // O CPF do Cliente (apenas números)
         qtdTitulos: Joi.number().min(1).max(6).required() // A quantidade de títulos que o cliente deseja
     });
-
-    return schema;
 }
 
 const sanitizeData = data => {
@@ -84,7 +83,7 @@ class Service extends eebService {
                 data: {}
             };
 
-            return clienteSchema().validateAsync(this.parm.data)
+            return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
                     result.data.titulo = sanitizeData(dataResult);
@@ -180,6 +179,7 @@ class Service extends eebService {
                 .then(resultTituloCompra => {
                     result.data.compra = resultTituloCompra;
 
+                    // Dados dos Títulos
                     result.data.titulo.qtdPremios = result.data.campanhaPremios.length;
                     result.data.titulo.qtdNumerosDaSortePorTitulo = result.data.campanha.qtdNumerosDaSortePorTitulo;
                     result.data.titulo.campanhaNome = result.data.campanha.titulo;
@@ -199,19 +199,18 @@ class Service extends eebService {
                     const promise = [];
 
                     for (let i = 0; i < result.qtdTitulos; i++) {
-                        const t = {
-                            guidTitulo: global.guid()
-                        }
+                        const t = { guidTitulo: global.guid() }
 
                         global.setDateTime(t, 'dtInclusao');
 
-                        promise.push(
-                            collectionTitulos.add({
-                                ...result.data.titulo,
-                                ...t
-                            })
-                        )
+                        promise.push(collectionTitulos.add({ ...result.data.titulo, ...t }))
                     }
+
+                    // Inicializa o controle de acompanhamento da Compra
+                    promise.push(acompanhamentoTituloCompra.initAcompanhamento(
+                        result.data.compra.id,
+                        result.data.compra.qtdTotalProcessos
+                    ));
 
                     return Promise.all(promise);
                 })
@@ -232,9 +231,7 @@ class Service extends eebService {
 
                     // Retornando só o que interessa
                     result.data = {
-                        compra: {
-                            id: result.data.compra.id
-                        },
+                        compra: { id: result.data.compra.id },
                         pedidoPagamento: result.data.pedidoPagamento
                     };
 

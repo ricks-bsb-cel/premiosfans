@@ -5,6 +5,8 @@ const global = require("../../global");
 const Joi = require('joi');
 
 /*
+Esta rotina verifica todos os títulos de uma compra
+---------------------------------------------------
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
@@ -21,51 +23,46 @@ const collectionTituloCompra = firestoreDAL.titulosCompras();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 
 const sendEmailTitulo = require('./sendEmailTitulo');
-
 const dashboardData = require('./generateDashboardData');
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 
 const schema = _ => {
-    const schema = Joi.object({
+    return Joi.object({
         idTituloCompra: Joi.string().token().min(18).max(22).required()
     });
-
-    return schema;
 }
 
-const checkNumeroTituloPremio = (idCampanha, idTitulo, idPremio, idTituloPremio, numero) => {
-    return new Promise((resolve, reject) => {
+async function checkNumeroTituloPremio(idCampanha, idTitulo, idPremio, idTituloPremio, numero) {
 
-        // Procura outros premios com o mesmo número da sorte
-        return collectionTitulosPremios.get({
-            filter: [
-                { field: "idCampanha", condition: "==", value: idCampanha },
-                { field: "idPremio", condition: "==", value: idPremio },
-                { field: "numerosDaSorte", condition: "array-contains", value: numero }
-            ]
-        })
-            .then(resultTitulosPremios => {
+    // Procura outros premios com o mesmo número da sorte
+    let resultTitulosPremios = await collectionTitulosPremios.get({
+        filter: [
+            { field: "idCampanha", condition: "==", value: idCampanha },
+            { field: "idPremio", condition: "==", value: idPremio },
+            { field: "numerosDaSorte", condition: "array-contains", value: numero }
+        ]
+    });
 
-                // Remove o premio do próprio título
-                resultTitulosPremios = resultTitulosPremios.filter(f => {
-                    return f.id !== idTituloPremio;
-                });
+    // Incrementa a validação
+    await acompanhamentoTituloCompra.incrementValidacao(
+        resultTitulosPremios.idTituloCompra,
+        resultTitulosPremios.length > 0
+    );
 
-                return resolve({
-                    error: resultTitulosPremios.length > 0,
-                    idPremio: idPremio,
-                    idTitulo: idTitulo,
-                    idTituloPremio: idTituloPremio,
-                    numero: numero,
-                    conflitos: resultTitulosPremios
-                })
-            })
+    // Remove o premio do próprio título
+    resultTitulosPremios = resultTitulosPremios.filter(f => {
+        return f.id !== idTituloPremio;
+    });
 
-            .catch(e => {
-                console.error(e);
+    return resolve({
+        error: resultTitulosPremios.length > 0,
+        idPremio: idPremio,
+        idTitulo: idTitulo,
+        idTituloPremio: idTituloPremio,
+        numero: numero,
+        conflitos: resultTitulosPremios
+    });
 
-                return reject(e);
-            })
-    })
 }
 
 class Service extends eebService {
@@ -98,6 +95,8 @@ class Service extends eebService {
 
                 result.data.qtdErrors = result.data.errors.length;
             };
+
+            let promiseCheckNumeros = [];
 
             return schema().validateAsync(this.parm.data)
 
@@ -137,7 +136,7 @@ class Service extends eebService {
 
                     // Quantidade de títulos gerados coincide com o pedido na compra?
                     if (result.data.tituloCompra.qtdTitulosCompra !== result.data.titulos.length) {
-                        addError(`titulos`, `A quantidade de títulos solicitada na compra [${result.data.tituloCompra.qtdTitulosCompra}] não coincide com o total de títulos [${result.data.titulos.length}]`)
+                        addError(`titulos`, `A quantidade de títulos solicitada na compra [${result.data.tituloCompra.qtdTitulosCompra}] não coincide com o total de títulos [${result.data.titulos.length}]`);
                     }
 
                     return Promise.all([
@@ -171,7 +170,7 @@ class Service extends eebService {
                         addError(`campanha`, `A quantidade de premios informado na campanha [${result.data.campanha.qtdPremios}] não coincide com a quantidade de prêmios existente [${qtdPremios}]`);
                     }
 
-                    // Verifica cada um dos títulos envolvidos na Compra
+                    // Verifica cada um dos títulos envolvidos na Compra (não verifica os números gerados)
                     result.data.titulos.forEach(t => {
                         // Total de premios lançado para o título
                         const qtdPremiosTitulo = result.data.titulosPremios.filter(f => { return f.idTitulo === t.id; }).length;
@@ -192,7 +191,7 @@ class Service extends eebService {
                         }
                     })
 
-                    const promiseCheckNumeros = [];
+                    promiseCheckNumeros = [];
 
                     result.data.titulosPremios.forEach(p => {
                         // Quantidade de números da sorte do premio do título tem que coincidir com o informado na campanha
@@ -206,6 +205,10 @@ class Service extends eebService {
                         })
                     })
 
+                    return acompanhamentoTituloCompra.setValidacaoEmAndamento(result.data.tituloCompra.id, promiseCheckNumeros.length);
+                })
+
+                .then(_ => {
                     return Promise.all(promiseCheckNumeros);
                 })
 

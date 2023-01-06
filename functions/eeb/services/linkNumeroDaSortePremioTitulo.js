@@ -22,6 +22,7 @@ const collectionTitulosPremios = firestoreDAL.titulosPremios();
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 
 const checkTitulosCompra = require('./checkTitulosCompra');
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 
 // Receber no parametro um guidTitulo e idInfluencer (obrigatórios)
 // Pesquisar e criar o título se não existir
@@ -209,7 +210,11 @@ class Service extends eebService {
                     // Atualização de Contadores
                     return Promise.all([
                         admin.firestore().collection('titulos').doc(result.data.premioTitulo.idTitulo).set({ qtdNumerosGerados: FieldValue.increment(1) }, { merge: true }),
-                        admin.firestore().collection('titulosCompras').doc(result.data.premioTitulo.idTituloCompra).set({ qtdNumerosGerados: FieldValue.increment(1), qtdTotalProcessosConcluidos: FieldValue.increment(1) }, { merge: true })
+                        admin.firestore().collection('titulosCompras').doc(result.data.premioTitulo.idTituloCompra).set({
+                            qtdNumerosGerados: FieldValue.increment(1),
+                            qtdTotalProcessosConcluidos: FieldValue.increment(1)
+                        }, { merge: true }),
+                        acompanhamentoTituloCompra.incrementProcessosConcluidos(result.data.premioTitulo.idTituloCompra)
                     ])
                 })
 
