@@ -25,6 +25,8 @@ const getById = idTitulo => {
                     premios = promiseResult[1];
 
                 const result = {
+                    idTituloCompra: titulo.idTituloCompra,
+                    idTitulo: titulo.id,
                     idCampanha: titulo.idCampanha,
                     campanhaNome: titulo.campanhaNome,
                     vlTitulo: titulo.campanhaVlTitulo,

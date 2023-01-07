@@ -1373,11 +1373,13 @@ exports.config = {
     }
 }
 
-
 exports.now = _ => {
     return Timestamp.now();
 }
 
+exports.nowTimestamp = _ => {
+    return Timestamp.now();
+}
 
 exports.nowMilliseconds = (addValue, addType) => {
     const hoje = moment(Timestamp.now().toDate());
@@ -1389,6 +1391,11 @@ exports.nowMilliseconds = (addValue, addType) => {
     return hoje.valueOf();
 }
 
+exports.nowDateTime = _ => {
+    const hoje = moment(Timestamp.now().toDate());
+
+    return hoje.format('YYYY-MM-DD HH:mm:ss');
+}
 
 exports.guid = _ => {
     let d = new Date().getTime(); // Timestamp

@@ -32,7 +32,7 @@ const schema = _ => {
     });
 }
 
-async function checkNumeroTituloPremio(idCampanha, idTitulo, idPremio, idTituloPremio, numero) {
+async function checkNumeroTituloPremio(idTituloCompra, idCampanha, idTitulo, idPremio, idTituloPremio, numero) {
 
     // Procura outros premios com o mesmo número da sorte
     let resultTitulosPremios = await collectionTitulosPremios.get({
@@ -43,25 +43,22 @@ async function checkNumeroTituloPremio(idCampanha, idTitulo, idPremio, idTituloP
         ]
     });
 
-    // Incrementa a validação
-    await acompanhamentoTituloCompra.incrementValidacao(
-        resultTitulosPremios.idTituloCompra,
-        resultTitulosPremios.length > 0
-    );
-
     // Remove o premio do próprio título
     resultTitulosPremios = resultTitulosPremios.filter(f => {
         return f.id !== idTituloPremio;
     });
 
-    return resolve({
+    // Incrementa a validação
+    await acompanhamentoTituloCompra.incrementValidacao(idTituloCompra, resultTitulosPremios.length > 0);
+
+    return {
         error: resultTitulosPremios.length > 0,
         idPremio: idPremio,
         idTitulo: idTitulo,
         idTituloPremio: idTituloPremio,
         numero: numero,
         conflitos: resultTitulosPremios
-    });
+    };
 
 }
 
@@ -201,7 +198,7 @@ class Service extends eebService {
 
                         // Verifica os números da sorte (descobre se já não existe em qualquer outro título)
                         p.numerosDaSorte.forEach(n => {
-                            promiseCheckNumeros.push(checkNumeroTituloPremio(p.idCampanha, p.idTitulo, p.idPremio, p.id, n));
+                            promiseCheckNumeros.push(checkNumeroTituloPremio(result.data.tituloCompra.id, p.idCampanha, p.idTitulo, p.idPremio, p.id, n));
                         })
                     })
 

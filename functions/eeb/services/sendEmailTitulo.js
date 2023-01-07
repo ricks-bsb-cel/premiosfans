@@ -12,6 +12,7 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
 const buTitulo = require('../../business/titulo');
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 
 const schema = _ => {
     const schema = Joi.object({
@@ -39,6 +40,8 @@ class Service extends eebService {
                 host: this.parm.host
             };
 
+            let parm;
+
             return schema().validateAsync(this.parm.data)
                 .then(dataResult => {
                     result.data = dataResult;
@@ -50,17 +53,13 @@ class Service extends eebService {
                     result.titulo = buTituloResult;
                     result.email = buTituloResult.email;
 
-                    if (result.data.showDataOnly) {
-                        return {
-                            message: "ignored"
-                        };
-                    }
+                    if (result.data.showDataOnly) return { message: "ignored" };
 
                     const sgMail = require('@sendgrid/mail');
 
                     sgMail.setApiKey(sendGridKey);
 
-                    const parm = {
+                    parm = {
                         from: {
                             email: 'nao-responda@premios.fans',
                             name: 'Premios.Fans'
@@ -72,9 +71,12 @@ class Service extends eebService {
                                     name: buTituloResult.nome
                                 }
                             ],
-                            dynamic_template_data: buTituloResult
+                            dynamic_template_data: buTituloResult,
+                            subject: '%F0%9F%92%B0 Seus Números da Sorte ~ Certificado ' + result.titulo.idTitulo,
+                            substitutions: {
+                                subject: '%F0%9F%92%B0 Seus Números da Sorte ~ Certificado ' + result.titulo.idTitulo
+                            }
                         }],
-                        subject: 'Seus Números da Sorte ~ Certificado ' + buTituloResult.id,
                         template_id: templateId
                     };
 
@@ -84,6 +86,22 @@ class Service extends eebService {
                 .then(sendResult => {
                     result.sendResult = sendResult;
 
+                    sendResult.forEach(s => {
+                        if (s) {
+                            return acompanhamentoTituloCompra.setEmailEnviado(
+                                result.titulo.idTituloCompra,
+                                result.titulo.idTitulo,
+                                {
+                                    payload: parm,
+                                    result: s.headers
+                                }
+                            );
+                        }
+                    })
+
+                })
+
+                .then(_ => {
                     return resolve(this.parm.async ? { success: true, email: result.email } : result);
                 })
 

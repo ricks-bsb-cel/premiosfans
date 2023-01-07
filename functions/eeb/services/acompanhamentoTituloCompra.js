@@ -19,12 +19,11 @@ async function initAcompanhamento(idTituloCompra, qtdTotalProcessos) {
             validacaoTotal: 0,
             validacaoTotalConcluidos: 0,
             validacaoTotalComErro: 0,
-            emailEnviado: false,
+            emailEnviadoQtd: 0,
             qtdTotalProcessos: qtdTotalProcessos,
-            qtdTotalProcessosConcluidos: 0
+            qtdTotalProcessosConcluidos: 0,
+            dtInclusao: global.nowDateTime()
         };
-
-    global.setDateTime(toAdd, 'dtInclusao');
 
     return await ref.set(toAdd);
 }
@@ -51,8 +50,7 @@ async function setPixData(idTituloCompra, pixData) {
         if (!data || typeof data !== 'object') return null;
 
         data.pixData = pixData;
-
-        global.setDateTime(data, 'pixData_criacao');
+        data.pixDataDtCriacao = global.nowDateTime();
 
         return data;
     });
@@ -67,8 +65,27 @@ async function setPago(idTituloCompra) {
         if (!data || typeof data !== 'object') return null;
 
         data.situacao = 'pago';
+        data.dtPagamento = global.nowDateTime();
 
-        global.setDateTime(data, 'dtPagamento');
+        return data;
+    });
+}
+
+async function setEmailEnviado(idTituloCompra, idTitulo, sendResult) {
+    const
+        path = getPath(idTituloCompra),
+        ref = admin.database().ref(path);
+
+    return ref.transaction(data => {
+        if (!data || typeof data !== 'object') return null;
+
+        data.emailEnviadoQtd++;
+        data.emailEnviado = data.emailEnviado || {};
+
+        data.emailEnviado[idTitulo] = {
+            dtEnvio: global.nowDateTime(),
+            sendResult: sendResult
+        };
 
         return data;
     });
@@ -84,8 +101,7 @@ async function setValidacaoEmAndamento(idTituloCompra, qtdProcessos) {
 
         data.validacaoIniciada = true;
         data.validacaoTotal = qtdProcessos;
-
-        global.setDateTime(data, 'validacaoDtInicio');
+        data.validacaoDtInicio = global.nowDateTime();
 
         return data;
     });
@@ -105,12 +121,17 @@ async function incrementValidacao(idTituloCompra, erro) {
 
         if (erro) data.validacaoTotalComErro++;
 
-        if (data.validacaoConcluida) global.setDateTime(data, 'validacaoDtFinal');
+        if (data.validacaoConcluida) {
+            data.validacaoDtFinal = global.nowDateTime();
+            data.pronto = data.validacaoTotalComErro === 0; // Só está pronto se não tem erros...
+
+            // Quer notificar a equipe se deu merda? Coloca aqui!
+
+        }
 
         return data;
     });
 }
-
 
 exports.initAcompanhamento = initAcompanhamento;
 exports.incrementProcessosConcluidos = incrementProcessosConcluidos;
@@ -118,3 +139,4 @@ exports.setPixData = setPixData;
 exports.setPago = setPago;
 exports.setValidacaoEmAndamento = setValidacaoEmAndamento;
 exports.incrementValidacao = incrementValidacao;
+exports.setEmailEnviado = setEmailEnviado;
