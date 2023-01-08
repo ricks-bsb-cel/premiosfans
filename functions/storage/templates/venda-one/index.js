@@ -3,7 +3,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
 import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-messaging.js";
-import { getFirestore, collection, query, where, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
+// import { getFirestore, collection, query, where, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
+import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
@@ -67,7 +68,9 @@ angular.module('app', [])
         let app = null,
             token = null,
             isReady = false,
-            messaging = null;
+            messaging = null,
+            TitulosComprasUsuario = [],
+            observerTitulosComprasUsuario = {};
 
         const init = _ => {
             app = initializeApp(firebaseConfig);
@@ -134,6 +137,8 @@ angular.module('app', [])
 
             setCookie(token);
             checkTokenChange();
+
+            initQueryTitulosComprasCliente();
         }
 
         const stateChanged = _ => {
@@ -170,6 +175,7 @@ angular.module('app', [])
             })
         }
 
+        /*
         const queryTitulosComprasCliente = _ => {
             return $q((resolve, reject) => {
                 ready()
@@ -191,6 +197,7 @@ angular.module('app', [])
                     })
             })
         }
+
 
         const getComprasCliente = _ => {
             return $q((resolve, reject) => {
@@ -221,6 +228,46 @@ angular.module('app', [])
                     })
             })
         }
+        */
+
+        const watchTituloCompraUsuario = (idTituloCompra, callback) => {
+            observerTitulosComprasUsuario[idTituloCompra] = {
+                f: callback
+            };
+        }
+
+        const unwatchTituloCompraUsuario = idTituloCompra => {
+            delete observerTitulosComprasUsuario[idTituloCompra];
+        }
+
+        const initQueryTitulosComprasCliente = _ => {
+            const
+                db = getDatabase(),
+                user = getCurrentUser(),
+                uid = user.uid,
+                refPath = ref(db, `titulosCompras/${_idCampanha}/${uid}`);
+
+            onValue(refPath, snapshot => {
+                snapshot = snapshot.val();
+
+                Object.keys(snapshot).forEach(idTituloCompra => {
+                    const tituloCompra = Object.assign(snapshot[idTituloCompra], { id: idTituloCompra });
+                    const pos = TitulosComprasUsuario.findIndex(f => { return f.id === idTituloCompra; });
+
+                    $timeout(_ => {
+                        if (pos < 0) {
+                            TitulosComprasUsuario.push(tituloCompra);
+                        } else {
+                            TitulosComprasUsuario[pos] = tituloCompra;
+                        }
+                    });
+
+                    if (observerTitulosComprasUsuario[idTituloCompra]) observerTitulosComprasUsuario[idTituloCompra].f(tituloCompra);
+                })
+
+                console.info(TitulosComprasUsuario);
+            });
+        }
 
         return {
             app: app,
@@ -229,8 +276,9 @@ angular.module('app', [])
             ready: ready,
             signIn: signIn,
             initMessaging: initMessaging,
-            getComprasCliente: getComprasCliente,
-            queryTitulosComprasCliente: queryTitulosComprasCliente
+            TitulosComprasUsuario: TitulosComprasUsuario,
+            watchTituloCompraUsuario: watchTituloCompraUsuario,
+            unwatchTituloCompraUsuario: unwatchTituloCompraUsuario
         }
 
     })
@@ -306,53 +354,22 @@ angular.module('app', [])
     .factory('comprasClienteFactory', function () {
         let delegate = {};
 
-        return {
-            delegate: delegate
-        };
+        return { delegate: delegate };
     })
     .directive('comprasCliente', function () {
         return {
             restrict: 'E',
             controller: function ($scope, global, init, comprasClienteFactory, pagarCompraFactory, detalhesCompraFactory, $timeout) {
-                $scope.compras = [];
-
-                const addCompra = compra => {
-                    if (Array.isArray(compra)) {
-                        compra.forEach(c => {
-                            addCompra(c);
-                        })
-                        return;
-                    }
-
-                    const pos = $scope.compras.findIndex(f => { f.id === compra.id });
-
-                    if (pos >= 0) {
-                        $scope.compras[pos] = compra;
-                    } else {
-                        $scope.compras.push(compra);
-                    }
-                }
+                $scope.compras = init.TitulosComprasUsuario;
 
                 const scrollToCompra = idCompra => {
                     $timeout(_ => {
                         global.scrollToId(`titulo-compra-${idCompra}`);
-                    })
-                }
-
-                const loadComprasClientes = idCompra => {
-                    init.getComprasCliente()
-                        .then(compras => {
-                            addCompra(compras);
-
-                            if (idCompra) scrollToCompra(idCompra);
-                        })
-                        .catch(e => {
-                            console.error(e);
-                        })
+                    }, 1000)
                 }
 
                 comprasClienteFactory.delegate = {
-                    loadComprasClientes: loadComprasClientes
+                    scrollToCompra: scrollToCompra
                 }
 
                 $scope.pagar = tituloCompra => {
@@ -362,8 +379,6 @@ angular.module('app', [])
                 $scope.detalhes = tituloCompra => {
                     detalhesCompraFactory.delegate.show(tituloCompra);
                 }
-
-                loadComprasClientes();
             },
             templateUrl: 'compras-cliente.htm'
         };
@@ -380,10 +395,9 @@ angular.module('app', [])
     .directive('formCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, init, global, formClienteFactory, httpCalls, pagarCompraFactory, comprasClienteFactory) {
+            controller: function ($scope, init, global, formClienteFactory, httpCalls, comprasClienteFactory, pagarCompraFactory) {
                 let element = null,
-                    idTituloCompra,
-                    unsubscribeSnapshot;
+                    idTituloCompra;
 
                 $scope.compra = {};
 
@@ -403,8 +417,16 @@ angular.module('app', [])
                         qtdTitulos: qtdTitulos || 1
                     };
 
+                    const tituloCompraChanged = tituloCompra => {
+                        if (tituloCompra.pixData) {
+                            init.unwatchTituloCompraUsuario(tituloCompra.id);
+                            Swal.close();
+                            pagarCompraFactory.delegate.show(tituloCompra);
+                        }
+                    }
+
                     Swal.fire({
-                        title: 'Atenção!',
+                        title: 'Confirme seus dados',
                         icon: 'info',
                         html: `
                             <small style="display:block;margin-bottom:20px;">Verifique se os seus dados estão corretos antes de prosseguir com a compra</small>
@@ -435,8 +457,6 @@ angular.module('app', [])
 
                                     idTituloCompra = response.data.result.data.compra.id;
 
-                                    // Depois que a compra está gerada, o backend cria um PIX e cola no documento
-
                                     Swal.update({
                                         title: 'Preparando PIX',
                                         html: `<img src="/assets/imgs/wait.svg" /><p>Um momento. Seu PIX exclusivo para pagamento está sendo gerado...</p>`,
@@ -445,28 +465,8 @@ angular.module('app', [])
                                         showConfirmButton: false
                                     });
 
-                                    // Aguarda o PIX estar pronto
-                                    return init.ready();
-                                })
-                                .then(app => {
-                                    const db = getFirestore(app);
-                                    const docRef = doc(db, "titulosCompras", idTituloCompra);
-
-                                    // Vigia as alterações no documento, aguardando a presença do PIX
-                                    unsubscribeSnapshot = onSnapshot(docRef, docSnapshot => {
-                                        docSnapshot = docSnapshot.data();
-
-                                        if (docSnapshot.pix) {
-                                            // o PIX foi criado para a Compra
-
-                                            unsubscribeSnapshot(); // Remove o Listenner
-
-                                            Swal.close(); // Fecha o SweatAlert
-                                            pagarCompraFactory.delegate.show(docSnapshot); // Exibe os dados do PIX para pagamento
-                                            comprasClienteFactory.delegate.loadComprasClientes(idTituloCompra); // Rola a tela até a nova compra
-                                        }
-                                    })
-
+                                    comprasClienteFactory.delegate.scrollToCompra(idTituloCompra);
+                                    init.watchTituloCompraUsuario(idTituloCompra, tituloCompraChanged);
                                 })
                                 .catch(e => {
                                     console.error(e);
@@ -479,7 +479,8 @@ angular.module('app', [])
                 }
 
                 const initMasks = _ => {
-                    const eCpf = element.find('input[name="cpf"]'),
+                    const
+                        eCpf = element.find('input[name="cpf"]'),
                         eCelular = element.find('input[name="celular"]');
 
                     VMasker(eCpf).maskPattern("999.999.999-99");
@@ -518,16 +519,23 @@ angular.module('app', [])
     .directive('pagarCompra', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, pagarCompraFactory, modal) {
+            controller: function ($scope, init, pagarCompraFactory, modal) {
                 $scope.visible = false;
                 $scope.compra = null;
 
                 let element = null;
 
                 $scope.close = _ => {
+                    init.unwatchTituloCompraUsuario($scope.compra.id);
+
                     modal.close();
+
                     $scope.compra = null;
                     $scope.visible = false;
+                }
+
+                $scope.CopyPixToClipboard = _ => {
+
                 }
 
                 const bindPixCopiaCola = _ => {
@@ -535,12 +543,13 @@ angular.module('app', [])
 
                     e.addEventListener('click', () => {
                         if ('clipboard' in navigator) {
-                            navigator.clipboard.writeText($scope.compra.pix.QRCode.EMV)
+                            navigator.clipboard.writeText($scope.compra.pixData.EMV)
                                 .then(_ => {
                                     Swal.fire({
-                                        title: 'Código copiado!',
-                                        html: 'Agora é só colar na opção PIX Copia e Cola do seu banco preferido.',
-                                        timer: 2000,
+                                        icon: 'success',
+                                        html: `<h3 class="mb-10">Copiado!</h3>`,
+                                        width: '240px',
+                                        timer: 1200,
                                         showConfirmButton: false
                                     });
                                 })
@@ -557,7 +566,7 @@ angular.module('app', [])
                             Swal.fire({
                                 title: 'Oops',
                                 html: 'Seu browser não permite o uso do recurso de copiar e colar. Você terá que selecionar, copiar e colar o código manualmente.',
-                                timer: 5000,
+                                timer: 3000,
                                 showConfirmButton: false
                             });
 
@@ -566,32 +575,30 @@ angular.module('app', [])
                     });
                 }
 
-                const startCheckTitulosCompras = _ => {
-                    // "Vigia" a compra aguardando o seu pagamento.
-                    // Quando um pagamento é feito, as atualizações são lançados no RTDB (pois o Firestore está ocupado criando montes de coisas!)
-                    // Caminho: /titulosCompras/<id>/data
-
-                    return null;
+                const tituloCompraChanged = tituloCompra => {
+                    console.info(tituloCompra);
+                    $scope.compra = tituloCompra
                 }
 
                 $scope.initDelegates = e => {
                     element = e;
 
                     pagarCompraFactory.delegate = {
-                        show: compra => {
+                        show: tituloCompra => {
                             // Exibição de dados de uma compra, com ou sem pagamento
-                            $scope.compra = { ...compra };
+                            $scope.compra = tituloCompra;
                             $scope.visible = true;
 
-                            startCheckTitulosCompras()
+                            init.watchTituloCompraUsuario(tituloCompra.id, tituloCompraChanged);
 
                             // Exibe o PIX, copia e cola, etc...
                             modal.open("pagar-compra");
+
+                            bindPixCopiaCola();
                         }
                     }
                 }
 
-                bindPixCopiaCola();
             },
             templateUrl: 'modal-pagar-compra.htm',
             link: function (scope, element) {

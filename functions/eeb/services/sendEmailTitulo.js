@@ -11,6 +11,9 @@ https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
+const firestoreDAL = require('../../api/firestoreDAL');
+const collectionTitulosCompra = firestoreDAL.titulosCompras();
+
 const buTitulo = require('../../business/titulo');
 const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 
@@ -53,6 +56,12 @@ class Service extends eebService {
                     result.titulo = buTituloResult;
                     result.email = buTituloResult.email;
 
+                    return collectionTitulosCompra.getDoc(result.titulo.idTituloCompra);
+                })
+
+                .then(tituloCompra => {
+                    result.tituloCompra = tituloCompra;
+
                     if (result.data.showDataOnly) return { message: "ignored" };
 
                     const sgMail = require('@sendgrid/mail');
@@ -89,7 +98,7 @@ class Service extends eebService {
                     sendResult.forEach(s => {
                         if (s) {
                             return acompanhamentoTituloCompra.setEmailEnviado(
-                                result.titulo.idTituloCompra,
+                                result.tituloCompra,
                                 result.titulo.idTitulo,
                                 {
                                     payload: parm,

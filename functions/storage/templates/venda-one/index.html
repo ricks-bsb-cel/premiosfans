@@ -292,7 +292,7 @@
         </small>
         <p>
             <small style="font-family:monospace;font-size:0.7em;margin-top:20px;display:block;">
-                v {{version}}<br/>
+                v {{version}}<br />
                 {{versionDate}}
             </small>
         </p>
@@ -380,12 +380,10 @@
             <article class="pt-20 pb-20 mb-0">
                 <hgroup class="mt-10">
                     <h2>Suas compras</h2>
-                    <p>Veja abaixo a sua lista de títulos adquiridos.</p>
-                    <p>Criamos uma identificação única para o seu dispositivo e só você pode ver suas compras.</p>
                 </hgroup>
 
                 <details
-                    ng-repeat="c in compras | orderBy:'dtInclusao_js_desc'"
+                    ng-repeat="c in compras | orderBy:'dtInclusao'"
                     id="titulo-compra-[[c.id]]"
                     id-titulo-compra="[[c.id]]"
                     open-detail="[[c.situacao==='aguardando-pagamento']]"
@@ -396,7 +394,7 @@
                         <strong ng-bind="::c.dtInclusao | ddmmhhmm"></strong>
                         <small>
                             ~
-                            <strong ng-bind="::c.qtdTitulosCompra"></strong>
+                            <strong ng-bind="::c.qtdTitulos"></strong>
                             Titulo(s)
                         </small>
                     </summary>
@@ -406,19 +404,19 @@
                             <tr>
                                 <td>Nome:</td>
                                 <td>
-                                    <span ng-bind="::c.nome"></span>
+                                    <span ng-bind="::c.compradorNome"></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td>Email:</td>
                                 <td>
-                                    <span ng-bind="::c.email_hide"></span>
+                                    <span ng-bind="::c.compradorEmailHide"></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td>CPF:</td>
                                 <td>
-                                    <span ng-bind="::c.cpf_hide"></span>
+                                    <span ng-bind="::c.compradorCpfHide"></span>
                                 </td>
                             </tr>
                             <tr ng-if="c.situacao==='pago'">
@@ -469,29 +467,45 @@
     <script type="text/ng-template" id="modal-pagar-compra.htm">
         <dialog ng-show="visible" id="pagar-compra">
             <article class="pt-20">
+                <div ng-if="compra.situacao === 'aguardando-pagamento'" class="block">
+                    <h3 class="mb-20 text-center">
+                        Pagar Compra
+                    </h3>
 
-                <h3 class="mb-20 text-center">
-                    Pagar Compra
-                </h3>
+                    <ol class="mb-10">
+                        <li>Copie o código PIX abaixo:</li>
+                    </ol>
+                    
+                    <p ng-bind="compra.pixData.EMV" class="pix-copia-cola"></p>
 
-                <p class="text-center">Clique no código abaixo para utilizar o <strong>PIX Copia e Cola</strong> do seu banco preferido</p>
-                
-                <p
-                    id="pix-copia-cola"
-                    ng-bind="compra.pix.QRCode.EMV"
-                    class="pix-copia-cola"
-                ></p>
+                    <button role="button" id="pix-copia-cola" class="secondary mb-10" >
+                        Copiar Código PIX
+                    </button>
 
-                <p class="p-10 m-0 text-center">ou abre o aplicativo do seu banco e utilize o QRCode abaixo:</p>
+                    <ol start="2" class="mb-0">
+                        <li class="mb-10">Acesse sua conta bancária no Internet Banking ou através do app;</li>
+                        <li class="mb-10">Escolha pagar via <strong>PIX Copia e Cola</strong></li>
+                        <li class="mb-10">Cole o codigo PIX que você copiou e finalize o pagamento</li>
+                    </ol>
+                    
+                    <p class="p-10 pt-5 m-0 text-center">
+                        ou abra o aplicativo do seu banco e utilize o QRCode abaixo:
+                    </p>
 
-                <img
-                    class="pix-qrcode"
-                    ng-if="compra.pix.QRCode.Imagem"
-                    ng-src="data:image/png;base64,[[compra.pix.QRCode.Imagem]]" />
+                    <img
+                        class="pix-qrcode"
+                        ng-if="compra.pixData.Imagem"
+                        ng-src="data:image/png;base64,[[compra.pixData.Imagem]]"
+                    />
 
-                <p class="pb-20 text-center">
-                    Após o pagamento, você receberá um eMail com o seus <strong>Números da Sorte</strong>.
-                </p>
+                    <p class="pb-20 text-center">
+                        Após o pagamento, você receberá um eMail com o seus <strong>Números da Sorte</strong>.
+                    </p>
+                </div>
+
+                <div ng-if="compra.situacao === 'paga'" class="block">
+                    
+                </div>
 
                 <footer class="mt-0">
                     <button class="mb-0" ng-click="close()">

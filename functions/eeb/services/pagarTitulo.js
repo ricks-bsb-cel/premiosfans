@@ -95,6 +95,7 @@ class Service extends eebService {
                             generatePremioTitulo.call(
                                 {
                                     "idCampanha": result.data.titulo.idCampanha,
+                                    "idTituloCompra": result.data.titulo.idTituloCompra,
                                     "idTitulo": result.data.titulo.id,
                                     "idPremio": p.id,
                                     "idSorteio": p.idSorteio

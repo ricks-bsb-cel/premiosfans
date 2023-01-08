@@ -44,12 +44,11 @@ async function checkNumeroTituloPremio(idTituloCompra, idCampanha, idTitulo, idP
     });
 
     // Remove o premio do próprio título
-    resultTitulosPremios = resultTitulosPremios.filter(f => {
-        return f.id !== idTituloPremio;
-    });
+    resultTitulosPremios = resultTitulosPremios.filter(f => { return f.id !== idTituloPremio; });
 
     // Incrementa a validação
-    await acompanhamentoTituloCompra.incrementValidacao(idTituloCompra, resultTitulosPremios.length > 0);
+    const tituloCompra = await collectionTituloCompra.getDoc(idTituloCompra);
+    await acompanhamentoTituloCompra.incrementValidacao(tituloCompra, resultTitulosPremios.length > 0);
 
     return {
         error: resultTitulosPremios.length > 0,
@@ -202,7 +201,7 @@ class Service extends eebService {
                         })
                     })
 
-                    return acompanhamentoTituloCompra.setValidacaoEmAndamento(result.data.tituloCompra.id, promiseCheckNumeros.length);
+                    return acompanhamentoTituloCompra.setValidacaoEmAndamento(result.data.tituloCompra, promiseCheckNumeros.length);
                 })
 
                 .then(_ => {

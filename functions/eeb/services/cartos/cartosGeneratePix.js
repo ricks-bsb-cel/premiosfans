@@ -50,7 +50,6 @@ async function generatePix(data, serviceId) {
 
     // Salva os dados na Collection PIX
     await collectionCartosPix.add(pix)
-    await acompanhamentoTituloCompra.setPixData(data.idTituloCompra, pix);
 
     // Se existir idTituloCompra
     if (data.idTituloCompra) {
@@ -58,6 +57,7 @@ async function generatePix(data, serviceId) {
 
         if (tituloCompra) {
             await collectionTituloCompra.merge(tituloCompra.id, { pix: pix });
+            await acompanhamentoTituloCompra.setPixData(tituloCompra, pix);
         }
     }
 

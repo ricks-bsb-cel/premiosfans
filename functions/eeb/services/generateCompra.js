@@ -206,11 +206,8 @@ class Service extends eebService {
                         promise.push(collectionTitulos.add({ ...result.data.titulo, ...t }))
                     }
 
-                    // Inicializa o controle de acompanhamento da Compra
-                    promise.push(acompanhamentoTituloCompra.initAcompanhamento(
-                        result.data.compra.id,
-                        result.data.compra.qtdTotalProcessos
-                    ));
+                    // Inicializa o controle de acompanhamento da Compra (os dados que podem ser vistos pelo cliente no front)
+                    promise.push(acompanhamentoTituloCompra.initAcompanhamento(result.data.compra));
 
                     return Promise.all(promise);
                 })

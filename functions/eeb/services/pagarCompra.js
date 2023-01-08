@@ -89,9 +89,7 @@ class Service extends eebService {
                 .then(_ => {
 
                     // Solicita o pagamento de cada um dos Títulos (que vai solicitar a geração dos números)
-                    promise = [
-                        acompanhamentoTituloCompra.setPago(result.data.tituloCompra.id)
-                    ];
+                    promise = [acompanhamentoTituloCompra.setPago(result.data.tituloCompra)];
 
                     result.data.titulos.forEach(p => {
                         promise.push(pagarTitulo.call({ "idTitulo": p.id }));
