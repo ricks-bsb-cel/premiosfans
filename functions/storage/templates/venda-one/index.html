@@ -428,13 +428,13 @@
                     </table>
 
                     <button 
-                        ng-if="c.situacao=='aguardando-pagamento'"
+                        ng-if="c.situacao==='aguardando-pagamento'"
                         ng-click="pagar(c)"
                         class="full-width">Pagar</button>
 
                     <button 
-                        ng-if="c.situacao=='pago'"
-                        ng-click="detalhes(c)"
+                        ng-if="c.situacao==='pago'"
+                        ng-click="pagar(c)"
                         class="full-width outline">Detalhes da Compra</button>
 
                     <div ng-if="!$last" class="mb-40"></div>
@@ -467,7 +467,7 @@
     <script type="text/ng-template" id="modal-pagar-compra.htm">
         <dialog ng-show="visible" id="pagar-compra">
             <article class="pt-20">
-                <div ng-if="compra.situacao === 'aguardando-pagamento'" class="block">
+                <div ng-show="compra.situacao === 'aguardando-pagamento'" class="block">
                     <h3 class="mb-20 text-center">
                         Pagar Compra
                     </h3>
@@ -478,7 +478,7 @@
                     
                     <p ng-bind="compra.pixData.EMV" class="pix-copia-cola"></p>
 
-                    <button role="button" id="pix-copia-cola" class="secondary mb-10" >
+                    <button ng-click="CopyPixToClipboard()" role="button" id="pix-copia-cola" class="secondary mb-10" >
                         Copiar Código PIX
                     </button>
 
@@ -498,13 +498,39 @@
                         ng-src="data:image/png;base64,[[compra.pixData.Imagem]]"
                     />
 
-                    <p class="pb-20 text-center">
-                        Após o pagamento, você receberá um eMail com o seus <strong>Números da Sorte</strong>.
+                    <p class="pb-10 mb-0 text-center">
+                        Após o pagamento, um email será enviado para
+                        <strong ng-bind="::compra.compradorEmail"></strong>
+                        com os seus <strong>Números da Sorte</strong>.
+                    </p>
+
+                    <p class="text-center pb-20">
+                        <small ng-bind="compra.id" style="font-family:monospace;font-size:0.75em;"></small>
                     </p>
                 </div>
 
-                <div ng-if="compra.situacao === 'paga'" class="block">
-                    
+                <div ng-show="compra.situacao === 'pago' && !compra.pronto" class="block">
+                    <h3 class="mb-20 text-center">
+                        Preparando seus Títulos
+                    </h3>
+
+                    <p class="p-10 pt-5 pb-20 m-0 text-center">
+                        Gerando seus <strong>Números da Sorte</strong>...
+                    </p>
+
+                    <progress value="" max=""></progress>
+
+                    <h4>Validando dados...</h4>
+                </div>
+
+                <div ng-show="compra.situacao === 'pago' && compra.pronto" class="block">
+                    <h3 class="mb-20 text-center">
+                        Detalhes da Compra
+                    </h3>
+
+                    <p class="p-10 pt-5 pb-20 m-0 text-center">
+                        Títulos da Compra:
+                    </p>
                 </div>
 
                 <footer class="mt-0">

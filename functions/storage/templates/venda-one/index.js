@@ -198,7 +198,6 @@ angular.module('app', [])
             })
         }
 
-
         const getComprasCliente = _ => {
             return $q((resolve, reject) => {
                 let compras = [];
@@ -249,6 +248,8 @@ angular.module('app', [])
 
             onValue(refPath, snapshot => {
                 snapshot = snapshot.val();
+
+                if (!snapshot) return;
 
                 Object.keys(snapshot).forEach(idTituloCompra => {
                     const tituloCompra = Object.assign(snapshot[idTituloCompra], { id: idTituloCompra });
@@ -535,49 +536,42 @@ angular.module('app', [])
                 }
 
                 $scope.CopyPixToClipboard = _ => {
-
-                }
-
-                const bindPixCopiaCola = _ => {
-                    const e = document.getElementById('pix-copia-cola');
-
-                    e.addEventListener('click', () => {
-                        if ('clipboard' in navigator) {
-                            navigator.clipboard.writeText($scope.compra.pixData.EMV)
-                                .then(_ => {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        html: `<h3 class="mb-10">Copiado!</h3>`,
-                                        width: '240px',
-                                        timer: 1200,
-                                        showConfirmButton: false
-                                    });
-                                })
-                                .catch(e => {
-                                    Swal.fire({
-                                        title: 'Oops',
-                                        icon: 'error',
-                                        html: e.message,
-                                        timer: 5000,
-                                        showConfirmButton: false
-                                    });
-                                })
-                        } else {
-                            Swal.fire({
-                                title: 'Oops',
-                                html: 'Seu browser não permite o uso do recurso de copiar e colar. Você terá que selecionar, copiar e colar o código manualmente.',
-                                timer: 3000,
-                                showConfirmButton: false
-                            });
-
-                            e.removeEventListener('click');
-                        };
-                    });
+                    if ('clipboard' in navigator) {
+                        navigator.clipboard.writeText($scope.compra.pixData.EMV)
+                            .then(_ => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    html: `<h3 class="mb-10">Copiado!</h3>`,
+                                    width: '240px',
+                                    timer: 1200,
+                                    showConfirmButton: false
+                                });
+                            })
+                            .catch(e => {
+                                Swal.fire({
+                                    title: 'Oops',
+                                    icon: 'error',
+                                    html: e.message,
+                                    timer: 5000,
+                                    showConfirmButton: false
+                                });
+                            })
+                    } else {
+                        Swal.fire({
+                            title: 'Oops',
+                            html: 'Seu browser não permite o uso do recurso de copiar e colar. Você terá que selecionar, copiar e colar o código manualmente.',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    };
                 }
 
                 const tituloCompraChanged = tituloCompra => {
                     console.info(tituloCompra);
-                    $scope.compra = tituloCompra
+                    $scope.compra = tituloCompra;
+
+                    $('#pagar-compra progress').attr("max", $scope.compra.qtdTotalProcessos);
+                    $('#pagar-compra progress').attr("value", $scope.compra.qtdTotalProcessosConcluidos);
                 }
 
                 $scope.initDelegates = e => {
@@ -586,7 +580,8 @@ angular.module('app', [])
                     pagarCompraFactory.delegate = {
                         show: tituloCompra => {
                             // Exibição de dados de uma compra, com ou sem pagamento
-                            $scope.compra = tituloCompra;
+                            tituloCompraChanged(tituloCompra);
+                            
                             $scope.visible = true;
 
                             init.watchTituloCompraUsuario(tituloCompra.id, tituloCompraChanged);
@@ -594,7 +589,7 @@ angular.module('app', [])
                             // Exibe o PIX, copia e cola, etc...
                             modal.open("pagar-compra");
 
-                            bindPixCopiaCola();
+                            // bindPixCopiaCola();
                         }
                     }
                 }
