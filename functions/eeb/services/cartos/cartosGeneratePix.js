@@ -36,7 +36,7 @@ const schema = _ => {
     });
 }
 
-async function generatePix(data, serviceId) {
+async function generatePix(data, tituloCompra, serviceId) {
     const credential = await userCredentials.getCredential(data.cpf, data.accountId);
     let pix = await cartosHttpRequest.generatePix(data, credential.token);
 
@@ -51,15 +51,8 @@ async function generatePix(data, serviceId) {
     // Salva os dados na Collection PIX
     await collectionCartosPix.add(pix)
 
-    // Se existir idTituloCompra
-    if (data.idTituloCompra) {
-        const tituloCompra = await collectionTituloCompra.getDoc(data.idTituloCompra);
-
-        if (tituloCompra) {
-            await collectionTituloCompra.merge(tituloCompra.id, { pix: pix });
-            await acompanhamentoTituloCompra.setPixData(tituloCompra, pix);
-        }
-    }
+    await collectionTituloCompra.merge(tituloCompra.id, { pix: pix });
+    await acompanhamentoTituloCompra.setPixData(tituloCompra, pix);
 
     return pix;
 }
@@ -74,11 +67,19 @@ class Service extends eebService {
 
     run() {
         return new Promise((resolve, reject) => {
+            const result = {};
 
             return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
-                    return generatePix(dataResult, this.parm.serviceId);
+                    result.parm = dataResult;
+
+                    return collectionTituloCompra.getDoc(result.parm.idTituloCompra);
+                })
+                .then(tituloCompraResult => {
+                    result.tituloCompra = tituloCompraResult;
+
+                    return generatePix(result.parm, result.tituloCompra, this.parm.serviceId);
                 })
 
                 .then(generatePixResult => {

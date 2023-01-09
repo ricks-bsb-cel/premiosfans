@@ -32,7 +32,7 @@ const ngModule = angular.module('services.app-collection', [])
 				if (onLoadFinishAttr && onLoadFinishAttr.orderBy) {
 					result = globalFactory.sortArray(result, onLoadFinishAttr.orderBy);
 				}
-				
+
 				return result;
 			}
 
@@ -116,6 +116,7 @@ const ngModule = angular.module('services.app-collection', [])
 							}
 
 							console.info(`New query on collection [${attr.collection}]`);
+
 							const db = appFirestore.firestore;
 							const c = appFirestore.collection(db, attr.collection);
 
@@ -134,12 +135,6 @@ const ngModule = angular.module('services.app-collection', [])
 
 							var q = appFirestore.query(c);
 
-							/*
-							if (attr.filterEmpresa) {
-								var q = appFirestore.query(q, appFirestore.where("idEmpresa", "==", appAuthHelper.profile.user.idEmpresa));
-							}
-							*/
-
 							if (parms.filter) {
 								if (Array.isArray(parms.filter)) {
 									parms.filter.forEach(f => {
@@ -154,11 +149,15 @@ const ngModule = angular.module('services.app-collection', [])
 								q = appFirestore.query(q, appFirestore.orderBy(parms.orderBy || attr.orderBy));
 							}
 
+							if (parms.orderByDesc || attr.orderByDesc) {
+								q = appFirestore.query(q, appFirestore.orderBy(parms.orderByDesc || attr.orderByDesc, 'desc'));
+							}
+
 							if (parms.limit) {
 								var q = appFirestore.query(q, appFirestore.limit(parms.limit));
 							}
 
-							this.unsubscribeSnapshot = appFirestore.onSnapshot(q, querySnapshot => {
+							this.unsubscribeSnapshot = appFirestore.onSnapshot(q, querySnapshot => {s
 
 								this.empty = querySnapshot.empty;
 

@@ -196,18 +196,18 @@ class Service extends eebService {
                     result.data.titulo.idTituloCompra = result.data.compra.id;
                     result.data.titulo.keywords = result.data.compra.keywords;
 
-                    const promise = [];
+                    // Inicializa o controle de acompanhamento da Compra (os dados que podem ser vistos pelo cliente no front)
+                    const promise = [
+                        acompanhamentoTituloCompra.initAcompanhamento(result.data.compra)
+                    ];
 
                     for (let i = 0; i < result.qtdTitulos; i++) {
                         const t = { guidTitulo: global.guid() }
 
                         global.setDateTime(t, 'dtInclusao');
 
-                        promise.push(collectionTitulos.add({ ...result.data.titulo, ...t }))
+                        promise.push(collectionTitulos.add({ ...result.data.titulo, ...t }));
                     }
-
-                    // Inicializa o controle de acompanhamento da Compra (os dados que podem ser vistos pelo cliente no front)
-                    promise.push(acompanhamentoTituloCompra.initAcompanhamento(result.data.compra));
 
                     return Promise.all(promise);
                 })
@@ -215,14 +215,20 @@ class Service extends eebService {
                 .then(resultTitulos => {
                     result.data = {
                         compra: result.data.compra,
-                        titulos: resultTitulos
+                        titulos: resultTitulos.filter(f => { return f.guidTitulo; })
                     }
 
+                    // Salva os títulos no acompanhamento
+                    return acompanhamentoTituloCompra.setTitulos(result.data.compra, result.data.titulos);
+                })
+
+                .then(_ => {
                     // Adição concluída. Momento de gerar o pedido de pagamento...
                     return generatePedidoPagamentoCompra.call({
                         idTituloCompra: result.data.compra.id
                     });
                 })
+
                 .then(pedidoPagamentoResult => {
                     result.data.pedidoPagamento = pedidoPagamentoResult.result;
 

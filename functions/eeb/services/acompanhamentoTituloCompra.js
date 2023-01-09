@@ -3,14 +3,30 @@
 const admin = require('firebase-admin');
 const global = require("../../global");
 
-const getPath = tituloCompra => {
-    return `/titulosCompras/${tituloCompra.idCampanha}/${tituloCompra.uidComprador}/${tituloCompra.id}`;
+const getPathByDoc = doc => {
+    if (!doc.idCampanha || !doc.uidComprador) throw new Error(`Erro criando path em acompanhamentoTituloCompra. O documento não tem idCampanha e/ou uidComprador`);
+
+    const
+        idCampanha = doc.idCampanha,
+        uidComprador = doc.uidComprador;
+
+    let idTituloCompra;
+
+    if (doc.situacao && doc.vlTotalCompra && doc.qtdPremios) {
+        // O documento é da coleção titulosCompra
+        idTituloCompra = doc.id;
+    } else {
+        if (!doc.idTituloCompra) throw new Error(`Erro criando path em acompanhamentoTituloCompra. O documento não tem idTituloCompra`);
+        idTituloCompra = doc.idTituloCompra;
+    }
+
+    return `/titulosCompras/${idCampanha}/${uidComprador}/${idTituloCompra}`;
 }
 
 // O acompanhamento isola os dados que podem ser vistos pelos clientes no front
 async function initAcompanhamento(tituloCompra) {
     const
-        path = getPath(tituloCompra),
+        path = getPathByDoc(tituloCompra),
         ref = admin.database().ref(path),
         toAdd = {
             situacao: 'aguardando-pagamento',
@@ -31,6 +47,7 @@ async function initAcompanhamento(tituloCompra) {
             campanhaId: tituloCompra.idCampanha,
             campanhaNome: tituloCompra.campanhaNome,
             campanhaQtdPremios: tituloCompra.campanhaQtdPremios,
+            msg: 'Preparando Pagamento',
 
             compradorNome: tituloCompra.nome,
             compradorCpf: tituloCompra.cpf_formated,
@@ -40,25 +57,32 @@ async function initAcompanhamento(tituloCompra) {
             compradorEmailHide: tituloCompra.email_hide
         };
 
-    return await ref.set(toAdd);
+    await ref.set(toAdd);
+
+    return path;
 }
 
-async function incrementProcessosConcluidos(tituloCompra) {
+// O doc deve ter idCampanha, uidComprador e idTituloCompra ou id
+async function incrementProcessosConcluidos(doc) {
     const
-        path = getPath(tituloCompra),
-        ref = admin.database().ref(path);
+        path = getPathByDoc(doc),
+        ref = admin.database().ref(path),
+        msg = 'Gerando seus Números da Sorte'
 
     return ref.transaction(data => {
         if (!data || typeof data !== 'object') return null;
 
         data.qtdTotalProcessosConcluidos++;
+
+        if (data.msg !== msg) data.msg = msg;
+
         return data;
     });
 }
 
-async function setPixData(tituloCompra, pixData) {
+async function setPixData(doc, pixData) {
     const
-        path = getPath(tituloCompra),
+        path = getPathByDoc(doc),
         ref = admin.database().ref(path);
 
     return ref.transaction(data => {
@@ -80,9 +104,9 @@ async function setPixData(tituloCompra, pixData) {
     });
 }
 
-async function setPago(tituloCompra) {
+async function setPago(doc) {
     const
-        path = getPath(tituloCompra),
+        path = getPathByDoc(doc),
         ref = admin.database().ref(path);
 
     return ref.transaction(data => {
@@ -90,14 +114,15 @@ async function setPago(tituloCompra) {
 
         data.situacao = 'pago';
         data.dtPagamento = global.nowDateTime();
+        data.msg = 'Verificando pagamento';
 
         return data;
     });
 }
 
-async function setEmailEnviado(tituloCompra, idTitulo, sendResult) {
+async function setEmailEnviado(doc, idTitulo, sendResult) {
     const
-        path = getPath(tituloCompra),
+        path = getPathByDoc(doc),
         ref = admin.database().ref(path);
 
     return ref.transaction(data => {
@@ -105,6 +130,7 @@ async function setEmailEnviado(tituloCompra, idTitulo, sendResult) {
 
         data.emailEnviadoQtd++;
         data.emailEnviado = data.emailEnviado || {};
+        data.msg = 'Enviando eMail';
 
         data.emailEnviado[idTitulo] = {
             dtEnvio: global.nowDateTime(),
@@ -115,10 +141,11 @@ async function setEmailEnviado(tituloCompra, idTitulo, sendResult) {
     });
 }
 
-async function setValidacaoEmAndamento(tituloCompra, qtdProcessos) {
+async function setValidacaoEmAndamento(doc, qtdProcessos) {
     const
-        path = getPath(tituloCompra),
-        ref = admin.database().ref(path);
+        path = getPathByDoc(doc),
+        ref = admin.database().ref(path),
+        msg = 'Validando Certificados dos Títulos'
 
     return ref.transaction(data => {
         if (!data || typeof data !== 'object') return null;
@@ -127,14 +154,17 @@ async function setValidacaoEmAndamento(tituloCompra, qtdProcessos) {
         data.validacaoTotal = qtdProcessos;
         data.validacaoDtInicio = global.nowDateTime();
 
+        if (data.msg !== msg) data.msg = msg;
+
         return data;
     });
 }
 
-async function incrementValidacao(tituloCompra, erro) {
+async function incrementValidacao(doc, erro) {
     const
-        path = getPath(tituloCompra),
-        ref = admin.database().ref(path);
+        path = getPathByDoc(doc),
+        ref = admin.database().ref(path),
+        msg = 'Validando Certificados dos Títulos'
 
     return ref.transaction(data => {
         if (!data || typeof data !== 'object') return null;
@@ -142,6 +172,8 @@ async function incrementValidacao(tituloCompra, erro) {
         data.validacaoEmAndamento = true;
         data.validacaoTotalConcluidos++;
         data.validacaoConcluida = data.validacaoTotal === data.validacaoTotalConcluidos;
+
+        if (data.msg !== msg) data.msg = msg;
 
         if (erro) data.validacaoTotalComErro++;
 
@@ -157,6 +189,32 @@ async function incrementValidacao(tituloCompra, erro) {
     });
 }
 
+async function setTitulos(doc, titulos) {
+    const
+        path = getPathByDoc(doc),
+        ref = admin.database().ref(path);
+
+    return ref.transaction(data => {
+        if (!data || typeof data !== 'object') return null;
+
+        data.titulos = data.titulos || [];
+
+        titulos.forEach(t => {
+            if (t.id && t.qtdPremios) {
+                data.titulos.push({
+                    id: t.id,
+                    qtdPremios: t.qtdPremios,
+                    qtdNumeroDaSorte: t.qtdNumerosDaSortePorTitulo,
+                    link: `/titulo/${doc.idCampanha}/${t.id}`
+                })
+            }
+        })
+
+        return data;
+    });
+}
+
+
 exports.initAcompanhamento = initAcompanhamento;
 exports.incrementProcessosConcluidos = incrementProcessosConcluidos;
 exports.setPixData = setPixData;
@@ -164,3 +222,4 @@ exports.setPago = setPago;
 exports.setValidacaoEmAndamento = setValidacaoEmAndamento;
 exports.incrementValidacao = incrementValidacao;
 exports.setEmailEnviado = setEmailEnviado;
+exports.setTitulos = setTitulos;

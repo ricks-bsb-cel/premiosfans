@@ -32,7 +32,7 @@ const schema = _ => {
     });
 }
 
-async function checkNumeroTituloPremio(idTituloCompra, idCampanha, idTitulo, idPremio, idTituloPremio, numero) {
+async function checkNumeroTituloPremio(tituloCompra, idCampanha, idTitulo, idPremio, idTituloPremio, numero) {
 
     // Procura outros premios com o mesmo número da sorte
     let resultTitulosPremios = await collectionTitulosPremios.get({
@@ -47,7 +47,6 @@ async function checkNumeroTituloPremio(idTituloCompra, idCampanha, idTitulo, idP
     resultTitulosPremios = resultTitulosPremios.filter(f => { return f.id !== idTituloPremio; });
 
     // Incrementa a validação
-    const tituloCompra = await collectionTituloCompra.getDoc(idTituloCompra);
     await acompanhamentoTituloCompra.incrementValidacao(tituloCompra, resultTitulosPremios.length > 0);
 
     return {
@@ -197,7 +196,7 @@ class Service extends eebService {
 
                         // Verifica os números da sorte (descobre se já não existe em qualquer outro título)
                         p.numerosDaSorte.forEach(n => {
-                            promiseCheckNumeros.push(checkNumeroTituloPremio(result.data.tituloCompra.id, p.idCampanha, p.idTitulo, p.idPremio, p.id, n));
+                            promiseCheckNumeros.push(checkNumeroTituloPremio(result.data.tituloCompra, p.idCampanha, p.idTitulo, p.idPremio, p.id, n));
                         })
                     })
 

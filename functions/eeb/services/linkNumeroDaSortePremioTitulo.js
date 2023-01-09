@@ -171,12 +171,6 @@ class Service extends eebService {
                 .then(resultPremioTitulo => {
                     result.data.premioTitulo = resultPremioTitulo;
 
-                    return collectionTitulosCompras.getDoc(result.data.premioTitulo.idTituloCompra);
-                })
-
-                .then(tituloCompraResult => {
-                    result.data.tituloCompra = tituloCompraResult;
-
                     if (result.data.premioTitulo.numerosDaSorte && result.data.premioTitulo.numerosDaSorte.length >= result.data.premioTitulo.qtdNumerosDaSortePorTitulo) {
                         result.jaGerado = true;
                         return true;
@@ -220,7 +214,7 @@ class Service extends eebService {
                             qtdNumerosGerados: FieldValue.increment(1),
                             qtdTotalProcessosConcluidos: FieldValue.increment(1)
                         }, { merge: true }),
-                        acompanhamentoTituloCompra.incrementProcessosConcluidos(result.data.tituloCompra)
+                        acompanhamentoTituloCompra.incrementProcessosConcluidos(result.data.premioTitulo)
                     ])
                 })
 

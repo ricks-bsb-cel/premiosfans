@@ -435,33 +435,12 @@
                     <button 
                         ng-if="c.situacao==='pago'"
                         ng-click="pagar(c)"
-                        class="full-width outline">Detalhes da Compra</button>
+                        class="full-width outline">Detalhes</button>
 
                     <div ng-if="!$last" class="mb-40"></div>
                 </details>
             </article>
         </div>
-    </script>
-
-    <script type="text/ng-template" id="modal-detalhe-compra.htm">
-        <dialog
-            ng-show="visible"
-            id="detalhes-compra"
-        >
-            <article class="pt-20">
-                <h3 class="mb-20">Detalhes Compra</h3>
-                <p>
-                    Cras sit amet maximus risus.
-                    Pellentesque sodales odio sit amet augue finibus pellentesque.
-                    Nullam finibus risus non semper euismod.
-                </p>
-                <footer>
-                    <button class="mb-0" ng-click="close()">
-                        Fechar
-                    </button>
-                </footer>
-            </article>
-        </dialog>
     </script>
 
     <script type="text/ng-template" id="modal-pagar-compra.htm">
@@ -498,11 +477,21 @@
                         ng-src="data:image/png;base64,[[compra.pixData.Imagem]]"
                     />
 
+                    <!--
                     <p class="pb-10 mb-0 text-center">
                         Após o pagamento, um email será enviado para
                         <strong ng-bind="::compra.compradorEmail"></strong>
                         com os seus <strong>Números da Sorte</strong>.
                     </p>
+                    -->
+
+                    <ol start="5" class="mb-0">
+                        <li class="mb-10">
+                            Seu pagamento será identificado em até 5 minutos, seu(s) título(s) serão gerados
+                            e você os recebera no email <strong ng-bind="compra.compradorEmail"></strong>.
+                            Boa Sorte!
+                        </li>
+                    </ol>
 
                     <p class="text-center pb-20">
                         <small ng-bind="compra.id" style="font-family:monospace;font-size:0.75em;"></small>
@@ -514,13 +503,10 @@
                         Preparando seus Títulos
                     </h3>
 
-                    <p class="p-10 pt-5 pb-20 m-0 text-center">
-                        Gerando seus <strong>Números da Sorte</strong>...
+                    <p class="p-10 pt-5 pb-20 m-0 text-center msg">
                     </p>
 
                     <progress value="" max=""></progress>
-
-                    <h4>Validando dados...</h4>
                 </div>
 
                 <div ng-show="compra.situacao === 'pago' && compra.pronto" class="block">
@@ -528,9 +514,64 @@
                         Detalhes da Compra
                     </h3>
 
-                    <p class="p-10 pt-5 pb-20 m-0 text-center">
-                        Títulos da Compra:
+                    <table class="label-description" style="zoom:0.9;">
+                        <tbody>
+                            <tr>
+                                <td>Nome:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorNome"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Email:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorEmailHide"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CPF:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorCpfHide"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Celular:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorCelular"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Pago em:</td>
+                                <td>
+                                    <span ng-bind="::compra.dtPagamento"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Qtd Títulos:</td>
+                                <td>
+                                    <span ng-bind="::compra.qtdTitulos"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Código Compra:</td>
+                                <td>
+                                    <span ng-bind="::compra.id"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="p-10 pt-5 pb-20 m-0">
+                        Títulos da sua Compra:<br/>
+                        <small>Clique para abrir e ver os <strong>Números da Sorte</strong></small>
                     </p>
+
+                    <ol>
+                        <li ng-repeat="t in compra.titulos">
+                            <a style="font-family:monospace;" href="[[t.link]]" target="_blank" ng-bind="t.id"></a>
+                        </li>
+                    </ol>
+
                 </div>
 
                 <footer class="mt-0">

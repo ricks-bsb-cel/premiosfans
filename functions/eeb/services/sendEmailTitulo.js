@@ -55,6 +55,7 @@ class Service extends eebService {
                 .then(buTituloResult => {
                     result.titulo = buTituloResult;
                     result.email = buTituloResult.email;
+                    result.buTitulo = buTituloResult;
 
                     return collectionTitulosCompra.getDoc(result.titulo.idTituloCompra);
                 })
@@ -76,8 +77,8 @@ class Service extends eebService {
                         personalizations: [{
                             to: [
                                 {
-                                    email: buTituloResult.email,
-                                    name: buTituloResult.nome
+                                    email: result.buTitulo.email,
+                                    name: result.buTitulo.nome
                                 }
                             ],
                             dynamic_template_data: buTituloResult,

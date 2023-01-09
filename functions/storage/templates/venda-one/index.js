@@ -146,6 +146,7 @@ angular.module('app', [])
             onAuthStateChanged(auth, user => {
                 if (user) {
                     console.info('user uid', user.uid);
+                    
                     initUser(user);
                 }
 
@@ -168,66 +169,13 @@ angular.module('app', [])
                         return resolve(token);
                     })
                     .catch((e) => {
-                        console.info(e.code, e.message);
+                        console.error(e);
+
                         return reject(e);
                     });
 
             })
         }
-
-        /*
-        const queryTitulosComprasCliente = _ => {
-            return $q((resolve, reject) => {
-                ready()
-                    .then(app => {
-                        const user = getCurrentUser();
-                        if (!user) return reject(new Error(`Não foi possível preparar a query`));
-
-                        let
-                            db = getFirestore(app),
-                            q = collection(db, "titulosCompras");
-
-                        q = query(q, where("idCampanha", "==", _idCampanha));
-                        q = query(q, where("uidComprador", "==", user.uid));
-
-                        return resolve(q);
-                    })
-                    .catch(e => {
-                        return reject(e);
-                    })
-            })
-        }
-
-        const getComprasCliente = _ => {
-            return $q((resolve, reject) => {
-                let compras = [];
-
-                return ready()
-                    .then(_ => {
-                        const user = getCurrentUser();
-                        if (!user) return null;
-
-                        return queryTitulosComprasCliente();
-                    })
-                    .then(query => {
-                        if (!query) return [];
-
-                        return getDocs(query);
-                    })
-                    .then(docs => {
-                        docs.forEach(c => {
-                            c = angular.merge(c.data(), { id: c.id });
-                            compras.push(c);
-                        });
-
-                        return resolve(compras);
-                    })
-                    .catch(e => {
-                        return reject(e);
-                    })
-            })
-        }
-        */
 
         const watchTituloCompraUsuario = (idTituloCompra, callback) => {
             observerTitulosComprasUsuario[idTituloCompra] = {
@@ -266,7 +214,6 @@ angular.module('app', [])
                     if (observerTitulosComprasUsuario[idTituloCompra]) observerTitulosComprasUsuario[idTituloCompra].f(tituloCompra);
                 })
 
-                console.info(TitulosComprasUsuario);
             });
         }
 
@@ -360,7 +307,7 @@ angular.module('app', [])
     .directive('comprasCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, global, init, comprasClienteFactory, pagarCompraFactory, detalhesCompraFactory, $timeout) {
+            controller: function ($scope, global, init, comprasClienteFactory, pagarCompraFactory, $timeout) {
                 $scope.compras = init.TitulosComprasUsuario;
 
                 const scrollToCompra = idCompra => {
@@ -377,9 +324,6 @@ angular.module('app', [])
                     pagarCompraFactory.delegate.show(tituloCompra);
                 }
 
-                $scope.detalhes = tituloCompra => {
-                    detalhesCompraFactory.delegate.show(tituloCompra);
-                }
             },
             templateUrl: 'compras-cliente.htm'
         };
@@ -460,7 +404,7 @@ angular.module('app', [])
 
                                     Swal.update({
                                         title: 'Preparando PIX',
-                                        html: `<img src="/assets/imgs/wait.svg" /><p>Um momento. Seu PIX exclusivo para pagamento está sendo gerado...</p>`,
+                                        html: `<img src="/assets/imgs/wait.svg" /><p>Um momento...<br />Estamos gerando um PIX exclusivo para o pagamento da sua compra.</p>`,
                                         icon: 'info',
                                         showCancelButton: false,
                                         showConfirmButton: false
@@ -567,11 +511,11 @@ angular.module('app', [])
                 }
 
                 const tituloCompraChanged = tituloCompra => {
-                    console.info(tituloCompra);
                     $scope.compra = tituloCompra;
 
                     $('#pagar-compra progress').attr("max", $scope.compra.qtdTotalProcessos);
                     $('#pagar-compra progress').attr("value", $scope.compra.qtdTotalProcessosConcluidos);
+                    $('#pagar-compra p.msg').html($scope.compra.msg);
                 }
 
                 $scope.initDelegates = e => {
@@ -581,15 +525,13 @@ angular.module('app', [])
                         show: tituloCompra => {
                             // Exibição de dados de uma compra, com ou sem pagamento
                             tituloCompraChanged(tituloCompra);
-                            
+
                             $scope.visible = true;
 
                             init.watchTituloCompraUsuario(tituloCompra.id, tituloCompraChanged);
 
                             // Exibe o PIX, copia e cola, etc...
                             modal.open("pagar-compra");
-
-                            // bindPixCopiaCola();
                         }
                     }
                 }
@@ -615,45 +557,6 @@ angular.module('app', [])
             }
         }
     })
-
-
-    .factory('detalhesCompraFactory', function () {
-        let delegate = {};
-
-        return {
-            delegate: delegate
-        }
-    })
-    .directive('detalhesCompra', function () {
-        return {
-            restrict: 'E',
-            controller: function ($scope, detalhesCompraFactory, modal) {
-                $scope.visible = false;
-                let element = null;
-
-                $scope.close = _ => {
-                    modal.close();
-                    $scope.visible = false;
-                }
-
-                $scope.initDelegates = e => {
-                    element = e;
-
-                    detalhesCompraFactory.delegate = {
-                        show: tituloCompra => {
-                            $scope.visible = true;
-                            modal.open("detalhes-compra");
-                        }
-                    }
-                }
-            },
-            templateUrl: 'modal-detalhe-compra.htm',
-            link: function (scope, element) {
-                scope.initDelegates(element);
-            }
-        };
-    })
-
 
 
     .factory('modalRegulamentoFactory', function () {

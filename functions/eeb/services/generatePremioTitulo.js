@@ -134,12 +134,7 @@ class Service extends eebService {
                     const promise = [];
 
                     for (let n = 0; n < result.data.tituloPremio.qtdNumerosDaSortePorTitulo; n++) {
-                        promise.push(
-                            linkNumeroDaSorte.call(
-                                result.data.tituloPremio.idPremio,
-                                result.data.tituloPremio.id
-                            )
-                        );
+                        promise.push(linkNumeroDaSorte.call(result.data.tituloPremio.idPremio, result.data.tituloPremio.id));
                     }
 
                     return Promise.all(promise);
@@ -148,7 +143,7 @@ class Service extends eebService {
                 .then(_ => {
                     if (result.jaGerado) return null;
 
-                    // Atualização do contador de Processos
+                    // Atualização do contador de Processos do Título
                     return admin
                         .firestore()
                         .collection('titulosCompras')
@@ -157,11 +152,9 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
-                    result.data = {
-                        tituloPremio: result.data.tituloPremio
-                    };
+                    result.data = { tituloPremio: result.data.tituloPremio };
 
-                    return acompanhamentoTituloCompra.incrementProcessosConcluidos(result.data.tituloCompra);
+                    return acompanhamentoTituloCompra.incrementProcessosConcluidos(result.data.tituloPremio);
                 })
                 .then(_ => {
                     return resolve(this.parm.async ? { success: true } : result);

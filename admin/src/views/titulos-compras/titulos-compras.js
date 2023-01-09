@@ -22,7 +22,10 @@ const ngModule = angular.module('views.titulos-compras', [
 		$scope.idCampanha = $routeParams.idCampanha || null;
 
 		const startSnapshot = termo => {
-			var attrFilter = { filter: [] };
+			var attrFilter = { 
+				filter: [],
+				orderByDesc: 'dtInclusao'
+			};
 
 			if ($scope.idCampanha) {
 				attrFilter.filter.push({ field: "idCampanha", operator: "==", value: $scope.idCampanha });
