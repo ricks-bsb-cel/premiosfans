@@ -264,8 +264,8 @@ const compileApp = (sourceData, obj) => {
                     id: global.generateRandomId(7),
                     qtd: i,
                     qtdExibicao: `<strong>${i}</strong> <small>Título${i > 1 ? 's' : ''}</small>`,
-                    vlTotal: render.config.vlTitulo * i,
-                    vlTotal_html: global.formatMoney(render.config.vlTitulo * i, true, true)
+                    vlTotal: render.campanha.vlTitulo * i,
+                    vlTotal_html: global.formatMoney(render.campanha.vlTitulo * i, true, true)
                 })
             }
 

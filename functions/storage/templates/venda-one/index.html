@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,minimal-ui,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -155,23 +155,24 @@
 
                         <div class="row">
                             {{#each config.sugestoes}}
-                            <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
-                                <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
-                                    <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
-                                        class="m-0 mb-20 p-10">
-                                        <div class="sugestao text-center">
-                                            <h3 class="mb-10 mt-10">
-                                                {{{this.qtdExibicao}}}
-                                            </h3>
-                                        </div>
-                                    </article>
+                                <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
+                                    <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
+                                        <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
+                                            class="m-0 mb-20 p-10">
+                                            <div class="sugestao text-center">
+                                                <h3 class="mb-10 mt-10">
+                                                    {{{this.qtdExibicao}}}
+                                                </h3>
+                                            </div>
+                                        </article>
+                                    </div>
                                 </div>
-                            </div>
                             {{/each}}
                         </div>
 
                         <h2 id="vl-total" class="mb-0" style="display: none;">
-                            Total: R$ <strong ng-bind="vlCompra | currency : '': 2 "></strong>
+                            <small>Total:</small>
+                            R$ <strong ng-bind="vlCompra | currency : '': 2 "></strong>
                         </h2>
                     </article>
 
@@ -382,11 +383,10 @@
                     <h2>Suas compras</h2>
                 </hgroup>
 
-                <details
+                <details open
                     ng-repeat="c in compras | orderBy:'dtInclusao'"
                     id="titulo-compra-[[c.id]]"
                     id-titulo-compra="[[c.id]]"
-                    open-detail="[[c.situacao==='aguardando-pagamento']]"
                     ng-class="{last:$last}"
                 >
                     <summary>
@@ -422,7 +422,8 @@
                             <tr ng-if="c.situacao==='pago'">
                                 <td>Pago em:</td>
                                 <td>
-                                    <span ng-bind="::c.dtPagamento | ddmmhhmm"></td>
+                                    <span ng-bind="::c.dtPagamento | ddmmhhmm">
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -445,8 +446,10 @@
 
     <script type="text/ng-template" id="modal-pagar-compra.htm">
         <dialog ng-show="visible" id="pagar-compra">
-            <article class="pt-20">
+            <article class="pt-20" style="position: relative;">
                 <div ng-show="compra.situacao === 'aguardando-pagamento'" class="block">
+                    <img src="/assets/imgs/close.svg" ng-click="close()" class="close" />
+
                     <h3 class="mb-20 text-center">
                         Pagar Compra
                     </h3>
@@ -457,7 +460,12 @@
                     
                     <p ng-bind="compra.pixData.EMV" class="pix-copia-cola"></p>
 
-                    <button ng-click="CopyPixToClipboard()" role="button" id="pix-copia-cola" class="secondary mb-10" >
+                    <button
+                        ng-click="CopyPixToClipboard()"
+                        role="button"
+                        id="pix-copia-cola"
+                        class="mb-10"
+                    >
                         Copiar Código PIX
                     </button>
 
@@ -477,25 +485,14 @@
                         ng-src="data:image/png;base64,[[compra.pixData.Imagem]]"
                     />
 
-                    <!--
-                    <p class="pb-10 mb-0 text-center">
-                        Após o pagamento, um email será enviado para
-                        <strong ng-bind="::compra.compradorEmail"></strong>
-                        com os seus <strong>Números da Sorte</strong>.
-                    </p>
-                    -->
-
                     <ol start="5" class="mb-0">
-                        <li class="mb-10">
+                        <li class="mb-10 mt-10">
                             Seu pagamento será identificado em até 5 minutos, seu(s) título(s) serão gerados
                             e você os recebera no email <strong ng-bind="compra.compradorEmail"></strong>.
                             Boa Sorte!
                         </li>
                     </ol>
 
-                    <p class="text-center pb-20">
-                        <small ng-bind="compra.id" style="font-family:monospace;font-size:0.75em;"></small>
-                    </p>
                 </div>
 
                 <div ng-show="compra.situacao === 'pago' && !compra.pronto" class="block">
@@ -510,6 +507,8 @@
                 </div>
 
                 <div ng-show="compra.situacao === 'pago' && compra.pronto" class="block">
+                    <img src="/assets/imgs/close.svg" ng-click="close()" class="close" />
+
                     <h3 class="mb-20 text-center">
                         Detalhes da Compra
                     </h3>
@@ -575,9 +574,19 @@
                 </div>
 
                 <footer class="mt-0">
-                    <button class="mb-0" ng-click="close()">
+                    <button
+                        ng-if="compra.situacao === 'pago' && compra.pronto"
+                        class="mb-0"
+                        ng-click="close()"
+                    >
                         Fechar
                     </button>
+
+                    <small
+                        class="id-compra"
+                        ng-bind="compra.id"
+                        ng-class="{'mt-20':compra.situacao === 'pago' && compra.pronto}"
+                    ></small>
                 </footer>
             </article>
 

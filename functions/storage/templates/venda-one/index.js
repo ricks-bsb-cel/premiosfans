@@ -146,7 +146,7 @@ angular.module('app', [])
             onAuthStateChanged(auth, user => {
                 if (user) {
                     console.info('user uid', user.uid);
-                    
+
                     initUser(user);
                 }
 
@@ -183,8 +183,8 @@ angular.module('app', [])
             };
         }
 
-        const unwatchTituloCompraUsuario = idTituloCompra => {
-            delete observerTitulosComprasUsuario[idTituloCompra];
+        const unwatchTituloCompraUsuario = _ => {
+            observerTitulosComprasUsuario = {};
         }
 
         const initQueryTitulosComprasCliente = _ => {
@@ -211,7 +211,13 @@ angular.module('app', [])
                         }
                     });
 
-                    if (observerTitulosComprasUsuario[idTituloCompra]) observerTitulosComprasUsuario[idTituloCompra].f(tituloCompra);
+                    if (
+                        typeof observerTitulosComprasUsuario[idTituloCompra] !== 'undefined' &&
+                        typeof observerTitulosComprasUsuario[idTituloCompra].f === 'function'
+                    ) {
+                        observerTitulosComprasUsuario[idTituloCompra].f(tituloCompra);
+                    }
+
                 })
 
             });
@@ -344,14 +350,20 @@ angular.module('app', [])
                 let element = null,
                     idTituloCompra;
 
-                $scope.compra = {};
+                $scope.compra = $scope.compra || {};
 
                 const sendPedidoCompra = qtdTitulos => {
 
                     if (!$scope.compra || !$scope.compra.nome || !$scope.compra.email || !$scope.compra.celular || !$scope.compra.cpf) {
-                        Swal.fire('Dados inválidos', 'Por favor, preencha corretamente todos os campos para realizar a compra.', 'error');
+                        return Swal.fire('Dados inválidos', 'Por favor, preencha corretamente todos os campos para realizar a compra.', 'error');
+                    }
 
-                        return;
+                    if (!$scope.compra.idade) {
+                        return Swal.fire('Sua Idade', 'Por favor, confirme que você tem 16 anos ou mais.', 'error');
+                    }
+
+                    if (!$scope.compra.termos) {
+                        return Swal.fire('Termos e Condições', 'Por favor, concorde com os Termos e Condições de Uso.', 'error');
                     }
 
                     $scope.compra = {
@@ -359,31 +371,36 @@ angular.module('app', [])
                         email: $scope.compra.email,
                         celular: $scope.compra.celular,
                         cpf: $scope.compra.cpf,
-                        qtdTitulos: qtdTitulos || 1
+                        qtdTitulos: qtdTitulos || 1,
+                        idade: $scope.compra.idade,
+                        termos: $scope.compra.termos
                     };
 
                     const tituloCompraChanged = tituloCompra => {
                         if (tituloCompra.pixData) {
-                            init.unwatchTituloCompraUsuario(tituloCompra.id);
+                            init.unwatchTituloCompraUsuario();
                             Swal.close();
                             pagarCompraFactory.delegate.show(tituloCompra);
                         }
                     }
+
 
                     Swal.fire({
                         title: 'Confirme seus dados',
                         icon: 'info',
                         html: `
                             <small style="display:block;margin-bottom:20px;">Verifique se os seus dados estão corretos antes de prosseguir com a compra</small>
-                            <h4 class="m-5">${$scope.compra.nome}</h4>
-                            <p class="m-5">${$scope.compra.email}</p>
-                            <p class="m-5"><small>Celular: </small>${$scope.compra.celular}</p>
-                            <p class="m-5"><small>CPF: </small>${$scope.compra.cpf}</p>
+                            <h4 class="m-5" style="color:black;">${$scope.compra.nome}</h4>
+                            <p class="m-5" style="color:black;">${$scope.compra.email}</p>
+                            <p class="m-5" style="color:black;"><small>Celular: </small>${$scope.compra.celular}</p>
+                            <p class="m-5" style="color:black;"><small>CPF: </small>${$scope.compra.cpf}</p>
                         `,
                         timer: 0,
                         showCancelButton: true,
                         focusConfirm: true,
-                        confirmButtonText: `Comprar ${$scope.compra.qtdTitulos} título${$scope.compra.qtdTitulos > 1 ? 's' : ''}s`,
+                        confirmButtonText: $scope.compra.qtdTitulos === 1 ?
+                            `Comprar 1 título` :
+                            `Comprar ${$scope.compra.qtdTitulos} títulos`,
                         cancelButtonText: 'Corrigir',
                         allowOutsideClick: false,
                         preConfirm: _ => {
@@ -471,7 +488,7 @@ angular.module('app', [])
                 let element = null;
 
                 $scope.close = _ => {
-                    init.unwatchTituloCompraUsuario($scope.compra.id);
+                    init.unwatchTituloCompraUsuario();
 
                     modal.close();
 

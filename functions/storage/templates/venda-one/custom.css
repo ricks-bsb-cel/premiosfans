@@ -203,6 +203,23 @@ h2.valor small.cents {
     color: white;
 }
 
+#pagar-compra .close{
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+    height: 36px;
+    width: 36px;
+    top: 22px;
+}
+
+#pagar-compra .id-compra{
+    font-family: monospace;
+    font-size: 0.7em;
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
 /* https://codepen.io/nxworld/pen/oLdoWb */
 
 #premios .sugestao {

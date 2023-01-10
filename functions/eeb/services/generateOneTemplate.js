@@ -62,6 +62,7 @@ class Service extends eebService {
             let saveLink, idTemplate, idInfluencer, idCampanha;
 
             return schema().validateAsync(this.parm.data)
+
                 .then(dataResult => {
                     idCampanha = dataResult.idCampanha;
                     idInfluencer = dataResult.idInfluencer;
@@ -93,6 +94,7 @@ class Service extends eebService {
 
                     return Promise.all(promises);
                 })
+
                 .then(promisesResult => {
                     result.template = promisesResult[0];
                     result.influencer = promisesResult[1];

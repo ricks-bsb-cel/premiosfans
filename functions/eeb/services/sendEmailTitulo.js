@@ -81,7 +81,7 @@ class Service extends eebService {
                                     name: result.buTitulo.nome
                                 }
                             ],
-                            dynamic_template_data: buTituloResult,
+                            dynamic_template_data: result.titulo,
                             subject: '%F0%9F%92%B0 Seus Números da Sorte ~ Certificado ' + result.titulo.idTitulo,
                             substitutions: {
                                 subject: '%F0%9F%92%B0 Seus Números da Sorte ~ Certificado ' + result.titulo.idTitulo
