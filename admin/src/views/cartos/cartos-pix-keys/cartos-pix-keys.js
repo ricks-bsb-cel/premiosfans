@@ -1,8 +1,10 @@
 'use strict';
 
 import config from './cartos-pix-keys.config';
+import editPixKey from './directives/edit/edit';
 
 const ngModule = angular.module('views.cartos-pix-keys', [
+	editPixKey.name
 ])
 	.config(config)
 
@@ -10,7 +12,8 @@ const ngModule = angular.module('views.cartos-pix-keys', [
 		$scope,
 		appAuthHelper,
 		collectionCartosPixKeys,
-		toastrFactory
+		toastrFactory,
+		cartosPixKeysEditFactory
 	) {
 
 		$scope.collectionCartosPixKeys = collectionCartosPixKeys;
@@ -26,6 +29,10 @@ const ngModule = angular.module('views.cartos-pix-keys', [
 			}
 
 			$scope.collectionCartosPixKeys.collection.startSnapshot(attrFilter);
+		}
+
+		$scope.edit = function (e) {
+			cartosPixKeysEditFactory.edit(e);
 		}
 
 		$scope.filter = {

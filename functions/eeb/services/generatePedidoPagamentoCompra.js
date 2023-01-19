@@ -11,6 +11,7 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
+const collectionCampanha = firestoreDAL.campanhas();
 
 const cartosGeneratePix = require('./cartos/cartosGeneratePix');
 
@@ -50,11 +51,18 @@ class Service extends eebService {
 
                     if (result.tituloCompra.situacao !== 'aguardando-pagamento') throw new Error(`A compra ${result.parm.idTituloCompra} não está em situação que permita pagamento.`);
 
+                    return collectionCampanha.getDoc(result.tituloCompra.idCampanha);
+                })
+
+                .then(resultCampanha => {
+
+                    if (!resultCampanha.pixKeyCredito || !resultCampanha.pixKeyCredito_accountId || !resultCampanha.pixKeyCredito_cpf) throw new Error(`A compra ${result.parm.idTituloCompra} pertence a uma campanha sem PIX de pagamento configurado.`);
+
                     // Geração do PIX
                     const pixData = {
-                        cpf: '57372209153', // Alterar
-                        accountId: '1f59ffdd-48ae-4103-bce0-84d6d6b35d36', // Alterar!
-                        receiverKey: '8ca86459-8f27-4552-9309-9e37da8703b4', // Alterar!
+                        cpf: resultCampanha.pixKeyCredito_cpf,
+                        accountId: resultCampanha.pixKeyCredito_accountId,
+                        receiverKey: resultCampanha.pixKeyCredito,
 
                         type: 'STATIC',
                         merchantCity: 'João Pessoa/PB',

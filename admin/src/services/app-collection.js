@@ -157,7 +157,7 @@ const ngModule = angular.module('services.app-collection', [])
 								var q = appFirestore.query(q, appFirestore.limit(parms.limit));
 							}
 
-							this.unsubscribeSnapshot = appFirestore.onSnapshot(q, querySnapshot => {s
+							this.unsubscribeSnapshot = appFirestore.onSnapshot(q, querySnapshot => {
 
 								this.empty = querySnapshot.empty;
 

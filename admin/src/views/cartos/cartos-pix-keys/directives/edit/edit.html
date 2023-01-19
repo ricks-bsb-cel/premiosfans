@@ -1,0 +1,55 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Configuração de Chave PIX
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <wait-overlay ready="$ctrl.ready">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                <h4>Geração antecipada de PIX</h4>
+                <p class="mr-5">
+                    Informe um <strong>valor em R$</strong> e uma <strong>quantidade</strong> de PIXs a serem
+                    gerados e armazenados antecipadamente.
+                    <br/> Eles serão usados para deixar o processo de venda
+                    mais rápido, pois a chave e o identificador de paramento já estará gerada no momento em que o cliente criar uma compra! <br />
+                    Crie valores iguais aos que serão utilizados nas campanhas que utilizam a chave PIX 
+                    <span class="monospace">{{$ctrl.data.key}}</span>. <br />
+                    Sempre que um PIX for utilizado um novo é gerado para manter a quantidade informada.<br />
+                    Isso também é útil para os casos em que a <strong>Cartos</strong> sair do ar por qualquer motivo.
+                </p>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                <form novalidate>
+                    <div class="row">
+                        <div class="col-5">
+                            <label>Valor</label>
+                        </div>
+                        <div class="col-5">
+                            <label>Quantidade</label>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-repeat="r in $ctrl.rows">
+                        <div class="col-5 mb-2">
+                            <input type="tel" ng-model="r.valor" class="form-control right" money-mask select-on-click>
+                        </div>
+                        <div class="col-5 mb-2">
+                            <input type="tel" ng-model="r.qtd" class="form-control right" integer-mask select-on-click>
+                        </div>
+                        <div class="col-2 mb-2 pt-2">
+                            <a href="#" ng-click="$ctrl.remover($index)" uib-popover="Excluir" class="ng-scope">
+                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </wait-overlay>
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <button class="btn btn-default" type="button" ng-click="$ctrl.add()" ng-if="!$ctrl.error">Adicionar</button>
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Salvar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
+</div>

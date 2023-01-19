@@ -1,7 +1,5 @@
 'use strict';
 
-import { update } from "lodash";
-
 const ngModule = angular.module('collection.campanhas', [])
 
     .factory('collectionCampanhas', function (
@@ -140,6 +138,8 @@ const ngModule = angular.module('collection.campanhas', [])
             if (!campanha.vlTitulo) throw new Error(`O Valor do Título é obrigatório`);
             if (!campanha.qtdNumerosDaSortePorTitulo) throw new Error(`A quantidade de números da sorte por título é obrigatório`);
 
+            if (!campanha.pixKeyCredito) throw new Error(`A Chave PIX que de Crédito é obrigatória`);
+
             let result = {
                 id: campanha.id || 'new',
                 ativo: typeof campanha.ativo === 'function' ? campanha.ativo : false,
@@ -159,7 +159,12 @@ const ngModule = angular.module('collection.campanhas', [])
                 termos: campanha.termos || null,
                 politica: campanha.politica || null,
                 rodape: campanha.rodape || null,
-                regulamento: campanha.regulamento || null
+                regulamento: campanha.regulamento || null,
+
+                pixKeyCredito: campanha.pixKeyCredito,
+                pixKeyCredito_accountId: campanha.pixKeyCredito_accountId,
+                pixKeyCredito_cpf: campanha.pixKeyCredito_cpf,
+                pixKeyCredito_type: campanha.pixKeyCredito_type
             };
 
             campanha.sorteios.forEach(s => {

@@ -181,6 +181,15 @@ const ngModule = angular.module('views.contratos-edit', [
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
 						{
+							key: 'pixKeyCredito',
+							templateOptions: {
+								label: 'PIX de Crédito',
+								required: true
+							},
+							type: 'ng-selector-pix-keys',
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+						},
+						{
 							key: 'vlTitulo',
 							templateOptions: {
 								label: 'Valor',

@@ -32,7 +32,9 @@
                             <tbody>
                                 <tr ng-repeat="c in collectionCartosPixKeys.collection.data  | orderBy: 'numer'">
                                     <td class="number monospace">
-                                        <small class="monospace">{{c.key}}</small>
+                                        <a href="#" ng-click="edit(c)">
+                                            <small class="monospace">{{c.key}}</small>
+                                        </a>
                                     </td>
                                     <td class="doc monospace">
                                         {{c.owner.cpf_cnpj | cpfCnpj}}

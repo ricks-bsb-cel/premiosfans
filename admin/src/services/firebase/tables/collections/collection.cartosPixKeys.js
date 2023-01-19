@@ -5,11 +5,11 @@ const ngModule = angular.module('collection.cartosPixKeys', [])
     .factory('collectionCartosPixKeys', function (
         appCollection
     ) {
-
         const attr = {
             collection: 'cartosPixKeys',
-            autoStartSnapshot: false,
-            filterEmpresa: false
+            autoStartSnapshot: true,
+            filterEmpresa: false,
+            orderBy: 'owner.name'
         };
 
         const firebaseCollection = new appCollection(attr);
@@ -17,7 +17,6 @@ const ngModule = angular.module('collection.cartosPixKeys', [])
         return {
             collection: firebaseCollection
         };
-
     });
 
 
