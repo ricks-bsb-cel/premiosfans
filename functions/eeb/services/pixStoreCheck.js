@@ -4,9 +4,15 @@ const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
 /*
-o Pré-Generate PIX gera um PIX e o deixa pronto para uso em uma compra futura.
-Os PIXs pre gerados são armazenados na colection cartosPixPreGenerated, e não estão vinculados
-à nenhuma compra.
+A pixStoreCheck verifica se é necessário iniciar a rotina de geração de PIX antecipados.
+Ela faz isso da seguinte forma:
+- Recebe a chave PIX e o Valor (em centavos)
+- Procura no RTDB /pixStore/<chavepix>/config/generate/<valor>
+- Se não localizar, não faz nada... cai fora com 200 (foda-se)
+- Se localizar, Procura o total atual de registros de pagamento PIX já gerados no RTDB /pixStore/<chavepix>/qtd/<valor>/qtdAtual (default 0)
+- Se a qtdAtual for menor ou igual á /pixStore/<chavepix>/config/generate/<valor>/qtdMinima, envia para o EEB o método
+pixStoreGenerate N vezes até atingir /pixStore/<chavepix>/config/generate/<valor>/qtdMaxima
+- e, retorna 200. Esta rotina SEMPRE retorna 200...
 */
 
 const firestoreDAL = require('../../api/firestoreDAL');

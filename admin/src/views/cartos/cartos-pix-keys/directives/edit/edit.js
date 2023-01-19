@@ -10,18 +10,29 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
         ) {
             var $ctrl = this;
 
-            $ctrl.ready = true;
+            $ctrl.ready = false;
             $ctrl.error = false;
             $ctrl.data = data;
 
             const key = $ctrl.data.key.replace(/[@.]/g, "-");
-            const path = `pixAntecipado/${key}`;
+            const path = `pixStore/${key}/config`;
 
             $ctrl.rows = [];
 
             appDatabaseHelper.get(path)
                 .then(data => {
-                    $ctrl.rows = data.generate;
+                    $ctrl.data.merchantCity = data.merchantCity || null;
+                    $ctrl.data.additionalInfo = data.additionalInfo || null;
+
+                    Object.keys(data.generate || {}).forEach(v => {
+                        $ctrl.rows.push({
+                            valor: parseFloat((parseInt(v) / 100).toFixed(2)),
+                            qtdMinima: data.generate[v].qtdMinima,
+                            qtdMaxima: data.generate[v].qtdMaxima
+                        })
+                    })
+
+                    $ctrl.ready = true;
                 })
                 .catch(e => {
                     console.error(e);
@@ -30,7 +41,8 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
             $ctrl.add = _ => {
                 $ctrl.rows.push({
                     valor: 0,
-                    qtd: 100
+                    qtdMinima: 10,
+                    qtdMaxima: 50
                 });
             }
 
@@ -42,21 +54,58 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
                 $uibModalInstance.dismiss();
             };
 
+            $ctrl.fields = [
+                {
+                    key: 'merchantCity',
+                    templateOptions: {
+                        label: 'Cidade Vendedor',
+                        type: 'text',
+                        required: true,
+                        maxlength: 32
+                    },
+                    type: 'input',
+                    className: 'col-6'
+                },
+                {
+                    key: 'additionalInfo',
+                    templateOptions: {
+                        label: 'Informações Adicionais',
+                        type: 'text',
+                        required: true,
+                        maxlength: 37
+                    },
+                    type: 'input',
+                    className: 'col-6'
+                },
+            ];
+
             $ctrl.ok = _ => {
+                if ($ctrl.data.merchantCity && $ctrl.data.merchantCity.length > 32) {
+                    return alertFactory.error('O campo de Cidade do Vendedor não pode ter mais do que 32 posições', 'Dados inválidos');
+                }
+
+                if ($ctrl.data.additionalInfo && $ctrl.data.additionalInfo.length > 37) {
+                    return alertFactory.error('O campo de Informações Adicionais não pode ter mais do que 37 posições', 'Dados inválidos');
+                }
+
                 const data = {
                     key: $ctrl.data.key,
                     accountId: $ctrl.data.accountId,
                     cpf: $ctrl.data.cpf,
                     type: $ctrl.data.type,
-                    generate: $ctrl.rows.map(r => {
-                        return {
-                            valor: r.valor,
-                            qtd: r.qtd
-                        }
-                    })
+                    merchantCity: $ctrl.data.merchantCity || null,
+                    additionalInfo: $ctrl.data.additionalInfo || null,
+                    generate: {}
                 };
 
-                if (!data.generate || data.generate.length === 0) data = null;
+                $ctrl.rows.forEach(r => {
+                    data.generate[((r.valor * 100).toFixed(0)).toString()] = {
+                        qtdMinima: r.qtdMinima,
+                        qtdMaxima: r.qtdMaxima
+                    }
+                })
+
+                if (Object.keys(data.generate) === 0) data = null;
 
                 appDatabaseHelper.set(path, data)
                     .then(_ => {

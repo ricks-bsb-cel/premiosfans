@@ -1144,11 +1144,15 @@ user-panel i.fa.fa-refresh {
 .campanhas table .actions {
   width: 160px;
 }
-.cartos-pix-keys-edit-modal input {
+.cartos-pix-keys-edit-modal input.right {
   text-align: right;
 }
 .cartos-pix-keys-edit-modal i.fa {
   font-size: 1.2em;
+}
+.cartos-pix-keys-edit-modal .valores label {
+  display: block;
+  text-align: right;
 }
 .clientes table .dt-alteracao {
   text-align: right;

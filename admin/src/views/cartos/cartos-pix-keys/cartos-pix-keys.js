@@ -45,10 +45,12 @@ const ngModule = angular.module('views.cartos-pix-keys', [
 			console.info(pixkey);
 		}
 
+		/*
 		appAuthHelper.ready()
 			.then(_ => {
 				// startSnapshot();
 			})
+		*/
 
 		$scope.$on('$destroy', function () {
 			$scope.collectionCartosPixKeys.collection.destroySnapshot();

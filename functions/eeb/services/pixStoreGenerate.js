@@ -18,7 +18,10 @@ const cartosGeneratePix = require('./cartos/cartosGeneratePix');
 
 const schema = _ => {
     const schema = Joi.object({
-        idTituloCompra: Joi.string().token().min(18).max(22).required()
+        cpf: Joi.string().token().min(11).required().required(),
+        accountId: Joi.string().token().length(36).required(),
+        key: Joi.string().required(),
+        valor: Joi.number().min(1).max(999999).required()s
     });
 
     return schema;
@@ -103,8 +106,8 @@ const call = (data, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
-        name: 'generate-pedido-pagamento-compra',
-        async: false,
+        name: 'pix-store-generate',
+        async: request && request.query.async ? request.query.async === 'true' : false,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,
         data: data

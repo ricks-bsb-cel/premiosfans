@@ -30,7 +30,7 @@ const schema = _ => {
                 { is: 'DYNAMIC', then: Joi.number().positive().required() }
             ]
         }),
-        additionalInfo: Joi.string().required(),
+        additionalInfo: Joi.string().max(37).required(),
         user_uid: Joi.string().min(1).max(128).optional(),
         idTituloCompra: Joi.string().token().min(18).max(22).optional()
     });
