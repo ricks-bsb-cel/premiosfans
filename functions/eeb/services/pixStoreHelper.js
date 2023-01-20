@@ -96,7 +96,8 @@ async function findNotUsedPix(pixKey, valor, compra) {
     */
 
     let id = null,
-        result = null;
+        result = null,
+        updateData = null;
 
     const query = admin.firestore().collection("cartosPixPreGenerated")
         .where('receiverKey', '==', pixKey)
@@ -111,24 +112,36 @@ async function findNotUsedPix(pixKey, valor, compra) {
             .then(docs => {
 
                 if (docs.size === 0) { // not found
-                    console.info('not found');
                     return result;
                 }
 
                 docs.forEach(d => {
                     id = d.id;
 
-                    transaction.update(d.ref, {
+                    updateData = {
                         utilizado: true,
+                        idTituloCompra: compra.id,
                         idCampanha: compra.idCampanha,
                         idInfluencer: compra.idInfluencer,
                         comprador_email: compra.email,
                         comprador_uid: compra.uidComprador,
-                        comprador_celular: compra.celular
+                        comprador_celular: compra.celular,
+                        comprador_celular_formated: compra.celular_formated,
+                        comprador_nome: compra.nome,
+                        comprador_cpf: compra.cpf,
+                        comprador_cpf_formated: compra.cpf_formated,
+                        dtUtilizacao: global.getToday()
+                    };
 
-                    })
-                })
+                });
 
+                return transaction.update(d.ref, updateData);
+            })
+
+            .then(updateResult => {
+                if (!updateResult) return null;
+
+                // Após salvar, devolve o registro
                 return admin.firestore().collection("cartosPixPreGenerated").doc(id).get();
             })
 
