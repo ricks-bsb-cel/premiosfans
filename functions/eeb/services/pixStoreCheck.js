@@ -1,23 +1,17 @@
 "use strict";
 
-const admin = require('firebase-admin');
+const pixStoreHelper = require('./pixStoreHelper');
 
 const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
-/*
-A pixStoreCheck verifica se é necessário iniciar a rotina de geração de PIX antecipados.
-Ela faz isso da seguinte forma:
-- Recebe a chave PIX e o Valor (em centavos)
-- Procura no RTDB /pixStore/<chavepix>/config/generate/<valor>
-- Se não localizar, não faz nada... cai fora com 200 (foda-se)
-- Se localizar, Procura o total atual de registros de pagamento PIX já gerados no RTDB /pixStore/<chavepix>/qtd/<valor>/qtdAtual (default 0)
-- Se a qtdAtual for menor ou igual á /pixStore/<chavepix>/config/generate/<valor>/qtdMinima, envia para o EEB o método
-pixStoreGenerate N vezes até atingir /pixStore/<chavepix>/config/generate/<valor>/qtdMaxima
-- e, retorna 200. Esta rotina SEMPRE retorna 200...
-*/
+const pixStoreGenerate = require('./pixStoreGenerate');
 
-// const firestoreDAL = require('../../api/firestoreDAL');
+/*
+A pixStoreCheck verifica se é necessário gerar novos PIXs antecipados.
+    - Carrega a configuração do PIX/Valor. Se não exitir, quer dizer que o PIX/Valor não tem PIX antecipado
+    - Se a quantidade de registros disponíveis for menor do que o mínimo, gera até a quantidade máxima
+*/
 
 const schema = _ => {
     const schema = Joi.object({
@@ -30,12 +24,13 @@ const schema = _ => {
 
 async function pixStoreCheck(parm) {
     const valor = parm.valor.toFixed(0);
-    const query = admin.database().ref(`/pixStore/${parm.key}/config`);
 
-    let pixStoreConfig = await query.once("value");
-    pixStoreConfig = pixStoreConfig.val() || null;
+    let pixStoreConfig = await pixStoreHelper.getPixKeyConfig(parm.key);
 
-    if (!pixStoreConfig || !pixStoreConfig.generate || !pixStoreConfig.generate[valor]) return null;
+    if (!pixStoreConfig || // Se não existir a configuração
+        !pixStoreConfig.generate || // Nem as chaves de valor de geração
+        !pixStoreConfig.generate[valor] // Nem a chave de valor a ser gerada
+    ) return null;
 
     pixStoreConfig = {
         ...pixStoreConfig,
@@ -44,7 +39,43 @@ async function pixStoreCheck(parm) {
 
     delete pixStoreConfig.generate;
 
-    return pixStoreConfig;
+    let
+        qtdCalls = 0,
+        qtdAtual = await pixStoreHelper.getPixKeyQtd(parm.key, valor);
+
+    const qtdMinima = pixStoreConfig.qtdMinima;
+    const qtdMaxima = pixStoreConfig.qtdMaxima;
+
+    if (qtdAtual >= qtdMinima) {
+        return {
+            success: true,
+            ignored: true,
+            message: `Quantidade atual [${qtdAtual}] maior do que a mínima exigida [${qtdMinima}]`
+        }
+    }
+
+    // A quantidade atual é menor do que a qtd mínima exigida.
+    const pixParm = {
+        cpf: pixStoreConfig.cpf,
+        accountId: pixStoreConfig.accountId,
+        key: pixStoreConfig.key,
+        valor: parm.valor,
+        merchantCity: pixStoreConfig.merchantCity,
+        additionalInfo: pixStoreConfig.additionalInfo
+    };
+
+    while (qtdAtual < qtdMaxima) {
+        await pixStoreGenerate.call(pixParm);
+
+        qtdAtual++;
+        qtdCalls++;
+    }
+
+    return {
+        success: true,
+        ignored: false,
+        message: `${qtdCalls} chamadas enfileiradas. Máximo de ${qtdMaxima}`
+    };
 }
 
 class Service extends eebService {
@@ -95,11 +126,21 @@ exports.Service = Service;
 const call = (data, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
 
+    if (!data || !data.key || !data.valor) {
+        if (response) {
+            return response.status(500).json({ success: false, error: 'Invalid request' });
+        } else {
+            throw new Error('Invalid request');
+        }
+    }
+
     const service = new Service(request, response, {
         name: 'pix-store-check',
-        async: request && request.query.async ? request.query.async === 'true' : false,
+        async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
-        auth: eebAuthTypes.internal,
+        ordered: true,
+        orderingKey: data.key + '-' + data.valor.toString(),
+        auth: eebAuthTypes.token,
         data: data
     });
 

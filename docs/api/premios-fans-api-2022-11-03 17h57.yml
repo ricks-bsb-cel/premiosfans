@@ -404,6 +404,42 @@ paths:
         '200':
           description: Success
 
+  /api/eeb/v1/psc:
+    post:
+      tags:
+      - EEB
+      summary: PixStore Check
+      operationId: eeb-pix-store-check
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-pix-store-check
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
 
 securityDefinitions:
   firebase:

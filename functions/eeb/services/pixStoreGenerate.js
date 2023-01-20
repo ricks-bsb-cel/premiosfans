@@ -1,10 +1,8 @@
 "use strict";
 
-const admin = require('firebase-admin');
-
 const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
-const global = require('../../global');
+const pixStoreHelper = require('./pixStoreHelper');
 
 /*
 o Pré-Generate PIX gera um PIX e o deixa pronto para uso em uma compra futura.
@@ -30,38 +28,38 @@ const schema = _ => {
     return schema;
 }
 
-const toSeconds = time => {
-    return parseFloat(parseFloat(time[0] + '.' + time[1]).toFixed(2));
-}
-
-const incrementCounter = (pixKey, valor) => {
-    return new Promise((resolve, reject) => {
-        const path = `/pixStore/${pixKey}/qtd/${valor}`;
-        const ref = admin.database().ref(path);
-
-        return ref.transaction(data => {
-            data = data || {};
-
-            data.qtdAtual = data.qtdAtual || 0;
-
-            data.qtdAtual++;
-            data.dtUltimaAtualizacao = global.getToday();
-
-            return data;
-        }).then(transactionResult => {
-            if (!transactionResult.committed) throw new Error('Transaction error...');
-
-            return resolve();
-        }).catch(e => {
-            console.error(e);
-
-            return reject(e);
-        })
-
-    })
-}
-
 async function pixStoreGenerate(parm) {
+
+    const currentConfig = await pixStoreHelper.getPixKeyConfig(parm.key);
+
+    if (!currentConfig) {
+        return {
+            success: true,
+            ignored: true,
+            message: `Config ${parm.key} not found`
+        }
+    }
+
+    const currentQtd = await pixStoreHelper.getPixKeyQtd(parm.key, parm.valor);
+
+    if (!currentConfig.generate[parm.valor]) {
+        return {
+            success: true,
+            ignored: true,
+            message: `Config ${parm.key} value ${parm.valor} not found`
+        }
+    }
+
+    const qtdMaxima = currentConfig.generate[parm.valor].qtdMaxima;
+
+    if (currentQtd >= qtdMaxima) {
+        return {
+            success: true,
+            ignored: true,
+            message: `PixStore already full`
+        }
+    }
+
     const pixData = {
         cpf: parm.cpf,
         accountId: parm.accountId,
@@ -89,14 +87,14 @@ async function pixStoreGenerate(parm) {
 
     const credential = await userCredentials.getCredential(parm.cpf, parm.accountId);
 
-    result.elapsedTimeGetCredential = toSeconds(process.hrtime(callStart));
+    result.elapsedTimeGetCredential = pixStoreHelper.toSeconds(process.hrtime(callStart));
 
     const
         callPix = process.hrtime(),
         pix = await cartosHttpRequest.generatePix(pixData, credential.token);
 
-    result.elapsedTimePixRequest = toSeconds(process.hrtime(callPix));
-    result.elapsedTimeGenerate = toSeconds(process.hrtime(callStart));
+    result.elapsedTimePixRequest = pixStoreHelper.toSeconds(process.hrtime(callPix));
+    result.elapsedTimeGenerate = pixStoreHelper.toSeconds(process.hrtime(callStart));
 
     result = {
         ...pixData,
@@ -108,7 +106,7 @@ async function pixStoreGenerate(parm) {
     result = await collectionCartosPixPreGenerated.add(result);
 
     // Atualiza o contador
-    await incrementCounter(parm.key, parm.valor);
+    await pixStoreHelper.incrementPixKeyValue(parm.key, parm.valor);
 
     return result;
 }
@@ -174,7 +172,7 @@ const call = (data, request, response) => {
 
     const service = new Service(request, response, {
         name: 'pix-store-generate',
-        async: request && request.query.async ? request.query.async === 'true' : false,
+        async: request && request.query.async ? request.query.async === 'true' : true,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,
         ordered: true,

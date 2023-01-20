@@ -502,8 +502,6 @@ const createSubscription = (topic, subscription, method, ordered) => {
 
         // https://googleapis.dev/nodejs/pubsub/latest/index.html
 
-        
-
         const options = {
             name: subscription,
             pushConfig: {
