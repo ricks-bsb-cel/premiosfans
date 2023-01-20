@@ -45,7 +45,17 @@
                             <a href="#" ng-click="$ctrl.remover($index)" uib-popover="Excluir" class="ng-scope">
                                 <i class="fa fa-trash-o" aria-hidden="true"></i>
                             </a>
+                            <a href="#" ng-if="r.refresh" ng-click="$ctrl.checkStorage(r)" uib-popover="Atualizar Storage" class="ng-scope">
+                                <i class="fa fa-refresh ml-2" aria-hidden="true"></i>
+                            </a>
                         </div>
+                    </div>
+
+                    <div class="row right p-1">
+                        <button class="btn btn-default btn-sm" type="button" ng-click="$ctrl.add()" ng-if="!$ctrl.error">
+                            <i class="fa fa-plus mr-2" aria-hidden="true"></i>
+                            Adicionar
+                        </button>
                     </div>
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
@@ -56,7 +66,7 @@
                         <li><strong>Qtd Min:</strong>
                             É o limíte mínimo para a geração dos pagamentos antecipados PIX. Se o
                             total de registros
-                            for igual ou menor do que este valor, a rotina irá gerar novos registros de pagamento até o
+                            for menor do que este valor a rotina irá gerar novos registros de pagamento até o
                             limite máximo.</li>
                         <li><strong>Qtd Max:</strong>
                             É o máximo de registros de pagamento que a chave e valor podem ter
@@ -78,18 +88,12 @@
                         Esta rotina também é útil para os casos em que a <strong>Cartos</strong> sair do ar por qualquer
                         motivo!
                     </p>
-                    <p>
-                        * O botão para adicionar novos valores e quantidades está abaixo (escrito <i>Adicionar</i>, ao
-                        lado do <i>Salvar</i>).
-                        RTFM!
-                    </p>
                 </div>
             </div>
         </form>
     </wait-overlay>
 </div>
 <div class="modal-footer" ng-if="$ctrl.ready">
-    <button class="btn btn-default" type="button" ng-click="$ctrl.add()" ng-if="!$ctrl.error">Adicionar</button>
     <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Salvar</button>
     <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
 </div>

@@ -209,7 +209,6 @@ const ngModule = angular.module('services.premios-fans', [])
                     );
             }
 
-
             const cep = attrs => {
                 attrs = attrs || {};
                 attrs.data = attrs.data || {};
@@ -262,11 +261,47 @@ const ngModule = angular.module('services.premios-fans', [])
                     );
             }
 
+            const checkPixStorage = attrs => {
+                attrs = attrs || {};
+
+                attrs.data = attrs.data || {};
+
+                if (!attrs.data.key || !attrs.data.valor) {
+                    throw new Error('Invalid parms');
+                }
+
+                attrs.data.valor = parseInt((attrs.data.valor * 100).toFixed(0));
+
+                $http({
+                    url: getUrlEndPoint('/api/eeb/v1/psc?async=true'),
+                    method: 'post',
+                    data: attrs.data,
+                    headers: {
+                        'Authorization': 'Bearer ' + appAuthHelper.token
+                    }
+                })
+
+                    .then(
+                        function (response) {
+                            toastrFactory.info(`Pedido de atualização do Pix Storage chave [${attrs.data.key}], valor [${attrs.data.valor}] foi solicitado...`);
+
+                            if (typeof attrs.success === 'function') attrs.success(response.data.data);
+
+                        },
+                        function (e) {
+                            console.error(e);
+                            toastrFactory.error(`Erro solicitando atualização do Pix Storage chave [${attrs.data.key}], valor [${attrs.data.valor}]...`);
+                            if (typeof attrs.error === 'function') attrs.error(e);
+                        }
+                    );
+            }
+
             return {
                 generateTemplates: generateTemplates,
                 pagarTituloCompra: pagarTituloCompra,
                 checkTituloCompra: checkTituloCompra,
                 ativarCampanha: ativarCampanha,
+                checkPixStorage: checkPixStorage,
                 cep: cep,
                 cnpj: cnpj,
                 refreshCartosPixKeys: refreshCartosPixKeys

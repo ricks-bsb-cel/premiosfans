@@ -6,6 +6,7 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
         function (
             $uibModalInstance,
             appDatabaseHelper,
+            premiosFansService,
             data
         ) {
             var $ctrl = this;
@@ -22,7 +23,7 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
             appDatabaseHelper.get(path)
                 .then(data => {
                     data = data || {};
-                    
+
                     $ctrl.data.merchantCity = data.merchantCity || null;
                     $ctrl.data.additionalInfo = data.additionalInfo || null;
 
@@ -30,7 +31,8 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
                         $ctrl.rows.push({
                             valor: parseFloat((parseInt(v) / 100).toFixed(2)),
                             qtdMinima: data.generate[v].qtdMinima,
-                            qtdMaxima: data.generate[v].qtdMaxima
+                            qtdMaxima: data.generate[v].qtdMaxima,
+                            refresh: true
                         })
                     })
 
@@ -44,7 +46,8 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
                 $ctrl.rows.push({
                     valor: 0,
                     qtdMinima: 10,
-                    qtdMaxima: 50
+                    qtdMaxima: 50,
+                    refrewh: false
                 });
             }
 
@@ -55,6 +58,15 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
             $ctrl.cancel = function () {
                 $uibModalInstance.dismiss();
             };
+
+            $ctrl.checkStorage = row => {
+                premiosFansService.checkPixStorage({
+                    data: {
+                        key: $ctrl.data.key,
+                        valor: row.valor
+                    }
+                })
+            }
 
             $ctrl.fields = [
                 {
