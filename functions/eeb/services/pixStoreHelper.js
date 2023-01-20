@@ -88,6 +88,75 @@ const toSeconds = time => {
     return parseFloat(parseFloat(time[0] + '.' + time[1]).toFixed(2));
 }
 
+async function findNotUsedPix(pixKey, valor, compra) {
+    /*
+    Este metodo faz o seguinte:
+    - Abre uma transação localizando o próximo PIX que ainda não foi utilizado com a mesma chave e valor
+    - Passa o PIX para utilizado, informando os dados da compra
+    */
+
+    let id = null,
+        result = null;
+
+    const query = admin.firestore().collection("cartosPixPreGenerated")
+        .where('receiverKey', '==', pixKey)
+        .where('value', '==', valor)
+        .where('utilizado', '==', false)
+        .orderBy('dtInclusao_js')
+        .limit(1);
+
+    return admin.firestore().runTransaction(transaction => {
+
+        return transaction.get(query)
+            .then(docs => {
+
+                if (docs.size === 0) { // not found
+                    console.info('not found');
+                    return result;
+                }
+
+                docs.forEach(d => {
+                    id = d.id;
+
+                    transaction.update(d.ref, {
+                        utilizado: true,
+                        idCampanha: compra.idCampanha,
+                        idInfluencer: compra.idInfluencer,
+                        comprador_email: compra.email,
+                        comprador_uid: compra.uidComprador,
+                        comprador_celular: compra.celular
+
+                    })
+                })
+
+                return admin.firestore().collection("cartosPixPreGenerated").doc(id).get();
+            })
+
+            .then(docUpdated => {
+                if (docUpdated) {
+                    result = docUpdated.data();
+                    result.id = id;
+                }
+
+                if (result) {
+                    return decrementPixKeyValue(pixKey, valor);
+                } else {
+                    return null;
+                }
+            })
+
+            .then(_ => {
+                return result;
+            })
+
+            .catch(e => {
+                console.error(e);
+
+                return null;
+            })
+    })
+
+}
 
 exports.getPathConfig = getPathConfig;
 exports.getPathQtd = getPathQtd;
@@ -96,3 +165,4 @@ exports.decrementPixKeyValue = decrementPixKeyValue;
 exports.getPixKeyConfig = getPixKeyConfig;
 exports.getPixKeyQtd = getPixKeyQtd;
 exports.toSeconds = toSeconds;
+exports.findNotUsedPix = findNotUsedPix;

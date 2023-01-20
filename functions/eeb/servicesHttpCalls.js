@@ -166,6 +166,11 @@ api.post("/v1/pixPreGenerate", (request, response) => {
     initFirebase.call(require('./services/pixStoreGenerate').callRequest, request, response);
 })
 
+// PixStore Not Used Pix
+api.post("/v1/pixFindNotUsed", (request, response) => {
+    initFirebase.call(require('./services/pixStoreGetNotUsedPix').callRequest, request, response);
+})
+
 /* Cartos
 
 api.post("/v1/pay/user-credential", (request, response) => {

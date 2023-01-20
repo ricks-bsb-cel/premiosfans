@@ -6,6 +6,9 @@ const Joi = require('joi');
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
+
+Esta é a rotina responsável por solicitar um PIX (mas não o "cola" na compra)
+
 */
 
 const firestoreDAL = require('../../api/firestoreDAL');

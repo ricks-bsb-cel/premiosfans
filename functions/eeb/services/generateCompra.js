@@ -4,6 +4,8 @@ const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 const Joi = require('joi');
 
+const pixStoreHelper = require('./pixStoreHelper');
+
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
@@ -29,7 +31,12 @@ const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
     - Gera o registro de Compra e dos títulos
     - NÃO GERA OS PRÊMIOS DO TÍTULO. Isso será feito após o pagamento.
 
-    * Lembre-se! Cada vez que esta rotina é executada um novo títuo é gerado!
+    - Esta rotina além de gerar a compra também prepara os títulos (mas não vincula os números)
+
+    20/01/2023
+    - Uso do PIX Storage. Procura por lá um PIX com a mesma chave/valor ainda não utilizado.
+    - Se achar, não solicita o generatePedidoPagamentoCompra, já chama o acompanhamentoTituloCompra.setPixData
+
 */
 
 const schema = _ => {
@@ -144,6 +151,9 @@ class Service extends eebService {
                         qtdTitulosCompra: parseInt(result.qtdTitulos),
                         uidComprador: this.parm.attributes.user_uid,
                         qtdNumerosGerados: 0,
+                        pixKeyCredito: result.data.campanha.pixKeyCredito,
+                        pixKeyCpf: result.data.campanha.pixKeyCredito_cpf,
+                        pixKeyAccountId: result.data.campanha.pixKeyCredito_accountId,
                         qtdTotalProcessos:
                             ( // Cada título gera seus próprios premios
                                 parseInt(result.qtdTitulos) * parseInt(result.data.campanha.qtdPremios)
@@ -223,6 +233,14 @@ class Service extends eebService {
                 })
 
                 .then(_ => {
+                    // Verifica se existe um PIX disponível no PIX Storage com a mesma CHAVE e VALOR
+                    // - A chave PIX está em result.compra.pixKeyCredito
+                    // - O valor total está em result.data.compra.vlTotalCompra
+
+                    const pixKey = result.data.campanha.pixKeyCredito;
+                    const valor = parseInt((result.data.compra.vlTotalCompra * 100).toFixed(0));
+
+
                     // Adição concluída. Momento de gerar o pedido de pagamento...
                     return generatePedidoPagamentoCompra.call({
                         idTituloCompra: result.data.compra.id

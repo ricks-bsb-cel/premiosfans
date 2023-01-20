@@ -15,6 +15,7 @@ const acompanhamentoTituloCompra = require('../acompanhamentoTituloCompra');
 
 /*
     Cria um PIX para pagamento e o salva na collection cartosPix
+    Também cola o PIX no tituloCompra
 */
 
 const schema = _ => {
