@@ -502,10 +502,12 @@ const createSubscription = (topic, subscription, method, ordered) => {
 
         // https://googleapis.dev/nodejs/pubsub/latest/index.html
 
+        
+
         const options = {
             name: subscription,
             pushConfig: {
-                pushEndpoint: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/receiver/${method}`
+                pushEndpoint: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/receiver/${method.substr(9)}`
             },
             topic: topic,
             messageRetentionDuration: { seconds: 7 * 24 * 60 * 60, nanos: 0 },

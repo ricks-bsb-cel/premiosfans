@@ -21,6 +21,8 @@ const ngModule = angular.module('views.cartos-pix-keys.edit', [])
 
             appDatabaseHelper.get(path)
                 .then(data => {
+                    data = data || {};
+                    
                     $ctrl.data.merchantCity = data.merchantCity || null;
                     $ctrl.data.additionalInfo = data.additionalInfo || null;
 

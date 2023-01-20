@@ -322,6 +322,10 @@ exports.cartosPixKeys = _ => {
     return new collectionClass('cartosPixKeys');
 }
 
+exports.cartosPixPreGenerated = _ =>{
+    return new collectionClass('cartosPixPreGenerated');
+}
+
 exports.cartosBalance = _ => {
     return new collectionClass('cartosBalance');
 }

@@ -156,6 +156,16 @@ api.post("/v1/cartos/generate-pix", (request, response) => {
 })
 
 
+// PixStore Checker
+api.post("/v1/psc", (request, response) => {
+    initFirebase.call(require('./services/pixStoreCheck').callRequest, request, response);
+})
+
+// PixStore Checker
+api.post("/v1/pixPreGenerate", (request, response) => {
+    initFirebase.call(require('./services/pixStoreGenerate').callRequest, request, response);
+})
+
 /* Cartos
 
 api.post("/v1/pay/user-credential", (request, response) => {

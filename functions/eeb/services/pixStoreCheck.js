@@ -1,5 +1,7 @@
 "use strict";
 
+const admin = require('firebase-admin');
+
 const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
@@ -15,19 +17,34 @@ pixStoreGenerate N vezes até atingir /pixStore/<chavepix>/config/generate/<valo
 - e, retorna 200. Esta rotina SEMPRE retorna 200...
 */
 
-const firestoreDAL = require('../../api/firestoreDAL');
-
-const collectionTitulosCompras = firestoreDAL.titulosCompras();
-const collectionCampanha = firestoreDAL.campanhas();
-
-const cartosGeneratePix = require('./cartos/cartosGeneratePix');
+// const firestoreDAL = require('../../api/firestoreDAL');
 
 const schema = _ => {
     const schema = Joi.object({
-        idTituloCompra: Joi.string().token().min(18).max(22).required()
+        key: Joi.string().required(),
+        valor: Joi.number().min(1).max(999999).required()
     });
 
     return schema;
+}
+
+async function pixStoreCheck(parm) {
+    const valor = parm.valor.toFixed(0);
+    const query = admin.database().ref(`/pixStore/${parm.key}/config`);
+
+    let pixStoreConfig = await query.once("value");
+    pixStoreConfig = pixStoreConfig.val() || null;
+
+    if (!pixStoreConfig || !pixStoreConfig.generate || !pixStoreConfig.generate[valor]) return null;
+
+    pixStoreConfig = {
+        ...pixStoreConfig,
+        ...pixStoreConfig.generate[valor]
+    };
+
+    delete pixStoreConfig.generate;
+
+    return pixStoreConfig;
 }
 
 class Service extends eebService {
@@ -50,43 +67,13 @@ class Service extends eebService {
                 .then(dataResult => {
                     result.parm = dataResult;
 
-                    return collectionTitulosCompras.getDoc(result.parm.idTituloCompra);
+                    return pixStoreCheck(result.parm)
                 })
 
-                .then(resultTituloCompra => {
-                    result.tituloCompra = resultTituloCompra;
-
-                    if (result.tituloCompra.situacao !== 'aguardando-pagamento') throw new Error(`A compra ${result.parm.idTituloCompra} não está em situação que permita pagamento.`);
-
-                    return collectionCampanha.getDoc(result.tituloCompra.idCampanha);
-                })
-
-                .then(resultCampanha => {
-
-                    if (!resultCampanha.pixKeyCredito || !resultCampanha.pixKeyCredito_accountId || !resultCampanha.pixKeyCredito_cpf) throw new Error(`A compra ${result.parm.idTituloCompra} pertence a uma campanha sem PIX de pagamento configurado.`);
-
-                    // Geração do PIX
-                    const pixData = {
-                        cpf: resultCampanha.pixKeyCredito_cpf,
-                        accountId: resultCampanha.pixKeyCredito_accountId,
-                        receiverKey: resultCampanha.pixKeyCredito,
-
-                        type: 'STATIC',
-                        merchantCity: 'João Pessoa/PB',
-                        value: result.tituloCompra.vlTotalCompra * 100,
-                        additionalInfo: `PremiosFans ${result.tituloCompra.id}`,
-                        user_uid: result.tituloCompra.uidComprador,
-                        idTituloCompra: result.parm.idTituloCompra
-                    };
-
-                    return cartosGeneratePix.call(pixData);
-                })
-
-                .then(cartosGeneratePixResult => {
+                .then(pixStoreConfigResult => {
                     result = {
                         success: true,
-                        idTituloCompra: result.tituloCompra.id,
-                        pixService: cartosGeneratePixResult
+                        pixStoreConfig: pixStoreConfigResult
                     };
 
                     return resolve(result);
@@ -109,8 +96,8 @@ const call = (data, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
-        name: 'generate-pedido-pagamento-compra',
-        async: false,
+        name: 'pix-store-check',
+        async: request && request.query.async ? request.query.async === 'true' : false,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,
         data: data
