@@ -178,6 +178,8 @@ angular.module('app', [])
         }
 
         const watchTituloCompraUsuario = (idTituloCompra, callback) => {
+            unwatchTituloCompraUsuario();
+            
             observerTitulosComprasUsuario[idTituloCompra] = {
                 f: callback
             };
@@ -383,7 +385,6 @@ angular.module('app', [])
                             pagarCompraFactory.delegate.show(tituloCompra);
                         }
                     }
-
 
                     Swal.fire({
                         title: 'Confirme seus dados',

@@ -38,7 +38,9 @@ const incrementPixKeyValue = (pixKey, valor) => {
     })
 }
 
-const decrementPixKeyValue = (pixKey, valor) => {
+const decrementPixKeyValue = (pixKey, valor, reset) => {
+    reset = typeof reset === 'boolean' ? reset : false;
+
     return new Promise((resolve, reject) => {
         const path = getPathQtd(pixKey, valor);
         const ref = admin.database().ref(path);
@@ -48,7 +50,9 @@ const decrementPixKeyValue = (pixKey, valor) => {
 
             data.qtdAtual = data.qtdAtual || 0;
 
-            if (data.qtdAtual > 0) data.qtdAtual--;
+            if (data.qtdAtual > 0) {
+                reset ? data.qtdAtual = 0 : data.qtdAtual--;
+            }
 
             data.dtLastDecrementUpdate = global.getToday();
 
@@ -56,7 +60,7 @@ const decrementPixKeyValue = (pixKey, valor) => {
         }).then(transactionResult => {
             if (!transactionResult.committed) throw new Error('decrementPixKeyValue Transaction error...');
 
-            return resolve();
+            return resolve(null);
         }).catch(e => {
             console.error(e);
 
@@ -95,9 +99,8 @@ async function findNotUsedPix(pixKey, valor, compra) {
     - Passa o PIX para utilizado, informando os dados da compra
     */
 
-    let id = null,
-        result = null,
-        updateData = null;
+    let result = null,
+        doc = null;
 
     const query = admin.firestore().collection("cartosPixPreGenerated")
         .where('receiverKey', '==', pixKey)
@@ -111,47 +114,50 @@ async function findNotUsedPix(pixKey, valor, compra) {
         return transaction.get(query)
             .then(docs => {
 
-                if (docs.size === 0) { // not found
-                    return result;
+                if (docs.size === 0) { // Not found
+                    return decrementPixKeyValue(pixKey, valor, true);
                 }
 
+                let updateData = { utilizado: true };
+
                 docs.forEach(d => {
-                    id = d.id;
+                    doc = d;
 
-                    updateData = {
-                        utilizado: true,
-                        idTituloCompra: compra.id,
-                        idCampanha: compra.idCampanha,
-                        idInfluencer: compra.idInfluencer,
-                        comprador_email: compra.email,
-                        comprador_uid: compra.uidComprador,
-                        comprador_celular: compra.celular,
-                        comprador_celular_formated: compra.celular_formated,
-                        comprador_nome: compra.nome,
-                        comprador_cpf: compra.cpf,
-                        comprador_cpf_formated: compra.cpf_formated,
-                        dtUtilizacao: global.getToday()
+                    result = Object.assign(doc.data(), { id: d.id });
+
+                    global.setDateTime(updateData, 'dtUtilizacao');
+
+                    if (compra) {
+                        updateData.idTituloCompra = compra.id;
+                        updateData.idCampanha = compra.idCampanha;
+                        updateData.idInfluencer = compra.idInfluencer;
+                        updateData.comprador_email = compra.email;
+                        updateData.comprador_uid = compra.uidComprador;
+                        updateData.comprador_celular = compra.celular;
+                        updateData.comprador_celular_formated = compra.celular_formated;
+                        updateData.comprador_nome = compra.nome;
+                        updateData.comprador_cpf = compra.cpf;
+                        updateData.comprador_cpf_formated = compra.cpf_formated;
+                        updateData.dtUtilizacao = global.getToday();
                     };
-
                 });
 
-                return transaction.update(d.ref, updateData);
+                transaction.update(doc.ref, updateData);
+
+                result = {
+                    ...result,
+                    ...updateData
+                };
+
+                return result;
+
             })
 
             .then(updateResult => {
                 if (!updateResult) return null;
 
-                // Após salvar, devolve o registro
-                return admin.firestore().collection("cartosPixPreGenerated").doc(id).get();
-            })
-
-            .then(docUpdated => {
-                if (docUpdated) {
-                    result = docUpdated.data();
-                    result.id = id;
-                }
-
                 if (result) {
+                    // Decrementa o total de Documentos disponíveis para o PIX/Valor
                     return decrementPixKeyValue(pixKey, valor);
                 } else {
                     return null;
@@ -163,7 +169,7 @@ async function findNotUsedPix(pixKey, valor, compra) {
             })
 
             .catch(e => {
-                console.error(e);
+                console.error(e.message);
 
                 return null;
             })

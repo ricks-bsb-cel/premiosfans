@@ -19,6 +19,7 @@ const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
 const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 const collectionTitulos = firestoreDAL.titulos();
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
+const collectionCartosPix = firestoreDAL.cartosPix();
 
 const generatePedidoPagamentoCompra = require('./generatePedidoPagamentoCompra');
 const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
@@ -237,23 +238,38 @@ class Service extends eebService {
                     // - A chave PIX está em result.compra.pixKeyCredito
                     // - O valor total está em result.data.compra.vlTotalCompra
 
-                    const pixKey = result.data.campanha.pixKeyCredito;
-                    const valor = parseInt((result.data.compra.vlTotalCompra * 100).toFixed(0));
+                    const pixKey = result.data.compra.pixKeyCredito;
+                    const valorPix = parseInt((result.data.compra.vlTotalCompra * 100).toFixed(0));
 
+                    console.info('PixSearch', pixKey, valorPix);
 
-                    // Adição concluída. Momento de gerar o pedido de pagamento...
-                    return generatePedidoPagamentoCompra.call({
-                        idTituloCompra: result.data.compra.id
-                    });
+                    return pixStoreHelper.findNotUsedPix(pixKey, valorPix, result.data.compra);
                 })
 
-                .then(pedidoPagamentoResult => {
-                    result.data.pedidoPagamento = pedidoPagamentoResult.result;
+                .then(findNotUsedPixResult => {
+
+                    if (findNotUsedPixResult) {
+                        console.info('found', result.data.compra.id);
+                        // Localizei um PIX disponivel (que já foi vinculado com a compra). Atualizo a compra com os dados do pix.
+
+                        return Promise.all([
+                            collectionCartosPix.add(findNotUsedPixResult),
+                            collectionTitulosCompras.merge(result.data.compra.id, { pix: findNotUsedPixResult }),
+                            acompanhamentoTituloCompra.setPixData(result.data.compra, findNotUsedPixResult)
+                        ])
+                    }
+
+                    console.info('not found', result.data.compra.id)
+                    // Não localizei pix disponível no storage, solicita a geração
+                    return generatePedidoPagamentoCompra.call({ idTituloCompra: result.data.compra.id });
+
+                })
+
+                .then(_ => {
 
                     // Retornando só o que interessa
                     result.data = {
-                        compra: { id: result.data.compra.id },
-                        pedidoPagamento: result.data.pedidoPagamento
+                        compra: { id: result.data.compra.id }
                     };
 
                     return resolve(result);
@@ -277,7 +293,7 @@ const call = (data, request, response) => {
 
     const service = new Service(request, response, {
         name: 'generate-titulo',
-        async: request && request.query.async ? request.query.async === 'true' : true,
+        async: false,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.token,
         data: data
