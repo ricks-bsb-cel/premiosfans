@@ -105,7 +105,14 @@ const getUserTokenFromRequest = (request, response) => {
             null;
     }
 
-    if (!token && cookies) token = cookies.get("__session") || null;
+    if (!token && cookies) {
+        try {
+            token = cookies.get("__session") || null;
+        }
+        catch (e) {
+            token = null;
+        }
+    }
 
     if (token && token.startsWith("Bearer ")) token = token.substr(7);
 

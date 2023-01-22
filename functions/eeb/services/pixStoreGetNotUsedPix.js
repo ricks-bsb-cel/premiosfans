@@ -26,7 +26,7 @@ class Service extends eebService {
     run() {
         return new Promise((resolve, reject) => {
 
-            let result = {
+            const result = {
                 success: true
             };
 

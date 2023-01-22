@@ -23,6 +23,7 @@ const collectionCartosPix = firestoreDAL.cartosPix();
 
 const generatePedidoPagamentoCompra = require('./generatePedidoPagamentoCompra');
 const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
+const pixStoreCheck = require('./pixStoreCheck');
 
 /*
     generateTitulo
@@ -88,7 +89,9 @@ class Service extends eebService {
                 success: true,
                 host: this.parm.host,
                 qtdTitulos: 0,
-                data: {}
+                data: {},
+                pixKey: null,
+                pixValue: null
             };
 
             return schema().validateAsync(this.parm.data)
@@ -238,30 +241,29 @@ class Service extends eebService {
                     // - A chave PIX está em result.compra.pixKeyCredito
                     // - O valor total está em result.data.compra.vlTotalCompra
 
-                    const pixKey = result.data.compra.pixKeyCredito;
-                    const valorPix = parseInt((result.data.compra.vlTotalCompra * 100).toFixed(0));
+                    result.pixKey = result.data.compra.pixKeyCredito;
+                    result.pixValue = parseInt((result.data.compra.vlTotalCompra * 100).toFixed(0));
 
-                    console.info('PixSearch', pixKey, valorPix);
-
-                    return pixStoreHelper.findNotUsedPix(pixKey, valorPix, result.data.compra);
+                    return pixStoreHelper.findNotUsedPix(result.pixKey, result.pixValue, result.data.compra);
                 })
 
                 .then(findNotUsedPixResult => {
 
                     if (findNotUsedPixResult) {
-                        console.info('found', result.data.compra.id);
                         // Localizei um PIX disponivel (que já foi vinculado com a compra). Atualizo a compra com os dados do pix.
-
                         return Promise.all([
-                            collectionCartosPix.add(findNotUsedPixResult),
-                            collectionTitulosCompras.merge(result.data.compra.id, { pix: findNotUsedPixResult }),
-                            acompanhamentoTituloCompra.setPixData(result.data.compra, findNotUsedPixResult)
+                            collectionCartosPix.add(findNotUsedPixResult), // Salva o PIX em CartosPix (como se tivesse sido gerado agora)
+                            collectionTitulosCompras.merge(result.data.compra.id, { pix: findNotUsedPixResult }), // Cola o pix na compra
+                            acompanhamentoTituloCompra.setPixData(result.data.compra, findNotUsedPixResult), // Atualiza o FrontEnd
+                            pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }) // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
                         ])
                     }
 
-                    console.info('not found', result.data.compra.id)
                     // Não localizei pix disponível no storage, solicita a geração
-                    return generatePedidoPagamentoCompra.call({ idTituloCompra: result.data.compra.id });
+                    return Promise.all([
+                        generatePedidoPagamentoCompra.call({ idTituloCompra: result.data.compra.id }), // Solicita que um nov PIX seja gerado
+                        pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }) // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
+                    ])
 
                 })
 

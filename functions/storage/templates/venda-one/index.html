@@ -160,9 +160,13 @@
                                         <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
                                             class="m-0 mb-20 p-10">
                                             <div class="sugestao text-center">
-                                                <h3 class="mb-10 mt-10">
+                                                <h3 class="mb-0 mt-10">
                                                     {{{this.qtdExibicao}}}
                                                 </h3>
+                                                <p class="mb-10 mt-10" style="line-height:18px;">
+                                                    <span>{{this.chances}}</span>
+                                                    <small>chances de ganhar!</small>
+                                                </p>
                                             </div>
                                         </article>
                                     </div>
@@ -321,7 +325,7 @@
         </svg>
     </div>
 
-    <script type="text/ng-template" id="form-cliente.htm">
+    <script type="text/ng-template" version="{{version}}" id="form-cliente.htm">
         <article
             id="form-cliente"
             class="pt-20 pb-20 mb-0 mt-5"
@@ -373,7 +377,7 @@
         </article>
 	</script>
 
-    <script type="text/ng-template" id="compras-cliente.htm">
+    <script type="text/ng-template" version="{{version}}" id="compras-cliente.htm">
         <div
             class="compras-cliente"
             ng-if="compras.length>0"
@@ -402,27 +406,22 @@
                     <table class="label-description">
                         <tbody>
                             <tr>
-                                <td>Nome:</td>
-                                <td>
-                                    <span ng-bind="::c.compradorNome"></span>
+                                <td ng-bind="::c.compradorNome">
                                 </td>
                             </tr>
                             <tr>
-                                <td>Email:</td>
-                                <td>
-                                    <span ng-bind="::c.compradorEmailHide"></span>
+                                <td ng-bind="::c.compradorEmailHide">
                                 </td>
                             </tr>
                             <tr>
-                                <td>CPF:</td>
-                                <td>
-                                    <span ng-bind="::c.compradorCpfHide"></span>
+                                <td >
+                                    <small>CPF:</small>
+                                    <span class="monospace" ng-bind="::c.compradorCpfHide"></span>
                                 </td>
                             </tr>
                             <tr ng-if="c.situacao==='pago'">
-                                <td>Pago em:</td>
                                 <td>
-                                    <span ng-bind="::c.dtPagamento | ddmmhhmm">
+                                    <span class="monospace" ng-bind="::c.dtPagamento | ddmmhhmm"></span>
                                 </td>
                             </tr>
                         </tbody>
@@ -444,7 +443,7 @@
         </div>
     </script>
 
-    <script type="text/ng-template" id="modal-pagar-compra.htm">
+    <script type="text/ng-template" version="{{version}}" id="modal-pagar-compra.htm">
         <dialog ng-show="visible" id="pagar-compra">
             <article class="pt-20" style="position: relative;">
                 <div ng-show="compra.situacao === 'aguardando-pagamento'" class="block">
@@ -561,24 +560,24 @@
                     </table>
 
                     <p class="p-10 pt-5 pb-20 m-0">
-                        Títulos da sua Compra:<br/>
-                        <small>Clique para abrir e ver os <strong>Números da Sorte</strong></small>
+                        Títulos da sua Compra:
                     </p>
 
                     <ol>
                         <li ng-repeat="t in compra.titulos">
-                            <a style="font-family:monospace;" href="[[t.link]]" target="_blank" ng-bind="t.id"></a>
+                            <span style="font-family:monospace;" ng-bind="t.id"></span>
+                            <!-- <a style="font-family:monospace;" href="[[t.link]]" target="_blank" ng-bind="t.id"></a> -->
                         </li>
                     </ol>
 
                 </div>
 
                 <footer class="mt-0">
-                    <button
-                        ng-if="compra.situacao === 'pago' && compra.pronto"
-                        class="mb-0"
-                        ng-click="close()"
-                    >
+                    <button ng-if="compra.situacao === 'pago' && compra.pronto" class="mb-0 secondary outline" ng-click="close()">
+                        Enviar Certificados...
+                    </button>
+
+                    <button ng-if="compra.situacao === 'pago' && compra.pronto" class="mb-0" ng-click="close()">
                         Fechar
                     </button>
 
@@ -593,7 +592,7 @@
         </dialog>
     </script>
 
-    <script type="text/ng-template" id="faq.htm">
+    <script type="text/ng-template" version="{{version}}" id="faq.htm">
         <section>
             <div class="container p-0">
                 <article class="pt-20 pb-20 mb-0">
@@ -613,7 +612,7 @@
         </section>
     </script>
 
-    <script type="text/ng-template" id="modal-regulamento.htm">
+    <script type="text/ng-template" version="{{version}}" id="modal-regulamento.htm">
         <dialog
             ng-show="visible"
             id="modal-regulamento"

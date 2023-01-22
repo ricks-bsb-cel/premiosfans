@@ -265,7 +265,8 @@ const compileApp = (sourceData, obj) => {
                     qtd: i,
                     qtdExibicao: `<strong>${i}</strong> <small>Título${i > 1 ? 's' : ''}</small>`,
                     vlTotal: render.campanha.vlTitulo * i,
-                    vlTotal_html: global.formatMoney(render.campanha.vlTitulo * i, true, true)
+                    vlTotal_html: global.formatMoney(render.campanha.vlTitulo * i, true, true),
+                    chances: parseInt((render.campanha.qtdPremios * i).toFixed(0))
                 })
             }
 

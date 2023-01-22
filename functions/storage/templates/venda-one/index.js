@@ -3,8 +3,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
 import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-messaging.js";
-// import { getFirestore, collection, query, where, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
-import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
@@ -179,10 +178,12 @@ angular.module('app', [])
 
         const watchTituloCompraUsuario = (idTituloCompra, callback) => {
             unwatchTituloCompraUsuario();
-            
-            observerTitulosComprasUsuario[idTituloCompra] = {
-                f: callback
-            };
+
+            observerTitulosComprasUsuario[idTituloCompra] = { f: callback };
+
+            const pos = TitulosComprasUsuario.findIndex(f => { return f.id === idTituloCompra; });
+
+            if (pos >= 0 && TitulosComprasUsuario[pos].pixData) callback(TitulosComprasUsuario[pos]);
         }
 
         const unwatchTituloCompraUsuario = _ => {
@@ -225,6 +226,15 @@ angular.module('app', [])
             });
         }
 
+        const getLastCompra = _ => {
+            if (!TitulosComprasUsuario || TitulosComprasUsuario.length === 0) return;
+            return TitulosComprasUsuario
+                .slice()
+                .sort(function (a, b) {
+                    return b.dtInclusao.localeCompare(a.dtInclusao);
+                })[0];
+        }
+
         return {
             app: app,
             init: init,
@@ -234,7 +244,8 @@ angular.module('app', [])
             initMessaging: initMessaging,
             TitulosComprasUsuario: TitulosComprasUsuario,
             watchTituloCompraUsuario: watchTituloCompraUsuario,
-            unwatchTituloCompraUsuario: unwatchTituloCompraUsuario
+            unwatchTituloCompraUsuario: unwatchTituloCompraUsuario,
+            getLastCompra: getLastCompra
         }
 
     })
@@ -450,11 +461,23 @@ angular.module('app', [])
                     VMasker(eCelular).maskPattern("(99) 9 9999-9999");
                 }
 
+                const setDadosCompra = compra => {
+                    $scope.compra = $scope.compra || {};
+
+                    $scope.compra.nome = compra.compradorNome;
+                    $scope.compra.email = compra.compradorEmail;
+                    $scope.compra.celular = compra.compradorCelular;
+                    $scope.compra.cpf = compra.compradorCpf;
+                }
+
                 $scope.initDelegates = e => {
                     element = e;
                     formClienteFactory.delegate = {
                         sendPedidoCompra: sendPedidoCompra,
-                        showFormCliente: _ => {
+                        showFormCliente: compra => {
+
+                            if (compra) setDadosCompra(compra);
+
                             $("#form-cliente").show();
                             initMasks();
                             global.scrollToId('form-cliente');
@@ -644,10 +667,12 @@ angular.module('app', [])
             $scope.qtd = qtd;
             $scope.vlCompra = vlTotal;
 
+            const lastCompra = init.getLastCompra();
+
             $("#vl-total").show();
 
             if (formClienteFactory && formClienteFactory.delegate && typeof formClienteFactory.delegate.showFormCliente === 'function') {
-                formClienteFactory.delegate.showFormCliente();
+                formClienteFactory.delegate.showFormCliente(lastCompra);
             }
         }
 

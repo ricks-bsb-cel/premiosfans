@@ -118,7 +118,7 @@ async function findNotUsedPix(pixKey, valor, compra) {
                     return decrementPixKeyValue(pixKey, valor, true);
                 }
 
-                let updateData = { utilizado: true };
+                const updateData = { utilizado: true };
 
                 docs.forEach(d => {
                     doc = d;
@@ -139,7 +139,7 @@ async function findNotUsedPix(pixKey, valor, compra) {
                         updateData.comprador_cpf = compra.cpf;
                         updateData.comprador_cpf_formated = compra.cpf_formated;
                         updateData.dtUtilizacao = global.getToday();
-                    };
+                    }
                 });
 
                 transaction.update(doc.ref, updateData);

@@ -140,7 +140,7 @@ const call = (data, request, response) => {
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         ordered: true,
         orderingKey: data.key + '-' + data.valor.toString(),
-        auth: eebAuthTypes.token,
+        auth: eebAuthTypes.internal,
         data: data
     });
 
