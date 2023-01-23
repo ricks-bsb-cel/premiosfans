@@ -1,6 +1,5 @@
 "use strict";
 
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 const Joi = require('joi');
@@ -17,6 +16,8 @@ const pagarTitulo = require('./pagarTitulo');
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 const collectionTitulos = firestoreDAL.titulos();
 
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
+
 const tituloCompraSchema = _ => {
     const schema = Joi.object({
         idTituloCompra: Joi.string().token().min(18).max(22).required()
@@ -28,7 +29,7 @@ const tituloCompraSchema = _ => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -88,16 +89,10 @@ class Service extends eebService {
                 .then(_ => {
 
                     // Solicita o pagamento de cada um dos Títulos (que vai solicitar a geração dos números)
-                    promise = [];
+                    promise = [acompanhamentoTituloCompra.setPago(result.data.tituloCompra)];
 
                     result.data.titulos.forEach(p => {
-                        promise.push(
-                            pagarTitulo.call(
-                                {
-                                    "idTitulo": p.id
-                                }
-                            )
-                        );
+                        promise.push(pagarTitulo.call({ "idTitulo": p.id }));
                     });
 
                     return Promise.all(promise);
@@ -137,16 +132,5 @@ const call = (data, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-
-    // Só pode ser chamado em testes ou entre rotinas
-    const host = global.getHost(request);
-
-    if (!request.body || host !== 'localhost') {
-        return response.status(500).json({
-            success: false,
-            error: 'Invalid parms'
-        })
-    }
-
     return call(request.body, request, response);
 }

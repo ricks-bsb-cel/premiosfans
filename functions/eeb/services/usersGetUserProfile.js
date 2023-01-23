@@ -1,9 +1,8 @@
 "use strict";
 
-const path = require('path');
-const eebService = require('../../eventBusService').abstract;
+const eebService = require('../eventBusService').abstract;
 
-const firestoreDAL = require('../../../api/firestoreDAL');
+const firestoreDAL = require('../../api/firestoreDAL');
 const collectionConfigProfiles = firestoreDAL.admConfigProfiles();
 
 const { getAuth } = require("firebase-admin/auth");
@@ -67,7 +66,7 @@ const _get = (uid, withProfile) => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -107,7 +106,7 @@ exports.Service = Service;
 exports.get = _get;
 
 const call = (uid, withProfile, request, response) => {
-    const eebAuthTypes = require('../../eventBusService').authType;
+    const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
         name: 'get-user-profile',

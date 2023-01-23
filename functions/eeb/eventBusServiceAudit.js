@@ -103,6 +103,7 @@ const auditPath = messageId => {
     return `/eebAudit/${hoje}/${messageId}`;
 }
 
+
 const addAuditMessageId = (messageId, field) => {
     return new Promise((resolve, reject) => {
 
@@ -123,8 +124,10 @@ const addAuditMessageId = (messageId, field) => {
     })
 }
 
+
 const startAuditMessageId = messageId => { return addAuditMessageId(messageId, 'start'); }
 const endAuditMessageId = messageId => { return addAuditMessageId(messageId, 'end'); }
+
 
 const auditMessageIdExists = messageId => {
     return new Promise((resolve, reject) => {
@@ -139,6 +142,7 @@ const auditMessageIdExists = messageId => {
             })
     })
 }
+
 
 const savePayload = (payload, event, result) => {
     return new Promise((resolve, reject) => {
@@ -189,6 +193,7 @@ const savePayload = (payload, event, result) => {
     })
 }
 
+
 const eventMessageExists = function (event, messageId) {
     return new Promise((resolve, reject) => {
         const query = `SELECT count(*) AS qtd FROM \`${fullTableName}\` WHERE messageId='${messageId}' AND event='${event}'`;
@@ -210,6 +215,7 @@ const eventMessageExists = function (event, messageId) {
             })
     })
 }
+
 
 const createAuditTable = _ => {
     return new Promise((resolve, reject) => {
@@ -234,10 +240,13 @@ const createAuditTable = _ => {
     })
 }
 
+
 exports.startAuditMessageId = startAuditMessageId;
 exports.endAuditMessageId = endAuditMessageId;
 exports.auditMessageIdExists = auditMessageIdExists;
 
+
 exports.savePayload = savePayload;
+
 
 exports.eventMessageExists = eventMessageExists;

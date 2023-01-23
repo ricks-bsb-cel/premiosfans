@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,minimal-ui,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -131,7 +131,7 @@
             <hgroup>
                 <h2>{{campanha.titulo}}</h2>
                 {{#if campanha.subTitulo}}
-                <h3>{{campanha.subTitulo}}</h3>
+                <h3 class="mt-10">{{campanha.subTitulo}}</h3>
                 {{/if}}
             </hgroup>
             {{#if campanha.detalhes}}
@@ -145,9 +145,7 @@
 
             <div class="container p-0">
                 <form>
-
                     <article class="pt-20 pb-20 mb-0">
-
                         <hgroup class="mt-10">
                             <h2>Compra Rápida</h2>
                             <h3>Acredite em sua sorte e invista em sua vitória! Escolha quantos títulos você deseja e
@@ -157,34 +155,36 @@
 
                         <div class="row">
                             {{#each config.sugestoes}}
-                            <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
-                                <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
-                                    <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
-                                        class="m-0 mb-20 p-10">
-                                        <div class="sugestao text-center">
-                                            <h3 class="mb-10 mt-10">
-                                                {{{this.qtdExibicao}}}
-                                            </h3>
-                                        </div>
-                                    </article>
+                                <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
+                                    <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
+                                        <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
+                                            class="m-0 mb-20 p-10">
+                                            <div class="sugestao text-center">
+                                                <h3 class="mb-0 mt-10">
+                                                    {{{this.qtdExibicao}}}
+                                                </h3>
+                                                <p class="mb-10 mt-10" style="line-height:18px;">
+                                                    <span>{{this.chances}}</span>
+                                                    <small>chances<br />de ganhar!</small>
+                                                </p>
+                                            </div>
+                                        </article>
+                                    </div>
                                 </div>
-                            </div>
                             {{/each}}
                         </div>
 
                         <h2 id="vl-total" class="mb-0" style="display: none;">
-                            Total: R$ <strong ng-bind="vlCompra | currency : '': 2 "></strong>
+                            <small>Total:</small>
+                            R$ <strong ng-bind="vlCompra | currency : '': 2 "></strong>
                         </h2>
                     </article>
 
                     <form-cliente></form-cliente>
 
                     <button ng-click="openSell()" class="mt-10">Comprar</button>
-
                 </form>
-
             </div>
-
         </section>
 
         <section id="premios">
@@ -205,9 +205,8 @@
                     <div class="row">
                         {{#each campanhaSorteios}}
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-
                             <article class="m-0 mb-20 p-10">
-                                <div class="sugestao text-center">
+                                <div class="sorteio text-center">
                                     <div class="ribbon ribbon-top-left">
                                         <span>
                                             {{this.qtdPremios}}
@@ -216,24 +215,27 @@
                                     </div>
 
                                     <p class="mb-5">
+                                        {{{this.titulo_html}}}
+                                    </p>
+
+                                    <p class="mb-5">
                                         <small>Dia</small>
                                         {{{this.dtSorteio}}}
                                     </p>
 
-                                    <h2 class="m-0 valor">
+                                    <h2 class="m-0 valor mb-5">
                                         {{{this.vlTotalPremios_html}}}
                                     </h2>
 
                                     {{#each this.premios}}
-                                        <footer data-id-premio="{{this.id}}" class="pt-10">
-                                            {{this.descricao}}
-                                        </footer>
+                                    <footer data-id-premio="{{this.id}}" class="pb-5">
+                                        {{this.descricao}}
+                                    </footer>
                                     {{/each}}
 
                                 </div>
 
                             </article>
-
                         </div>
                         {{/each}}
                     </div>
@@ -247,7 +249,7 @@
         </section>
 
         <section>
-            <div class="container p-0">
+            <div class="container p-0 faq">
                 <article class="pt-20 pb-20 mb-0">
                     <hgroup class="mt-10">
                         <h2>Perguntas Frequentes</h2>
@@ -259,10 +261,10 @@
 
                     <div class="row">
                         {{#each faq}}
-                            <details>
-                                <summary>{{this.pergunta}}</summary>
-                                <p>{{{this.resposta}}}</p>
-                            </details>
+                        <details>
+                            <summary style="line-height:1.4em;">{{this.pergunta}}</summary>
+                            <div class="resposta">{{{this.resposta}}}</div>
+                        </details>
                         {{/each}}
                     </div>
                 </article>
@@ -274,9 +276,9 @@
         <modal-regulamento></modal-regulamento>
 
         {{#if campanha.rodape}}
-            <section id="rodape">
-                {{{campanha.rodape}}}
-            </section>
+        <section id="rodape">
+            {{{campanha.rodape}}}
+        </section>
         {{/if}}
 
     </main>
@@ -294,8 +296,9 @@
             <a href="#top">Topo</a>
         </small>
         <p>
-            <small style="font-family:monospace;">
-                v {{version}}
+            <small style="font-family:monospace;font-size:0.7em;margin-top:20px;display:block;">
+                v {{version}}<br />
+                {{versionDate}}
             </small>
         </p>
     </footer>
@@ -322,7 +325,7 @@
         </svg>
     </div>
 
-    <script type="text/ng-template" id="form-cliente.htm">
+    <script type="text/ng-template" version="{{version}}" id="form-cliente.htm">
         <article
             id="form-cliente"
             class="pt-20 pb-20 mb-0 mt-5"
@@ -338,34 +341,34 @@
                 <div class="row">
                     <label class="col-md-6" for="nome">
                         Nome *
-                        <input type="text" ng-model="titulo.nome" name="name" autocomplete="name" placeholder="Nome completo">
+                        <input type="text" ng-model="compra.nome" name="name" autocomplete="name" placeholder="Nome completo">
                     </label>
 
                     <label class="col-md-6" for="email">
                         Email *
-                        <input type="text" ng-model="titulo.email" name="email" autocomplete="email" placeholder="Seu melhor email">
+                        <input type="text" ng-model="compra.email" name="email" autocomplete="email" placeholder="Seu melhor email">
                     </label>
                 </div>
 
                 <div class="row">
                     <label class="col-md-6" for="celular">
                         Celular *
-                        <input type="tel" ng-model="titulo.celular" autocomplete="mobile" name="celular">
+                        <input type="tel" ng-model="compra.celular" autocomplete="mobile" name="celular">
                     </label>
 
                     <label class="col-md-6" for="cpf">
                         CPF *
-                        <input type="tel" ng-model="titulo.cpf" name="cpf">
+                        <input type="tel" ng-model="compra.cpf" name="cpf">
                     </label>
                 </div>
 
                 <fieldset>
                     <label for="idade">
-                        <input ng-model="titulo.idade" type="checkbox" id="idade" name="idade">
+                        <input ng-model="compra.idade" type="checkbox" id="idade" name="idade">
                         Declaro que tenho mais que 16 anos completos
                     </label>
                     <label for="termos">
-                        <input ng-model="titulo.termos" type="checkbox" id="termos" name="termos">
+                        <input ng-model="compra.termos" type="checkbox" id="termos" name="termos">
                         Concordo com os Termos e Condições de Uso do Premios Fans
                     </label>
                 </fieldset>
@@ -374,7 +377,7 @@
         </article>
 	</script>
 
-    <script type="text/ng-template" id="compras-cliente.htm">
+    <script type="text/ng-template" version="{{version}}" id="compras-cliente.htm">
         <div
             class="compras-cliente"
             ng-if="compras.length>0"
@@ -382,14 +385,12 @@
             <article class="pt-20 pb-20 mb-0">
                 <hgroup class="mt-10">
                     <h2>Suas compras</h2>
-                    <p>Veja abaixo a sua lista de títulos adquiridos.</p>
-                    <p>Criamos uma identificação única para o seu dispositivo e só você pode ver suas compras.</p>
                 </hgroup>
 
-                <details
-                    ng-repeat="c in compras | orderBy:'dtInclusao_js_desc'"
+                <details open
+                    ng-repeat="c in compras | orderBy:'dtInclusao'"
+                    id="titulo-compra-[[c.id]]"
                     id-titulo-compra="[[c.id]]"
-                    open-detail="[[c.situacao==='aguardando-pagamento']]"
                     ng-class="{last:$last}"
                 >
                     <summary>
@@ -397,7 +398,7 @@
                         <strong ng-bind="::c.dtInclusao | ddmmhhmm"></strong>
                         <small>
                             ~
-                            <strong ng-bind="::c.qtdTitulosCompra"></strong>
+                            <strong ng-bind="::c.qtdTitulos"></strong>
                             Titulo(s)
                         </small>
                     </summary>
@@ -405,42 +406,36 @@
                     <table class="label-description">
                         <tbody>
                             <tr>
-                                <td>Nome:</td>
-                                <td>
-                                    <span ng-bind="::c.nome"></span>
+                                <td ng-bind="::c.compradorNome">
                                 </td>
                             </tr>
                             <tr>
-                                <td>Email:</td>
-                                <td>
-                                    <span ng-bind="::c.email_hide"></span>
+                                <td ng-bind="::c.compradorEmailHide">
                                 </td>
                             </tr>
                             <tr>
-                                <td>CPF:</td>
-                                <td>
-                                    <span ng-bind="::c.cpf_hide"></span>
+                                <td >
+                                    <small>CPF:</small>
+                                    <span class="monospace" ng-bind="::c.compradorCpfHide"></span>
                                 </td>
                             </tr>
                             <tr ng-if="c.situacao==='pago'">
-                                <td>Pago em:</td>
                                 <td>
-                                    <span ng-bind="::c.dtPagamento | ddmmhhmm"></td>
+                                    <span class="monospace" ng-bind="::c.dtPagamento | ddmmhhmm"></span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
 
                     <button 
-                        ng-if="c.situacao=='aguardando-pagamento'"
+                        ng-if="c.situacao==='aguardando-pagamento'"
                         ng-click="pagar(c)"
-                        class="full-width"
-                    >Pagar</button>
+                        class="full-width">Pagar</button>
 
                     <button 
-                        ng-if="c.situacao=='pago'"
-                        ng-click="detalhes(c)"
-                        class="full-width outline"
-                    >Detalhes da Compra</button>
+                        ng-if="c.situacao==='pago'"
+                        ng-click="pagar(c)"
+                        class="full-width outline">Detalhes</button>
 
                     <div ng-if="!$last" class="mb-40"></div>
                 </details>
@@ -448,49 +443,156 @@
         </div>
     </script>
 
-    <script type="text/ng-template" id="modal-detalhe-compra.htm">
-        <dialog
-            ng-show="visible"
-            id="detalhes-compra"
-        >
-            <article class="pt-20">
-                <h3 class="mb-20">Detalhes Compra</h3>
-                <p>
-                    Cras sit amet maximus risus.
-                    Pellentesque sodales odio sit amet augue finibus pellentesque.
-                    Nullam finibus risus non semper euismod.
-                </p>
-                <footer>
-                    <button class="mb-0" ng-click="close()">
+    <script type="text/ng-template" version="{{version}}" id="modal-pagar-compra.htm">
+        <dialog ng-show="visible" id="pagar-compra">
+            <article class="pt-20" style="position: relative;">
+                <div ng-show="compra.situacao === 'aguardando-pagamento'" class="block">
+                    <img src="/assets/imgs/close.svg" ng-click="close()" class="close" />
+
+                    <h3 class="mb-20 text-center">
+                        Pagar Compra
+                    </h3>
+
+                    <ol class="mb-10">
+                        <li>Copie o código PIX abaixo:</li>
+                    </ol>
+                    
+                    <p ng-bind="compra.pixData.EMV" class="pix-copia-cola"></p>
+
+                    <button
+                        ng-click="CopyPixToClipboard()"
+                        role="button"
+                        id="pix-copia-cola"
+                        class="mb-10"
+                    >
+                        Copiar Código PIX
+                    </button>
+
+                    <ol start="2" class="mb-0">
+                        <li class="mb-10">Acesse sua conta bancária no Internet Banking ou através do app;</li>
+                        <li class="mb-10">Escolha pagar via <strong>PIX Copia e Cola</strong></li>
+                        <li class="mb-10">Cole o codigo PIX que você copiou e finalize o pagamento</li>
+                    </ol>
+                    
+                    <p class="p-10 pt-5 m-0 text-center">
+                        ou abra o aplicativo do seu banco e utilize o QRCode abaixo:
+                    </p>
+
+                    <img
+                        class="pix-qrcode"
+                        ng-if="compra.pixData.Imagem"
+                        ng-src="data:image/png;base64,[[compra.pixData.Imagem]]"
+                    />
+
+                    <ol start="5" class="mb-0">
+                        <li class="mb-10 mt-10">
+                            Seu pagamento será identificado em até 5 minutos, seu(s) título(s) serão gerados
+                            e você os recebera no email <strong ng-bind="compra.compradorEmail"></strong>.
+                            Boa Sorte!
+                        </li>
+                    </ol>
+
+                </div>
+
+                <div ng-show="compra.situacao === 'pago' && !compra.pronto" class="block">
+                    <h3 class="mb-20 text-center">
+                        Preparando seus Títulos
+                    </h3>
+
+                    <p class="p-10 pt-5 pb-20 m-0 text-center msg">
+                    </p>
+
+                    <progress value="" max=""></progress>
+                </div>
+
+                <div ng-show="compra.situacao === 'pago' && compra.pronto" class="block">
+                    <img src="/assets/imgs/close.svg" ng-click="close()" class="close" />
+
+                    <h3 class="mb-20 text-center">
+                        Detalhes da Compra
+                    </h3>
+
+                    <table class="label-description" style="zoom:0.9;">
+                        <tbody>
+                            <tr>
+                                <td>Nome:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorNome"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Email:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorEmailHide"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CPF:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorCpfHide"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Celular:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorCelular"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Pago em:</td>
+                                <td>
+                                    <span ng-bind="::compra.dtPagamento"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Qtd Títulos:</td>
+                                <td>
+                                    <span ng-bind="::compra.qtdTitulos"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Código Compra:</td>
+                                <td>
+                                    <span ng-bind="::compra.id"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="p-10 pt-5 pb-20 m-0">
+                        Títulos da sua Compra:
+                    </p>
+
+                    <ol>
+                        <li ng-repeat="t in compra.titulos">
+                            <span style="font-family:monospace;" ng-bind="t.id"></span>
+                            <!-- <a style="font-family:monospace;" href="[[t.link]]" target="_blank" ng-bind="t.id"></a> -->
+                        </li>
+                    </ol>
+
+                </div>
+
+                <footer class="mt-0">
+                    <button ng-if="compra.situacao === 'pago' && compra.pronto" class="mb-0 secondary outline" ng-click="close()">
+                        Enviar Certificados...
+                    </button>
+
+                    <button ng-if="compra.situacao === 'pago' && compra.pronto" class="mb-0" ng-click="close()">
                         Fechar
                     </button>
+
+                    <small
+                        class="id-compra"
+                        ng-bind="compra.id"
+                        ng-class="{'mt-20':compra.situacao === 'pago' && compra.pronto}"
+                    ></small>
                 </footer>
             </article>
+
         </dialog>
     </script>
 
-    <script type="text/ng-template" id="modal-pagar-compra.htm">
-        <dialog
-            ng-show="visible"
-            id="pagar-compra"
-        >
-            <article class="pt-20">
-                <h3 class="mb-20">Pagamento da Compra</h3>
-                <p>
-                    Cras sit amet maximus risus.
-                    Pellentesque sodales odio sit amet augue finibus pellentesque.
-                    Nullam finibus risus non semper euismod.
-                </p>
-                <footer>
-                    <button class="mb-0" ng-click="close()">
-                        Fechar
-                    </button>
-                </footer>
-            </article>
-        </dialog>
-    </script>
-
-    <script type="text/ng-template" id="faq.htm">
+    <script type="text/ng-template" version="{{version}}" id="faq.htm">
         <section>
             <div class="container p-0">
                 <article class="pt-20 pb-20 mb-0">
@@ -500,9 +602,9 @@
                     </hgroup>
 
                     <div class="row">
-                        <details ng-repeat="f in list">
+                        <details ng-repeat="f in list" style="line-height: 1.4rem;">
                             <summary ng-bind="::f.p"></summary>
-                            <p ng-bind="::f.r"></p>
+                            <div ng-bind-html="::f.r"></div>
                         </details>
                     </div>
                 </article>
@@ -510,7 +612,7 @@
         </section>
     </script>
 
-    <script type="text/ng-template" id="modal-regulamento.htm">
+    <script type="text/ng-template" version="{{version}}" id="modal-regulamento.htm">
         <dialog
             ng-show="visible"
             id="modal-regulamento"

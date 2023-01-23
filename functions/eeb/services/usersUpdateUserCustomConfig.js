@@ -1,8 +1,7 @@
 "use strict";
 
-const path = require('path');
 const admin = require("firebase-admin");
-const eebService = require('../../eventBusService').abstract;
+const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 
 /*
@@ -10,8 +9,8 @@ https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
-const getUserProfile = require("./getUserProfile");
-const firestoreDAL = require("../../../api/firestoreDAL");
+const getUserProfile = require("./usersGetUserProfile");
+const firestoreDAL = require("../../api/firestoreDAL");
 const collectionConfigProfiles = firestoreDAL.admConfigProfiles();
 
 const schema = _ => {
@@ -28,7 +27,7 @@ const schema = _ => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -114,7 +113,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../../eventBusService').authType;
+    const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
         name: 'update-user-custom-config',

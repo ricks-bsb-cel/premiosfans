@@ -9,34 +9,34 @@ const path = require('path');
 const _ = require("lodash");
 const fs = require("fs");
 
-/*
-String.prototype.splitReplace = function (search, replacement) {
-    let target = this;
-    return target.split(search).join(replacement);
+
+const encryptString = (value, secret) => {
+    try {
+        const Cryptr = require('cryptr');
+        const cryptr = new Cryptr(secret);
+
+        return cryptr.encrypt(value);
+    }
+    catch (e) {
+        throw global.newError(e);
+    }
 }
+exports.encryptString = encryptString;
 
-String.prototype.replaceAll = function (search, replacement) {
-    let target = this;
-    return target.replace(new RegExp(search, 'g'), replacement);
-};
 
-String.prototype.onlyNumbers = function () {
-    let target = this;
-    if (target) { target = target.replace(/\D/g, ""); }
-    return target;
-};
+const decryptString = (value, secret) => {
+    try {
+        const Cryptr = require('cryptr');
+        const cryptr = new Cryptr(secret);
 
-String.prototype.isNumber = function () {
-    return /^\d+$/.test(this);
+        return cryptr.decrypt(value);
+    }
+    catch (e) {
+        throw global.newError(e);
+    }
 }
+exports.decryptString = decryptString;
 
-String.prototype.between = function (min, max) {
-    let target = this;
-    if (!target && min > 0) { return false; }
-    target = target.trim();
-    return target.length >= min && target.length <= max;
-}
-*/
 
 const newError = (msg, code, details) => {
     const e = new Error(msg);
@@ -633,6 +633,7 @@ const todayMoment = _ => {
     result.hour(0).minute(0).second(0).millisecond(0);
     return result;
 }
+exports.todayMoment = todayMoment;
 
 
 const dateToMoment = (value, br) => {
@@ -1356,7 +1357,6 @@ exports.generateKeywords = function (v1, v2, v3, v4, v5, v6, v7) {
 
 exports.config = {
     get: path => {
-
         path = splitReplace(path, '.', '_');
 
         if (path.startsWith('/')) {
@@ -1373,11 +1373,13 @@ exports.config = {
     }
 }
 
-
 exports.now = _ => {
     return Timestamp.now();
 }
 
+exports.nowTimestamp = _ => {
+    return Timestamp.now();
+}
 
 exports.nowMilliseconds = (addValue, addType) => {
     const hoje = moment(Timestamp.now().toDate());
@@ -1389,6 +1391,11 @@ exports.nowMilliseconds = (addValue, addType) => {
     return hoje.valueOf();
 }
 
+exports.nowDateTime = _ => {
+    const hoje = moment(Timestamp.now().toDate());
+
+    return hoje.format('YYYY-MM-DD HH:mm:ss');
+}
 
 exports.guid = _ => {
     let d = new Date().getTime(); // Timestamp

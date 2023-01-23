@@ -1,0 +1,68 @@
+<section class="content cartos-pix-keys">
+
+    <search-filter filter="filter"></search-filter>
+
+    <wait-overlay 
+        ready="collectionCartosPixKeys.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row">
+
+            <div ng-if="collectionCartosPixKeys.collection.isEmpty()" class="col-12">
+                <div class="callout callout-warning">
+                    <h5>Nenhuma venda encontrado...</h5>
+                </div>
+            </div>
+
+            <div class="col-12" ng-if="collectionCartosPixKeys.collection.data.length">
+                <div class="card">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="number monospace">Chave PIX</th>
+                                    <th class="Doc">Documento</th>
+                                    <th class="Nome">Nome</th>
+                                    <th class="cpf">CPF Conta</th>
+                                    <th class="accountId">AccountID</th>
+                                    <th class="criacao right">Criação</th>
+                                    <th class="actions right"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in collectionCartosPixKeys.collection.data  | orderBy: 'numer'">
+                                    <td class="number monospace">
+                                        <a href="#" ng-click="edit(c)">
+                                            <small class="monospace">{{c.key}}</small>
+                                        </a>
+                                    </td>
+                                    <td class="doc monospace">
+                                        {{c.owner.cpf_cnpj | cpfCnpj}}
+                                    </td>
+                                    <td class="Nome">
+                                        {{c.owner.name}}
+                                    </td>
+                                    <td class="cpf">
+                                        {{c.cpf | cpfCnpj}}
+                                    </td>
+                                    <td class="Account ID">
+                                        <small class="monospace">{{c.accountId}}</small>
+                                    </td>
+                                    <td class="criacao right">
+                                        {{c.createdAt | ddmmyyyyhhmm}}
+                                    </td>
+                                    <td class="actions right">
+                                        <a class="btn btn-default btn-xs" ng-click="remove(c)">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                            Excluir
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

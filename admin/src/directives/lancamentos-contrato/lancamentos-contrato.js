@@ -75,7 +75,7 @@ let ngModule = angular.module('directives.lancamentos-contrato', [])
 
             appAuthHelper.ready()
                 .then(_ => {
-                    $scope.user = appAuthHelper.profile.user;
+                    $scope.user = appAuthHelper.user;
                     console.info($scope.user);
 
                     init();

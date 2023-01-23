@@ -158,11 +158,11 @@ const ngModule = angular.module('collection.campanhasSorteios', [])
                 })
 
             if (result.id === 'new') {
-                result.uidInclusao = appAuthHelper.profile.user.uid;
+                result.uidInclusao = appAuthHelper.user.uid;
                 result.dtInclusao = appFirestoreHelper.currentTimestamp();
             }
 
-            result.uidAlteracao = appAuthHelper.profile.user.uid;
+            result.uidAlteracao = appAuthHelper.user.uid;
             result.dtAlteracao = appFirestoreHelper.currentTimestamp();
 
             return result;

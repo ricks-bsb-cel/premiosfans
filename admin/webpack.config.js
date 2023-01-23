@@ -3,7 +3,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
 const webpack = require('webpack');
 
-var production = true;
+const production = false;
+
+// $env:NODE_OPTIONS = "--openssl-legacy-provider"
 
 console.info(`on ${production ? 'Production' : 'Dev'}...`);
 

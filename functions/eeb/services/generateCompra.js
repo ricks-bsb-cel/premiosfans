@@ -1,9 +1,10 @@
 "use strict";
 
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 const Joi = require('joi');
+
+const pixStoreHelper = require('./pixStoreHelper');
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
@@ -18,6 +19,11 @@ const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
 const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 const collectionTitulos = firestoreDAL.titulos();
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
+const collectionCartosPix = firestoreDAL.cartosPix();
+
+const generatePedidoPagamentoCompra = require('./generatePedidoPagamentoCompra');
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
+const pixStoreCheck = require('./pixStoreCheck');
 
 /*
     generateTitulo
@@ -27,21 +33,24 @@ const collectionTitulosCompras = firestoreDAL.titulosCompras();
     - Gera o registro de Compra e dos títulos
     - NÃO GERA OS PRÊMIOS DO TÍTULO. Isso será feito após o pagamento.
 
-    * Lembre-se! Cada vez que esta rotina é executada um novo títuo é gerado!
+    - Esta rotina além de gerar a compra também prepara os títulos (mas não vincula os números)
+
+    20/01/2023
+    - Uso do PIX Storage. Procura por lá um PIX com a mesma chave/valor ainda não utilizado.
+    - Se achar, não solicita o generatePedidoPagamentoCompra, já chama o acompanhamentoTituloCompra.setPixData
+
 */
 
-const clienteSchema = _ => {
-    const schema = Joi.object({
+const schema = _ => {
+    return Joi.object({
         idCampanha: Joi.string().token().min(18).max(22).required(),
         idInfluencer: Joi.string().token().min(18).max(22).required(),
-        nome: Joi.string().min(6).max(120).required(),
-        email: Joi.string().email().required(),
-        celular: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(),
-        cpf: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(),
-        qtdTitulos: Joi.number().min(1).max(6).required()
+        nome: Joi.string().min(6).max(120).required(), // O nome do Cliente
+        email: Joi.string().email().required(), // O email do Cliente
+        celular: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(), // O celular do Cliente (apenas números)
+        cpf: Joi.string().replace(' ', '').length(11).pattern(/^[0-9]+$/).required(), // O CPF do Cliente (apenas números)
+        qtdTitulos: Joi.number().min(1).max(6).required() // A quantidade de títulos que o cliente deseja
     });
-
-    return schema;
 }
 
 const sanitizeData = data => {
@@ -66,7 +75,7 @@ const sanitizeData = data => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -80,10 +89,12 @@ class Service extends eebService {
                 success: true,
                 host: this.parm.host,
                 qtdTitulos: 0,
-                data: {}
+                data: {},
+                pixKey: null,
+                pixValue: null
             };
 
-            return clienteSchema().validateAsync(this.parm.data)
+            return schema().validateAsync(this.parm.data)
 
                 .then(dataResult => {
                     result.data.titulo = sanitizeData(dataResult);
@@ -144,6 +155,9 @@ class Service extends eebService {
                         qtdTitulosCompra: parseInt(result.qtdTitulos),
                         uidComprador: this.parm.attributes.user_uid,
                         qtdNumerosGerados: 0,
+                        pixKeyCredito: result.data.campanha.pixKeyCredito,
+                        pixKeyCpf: result.data.campanha.pixKeyCredito_cpf,
+                        pixKeyAccountId: result.data.campanha.pixKeyCredito_accountId,
                         qtdTotalProcessos:
                             ( // Cada título gera seus próprios premios
                                 parseInt(result.qtdTitulos) * parseInt(result.data.campanha.qtdPremios)
@@ -179,6 +193,7 @@ class Service extends eebService {
                 .then(resultTituloCompra => {
                     result.data.compra = resultTituloCompra;
 
+                    // Dados dos Títulos
                     result.data.titulo.qtdPremios = result.data.campanhaPremios.length;
                     result.data.titulo.qtdNumerosDaSortePorTitulo = result.data.campanha.qtdNumerosDaSortePorTitulo;
                     result.data.titulo.campanhaNome = result.data.campanha.titulo;
@@ -195,21 +210,17 @@ class Service extends eebService {
                     result.data.titulo.idTituloCompra = result.data.compra.id;
                     result.data.titulo.keywords = result.data.compra.keywords;
 
-                    const promise = [];
+                    // Inicializa o controle de acompanhamento da Compra (os dados que podem ser vistos pelo cliente no front)
+                    const promise = [
+                        acompanhamentoTituloCompra.initAcompanhamento(result.data.compra)
+                    ];
 
                     for (let i = 0; i < result.qtdTitulos; i++) {
-                        const t = {
-                            guidTitulo: global.guid()
-                        }
+                        const t = { guidTitulo: global.guid() }
 
                         global.setDateTime(t, 'dtInclusao');
 
-                        promise.push(
-                            collectionTitulos.add({
-                                ...result.data.titulo,
-                                ...t
-                            })
-                        )
+                        promise.push(collectionTitulos.add({ ...result.data.titulo, ...t }));
                     }
 
                     return Promise.all(promise);
@@ -218,10 +229,52 @@ class Service extends eebService {
                 .then(resultTitulos => {
                     result.data = {
                         compra: result.data.compra,
-                        titulos: resultTitulos
+                        titulos: resultTitulos.filter(f => { return f.guidTitulo; })
                     }
 
-                    return resolve(this.parm.async ? { success: true } : result);
+                    // Salva os títulos no acompanhamento
+                    return acompanhamentoTituloCompra.setTitulos(result.data.compra, result.data.titulos);
+                })
+
+                .then(_ => {
+                    // Verifica se existe um PIX disponível no PIX Storage com a mesma CHAVE e VALOR
+                    // - A chave PIX está em result.compra.pixKeyCredito
+                    // - O valor total está em result.data.compra.vlTotalCompra
+
+                    result.pixKey = result.data.compra.pixKeyCredito;
+                    result.pixValue = parseInt((result.data.compra.vlTotalCompra * 100).toFixed(0));
+
+                    return pixStoreHelper.findNotUsedPix(result.pixKey, result.pixValue, result.data.compra);
+                })
+
+                .then(findNotUsedPixResult => {
+
+                    if (findNotUsedPixResult) {
+                        // Localizei um PIX disponivel (que já foi vinculado com a compra). Atualizo a compra com os dados do pix.
+                        return Promise.all([
+                            collectionCartosPix.add(findNotUsedPixResult), // Salva o PIX em CartosPix (como se tivesse sido gerado agora)
+                            collectionTitulosCompras.merge(result.data.compra.id, { pix: findNotUsedPixResult }), // Cola o pix na compra
+                            acompanhamentoTituloCompra.setPixData(result.data.compra, findNotUsedPixResult), // Atualiza o FrontEnd
+                            pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }) // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
+                        ])
+                    }
+
+                    // Não localizei pix disponível no storage, solicita a geração
+                    return Promise.all([
+                        generatePedidoPagamentoCompra.call({ idTituloCompra: result.data.compra.id }), // Solicita que um nov PIX seja gerado
+                        pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }) // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
+                    ])
+
+                })
+
+                .then(_ => {
+
+                    // Retornando só o que interessa
+                    result.data = {
+                        compra: { id: result.data.compra.id }
+                    };
+
+                    return resolve(result);
                 })
 
                 .catch(e => {
@@ -242,7 +295,7 @@ const call = (data, request, response) => {
 
     const service = new Service(request, response, {
         name: 'generate-titulo',
-        async: request && request.query.async ? request.query.async === 'true' : true,
+        async: false,
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.token,
         data: data

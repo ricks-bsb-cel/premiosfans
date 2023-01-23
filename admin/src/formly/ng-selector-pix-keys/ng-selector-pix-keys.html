@@ -1,0 +1,22 @@
+<script type="text/ng-template" id="selector/pix-keys/item-template">
+    <span ng-bind="::option.id" class="monospace"></span><br />
+    <small ng-bind="::option.owner.name"></small>
+    <span class="badge bg-success" ng-bind="::option.owner.cpf_cnpj | cpfCnpj"></span>
+</script>
+
+<div class="form-group ng-selector-pix-keys">
+    <select
+        selector
+        ng-if="pixKeys.collection.ready"
+        model="model[options.key]"
+        multi="false"
+        label-attr="id"
+        value-attr="id"
+        require="true"
+        options="pixKeys.collection.data"
+        placeholder="Chave PIX de Crédito"
+        view-item-template="'selector/pix-keys/item-template'"
+        dropdown-item-template="'selector/pix-keys/item-template'"
+        change="changed(newValue,oldValue)"
+    ></select>
+</div>

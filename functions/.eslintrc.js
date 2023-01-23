@@ -34,6 +34,7 @@ module.exports = {
 		"new-cap": 0,
 		"camelcase": 0,
 		"no-undef": 0,
-		"no-trailing-space": 0
+		"no-trailing-space": 0,
+		"linebreak-style": 0
 	},
 };

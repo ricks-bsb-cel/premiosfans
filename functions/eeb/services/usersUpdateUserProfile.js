@@ -2,18 +2,17 @@
 
 const admin = require("firebase-admin");
 
-const path = require('path');
-const eebService = require('../../eventBusService').abstract;
-const global = require("../../../global");
-const helper = require("../../eventBusServiceHelper");
+const eebService = require('../eventBusService').abstract;
+const global = require("../../global");
+const helper = require("../eventBusServiceHelper");
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
-const getUserProfile = require('./getUserProfile');
-const firestoreDAL = require('../../../api/firestoreDAL');
+const getUserProfile = require('./usersGetUserProfile');
+const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionUserProfile = firestoreDAL.userProfile();
 
@@ -98,7 +97,7 @@ const _updateWithUid = (uid, withProfile) => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -125,7 +124,7 @@ exports.Service = Service;
 exports.updateWithToken = _updateWithToken;
 
 const call = (request, response) => {
-    const eebAuthTypes = require('../../eventBusService').authType;
+    const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
         name: 'update-user-profile',

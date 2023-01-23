@@ -3,7 +3,6 @@
 */
 "use strict";
 
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 
 /*
@@ -21,7 +20,7 @@ const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }

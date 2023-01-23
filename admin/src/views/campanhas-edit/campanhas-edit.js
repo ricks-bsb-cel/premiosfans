@@ -22,7 +22,7 @@ const ngModule = angular.module('views.contratos-edit', [
 		premiosFansService
 	) {
 
-		/* não há nada mais apavorante do que alguem que acredita em sua própria luta, e é fanático por ela */
+		/* não há nada mais apavorante do que alguém que acredita em sua própria luta, e é fanático por ela */
 
 		const _qtdGrupos = 1000;
 		const _qtdNumerosPorGrupo = 100;
@@ -83,11 +83,12 @@ const ngModule = angular.module('views.contratos-edit', [
 		}
 
 		$scope.ativar = _ => {
-			alertFactory.yesno('Tem certeza que deseja ativar a Campanha?', _ => {
-				premiosFansService.ativarCampanha({
-					idCampanha: $scope.campanha.id
-				});
-			})
+			alertFactory.yesno('Tem certeza que deseja ativar a Campanha?')
+				.then(_ => {
+					premiosFansService.ativarCampanha({
+						idCampanha: $scope.campanha.id
+					});
+				})
 		}
 
 		const showNavbar = _ => {
@@ -180,6 +181,15 @@ const ngModule = angular.module('views.contratos-edit', [
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
 						},
 						{
+							key: 'pixKeyCredito',
+							templateOptions: {
+								label: 'PIX de Crédito',
+								required: true
+							},
+							type: 'ng-selector-pix-keys',
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+						},
+						{
 							key: 'vlTitulo',
 							templateOptions: {
 								label: 'Valor',
@@ -217,7 +227,7 @@ const ngModule = angular.module('views.contratos-edit', [
 						{
 							key: 'qtdNumerosPorGrupo',
 							templateOptions: {
-								label: 'Números por Grupo',
+								label: 'Números',
 								required: true
 							},
 							defaultValue: _qtdNumerosPorGrupo,

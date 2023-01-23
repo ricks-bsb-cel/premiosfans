@@ -1,15 +1,14 @@
 "use strict";
 
-const path = require('path');
-const eebService = require('../eventBusService').abstract;
+const eebService = require('../../eventBusService').abstract;
 
-const firestoreDAL = require('../../api/firestoreDAL');
+const firestoreDAL = require('../../../api/firestoreDAL');
 const collectionEebTest = firestoreDAL.eebTest();
 
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -46,7 +45,7 @@ class Service extends eebService {
 exports.Service = Service;
 
 const call = (data, request, response) => {
-    const eebAuthTypes = require('../eventBusService').authType;
+    const eebAuthTypes = require('../../eventBusService').authType;
 
     const parm = {
         name: 'test',

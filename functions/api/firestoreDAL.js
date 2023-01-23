@@ -246,6 +246,10 @@ exports.log = () => {
     return new collectionClass('_log');
 }
 
+exports.serviceUserCredential = () => {
+    return new collectionClass('serviceUserCredential');
+}
+
 exports.appUsers = () => {
     return new collectionClass('appUsers');
 }
@@ -308,4 +312,32 @@ exports.titulosCompras = _ => {
 
 exports.faq = _ => {
     return new collectionClass('faq');
+}
+
+exports.cartosAccounts = _ => {
+    return new collectionClass('cartosAccounts');
+}
+
+exports.cartosPixKeys = _ => {
+    return new collectionClass('cartosPixKeys');
+}
+
+exports.cartosPixPreGenerated = _ =>{
+    return new collectionClass('cartosPixPreGenerated');
+}
+
+exports.cartosBalance = _ => {
+    return new collectionClass('cartosBalance');
+}
+
+exports.cartosExtract = _ => {
+    return new collectionClass('cartosExtract');
+}
+
+exports.cartosPix = _ => {
+    return new collectionClass('cartosPix');
+}
+
+exports.cartosPixPago = _ => {
+    return new collectionClass('cartosPixPago');
 }

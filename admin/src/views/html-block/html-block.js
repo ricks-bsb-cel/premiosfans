@@ -39,7 +39,7 @@ const ngModule = angular.module('views.html-block', [
 
 		appAuthHelper.ready()
 			.then(_ => {
-				$scope.user = appAuthHelper.profile.user;
+				$scope.user = appAuthHelper.user;
 				$scope.collectionHtmlBlock.collection.startSnapshot();
 				showMenu();
 			})

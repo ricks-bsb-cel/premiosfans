@@ -1,0 +1,99 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Configuração de Chave PIX
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <wait-overlay ready="$ctrl.ready">
+        <form novalidate>
+            <div class="row pt-2">
+                <h5>Detalhes do PIX</h5>
+
+                <form novalidate>
+                    <formly-form class="row" model="$ctrl.data" fields="$ctrl.fields" form="$ctrl.form" novalidate>
+                    </formly-form>
+                </form>
+
+                <h5>Geração antecipada de PIX</h5>
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 valores">
+                    <div class="row">
+                        <div class="col-4">
+                            <label>Valor</label>
+                        </div>
+                        <div class="col-3">
+                            <label>Qtd Min</label>
+                        </div>
+                        <div class="col-3">
+                            <label>Qtd Max</label>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-repeat="r in $ctrl.rows">
+                        <div class="col-4 mb-2">
+                            <input type="tel" ng-model="r.valor" class="form-control right" money-mask select-on-click>
+                        </div>
+                        <div class="col-3 mb-2">
+                            <input type="tel" ng-model="r.qtdMinima" class="form-control right" integer-mask
+                                select-on-click>
+                        </div>
+                        <div class="col-3 mb-2">
+                            <input type="tel" ng-model="r.qtdMaxima" class="form-control right" integer-mask
+                                select-on-click>
+                        </div>
+                        <div class="col-2 mb-2 pt-2">
+                            <a href="#" ng-click="$ctrl.remover($index)" uib-popover="Excluir" class="ng-scope">
+                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                            </a>
+                            <a href="#" ng-if="r.refresh" ng-click="$ctrl.checkStorage(r)" uib-popover="Atualizar Storage" class="ng-scope">
+                                <i class="fa fa-refresh ml-2" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row right p-1">
+                        <button class="btn btn-default btn-sm" type="button" ng-click="$ctrl.add()" ng-if="!$ctrl.error">
+                            <i class="fa fa-plus mr-2" aria-hidden="true"></i>
+                            Adicionar
+                        </button>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                    <p>Como preencher?</p>
+                    <ul>
+                        <li><strong>Valor:</strong>
+                            É o valor dos pagamentos em PIX que devem ser gerados.</li>
+                        <li><strong>Qtd Min:</strong>
+                            É o limíte mínimo para a geração dos pagamentos antecipados PIX. Se o
+                            total de registros
+                            for menor do que este valor a rotina irá gerar novos registros de pagamento até o
+                            limite máximo.</li>
+                        <li><strong>Qtd Max:</strong>
+                            É o máximo de registros de pagamento que a chave e valor podem ter
+                            armazenados. Ao se atingir este
+                            limite a rotina para de gerar novos registros, e iniciará novamente quando a quantidade
+                            atingir
+                            o mínimo.</li>
+                    </ul>
+
+                </div>
+                <div class="col-12">
+                    <p>Os PIX Antecipados serão usados para deixar o processo de venda
+                        mais rápido, pois PIX de paramento já estará gerada no momento em que o
+                        cliente criar uma compra!</p>
+                    <p>Crie valores iguais aos que serão utilizados nas campanhas que utilizam a chave PIX
+                        <span class="monospace">{{$ctrl.data.key}}</span>.
+                    </p>
+                    <p>
+                        Esta rotina também é útil para os casos em que a <strong>Cartos</strong> sair do ar por qualquer
+                        motivo!
+                    </p>
+                </div>
+            </div>
+        </form>
+    </wait-overlay>
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Salvar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
+</div>

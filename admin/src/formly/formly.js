@@ -42,6 +42,7 @@ import ngSelectorEmpresa from './ng-selector-empresa/ng-selector-empresa';
 import ngSelectorPerfis from './ng-selector-perfis/ng-selector-perfis';
 import ngSelectorTipoPessoa from './ng-selector-tipo-pessoa/ng-selector-tipo-pessoa';
 import ngSelectorFrontTemplate from './ng-selector-front-template/ng-selector-front-template';
+import ngSelectorPixKeys from './ng-selector-pix-keys/ng-selector-pix-keys';
 
 const ngModule = angular
 	.module(
@@ -86,7 +87,8 @@ const ngModule = angular
 			ngSelectorEmpresa.name,
 			ngSelectorPerfis.name,
 			ngSelectorTipoPessoa.name,
-			ngSelectorFrontTemplate.name
+			ngSelectorFrontTemplate.name,
+			ngSelectorPixKeys.name
 		]
 	)
 

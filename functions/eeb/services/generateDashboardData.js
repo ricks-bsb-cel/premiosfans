@@ -1,7 +1,6 @@
 "use strict";
 
 const admin = require('firebase-admin');
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const Joi = require('joi');
 const moment = require("moment-timezone");
@@ -87,7 +86,7 @@ const updatePath = (parms) => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }

@@ -11,7 +11,8 @@ const pubSubReceiver = (request, response) => {
         });
     }
 
-    const data = helper.base64ToJson(request.body.message.data) || {},
+    const
+        data = helper.base64ToJson(request.body.message.data) || {},
         attributes = request.body.message.attributes;
 
     let msgAlreadyProcessed = false;
@@ -24,7 +25,7 @@ const pubSubReceiver = (request, response) => {
         serviceId: attributes.serviceId,
         method: attributes.method,
         messageId: request.body.message.messageId,
-        topic: 'eeb-' + attributes.method
+        source: 'pub-sub'
     };
 
     return audit.auditMessageIdExists(parm.messageId)
@@ -45,7 +46,7 @@ const pubSubReceiver = (request, response) => {
 
             helper.log('async-run-init', helper.logType.info, { method: parm.method, serviceId: parm.serviceId });
 
-            const req = require(`./services/${attributes.method}`);
+            const req = require(`./${attributes.method}`);
             const service = new req.Service(null, null, parm);
 
             return service.run();

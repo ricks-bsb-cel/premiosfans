@@ -39,6 +39,7 @@ app.get('/template/:nome', (request, response) => {
 // Busca por Template
 // Template main, que está em functions/storage/templates/main
 // Todo HTML do template fica em index.html
+/*
 app.get('/', (request, response) => {
     request.params.dirFile1 = 'templates';
     request.params.dirFile2 = 'main';
@@ -46,10 +47,14 @@ app.get('/', (request, response) => {
 
     initFirebase.call(require('./home').getStorageFile, request, response);
 });
+*/
 
-
-app.get('/:dirFile1?/:dirFile2?/:dirFile3?/:dirFile4?/:dirFile5?', (request, response) => {
+app.get('/:dirFile1/:dirFile2?/:dirFile3?/:dirFile4?/:dirFile5?', (request, response) => {
     initFirebase.call(require('./home').getStorageFile, request, response);
 });
+
+app.get('/', (request, response) => {
+    return response.json({ root: 'root' }).end();
+})
 
 exports.mainApp = app;

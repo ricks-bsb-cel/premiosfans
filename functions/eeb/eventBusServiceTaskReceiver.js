@@ -22,7 +22,7 @@ const taskReceiver = (request, response) => {
         attributes: attributes,
         serviceId: attributes.serviceId,
         method: attributes.method,
-        topic: 'eeb-' + attributes.method
+        source: 'task'
     };
 
     helper.log('task-run-init', helper.logType.info, {
@@ -30,7 +30,7 @@ const taskReceiver = (request, response) => {
         serviceId: parm.serviceId
     });
 
-    const req = require(`./services/${parm.method}`);
+    const req = require(`./${parm.method}`);
     const service = new req.Service(null, null, parm);
 
     return service.run()

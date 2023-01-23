@@ -4,6 +4,7 @@ const { Logging } = require('@google-cloud/logging');
 const projectId = 'premios-fans';
 const logging = new Logging({ projectId });
 const log = logging.log('premiosfansbackend');
+const needle = require('needle');
 
 const logType = {
     default: 'DEFAULT',
@@ -104,17 +105,167 @@ const getUserTokenFromRequest = (request, response) => {
             null;
     }
 
-    token = token || cookies.get("__session") || null;
-
-    if (token && token.startsWith("Bearer ")) {
-        token = token.substr(7);
+    if (!token && cookies) {
+        try {
+            token = cookies.get("__session") || null;
+        }
+        catch (e) {
+            token = null;
+        }
     }
 
-    if (!token && request.query && request.query.token) {
-        token = request.query.token || null;
-    }
+    if (token && token.startsWith("Bearer ")) token = token.substr(7);
+
+    if (!token && request.query && request.query.token) token = request.query.token || null;
+
 
     return token;
+}
+
+const callNeddleGet = (endpoint, headers) => {
+    return new Promise((resolve, reject) => {
+        const auditHttp = require('./eventBusServiceAuditHttp');
+
+        const audit = {
+            verb: 'get',
+            type: 'request',
+            url: endpoint,
+            headers: headers
+        };
+
+        return needle('get', endpoint, { headers: headers })
+            .then(needleResult => {
+
+                audit.result = needleResult.body;
+                audit.type = 'result';
+
+                const result = {
+                    data: needleResult.body,
+                    statusCode: needleResult.statusCode
+                }
+
+                if (needleResult.message && result.statusCode !== 200) {
+                    result.message = needleResult.message;
+
+                    audit.error = {
+                        statusCode: result.statusCode,
+                        message: needleResult.message
+                    };
+                }
+
+                auditHttp.save(audit);
+
+                return resolve(result);
+            })
+
+            .catch(e => {
+                audit.type = 'error';
+
+                audit.error = {
+                    code: e.code || null,
+                    message: e.message || null
+                }
+
+                auditHttp.save(audit);
+
+                return reject(e);
+            })
+    })
+}
+
+const callNeddlePost = (endpoint, payload, headers) => {
+    return new Promise((resolve, reject) => {
+        const auditHttp = require('./eventBusServiceAuditHttp');
+
+        const audit = {
+            verb: 'post',
+            type: 'request',
+            url: endpoint,
+            payload: payload,
+            headers: headers
+        };
+
+        auditHttp.save(audit);
+
+        return needle(
+            'post',
+            endpoint,
+            payload,
+            {
+                json: true,
+                headers: headers
+            }
+        )
+            .then(needleResult => {
+
+                const result = {
+                    data: needleResult.body,
+                    statusCode: needleResult.statusCode
+                }
+
+                audit.result = needleResult.body;
+                audit.type = 'result';
+
+                if (needleResult.message && result.statusCode !== 200) {
+                    result.message = needleResult.message;
+
+                    audit.error = {
+                        statusCode: result.statusCode,
+                        message: needleResult.message
+                    };
+                }
+
+                auditHttp.save(audit);
+
+                return resolve(result);
+
+            })
+
+            .catch(e => {
+                audit.type = 'error';
+
+                audit.error = {
+                    code: e.code || null,
+                    message: e.message || null
+                }
+
+                auditHttp.save(audit);
+
+                return reject(e);
+            })
+    })
+}
+
+const callNeddleDelete = (endpoint, headers) => {
+    return new Promise((resolve, reject) => {
+
+        return needle(
+            'delete',
+            endpoint,
+            {
+                json: true,
+                headers: headers
+            }
+        )
+            .then(needleResult => {
+
+                const result = {
+                    data: needleResult.body,
+                    statusCode: needleResult.statusCode
+                }
+
+                if (needleResult.message && result.statusCode !== 200) {
+                    result.message = needleResult.message;
+                }
+
+                return resolve(result);
+
+            })
+
+            .catch(e => {
+                return reject(e);
+            })
+    })
 }
 
 exports.getHost = getHost;
@@ -123,3 +274,9 @@ exports.logType = logType;
 exports.log = writeLog;
 exports.setDateTime = setDateTime;
 exports.getUserTokenFromRequest = getUserTokenFromRequest;
+
+exports.http = {
+    get: callNeddleGet,
+    post: callNeddlePost,
+    delete: callNeddleDelete
+}

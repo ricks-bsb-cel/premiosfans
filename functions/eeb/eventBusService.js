@@ -4,7 +4,10 @@
 // https://www.npmjs.com/package/@google-cloud/pubsub
 // https://cloud.google.com/nodejs/docs/reference/tasks/latest
 
+// $env:NODE_OPTIONS = "--openssl-legacy-provider"
+
 const admin = require("firebase-admin");
+const path = require('path');
 
 const initFirebase = require("../initFirebase");
 const { PubSub } = require('@google-cloud/pubsub');
@@ -34,11 +37,6 @@ const authTypeDesc = authType => {
     })
     return result;
 }
-
-/*
-const pubSubRegion = 'us-central1-pubsub.googleapis.com:443';
-const pubSubClient = new PubSub({ apiEndpoint: pubSubRegion });
-*/
 
 const pubSubClient = new PubSub();
 const topicsCache = [];
@@ -153,8 +151,19 @@ class eventBusService {
         this.parm.orderingKey = this.parm.orderingKey || null;
         this.parm.attributes = this.parm.attributes || {};
 
-        this.parm.topic = `eeb-${this.parm.name}`
-        this.parm.topicSubscription = `eeb-subscription-${this.parm.name}`
+        this.parm.topic = `eeb-${this.parm.name}`;
+        this.parm.topicSubscription = `eeb-subscription-${this.parm.name}`;
+
+        this.parm.source = this.parm.source || 'run';
+    }
+
+    static getMethod(fullFileName) {
+        fullFileName = path.normalize(fullFileName);
+
+        const pos = fullFileName.indexOf('services');
+        const result = fullFileName.substr(pos).replace(/\\/g, '/').replace('.js', '');
+
+        return result;
     }
 
     getTopic() {
@@ -211,7 +220,6 @@ class eventBusService {
 
                 .then(userInfoResult => {
                     this.parm = { ...this.parm, ...userInfoResult };
-
                     this.parm.attributes.user_uid = userInfoResult.user_uid;
 
                     // Dispara de acordo com o o tipo.
@@ -230,10 +238,20 @@ class eventBusService {
                     result = startResult;
                     result.async = this.parm.async;
 
-                    return resolve(this.response ? this.response.status(200).json(result) : null);
+                    if (this.response) { // A chamada foi REST
+                        if (this.parm.source === 'run') {
+                            return resolve(this.response.status(200).json(result));
+                        } else {
+                            return resolve(this.response.status(200));
+                        }
+                    } else { // Chamada interna, sem reponse
+                        return resolve(result);
+                    }
                 })
 
                 .catch(e => {
+                    console.error(e);
+
                     const error = e.message || e.details || 'unknow';
                     this.log('error', helper.logType.error, { error: { code: e.code, message: error } });
 
@@ -243,7 +261,6 @@ class eventBusService {
                             error: e.toString()
                         })
                     } else {
-
                         return reject(new Error(error));
                     }
                 })
@@ -274,7 +291,7 @@ class eventBusService {
                     headers: { 'Content-Type': 'text/plain' },
                     httpMethod: 'POST',
                     body: Buffer.from(JSON.stringify(payload)),
-                    url: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/task-receiver/${this.parm.method}`
+                    url: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/task-receiver/${this.parm.name}`
                 },
                 scheduleTime: {
                     seconds: parseInt(this.parm.delay) + Date.now() / 1000
@@ -309,7 +326,6 @@ class eventBusService {
 
     publish() {
         return new Promise((resolve, reject) => {
-
             const publishData = {
                 data: this.parm.data ? Buffer.from(JSON.stringify(this.parm.data), 'utf8') : null,
                 attributes: Object.assign(
@@ -326,7 +342,7 @@ class eventBusService {
                 publishData.orderingKey = this.parm.orderingKey;
             }
 
-            // garante que os attributes contenham apenas strings
+            // Garante que os attributes contenham apenas strings
             Object.keys(publishData.attributes).forEach(k => {
                 if (typeof publishData.attributes[k] !== 'string') {
                     publishData.attributes[k] = publishData.attributes[k].toString();
@@ -386,9 +402,14 @@ class eventBusService {
             return this.run(this.admin)
 
                 .then(runResult => {
-                    result = { result: runResult, code: 200 }
+                    result = {
+                        result: runResult,
+                        code: 200
+                    };
 
-                    if (this.parm.debug) { result.debug = this.parm; }
+                    if (this.parm.debug) {
+                        result.debug = this.parm;
+                    }
 
                     return resolve(result);
                 })
@@ -402,7 +423,6 @@ class eventBusService {
 
     _startPublish() {
         return new Promise((resolve, reject) => {
-
             this.publish()
                 .then(result => {
                     const r = { result: result, code: 200 }
@@ -441,7 +461,8 @@ const eventBusServiceParmSchema = _ => {
             orderingKey: Joi.string().allow(null),
             delay: Joi.number().integer().min(0).default(0),
             taskQueueName: Joi.string().default('eeb'),
-            auth: Joi.number().integer().min(1).max(6).required() // Tipo de Autenticação
+            auth: Joi.number().integer().min(1).max(6).required(), // Tipo de Autenticação
+            source: Joi.string().valid('run', 'pub-sub', 'task').required()
         });
 
     /*
@@ -484,7 +505,7 @@ const createSubscription = (topic, subscription, method, ordered) => {
         const options = {
             name: subscription,
             pushConfig: {
-                pushEndpoint: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/receiver/${method}`
+                pushEndpoint: `https://us-central1-premios-fans.cloudfunctions.net/eeb/api/eeb/v1/receiver/${method.substr(9)}`
             },
             topic: topic,
             messageRetentionDuration: { seconds: 7 * 24 * 60 * 60, nanos: 0 },

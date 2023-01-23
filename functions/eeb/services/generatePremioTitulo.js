@@ -1,7 +1,6 @@
 "use strict";
 
 const admin = require('firebase-admin');
-const path = require('path');
 const eebService = require('../eventBusService').abstract;
 const global = require("../../global");
 const Joi = require('joi');
@@ -19,8 +18,10 @@ const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios
 const collectionCampanhasSorteios = firestoreDAL.campanhasSorteios();
 const collectionTitulos = firestoreDAL.titulos();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
+const collectionTitulosCompras = firestoreDAL.titulosCompras();
 
 const linkNumeroDaSorte = require('./linkNumeroDaSortePremioTitulo');
+const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 
 /*
     generatePremioTitulo
@@ -33,6 +34,7 @@ const linkNumeroDaSorte = require('./linkNumeroDaSortePremioTitulo');
 const premioTituloSchema = _ => {
     const schema = Joi.object({
         idCampanha: Joi.string().token().min(18).max(22).required(),
+        idTituloCompra: Joi.string().token().min(18).max(22).required(),
         idTitulo: Joi.string().token().min(18).max(22).required(),
         idPremio: Joi.string().token().min(18).max(22).required(),
         idSorteio: Joi.string().token().min(18).max(22).required()
@@ -44,7 +46,7 @@ const premioTituloSchema = _ => {
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
@@ -65,6 +67,7 @@ class Service extends eebService {
                     result.data.tituloPremio = dataResult;
 
                     const promise = [
+                        collectionTitulosCompras.getDoc(result.data.tituloPremio.idTituloCompra),
                         collectionTitulos.getDoc(result.data.tituloPremio.idTitulo),
                         collectionCampanhasSorteiosPremios.getDoc(result.data.tituloPremio.idPremio),
                         collectionCampanhasSorteios.getDoc(result.data.tituloPremio.idSorteio)
@@ -74,9 +77,10 @@ class Service extends eebService {
                 })
 
                 .then(promiseResult => {
-                    result.data.titulo = promiseResult[0];
-                    result.data.premio = promiseResult[1];
-                    result.data.sorteio = promiseResult[2];
+                    result.data.tituloCompra = promiseResult[0];
+                    result.data.titulo = promiseResult[1];
+                    result.data.premio = promiseResult[2];
+                    result.data.sorteio = promiseResult[3];
 
                     if (result.data.titulo.idCampanha !== result.data.tituloPremio.idCampanha) throw new Error(`O título ${result.data.titulo.idTitulo} não pertence à campanha ${result.data.titulo.idCampanha}`);
                     if (result.data.premio.idCampanha !== result.data.tituloPremio.idCampanha) throw new Error(`O premio ${result.data.premio.idTitulo} não pertence à campanha ${result.data.titulo.idCampanha}`);
@@ -130,12 +134,7 @@ class Service extends eebService {
                     const promise = [];
 
                     for (let n = 0; n < result.data.tituloPremio.qtdNumerosDaSortePorTitulo; n++) {
-                        promise.push(
-                            linkNumeroDaSorte.call(
-                                result.data.tituloPremio.idPremio,
-                                result.data.tituloPremio.id
-                            )
-                        );
+                        promise.push(linkNumeroDaSorte.call(result.data.tituloPremio.idPremio, result.data.tituloPremio.id));
                     }
 
                     return Promise.all(promise);
@@ -144,15 +143,20 @@ class Service extends eebService {
                 .then(_ => {
                     if (result.jaGerado) return null;
 
-                    // Atualização do contador de Processos
-                    return admin.firestore().collection('titulosCompras').doc(result.data.tituloPremio.idTituloCompra).set({
-                        qtdTotalProcessosConcluidos: FieldValue.increment(1)
-                    }, { merge: true });
+                    // Atualização do contador de Processos do Título
+                    return admin
+                        .firestore()
+                        .collection('titulosCompras')
+                        .doc(result.data.tituloPremio.idTituloCompra)
+                        .set({ qtdTotalProcessosConcluidos: FieldValue.increment(1) }, { merge: true });
                 })
 
                 .then(_ => {
                     result.data = { tituloPremio: result.data.tituloPremio };
 
+                    return acompanhamentoTituloCompra.incrementProcessosConcluidos(result.data.tituloPremio);
+                })
+                .then(_ => {
                     return resolve(this.parm.async ? { success: true } : result);
                 })
 

@@ -9,6 +9,14 @@ html {
     scroll-behavior: smooth;
 }
 
+details summary {
+    line-height: 1.4rem;
+}
+
+details p{
+    font-size: 0.9em;
+}
+
 section#rodape * {
     font-size: 0.8em;
     line-height: 1.1em;
@@ -29,6 +37,24 @@ a.link{
     #premios article {
         min-height: 200px;
     }
+}
+
+.pix-copia-cola{
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    border: 1px solid silver;
+    padding: 5px 10px;
+    background-color: lightgray;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: black;
+}
+
+.pix-qrcode{
+    max-width: 180px;
+    margin: 0 auto;
+    display: block;
 }
 
 dialog#modal-regulamento .content * {
@@ -58,6 +84,15 @@ dialog#modal-regulamento .content h4 {
     font-family: 'Courier New', Courier, monospace;
 }
 
+#premios .sorteio {
+    position: relative;
+}
+
+#premios .sorteio footer{
+    font-size: 0.9em;
+}
+
+/*
 table.label-description tr td:nth-child(1) {
     font-size: 0.9em;
     min-width: 110px;
@@ -74,6 +109,7 @@ table.label-description tr td:nth-child(2) span {
     overflow: hidden !important;
     text-overflow: ellipsis;
 }
+*/
 
 .full-width {
     width: 100%;
@@ -120,7 +156,7 @@ h2.valor small.cents {
     font-size: 0.45em;
     position: relative;
     font-weight: 400;
-    top: -12px;
+    top: -10px;
     right: -2px;
 }
 
@@ -167,6 +203,23 @@ h2.valor small.cents {
 
 #top .white {
     color: white;
+}
+
+#pagar-compra .close{
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+    height: 36px;
+    width: 36px;
+    top: 22px;
+}
+
+#pagar-compra .id-compra{
+    font-family: monospace;
+    font-size: 0.7em;
+    text-align: center;
+    display: block;
+    width: 100%;
 }
 
 /* https://codepen.io/nxworld/pen/oLdoWb */
@@ -438,4 +491,9 @@ input[type=reset],
 input[type=submit] {
     --background-color: green;
     font-size: 1.2rem;
+}
+
+.swal2-title {
+    padding: 0.5em 1em 0 !important;
+    line-height: 1.2em !important;
 }

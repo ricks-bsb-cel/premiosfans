@@ -34,6 +34,9 @@ import viewContasEdit from './contas-edit/contas-edit';
 
 import viewFaq from './faq/faq';
 
+import viewCartosAccounts from './cartos/cartos-accounts/cartos-accounts';
+import viewCartosPixKeys from './cartos/cartos-pix-keys/cartos-pix-keys';
+
 let ngModule = angular.module('views', [
 	viewAdmConfigPath.name,
 	viewAdmConfigProfiles.name,
@@ -70,7 +73,10 @@ let ngModule = angular.module('views', [
 
 	viewContas.name,
 	viewContasEdit.name,
-	viewFaq.name
+	viewFaq.name,
+
+	viewCartosAccounts.name,
+	viewCartosPixKeys.name
 ]);
 
 export default ngModule;

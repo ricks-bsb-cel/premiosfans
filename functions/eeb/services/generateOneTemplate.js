@@ -2,6 +2,8 @@
 
 const admin = require('firebase-admin');
 const { Storage } = require('@google-cloud/storage');
+const _ = require('lodash');
+const Joi = require('joi');
 
 const path = require('path');
 const eebService = require('../eventBusService').abstract;
@@ -29,20 +31,26 @@ const collectionFaq = firestoreDAL.faq();
 
 const storage = new Storage();
 
+const schema = _ => {
+    const schema = Joi.object({
+        idCampanha: Joi.string().token().min(18).max(22).required(),
+        idInfluencer: Joi.string().token().min(18).max(22).required(),
+        idTemplate: Joi.string().required()
+    });
+
+    return schema;
+}
+
 class Service extends eebService {
 
     constructor(request, response, parm) {
-        const method = path.basename(__filename, '.js');
+        const method = eebService.getMethod(__filename);
 
         super(request, response, parm, method);
     }
 
     run() {
         return new Promise((resolve, reject) => {
-
-            const idTemplate = this.parm.data.idTemplate;
-            const idInfluencer = this.parm.data.idInfluencer;
-            const idCampanha = this.parm.data.idCampanha;
 
             const version = global.generateRandomId(7);
 
@@ -51,37 +59,42 @@ class Service extends eebService {
                 host: this.parm.host
             };
 
-            let saveLink;
+            let saveLink, idTemplate, idInfluencer, idCampanha;
 
-            if (!idTemplate) throw new Error(`idTemplate inválido. Informe idTemplate`);
-            if (!idInfluencer) throw new Error(`idInfluencer inválido. Informe idInfluencer`);
-            if (!idCampanha) throw new Error(`idCampanha inválido. Informe idCampanha`);
+            return schema().validateAsync(this.parm.data)
 
-            // Carga dos dados
-            const promises = [
-                collectionFrontTemplates.getDoc(idTemplate),
-                collectionInfluencers.getDoc(idInfluencer),
-                collectionCampanhas.getDoc(idCampanha),
-                collectionCampanhasInfluencers.get({
-                    filter: [
-                        { field: "idCampanha", condition: "==", value: idCampanha },
-                        { field: "idInfluencer", condition: "==", value: idInfluencer }
-                    ]
-                }),
-                collectionCampanhasSorteios.get({
-                    filter: [
-                        { field: "idCampanha", condition: "==", value: idCampanha },
-                    ]
-                }),
-                collectionCampanhasSorteiosPremios.get({
-                    filter: [
-                        { field: "idCampanha", condition: "==", value: idCampanha },
-                    ]
-                }),
-                collectionFaq.get()
-            ];
+                .then(dataResult => {
+                    idCampanha = dataResult.idCampanha;
+                    idInfluencer = dataResult.idInfluencer;
+                    idTemplate = dataResult.idTemplate;
 
-            return Promise.all(promises)
+                    // Carga dos dados
+                    const promises = [
+                        collectionFrontTemplates.getDoc(idTemplate),
+                        collectionInfluencers.getDoc(idInfluencer),
+                        collectionCampanhas.getDoc(idCampanha),
+                        collectionCampanhasInfluencers.get({
+                            filter: [
+                                { field: "idCampanha", condition: "==", value: idCampanha },
+                                { field: "idInfluencer", condition: "==", value: idInfluencer }
+                            ]
+                        }),
+                        collectionCampanhasSorteios.get({
+                            filter: [
+                                { field: "idCampanha", condition: "==", value: idCampanha },
+                            ]
+                        }),
+                        collectionCampanhasSorteiosPremios.get({
+                            filter: [
+                                { field: "idCampanha", condition: "==", value: idCampanha },
+                            ]
+                        }),
+                        collectionFaq.get()
+                    ];
+
+                    return Promise.all(promises);
+                })
+
                 .then(promisesResult => {
                     result.template = promisesResult[0];
                     result.influencer = promisesResult[1];
@@ -99,6 +112,10 @@ class Service extends eebService {
                     if (!result.campanhaSorteiosPremios || result.campanhaSorteiosPremios === 0) throw new Error('Premios da not found');
 
                     result.version = version;
+                    result.versionDate = global.todayMoment().toString('DD/MM HH:mm:ss');
+
+                    // Ordenações
+                    result.campanhaSorteios = _.orderBy(result.campanhaSorteios, ['dtSorteio_yyyymmdd']);
 
                     return loadTemplateFiles(result.template);
                 })
