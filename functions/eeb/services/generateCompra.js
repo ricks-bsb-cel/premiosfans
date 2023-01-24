@@ -215,6 +215,7 @@ class Service extends eebService {
                         acompanhamentoTituloCompra.initAcompanhamento(result.data.compra)
                     ];
 
+                    // E adiciona os títulos na mesma transação
                     for (let i = 0; i < result.qtdTitulos; i++) {
                         const t = { guidTitulo: global.guid() }
 

@@ -96,7 +96,6 @@ angular.module('app', [])
                     });
                 }
             })
-
         }
 
         const ready = _ => {
@@ -204,9 +203,9 @@ angular.module('app', [])
 
                 Object.keys(snapshot).forEach(idTituloCompra => {
                     const tituloCompra = Object.assign(snapshot[idTituloCompra], { id: idTituloCompra });
-                    const pos = TitulosComprasUsuario.findIndex(f => { return f.id === idTituloCompra; });
 
                     $timeout(_ => {
+                        const pos = TitulosComprasUsuario.findIndex(f => { return f.id === idTituloCompra; });
                         if (pos < 0) {
                             TitulosComprasUsuario.push(tituloCompra);
                         } else {
@@ -359,7 +358,7 @@ angular.module('app', [])
     .directive('formCliente', function () {
         return {
             restrict: 'E',
-            controller: function ($scope, init, global, formClienteFactory, httpCalls, comprasClienteFactory, pagarCompraFactory) {
+            controller: function ($scope, init, mainControllerFactory, global, formClienteFactory, httpCalls, comprasClienteFactory, pagarCompraFactory) {
                 let element = null,
                     idTituloCompra;
 
@@ -441,6 +440,7 @@ angular.module('app', [])
 
                                     comprasClienteFactory.delegate.scrollToCompra(idTituloCompra);
                                     init.watchTituloCompraUsuario(idTituloCompra, tituloCompraChanged);
+                                    resetForm();
                                 })
                                 .catch(e => {
                                     console.error(e);
@@ -450,6 +450,11 @@ angular.module('app', [])
                         }
                     })
 
+                }
+
+                const resetForm = _ => {
+                    mainControllerFactory.delegate.resetSelected();
+                    $("#form-cliente").hide();
                 }
 
                 const initMasks = _ => {
@@ -651,11 +656,19 @@ angular.module('app', [])
         };
     })
 
+    .factory('mainControllerFactory', function () {
+        let delegate = {};
+
+        return {
+            delegate: delegate
+        }
+    })
 
     .controller('mainController', function (
         $scope,
         formClienteFactory,
         modalRegulamentoFactory,
+        mainControllerFactory,
         init
     ) {
         $scope.selected = null;
@@ -687,6 +700,12 @@ angular.module('app', [])
 
         $scope.showRegulamento = _ => {
             modalRegulamentoFactory.delegate.show();
+        }
+
+        mainControllerFactory.delegate = {
+            resetSelected: _ => {
+                $scope.selected = null;
+            }
         }
 
     })
