@@ -50,8 +50,9 @@ angular.module('app', [])
         }
 
         const scrollToId = id => {
+            const e = $(`#${id}`);
             return $("html, body").animate({
-                scrollTop: $(`#${id}`).offset().top
+                scrollTop: e.offset().top
             }, 500);
         }
 
@@ -364,6 +365,14 @@ angular.module('app', [])
 
                 $scope.compra = $scope.compra || {};
 
+                const tituloCompraChanged = tituloCompra => {
+                    if (tituloCompra.pixData) {
+                        init.unwatchTituloCompraUsuario();
+                        Swal.close();
+                        pagarCompraFactory.delegate.show(tituloCompra);
+                    }
+                }
+
                 const sendPedidoCompra = qtdTitulos => {
 
                     if (!$scope.compra || !$scope.compra.nome || !$scope.compra.email || !$scope.compra.celular || !$scope.compra.cpf) {
@@ -387,14 +396,6 @@ angular.module('app', [])
                         idade: $scope.compra.idade,
                         termos: $scope.compra.termos
                     };
-
-                    const tituloCompraChanged = tituloCompra => {
-                        if (tituloCompra.pixData) {
-                            init.unwatchTituloCompraUsuario();
-                            Swal.close();
-                            pagarCompraFactory.delegate.show(tituloCompra);
-                        }
-                    }
 
                     Swal.fire({
                         title: 'Confirme seus dados',
@@ -428,19 +429,26 @@ angular.module('app', [])
                                 .then(response => {
                                     if (response.data.code !== 200) throw new Error('Erro solicitando compra');
 
-                                    idTituloCompra = response.data.result.data.compra.id;
+                                    const compra = response.data.result.data.compra;
+                                    idTituloCompra = compra.id;
+
+                                    comprasClienteFactory.delegate.scrollToCompra(idTituloCompra);
+                                    resetForm();
+
+                                    if (compra.pixData) {
+                                        return formClienteFactory.delegate.showPixPagamento(compra);
+                                    }
+
+                                    init.watchTituloCompraUsuario(idTituloCompra, tituloCompraChanged);
 
                                     Swal.update({
                                         title: 'Preparando PIX',
-                                        html: `<img src="/assets/imgs/wait.svg" /><p>Um momento...<br />Estamos gerando um PIX exclusivo para o pagamento da sua compra.</p>`,
+                                        html: `<img src="/assets/imgs/wait.svg" /><p>Um momento...<br />Estamos gerando um PIX para o pagamento da sua compra.</p>`,
                                         icon: 'info',
                                         showCancelButton: false,
                                         showConfirmButton: false
                                     });
 
-                                    comprasClienteFactory.delegate.scrollToCompra(idTituloCompra);
-                                    init.watchTituloCompraUsuario(idTituloCompra, tituloCompraChanged);
-                                    resetForm();
                                 })
                                 .catch(e => {
                                     console.error(e);
@@ -480,13 +488,13 @@ angular.module('app', [])
                     formClienteFactory.delegate = {
                         sendPedidoCompra: sendPedidoCompra,
                         showFormCliente: compra => {
-
                             if (compra) setDadosCompra(compra);
 
                             $("#form-cliente").show();
                             initMasks();
                             global.scrollToId('form-cliente');
-                        }
+                        },
+                        showPixPagamento: tituloCompraChanged
                     }
                 }
 

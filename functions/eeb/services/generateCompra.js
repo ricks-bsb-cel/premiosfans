@@ -263,17 +263,17 @@ class Service extends eebService {
                     // Não localizei pix disponível no storage, solicita a geração
                     return Promise.all([
                         generatePedidoPagamentoCompra.call({ idTituloCompra: result.data.compra.id }), // Solicita que um nov PIX seja gerado
-                        pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }) // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
+                        pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }), // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
+                        acompanhamentoTituloCompra.get(result.data.compra) // Documento do FrontEnd (sem atualização)
                     ])
 
                 })
 
-                .then(_ => {
+                .then(promiseResult => {
+                    const compraFront = promiseResult[2];
 
                     // Retornando só o que interessa
-                    result.data = {
-                        compra: { id: result.data.compra.id }
-                    };
+                    result.data = { compra: compraFront };
 
                     return resolve(result);
                 })

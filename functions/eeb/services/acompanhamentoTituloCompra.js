@@ -29,6 +29,7 @@ async function initAcompanhamento(tituloCompra) {
         path = getPathByDoc(tituloCompra),
         ref = admin.database().ref(path),
         toAdd = {
+            id: tituloCompra.id,
             situacao: 'aguardando-pagamento',
             pronto: false,
             validacaoIniciada: false,
@@ -98,10 +99,29 @@ async function setPixData(doc, pixData) {
             txId: pixData.txId,
             value: pixData.value
         };
+
         data.pixDataDtCriacao = global.nowDateTime();
 
         return data;
-    });
+    }).then(update => {
+        if (!update.committed) {
+            console.info(`Erro atualizando RTDB [${path}]`);
+        }
+
+        return update.snapshot || null;
+    })
+}
+
+const get = doc => {
+    return new Promise(resolve => {
+        const path = getPathByDoc(doc);
+        const ref = admin.database().ref(path);
+
+        return ref.on('value', data => {
+            return resolve(data.val() || null)
+        })
+    })
+
 }
 
 async function setPago(doc) {
@@ -214,7 +234,6 @@ async function setTitulos(doc, titulos) {
     });
 }
 
-
 exports.initAcompanhamento = initAcompanhamento;
 exports.incrementProcessosConcluidos = incrementProcessosConcluidos;
 exports.setPixData = setPixData;
@@ -223,3 +242,4 @@ exports.setValidacaoEmAndamento = setValidacaoEmAndamento;
 exports.incrementValidacao = incrementValidacao;
 exports.setEmailEnviado = setEmailEnviado;
 exports.setTitulos = setTitulos;
+exports.get = get;
