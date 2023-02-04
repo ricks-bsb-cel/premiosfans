@@ -303,8 +303,8 @@ angular.module('app', [])
                             return resolve(response);
                         },
                         function (e) {
+                            console.error(e);
                             global.unblockUi();
-                            Swal.fire('Ooops!', e.data.error, 'error');
 
                             return reject(e);
                         }
