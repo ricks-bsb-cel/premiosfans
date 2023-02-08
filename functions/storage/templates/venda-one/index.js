@@ -303,7 +303,6 @@ angular.module('app', [])
                             return resolve(response);
                         },
                         function (e) {
-                            console.error(e);
                             global.unblockUi();
 
                             return reject(e);
@@ -450,8 +449,13 @@ angular.module('app', [])
                                     });
 
                                 })
+
                                 .catch(e => {
-                                    console.error(e);
+                                    Swal.close();
+
+                                    if (e.data && e.data.error) {
+                                        Swal.fire('Dados inválidos', e.data.error, 'error');
+                                    }
                                 })
 
                             return false;
@@ -588,6 +592,10 @@ angular.module('app', [])
                             modal.open("pagar-compra");
                         }
                     }
+                }
+
+                $scope.enviarCertificado = _ => {
+                    Swal.fire('Certificado', `Os certificados dos seus títulos foram enviados para o seu email.`, 'success');
                 }
 
             },
