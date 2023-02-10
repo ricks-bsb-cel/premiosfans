@@ -124,10 +124,8 @@ const addAuditMessageId = (messageId, field) => {
     })
 }
 
-
 const startAuditMessageId = messageId => { return addAuditMessageId(messageId, 'start'); }
 const endAuditMessageId = messageId => { return addAuditMessageId(messageId, 'end'); }
-
 
 const auditMessageIdExists = messageId => {
     return new Promise((resolve, reject) => {

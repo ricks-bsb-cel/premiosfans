@@ -455,6 +455,8 @@ angular.module('app', [])
 
                                     if (e.data && e.data.error) {
                                         Swal.fire('Dados inválidos', e.data.error, 'error');
+                                    } else {
+                                        Swal.fire('Gerando PIX', 'A preparação do PIX está demorando um pouco. Vamos enviar um eMail para você assim que o pedido de pagamento estiver pronto. Você também pode acompanhar seus pedidos de compra e solicitar o pagamento por aqui mesmo! Está logo abaixo dos dados da campanha.', 'success');
                                     }
                                 })
 

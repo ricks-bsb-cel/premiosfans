@@ -171,6 +171,13 @@ api.post("/v1/pixFindNotUsed", (request, response) => {
     initFirebase.call(require('./services/pixStoreGetNotUsedPix').callRequest, request, response);
 })
 
+
+// BigQuery Tests
+api.post("/v1/bq/save-compra-concluida", (request, response) => {
+    initFirebase.call(require('./services/bigquery/bigquerySaveCompraConcluida').callRequest, request, response);
+})
+
+
 /* Cartos
 
 api.post("/v1/pay/user-credential", (request, response) => {
