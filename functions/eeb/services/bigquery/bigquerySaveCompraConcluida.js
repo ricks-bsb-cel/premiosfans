@@ -38,9 +38,7 @@ class Service extends eebService {
 
                 .then(dataResult => {
                     return Promise.all([
-                        bigqueryHelper.getDataSet('test', 'test', tableSchemaTest),
-                        bigqueryHelper.getDataSet('test', 'test5', tableSchemaTest),
-                        bigqueryHelper.getDataSet('test', 'test6', tableSchemaTest)
+                        bigqueryHelper.getTable('teste', 'test')
                     ])
                 })
 

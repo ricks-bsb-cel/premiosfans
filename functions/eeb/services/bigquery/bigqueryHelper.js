@@ -5,7 +5,9 @@ const { BigQuery } = require('@google-cloud/bigquery');
 const bigquery = new BigQuery();
 const global = require('../../../global');
 
-async function createTableOnBigQuery(datasetId, tableName, tableStruct) {
+const bigqueryTables = require('./bigqueryTables');
+
+async function createTableOnBigQuery(datasetId, tableName) {
     let dataset;
 
     try {
@@ -21,7 +23,7 @@ async function createTableOnBigQuery(datasetId, tableName, tableStruct) {
     }
 }
 
-const getDataSet = (datasetId, tableName, tableStruct) => {
+const getTable = (datasetId, tableName, tableStruct) => {
     const
         path = `bigQueryTablesStatus/${datasetId}/${tableName}`,
         ref = admin.database().ref(path);
@@ -31,6 +33,8 @@ const getDataSet = (datasetId, tableName, tableStruct) => {
         result = null;
 
     return new Promise((resolve, reject) => {
+
+        const tableStruct = bigqueryTables.getStructure(datasetId, tableName);
 
         return ref.once("value")
 
@@ -95,7 +99,7 @@ const getDataSet = (datasetId, tableName, tableStruct) => {
             })
 
             .then(_ => {
-                return resolve(result || null);
+                return bigquery.dataset(datasetId).table(tableName);
             })
 
             .catch(e => {
@@ -106,4 +110,4 @@ const getDataSet = (datasetId, tableName, tableStruct) => {
     })
 }
 
-exports.getDataSet = getDataSet;
+exports.getTable = getTable;
