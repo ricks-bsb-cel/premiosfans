@@ -24,6 +24,11 @@ api.post("/v1/receiver/:method", (request, response) => {
     initFirebase.call(receiver.pubSubReceiver, request, response);
 })
 
+api.post("/v1/receiver/:servicePath/:method", (request, response) => {
+    const receiver = require('./eventBusServicePubSubReceiver');
+    initFirebase.call(receiver.pubSubReceiver, request, response);
+})
+
 // Subscrições em DeadLettering apontam para cá...
 api.post("/v1/dead-lettering", (request, response) => {
     const deadLettering = require('./eventBusServicePubSubDeadLetterReceiver');
