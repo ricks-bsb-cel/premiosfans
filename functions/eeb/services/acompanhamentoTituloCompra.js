@@ -3,6 +3,8 @@
 const admin = require('firebase-admin');
 const global = require("../../global");
 
+const bigQueryAddRow = require('./bigquery/bigqueryAddRow');
+
 const getPathByDoc = doc => {
     if (!doc.idCampanha || !doc.uidComprador) throw new Error(`Erro criando path em acompanhamentoTituloCompra. O documento não tem idCampanha e/ou uidComprador`);
 
@@ -21,6 +23,42 @@ const getPathByDoc = doc => {
     }
 
     return `/titulosCompras/${idCampanha}/${uidComprador}/${idTituloCompra}`;
+}
+
+const toBigQueryTablePixCompras = (compra, pix) => {
+    const data = {
+        idCompra: compra.id,
+        idCampanha: compra.idCampanha,
+        idInfluencer: compra.idInfluencer,
+        vlTotalCompra: compra.vlTotalCompra,
+        uidComprador: compra.uidComprador,
+        pixKeyCredito: compra.pixKeyCredito,
+        pixKeyCpf: compra.pixKeyCpf,
+        pixKeyAccountId: compra.pixKeyAccountId,
+        qtdTotalProcessos: compra.qtdTotalProcessos,
+
+        pixEMV: pix.QRCode.EMV,
+        pixImagem: pix.QRCode.Imagem,
+        pixAdditionalInfo: pix.additionalInfo,
+        pixCreatedAt: pix.createdAt,
+        pixMerchantCity: pix.merchantCity,
+        pixReceiverKey: pix.receiverKey,
+        pixTxId: pix.txId,
+        pixValue: pix.value,
+
+        compradorCPF: compra.cpf,
+        compradorNome: compra.nome,
+        compradorEmail: compra.email,
+        compradorCelular: compra.celular
+    };
+
+    // Estrutura da tabela
+    return {
+        "tableType": "bigQueryTablePixCompras",
+        "datasetId": "campanha_" + compra.idCampanha,
+        "tableName": "comprasPix",
+        "row": data
+    };
 }
 
 // O acompanhamento isola os dados que podem ser vistos pelos clientes no front
@@ -81,10 +119,12 @@ async function incrementProcessosConcluidos(doc) {
     });
 }
 
-async function setPixData(doc, pixData) {
+async function setPixData(compra, pixData) {
     const
-        path = getPathByDoc(doc),
+        path = getPathByDoc(compra),
         ref = admin.database().ref(path);
+
+    let update;
 
     return ref.transaction(data => {
         if (!data || typeof data !== 'object') return null;
@@ -103,13 +143,22 @@ async function setPixData(doc, pixData) {
         data.pixDataDtCriacao = global.nowDateTime();
 
         return data;
-    }).then(update => {
-        if (!update.committed) {
-            console.info(`Erro atualizando RTDB [${path}]`);
-        }
-
-        return update.snapshot || null;
     })
+
+        .then(updateResult => {
+            update = updateResult;
+
+            if (!update.committed) {
+                console.info(`Erro atualizando RTDB [${path}]`);
+            }
+
+            // Atualiza o bigQuery com os dados do pix/compra
+            return bigQueryAddRow.call(toBigQueryTablePixCompras(compra, pixData));
+        })
+
+        .then(_ => {
+            return update.snapshot || null;
+        })
 }
 
 const get = doc => {

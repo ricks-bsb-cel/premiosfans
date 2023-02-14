@@ -173,8 +173,8 @@ api.post("/v1/pixFindNotUsed", (request, response) => {
 
 
 // BigQuery Tests
-api.post("/v1/bq/save-compra-concluida", (request, response) => {
-    initFirebase.call(require('./services/bigquery/bigquerySaveCompraConcluida').callRequest, request, response);
+api.post("/v1/bq/add-row", (request, response) => {
+    initFirebase.call(require('./services/bigquery/bigqueryAddRow').callRequest, request, response);
 })
 
 

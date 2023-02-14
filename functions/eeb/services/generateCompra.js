@@ -25,6 +25,8 @@ const generatePedidoPagamentoCompra = require('./generatePedidoPagamentoCompra')
 const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 const pixStoreCheck = require('./pixStoreCheck');
 
+const bigQueryAddRow = require('./bigquery/bigqueryAddRow');
+
 /*
     generateTitulo
     - Valida o token do cliente
@@ -70,6 +72,42 @@ const sanitizeData = data => {
     data.celular_hide = global.hideCelular(data.celular);
 
     return data;
+}
+
+const toBigQueryTableCompraNaoPaga = compra => {
+    const data = {
+        idCompra: compra.id,
+        idCampanha: compra.idCampanha,
+        idInfluencer: compra.idInfluencer,
+        qtdPremios: compra.qtdPremios,
+        campanhaQtdNumerosDaSortePorTitulo: compra.campanhaQtdNumerosDaSortePorTitulo,
+        campanhaNome: compra.campanhaNome,
+        campanhaSubTitulo: compra.campanhaSubTitulo,
+        campanhaDetalhes: compra.campanhaDetalhes,
+        campanhaVlTitulo: compra.campanhaVlTitulo,
+        vlTotalCompra: compra.vlTotalCompra,
+        campanhaQtdPremios: compra.campanhaQtdPremios,
+        campanhaTemplate: compra.campanhaTemplate,
+        guidCompra: compra.guidCompra,
+        qtdTitulosCompra: compra.qtdTitulosCompra,
+        uidComprador: compra.uidComprador,
+        pixKeyCredito: compra.pixKeyCredito,
+        pixKeyCpf: compra.pixKeyCpf,
+        pixKeyAccountId: compra.pixKeyAccountId,
+        qtdTotalProcessos: compra.qtdTotalProcessos,
+        compradorCPF: compra.cpf,
+        compradorNome: compra.nome,
+        compradorEmail: compra.email,
+        compradorCelular: compra.celular
+    };
+
+    // Estrutura da tabela
+    return {
+        "tableType": "bigQueryTableCompras",
+        "datasetId": "campanha_" + compra.idCampanha,
+        "tableName": "comprasNaoPagas",
+        "row": data
+    };
 }
 
 class Service extends eebService {
@@ -256,7 +294,8 @@ class Service extends eebService {
                             collectionCartosPix.add(findNotUsedPixResult), // Salva o PIX em CartosPix (como se tivesse sido gerado agora)
                             collectionTitulosCompras.merge(result.data.compra.id, { pix: findNotUsedPixResult }), // Cola o pix na compra
                             acompanhamentoTituloCompra.setPixData(result.data.compra, findNotUsedPixResult), // Atualiza o FrontEnd
-                            pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }) // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
+                            pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }), // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
+                            bigQueryAddRow.call(toBigQueryTableCompraNaoPaga(result.data.compra)) // Adiciona o pedido de compra não paga ao bigQuery
                         ])
                     }
 
@@ -264,7 +303,8 @@ class Service extends eebService {
                     return Promise.all([
                         generatePedidoPagamentoCompra.call({ idTituloCompra: result.data.compra.id }), // Solicita que um nov PIX seja gerado
                         pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }), // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
-                        acompanhamentoTituloCompra.get(result.data.compra) // Documento do FrontEnd (sem atualização)
+                        acompanhamentoTituloCompra.get(result.data.compra), // Documento do FrontEnd (sem atualização)
+                        bigQueryAddRow.call(toBigQueryTableCompraNaoPaga(result.data.compra)) // Adiciona a compra não paga no bigQuery
                     ])
 
                 })

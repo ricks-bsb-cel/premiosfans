@@ -250,17 +250,23 @@ class eventBusService {
                 })
 
                 .catch(e => {
-                    console.error(e);
-
                     const error = e.message || e.details || 'unknow';
                     this.log('error', helper.logType.error, { error: { code: e.code, message: error } });
 
+                    const errorResult = {
+                        success: false,
+                        error: e.toString()
+                    };
+
+                    if (e.errors) {
+                        errorResult.errorDetails = e.errors;
+                    }
+
                     if (this.response) {
-                        return this.response.status(500).json({
-                            success: false,
-                            error: e.toString()
-                        })
+                        return this.response.status(500).json(errorResult)
                     } else {
+                        console.error(JSON.stringify(errorResult));
+
                         return reject(new Error(error));
                     }
                 })

@@ -1,113 +1,52 @@
 "use strict";
 
-const admin = require("firebase-admin");
-const { BigQuery } = require('@google-cloud/bigquery');
-const bigquery = new BigQuery();
-const global = require('../../../global');
-
 const bigqueryTables = require('./bigqueryTables');
 
-async function createTableOnBigQuery(datasetId, tableName) {
-    let dataset;
-
+async function createTableOnBigQuery(tableType, datasetId, tableName) {
     try {
+        const tableStruct = bigqueryTables.getStructure(tableType, datasetId, tableName);
+
         // Garante que o dataset exista
-        dataset = bigquery.dataset(datasetId);
-        dataset = await dataset.get({ autoCreate: true });
+        const { BigQuery } = require('@google-cloud/bigquery');
+        const bigquery = new BigQuery();
 
-        const table = await bigquery.dataset(datasetId).createTable(tableName, tableStruct);
+        const dataset = bigquery.dataset(datasetId);
+        await dataset.get({ autoCreate: true });
 
-        return;
-    } catch (error) {
-        throw new Error(`Table or Dataset creation failed: ${error.message}`);
+        const [job] = await bigquery.createQueryJob({
+            query: tableStruct.createTable,
+        });
+
+        await job.getQueryResults();
+
+        return true;
+    } catch (e) {
+        throw new Error(`Erro na criação do DataSet ou Tabela: ${e.message}`);
     }
 }
 
-const getTable = (datasetId, tableName, tableStruct) => {
-    const
-        path = `bigQueryTablesStatus/${datasetId}/${tableName}`,
-        ref = admin.database().ref(path);
+async function addRow(parm) {
+    const { BigQuery } = require('@google-cloud/bigquery');
+    const bigquery = new BigQuery();
 
-    let
-        dataset,
-        result = null;
+    try {
+        await bigquery.dataset(parm.datasetId).table(parm.tableName).insert(parm.row || parm.rows);
 
-    return new Promise((resolve, reject) => {
+        return true;
+    } catch (e) {
+        if (e.code === 404) {
+            console.info(`Dataset ${parm.datasetId} e/ou tabela ${parm.tableName} não encontrados. Criando...`);
 
-        const tableStruct = bigqueryTables.getStructure(datasetId, tableName);
+            await createTableOnBigQuery(parm.tableType, parm.datasetId, parm.tableName);
 
-        return ref.once("value")
+            e.code = 404;
+            e.message = `O dataset ${parm.datasetId} e/ou tabela ${parm.tableName} foram criado com exito. Tente novamente...`;
 
-            .then(data => {
-                result = data.val() || null;
-
-                if (result && result.status === 'ready') {
-                    return;
-                }
-
-                if (result && result.status === 'creating') {
-                    throw new Error('A tabela está sendo criada...')
-                }
-
-                return ref.transaction(data => {
-
-                    if (data && data.status === 'creating') {
-                        // Já existe registro de controle da tabela, mas a tabela ainda está sendo criada
-                        throw new Error('A tabela está sendo criada...');
-                    }
-
-                    if (!data) {
-                        // Ainda não existe registro de controle da tabela
-                        result = {
-                            status: 'creating',
-                            dtCreating: global.getToday()
-                        };
-
-                        data = result;
-
-                        return data;
-                    }
-
-                })
-
-            })
-
-            .then(transactionResult => {
-                if (result && result.status === 'creating' && transactionResult.committed) {
-                    // Tudo pronto para a criação da tabela no BigQuery
-                    return createTableOnBigQuery(datasetId, tableName, tableStruct);
-                }
-
-                if (result && result.status === 'ready') {
-                    return;
-                }
-
-                throw new Error('Unknnow error');
-            })
-
-            .then(_ => {
-                if (result && result.status === 'creating') {
-                    result = {
-                        status: 'ready',
-                        dtReady: global.getToday()
-                    }
-
-                    return ref.update(result);
-                }
-
-                return;
-            })
-
-            .then(_ => {
-                return bigquery.dataset(datasetId).table(tableName);
-            })
-
-            .catch(e => {
-                console.error(e);
-
-                return reject(e);
-            })
-    })
+            throw e;
+        } else {
+            throw e;
+        }
+    }
 }
 
-exports.getTable = getTable;
+exports.addRow = addRow;
