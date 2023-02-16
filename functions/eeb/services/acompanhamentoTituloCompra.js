@@ -30,7 +30,7 @@ const toBigQueryTablePixCompras = (compra, pix) => {
         idCompra: compra.id,
         idCampanha: compra.idCampanha,
         idInfluencer: compra.idInfluencer,
-        vlTotalCompra: compra.vlTotalCompra,
+        vlTotalCompra: parseFloat((compra.vlTotalCompra / 100).toFixed(2)),
         uidComprador: compra.uidComprador,
         pixKeyCredito: compra.pixKeyCredito,
         pixKeyCpf: compra.pixKeyCpf,

@@ -6,7 +6,7 @@ const _ = require("lodash");
 
 // Especificação dos tipos de tabelas
 const tablesStructures = {
-    "bigQueryTableCompras": {
+    "bigQueryTableCompras": { // Todas as compras, inclusive as não pagas
         "createTable": `CREATE TABLE {datasetId}.{tableName} (
             idCompra STRING(28) NOT NULL,
             idCampanha STRING(28) NOT NULL,
@@ -36,7 +36,52 @@ const tablesStructures = {
             dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
         )`
     },
-    "bigQueryTablePixCompras": {
+    "bigQueryTableComprasPagas": { // Apenas as compras pagas,
+        "createTable": `CREATE TABLE {datasetId}.{tableName} (
+            idCompra STRING(28) NOT NULL,
+            idCampanha STRING(28) NOT NULL,
+            idInfluencer STRING(28) NOT NULL,
+            qtdPremios INT64 NOT NULL,
+            campanhaQtdNumerosDaSortePorTitulo INT64 NOT NULL,
+            campanhaNome STRING NOT NULL,
+            campanhaSubTitulo STRING,
+            campanhaDetalhes STRING,
+            campanhaVlTitulo NUMERIC(15,2) NOT NULL,
+            vlTotalCompra NUMERIC(15,2) NOT NULL,
+            campanhaQtdPremios INT64 NOT NULL,
+            campanhaTemplate STRING NOT NULL,
+            guidCompra STRING NOT NULL,
+            qtdTitulosCompra INT64 NOT NULL,
+            uidComprador STRING NOT NULL,
+
+            pixKeyCredito STRING NOT NULL,
+            pixKeyCpf STRING NOT NULL,
+            pixKeyAccountId STRING NOT NULL,
+            qtdTotalProcessos INT64 NOT NULL,
+
+            compradorCPF STRING NOT NULL,
+            compradorNome STRING,
+            compradorEmail STRING,
+            compradorCelular STRING,
+
+            pagamentoManual BOOL,
+            dtPagamento TIMESTAMP NOT NULL,
+
+            idCartosPix STRING(28) NULL,
+
+            payerAccount STRING,
+            payerAgency STRING,
+            payerBankIspb STRING,
+            payerClientName STRING,
+            payerDescription STRING,
+            payerDocument STRING,
+            payerOperationNumber STRING,
+            payerTxId STRING,
+
+            dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
+        )`
+    },
+    "bigQueryTablePixCompras": { // PIXs relacionados com as Compras
         "createTable": `CREATE TABLE {datasetId}.{tableName} (
             idCompra STRING(28) NOT NULL,
             idCampanha STRING(28) NOT NULL,
@@ -67,6 +112,7 @@ const tablesStructures = {
             dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
         )`
     }
+
 }
 
 const getStructure = (tableType, datasetId, tableName) => {

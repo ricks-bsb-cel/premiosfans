@@ -44,6 +44,9 @@ async function addRow(parm) {
 
             throw e;
         } else {
+            console.error(e.message);
+            if (e.errors) console.error(JSON.stringify(e.errors));
+
             throw e;
         }
     }
