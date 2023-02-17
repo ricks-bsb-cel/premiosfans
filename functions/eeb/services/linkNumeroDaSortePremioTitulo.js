@@ -18,11 +18,14 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionCampanha = firestoreDAL.campanhas();
+const collectionCampanhaSorteioPremios = firestoreDAL.campanhasSorteiosPremios();
 const collectionTitulosPremios = firestoreDAL.titulosPremios();
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 
 const checkTitulosCompra = require('./checkTitulosCompra');
 const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
+
+const bigQueryAddRow = require('./bigquery/bigqueryAddRow');
 
 // Receber no parametro um guidTitulo e idInfluencer (obrigatórios)
 // Pesquisar e criar o título se não existir
@@ -120,7 +123,35 @@ const getNumero = (parm) => {
     })
 }
 
-const updatePremioTitulo = async (idPremioTitulo, numeroDaSorte) => {
+const toBigQueryTablePremiosCompras = (numeroDaSorte, sorteioPremio, tituloPremio) => {
+    const data = {
+        idTituloPremio: tituloPremio.id,
+        idPremio: tituloPremio.idPremio,
+        idSorteio: tituloPremio.idSorteio,
+        idTitulo: tituloPremio.idTitulo,
+        idCompra: tituloPremio.idTituloCompra,
+        idCampanha: tituloPremio.idCampanha,
+
+        uidComprador: tituloPremio.uidComprador,
+
+        numeroDaSorte: numeroDaSorte,
+
+        premioDescricao: sorteioPremio.descricao,
+        premioValor: parseFloat((sorteioPremio.valor / 100).toFixed(2)),
+
+        dtSorteio: tituloPremio.sorteioDtSorteio_yyyymmdd
+    };
+
+    // Estrutura da tabela
+    return {
+        "tableType": "bigQueryTablePremiosCompras",
+        "datasetId": "campanha_" + tituloPremio.idCampanha,
+        "tableName": "comprasPremios",
+        "row": data
+    };
+}
+
+const updatePremioTitulo = async (idPremioTitulo, numeroDaSorte, tituloPremio, sorteioPremio) => {
     const premioTituloRef = admin.firestore().collection("titulosPremios").doc(idPremioTitulo);
 
     await admin.firestore().runTransaction(async t => {
@@ -136,6 +167,9 @@ const updatePremioTitulo = async (idPremioTitulo, numeroDaSorte) => {
             numerosDaSorte: numerosDaSorte,
             linksNumerosDaSorte: linksNumerosDaSorte
         });
+
+        // Envia os dados do prêmio para a base de dados do BigQuery
+        await bigQueryAddRow.call(toBigQueryTablePremiosCompras(numeroDaSorte, sorteioPremio, tituloPremio));
 
         return true;
     });
@@ -182,13 +216,18 @@ class Service extends eebService {
 
                     result.path = `/numerosDaSorte/${result.idCampanha}/${result.idPremio}`;
 
-                    return collectionCampanha.getDoc(result.idCampanha);
+                    // return collectionCampanha.getDoc(result.idCampanha);
+                    return Promise.all([
+                        collectionCampanha.getDoc(result.idCampanha),
+                        collectionCampanhaSorteioPremios.getDoc(result.idPremio)
+                    ])
                 })
 
-                .then(resultCampanha => {
+                .then(promiseResult => {
                     if (result.jaGerado) return true;
 
-                    result.campanha = resultCampanha;
+                    result.campanha = promiseResult[0];
+                    result.sorteioPremio = promiseResult[1];
 
                     result.gruposLength = (result.campanha.qtdGrupos - 1).toString().length;
                     result.NumerosPorGrupoLength = (result.campanha.qtdNumerosPorGrupo - 1).toString().length;
@@ -201,7 +240,12 @@ class Service extends eebService {
 
                     result.numero = getNumeroResult;
 
-                    return updatePremioTitulo(result.data.idPremioTitulo, result.numero);
+                    return updatePremioTitulo(
+                        result.data.idPremioTitulo,
+                        result.numero,
+                        result.data.premioTitulo,
+                        result.sorteioPremio
+                    );
                 })
 
                 .then(_ => {

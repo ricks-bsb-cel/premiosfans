@@ -6,6 +6,7 @@ const _ = require("lodash");
 
 // Especificação dos tipos de tabelas
 const tablesStructures = {
+
     "bigQueryTableCompras": { // Todas as compras, inclusive as não pagas
         "createTable": `CREATE TABLE {datasetId}.{tableName} (
             idCompra STRING(28) NOT NULL,
@@ -36,6 +37,7 @@ const tablesStructures = {
             dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
         )`
     },
+
     "bigQueryTableComprasPagas": { // Apenas as compras pagas,
         "createTable": `CREATE TABLE {datasetId}.{tableName} (
             idCompra STRING(28) NOT NULL,
@@ -81,6 +83,7 @@ const tablesStructures = {
             dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
         )`
     },
+
     "bigQueryTablePixCompras": { // PIXs relacionados com as Compras
         "createTable": `CREATE TABLE {datasetId}.{tableName} (
             idCompra STRING(28) NOT NULL,
@@ -111,7 +114,30 @@ const tablesStructures = {
 
             dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
         )`
+    },
+
+    "bigQueryTablePremiosCompras": { // Premios das compras (depois do pagamento)
+        "createTable": `CREATE TABLE {datasetId}.{tableName} (
+            idTituloPremio STRING(28) NOT NULL,
+            idPremio STRING(28) NOT NULL,
+            idSorteio STRING(28) NOT NULL,
+            idTitulo STRING(28) NOT NULL,
+            idCompra STRING(28) NOT NULL,
+            idCampanha STRING(28) NOT NULL,
+
+            uidComprador STRING NOT NULL,
+            
+            numeroDaSorte INT64 NOT NULL,
+
+            premioDescricao STRING NOT NULL,
+            premioValor NUMERIC(15,2) NOT NULL,
+
+            dtSorteio DATE NOT NULL,
+
+            dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
+        )`
     }
+
 
 }
 
