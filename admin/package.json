@@ -45,6 +45,7 @@
     "angular-selector": "^1.6.1",
     "angular-summernote": "^0.8.1",
     "angular-touch": "^1.8.2",
+    "angular-tree-control": "^0.2.30",
     "angular-ui-sortable": "^0.19.0",
     "angularjs-slider": "^7.0.0",
     "async-mutex": "^0.3.2",

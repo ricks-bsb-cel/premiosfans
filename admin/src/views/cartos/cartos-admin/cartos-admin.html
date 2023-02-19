@@ -1,0 +1,22 @@
+<section class="content cartos-admin">
+
+    <search-filter></search-filter>
+
+    <wait-overlay 
+        ready="ready"
+        class="container-fluid"
+    >
+        <div class="row">
+            <div class="col-12">
+                <treecontrol class="tree-classic"
+                    tree-model="dataForTheTree"
+                    options="treeOptions"
+                    on-selection="showSelected(node)"
+                    selected-node="node1"
+                >
+                    employee: {{node.name}} age {{node.age}}
+                </treecontrol>
+            </div>
+        </div>
+    </wait-overlay>
+</section>

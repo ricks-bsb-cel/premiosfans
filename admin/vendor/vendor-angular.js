@@ -47,6 +47,8 @@ let rzSlider = 'rzSlider';
 import '../node_modules/json-tree2';
 let jsontree = 'json-tree';
 
+import 'angular-tree-control';
+
 const ngModule = angular.module(
 	'vendor',
 	[
@@ -67,7 +69,8 @@ const ngModule = angular.module(
 		googlechart,
 		rzSlider,
 		ngSelector,
-		jsontree
+		jsontree,
+		'treeControl'
 	]
 );
 
