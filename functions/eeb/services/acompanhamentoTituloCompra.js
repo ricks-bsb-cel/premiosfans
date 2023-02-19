@@ -3,6 +3,9 @@
 const admin = require('firebase-admin');
 const global = require("../../global");
 
+const firestoreDAL = require('../../api/firestoreDAL');
+const collectionInfluencer = firestoreDAL.influencers();
+
 const bigQueryAddRow = require('./bigquery/bigqueryAddRow');
 
 const getPathByDoc = doc => {
@@ -25,11 +28,16 @@ const getPathByDoc = doc => {
     return `/titulosCompras/${idCampanha}/${uidComprador}/${idTituloCompra}`;
 }
 
-const toBigQueryTablePixCompras = (compra, pix) => {
+const toBigQueryTablePixCompras = (compra, pix, influencer) => {
     const data = {
         idCompra: compra.id,
         idCampanha: compra.idCampanha,
+
         idInfluencer: compra.idInfluencer,
+        influencerNome: influencer.nome,
+        influencerEmail: influencer.email || null,
+        influencerCelular: influencer.celular || null,
+
         vlTotalCompra: parseFloat((compra.vlTotalCompra / 100).toFixed(2)),
         uidComprador: compra.uidComprador,
         pixKeyCredito: compra.pixKeyCredito,
@@ -122,7 +130,8 @@ async function incrementProcessosConcluidos(doc) {
 async function setPixData(compra, pixData) {
     const
         path = getPathByDoc(compra),
-        ref = admin.database().ref(path);
+        ref = admin.database().ref(path),
+        influencer = await collectionInfluencer.getDoc(compra.idInfluencer);
 
     let update;
 
@@ -153,7 +162,7 @@ async function setPixData(compra, pixData) {
             }
 
             // Atualiza o bigQuery com os dados do pix/compra
-            return bigQueryAddRow.call(toBigQueryTablePixCompras(compra, pixData));
+            return bigQueryAddRow.call(toBigQueryTablePixCompras(compra, pixData, influencer));
         })
 
         .then(_ => {

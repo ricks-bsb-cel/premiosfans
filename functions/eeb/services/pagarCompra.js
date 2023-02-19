@@ -17,6 +17,7 @@ const pagarTitulo = require('./pagarTitulo');
 const collectionTitulosCompras = firestoreDAL.titulosCompras();
 const collectionTitulos = firestoreDAL.titulos();
 const collectionCartosPix = firestoreDAL.cartosPix();
+const collectionInfluencer = firestoreDAL.influencers();
 
 const acompanhamentoTituloCompra = require('./acompanhamentoTituloCompra');
 
@@ -29,11 +30,16 @@ const tituloCompraSchema = _ => {
     return schema;
 }
 
-const toBigQueryTableComprasPagas = (compra, cartosPix) => {
+const toBigQueryTableComprasPagas = (compra, cartosPix, influencer) => {
     const data = {
         idCompra: compra.id,
         idCampanha: compra.idCampanha,
+
         idInfluencer: compra.idInfluencer,
+        influencerNome: influencer.nome,
+        influencerEmail: influencer.email || null,
+        influencerCelular: influencer.celular || null,
+
         qtdPremios: compra.qtdPremios,
         campanhaQtdNumerosDaSortePorTitulo: compra.campanhaQtdNumerosDaSortePorTitulo,
         campanhaNome: compra.campanhaNome,
@@ -142,6 +148,13 @@ class Service extends eebService {
                         throw new Error('A compra não possui nenhum título aguardando pagamento');
                     }
 
+                    // Busca os dados do influencer
+                    return collectionInfluencer.getDoc(result.data.tituloCompra.idInfluencer);
+                })
+
+                .then(resultInfluencer => {
+                    result.data.influencer = resultInfluencer;
+
                     // Atualiza a situação do titulo
                     result.data.updateTituloCompra = {
                         situacao: 'pago',
@@ -163,7 +176,14 @@ class Service extends eebService {
                     });
 
                     // Adiciona também o registro do TituloCompra pago em bigQueryTableComprasPagas
-                    promise.push(bigQueryAddRow.call(toBigQueryTableComprasPagas(result.data.tituloCompra, result.data.cartosPix)));
+                    promise.push(bigQueryAddRow.call(
+                        toBigQueryTableComprasPagas(
+                            result.data.tituloCompra,
+                            result.data.cartosPix,
+                            result.data.influencer
+                        )
+                    )
+                    );
 
                     return Promise.all(promise);
                 })

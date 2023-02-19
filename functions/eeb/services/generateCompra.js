@@ -74,11 +74,16 @@ const sanitizeData = data => {
     return data;
 }
 
-const toBigQueryTableCompraNaoPaga = compra => {
+const toBigQueryTableCompraNaoPaga = (compra, influencer) => {
     const data = {
         idCompra: compra.id,
         idCampanha: compra.idCampanha,
+
         idInfluencer: compra.idInfluencer,
+        influencerNome: influencer.nome,
+        influencerEmail: influencer.email || null,
+        influencerCelular: influencer.celular || null,
+
         qtdPremios: compra.qtdPremios,
         campanhaQtdNumerosDaSortePorTitulo: compra.campanhaQtdNumerosDaSortePorTitulo,
         campanhaNome: compra.campanhaNome,
@@ -268,7 +273,12 @@ class Service extends eebService {
                 .then(resultTitulos => {
                     result.data = {
                         compra: result.data.compra,
-                        titulos: resultTitulos.filter(f => { return f.guidTitulo; })
+                        influencer: {
+                            nome: result.data.influencer.nome,
+                            email: result.data.influencer.email,
+                            celular: result.data.influencer.celular
+                        },
+                        titulos: resultTitulos.filter(f => { return f.guidTitulo; }),
                     }
 
                     // Salva os títulos no acompanhamento
@@ -295,7 +305,7 @@ class Service extends eebService {
                             collectionTitulosCompras.merge(result.data.compra.id, { pix: findNotUsedPixResult }), // Cola o pix na compra
                             acompanhamentoTituloCompra.setPixData(result.data.compra, findNotUsedPixResult), // Atualiza o FrontEnd
                             pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }), // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
-                            bigQueryAddRow.call(toBigQueryTableCompraNaoPaga(result.data.compra)) // Adiciona o pedido de compra não paga ao bigQuery
+                            bigQueryAddRow.call(toBigQueryTableCompraNaoPaga(result.data.compra, result.data.influencer)) // Adiciona o pedido de compra não paga ao bigQuery
                         ])
                     }
 
@@ -304,7 +314,7 @@ class Service extends eebService {
                         generatePedidoPagamentoCompra.call({ idTituloCompra: result.data.compra.id }), // Solicita que um nov PIX seja gerado
                         pixStoreCheck.call({ key: result.pixKey, valor: result.pixValue }), // Solicita que seja verificado se novos PIX devem ser gerados no PIX Storage
                         acompanhamentoTituloCompra.get(result.data.compra), // Documento do FrontEnd (sem atualização)
-                        bigQueryAddRow.call(toBigQueryTableCompraNaoPaga(result.data.compra)) // Adiciona a compra não paga no bigQuery
+                        bigQueryAddRow.call(toBigQueryTableCompraNaoPaga(result.data.compra, result.data.influencer)) // Adiciona a compra não paga no bigQuery
                     ])
 
                 })

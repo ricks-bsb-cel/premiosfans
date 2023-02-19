@@ -11,7 +11,12 @@ const tablesStructures = {
         "createTable": `CREATE TABLE {datasetId}.{tableName} (
             idCompra STRING(28) NOT NULL,
             idCampanha STRING(28) NOT NULL,
+
             idInfluencer STRING(28) NOT NULL,
+            influencerNome STRING(512),
+            influencerEmail STRING(256),
+            influencerCelular STRING(32),
+
             qtdPremios INT64 NOT NULL,
             campanhaQtdNumerosDaSortePorTitulo INT64 NOT NULL,
             campanhaNome STRING NOT NULL,
@@ -42,7 +47,12 @@ const tablesStructures = {
         "createTable": `CREATE TABLE {datasetId}.{tableName} (
             idCompra STRING(28) NOT NULL,
             idCampanha STRING(28) NOT NULL,
+
             idInfluencer STRING(28) NOT NULL,
+            influencerNome STRING(512),
+            influencerEmail STRING(256),
+            influencerCelular STRING(32),
+
             qtdPremios INT64 NOT NULL,
             campanhaQtdNumerosDaSortePorTitulo INT64 NOT NULL,
             campanhaNome STRING NOT NULL,
@@ -69,7 +79,7 @@ const tablesStructures = {
             pagamentoManual BOOL,
             dtPagamento TIMESTAMP NOT NULL,
 
-            idCartosPix STRING(28) NULL,
+            idCartosPix STRING(28),
 
             payerAccount STRING,
             payerAgency STRING,
@@ -88,7 +98,12 @@ const tablesStructures = {
         "createTable": `CREATE TABLE {datasetId}.{tableName} (
             idCompra STRING(28) NOT NULL,
             idCampanha STRING(28) NOT NULL,
+
             idInfluencer STRING(28) NOT NULL,
+            influencerNome STRING(512),
+            influencerEmail STRING(256),
+            influencerCelular STRING(32),
+
             vlTotalCompra NUMERIC(15,2) NOT NULL,
             uidComprador STRING NOT NULL,
 

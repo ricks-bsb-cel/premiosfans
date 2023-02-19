@@ -134,7 +134,7 @@ const toBigQueryTablePremiosCompras = (numeroDaSorte, sorteioPremio, tituloPremi
 
         uidComprador: tituloPremio.uidComprador,
 
-        numeroDaSorte: numeroDaSorte,
+        numeroDaSorte: parseInt(numeroDaSorte.numero),
 
         premioDescricao: sorteioPremio.descricao,
         premioValor: parseFloat((sorteioPremio.valor / 100).toFixed(2)),
