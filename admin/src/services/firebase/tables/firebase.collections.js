@@ -36,6 +36,7 @@ import collectionContas from './collections/collection.contas';
 
 import collectionFaq from './collections/collection.faq';
 
+import collectionCartosServiceUserCredentials from './collections/collection.cartosServiceUserCredentials';
 import collectionCartosAccounts from './collections/collection.cartosAccounts';
 import collectionCartosPixKeys from './collections/collection.cartosPixKeys';
 
@@ -71,6 +72,7 @@ let ngModule = angular.module('firebase.collections', [
 	collectionContas.name,
 	collectionFaq.name,
 
+	collectionCartosServiceUserCredentials.name,
 	collectionCartosAccounts.name,
 	collectionCartosPixKeys.name
 ]);

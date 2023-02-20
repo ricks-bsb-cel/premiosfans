@@ -82,6 +82,27 @@ const ngModule = angular.module('services.app-collection', [])
 				})
 			}
 
+			this.updateDoc = (id, data) => {
+				return $q((resolve, reject) => {
+					const db = appFirestore.firestore;
+
+					if (data.id) delete data.id;
+
+					appFirestore.setDoc(appFirestore.doc(db, attr.collection, id), data, { merge: true })
+						.then(doc => {
+							data.id = id;
+
+							return resolve(data);
+						})
+						.catch(e => {
+							console.error(attr.collection, e);
+
+							return reject(e);
+						})
+
+				})
+			}
+
 			this.destroySnapshot = () => {
 				onLoadFinishCallback = null;
 				if (typeof this.unsubscribeSnapshot === 'function') {

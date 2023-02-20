@@ -3,7 +3,9 @@
 const ngModule = angular.module('collection.cartosAccounts', [])
 
     .factory('collectionCartosAccounts', function (
-        appCollection
+        appCollection,
+        appAuthHelper,
+        appFirestoreHelper
     ) {
 
         const attr = {
@@ -14,8 +16,18 @@ const ngModule = angular.module('collection.cartosAccounts', [])
 
         const firebaseCollection = new appCollection(attr);
 
+        async function getByCpf(cpf){
+            await appAuthHelper.ready();
+            
+            let query = appFirestoreHelper.collection(attr.collection);
+            query = appFirestoreHelper.query(query, 'cpf', '==', cpf);
+
+            return await appFirestoreHelper.docs(query);
+        }
+
         return {
-            collection: firebaseCollection
+            collection: firebaseCollection,
+            getByCpf: getByCpf
         };
 
     });

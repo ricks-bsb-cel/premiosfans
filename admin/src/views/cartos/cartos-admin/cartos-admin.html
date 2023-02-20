@@ -1,23 +1,14 @@
 <section class="content cartos-admin">
-
     <search-filter></search-filter>
-
-    <wait-overlay ready="ready" class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-
-                <div
-                    treecontrol
-                    class="tree-classic"
-                    tree-model="dataForTheTree"
-                    options="treeOptions"
-                    selected-node="node1"
-                    on-selection="nodeSelected(node)"
-                    style="zoom:1.1"
-                >
-                    employee: {{node.name}} age {{node.age}}
-                </div>
-
+    <wait-overlay
+        ready="collectionCartosServiceUserCredentials.collection.isReady()"
+        class="container-fluid"
+    >
+        <div class="row mt-4">
+            <div ng-repeat="c in collectionCartosServiceUserCredentials.collection.data" class="col-12">
+                <block-cartos-admin
+                    service-user-credential="c"
+                ></block-cartos-admin>
             </div>
         </div>
     </wait-overlay>
