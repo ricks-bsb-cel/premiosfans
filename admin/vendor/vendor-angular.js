@@ -47,7 +47,10 @@ let rzSlider = 'rzSlider';
 import '../node_modules/json-tree2';
 let jsontree = 'json-tree';
 
-import 'angular-tree-control';
+import '../node_modules/angular-tree-control/angular-tree-control';
+import '../node_modules/angular-tree-control/context-menu';
+
+let ngTreeControl = 'treeControl';
 
 const ngModule = angular.module(
 	'vendor',
@@ -70,7 +73,7 @@ const ngModule = angular.module(
 		rzSlider,
 		ngSelector,
 		jsontree,
-		'treeControl'
+		ngTreeControl
 	]
 );
 
