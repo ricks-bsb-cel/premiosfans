@@ -166,7 +166,7 @@ const ngModule = angular.module('views.contratos-edit', [
 								type: 'text',
 								required: false,
 								minlength: 3,
-								maxlength: 64
+								maxlength: 128
 							},
 							type: 'input',
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'

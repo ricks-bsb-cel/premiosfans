@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" ng-app="app">
+<html lang="en" ng-app="app" data-theme="light">
 
 <head>
     <meta charset="utf-8">
@@ -105,7 +105,7 @@
         </header>
     </div>
 
-    <section class="m-0">
+    <section class="m-0 p-5">
         <a href="#compra-rapida" role="button" class="display:block;" style="width:100%;">
             Quero Participar!
         </a>
@@ -144,14 +144,13 @@
         <compras-cliente></compras-cliente>
 
         <section id="compra-rapida">
-
             <div class="container p-0">
                 <form>
                     <article class="pt-20 pb-20 mb-0">
                         <hgroup class="mt-10">
                             <h2>Compra Rápida</h2>
                             <h3>Acredite em sua sorte e invista em sua vitória! Escolha quantos títulos você deseja e
-                                <strong>compre agora</strong>!
+                                <strong>compre agora</strong>! 
                             </h3>
                         </hgroup>
 
@@ -160,7 +159,7 @@
                                 <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
                                     <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
                                         <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
-                                            class="m-0 mb-20 p-10">
+                                            class="m-0 mb-20 p-10 botao-compra">
                                             <div class="sugestao text-center">
                                                 <h3 class="mb-0 mt-10">
                                                     {{{this.qtdExibicao}}}
@@ -178,13 +177,22 @@
 
                         <h2 id="vl-total" class="mb-0" style="display: none;">
                             <small>Total:</small>
-                            R$ <strong ng-bind="vlCompra | currency : '': 2 "></strong>
+                            <strong ng-bind="vlCompra | currency:'R$ '"></strong>
                         </h2>
                     </article>
 
                     <form-cliente></form-cliente>
 
-                    <button ng-click="openSell()" class="mt-10">Comprar</button>
+                    <button ng-click="openSell()" class="mt-10 open-sell">
+                        Comprar
+                        <br ng-if="qtd" />
+                        <span ng-if="qtd" style="color:white;">
+                            <strong ng-bind="qtd"></strong>
+                            <small ng-if="qtd===1" style="color:white;">Título,</small>
+                            <small ng-if="qtd>1" style="color:white;">Títulos,</small>
+                            <strong ng-bind="vlCompra | currency:'R$ '"></strong>
+                        </span>
+                    </button>
                 </form>
             </div>
         </section>
@@ -242,7 +250,7 @@
                         {{/each}}
                     </div>
 
-                    <a href="#compra-rapida" style="display: block;" class="mt-10" role="button">
+                    <a href="#compra-rapida" style="display: block;" class="mt-0" role="button">
                         Garanta o <strong>seu</strong> Título!
                     </a>
 
@@ -278,9 +286,9 @@
         <modal-regulamento></modal-regulamento>
 
         {{#if campanha.rodape}}
-        <section id="rodape">
-            {{{campanha.rodape}}}
-        </section>
+            <section id="rodape">
+                {{{campanha.rodape}}}
+            </section>
         {{/if}}
 
     </main>
@@ -387,6 +395,7 @@
             <article class="pt-20 pb-20 mb-0">
                 <hgroup class="mt-10">
                     <h2>Suas compras</h2>
+                    <h3>Veja abaixo as suas compras solicitadas e já concluídas. Você pode realizar o pagamento de compras pendentes em até 24 horas.</h3>
                 </hgroup>
 
                 <details open
@@ -646,6 +655,7 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="/assets/angular/angular-locale_pt-br.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/vanilla-masker@1.1.1/build/vanilla-masker.min.js"></script>
     <script src="/assets/moment.min.js"></script>

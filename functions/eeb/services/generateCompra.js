@@ -90,7 +90,7 @@ const toBigQueryTableCompraNaoPaga = (compra, influencer) => {
         campanhaSubTitulo: compra.campanhaSubTitulo,
         campanhaDetalhes: compra.campanhaDetalhes,
         campanhaVlTitulo: compra.campanhaVlTitulo,
-        vlTotalCompra: parseFloat((compra.vlTotalCompra / 100).toFixed(2)),
+        vlTotalCompra: parseFloat(compra.vlTotalCompra.toFixed(2)),
         campanhaQtdPremios: compra.campanhaQtdPremios,
         campanhaTemplate: compra.campanhaTemplate,
         guidCompra: compra.guidCompra,

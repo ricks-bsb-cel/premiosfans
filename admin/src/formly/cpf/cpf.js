@@ -4,20 +4,19 @@ const ngModule = angular.module('admin.formly.cpf', [])
         formlyConfig
     ) {
 
-        var fieldObj = {
+        const fieldObj = {
             name: 'cpf',
             extends: 'input',
             templateUrl: 'cpf/cpf.html',
             controller: function ($scope, $timeout, globalFactory, appConfig) {
 
-                var id = $scope.options.id + "_cpf";
-
+                $scope.id = $scope.options.id + "_cpf_" + globalFactory.generateRandomId(7);
                 $scope.value = $scope.model[$scope.options.key + '_formatted'] || $scope.model[$scope.options.key] || null;
+
                 $scope.isValid = true;
                 $scope.isEmpty = true;
 
                 $scope.$watch('value', function (newvalue, oldvalue) {
-
                     $scope.isValid = globalFactory.isCPFValido(newvalue);
                     $scope.isEmpty = globalFactory.onlyNumbers(newvalue) === '';
 
@@ -31,12 +30,17 @@ const ngModule = angular.module('admin.formly.cpf', [])
                     }
                 });
 
-                $timeout(function () {
-                    var e = document.getElementById(id);
-                    VMasker(e).maskPattern(appConfig.get("/masks/cpf"));
-                })
+                $scope.init = _ => {
+                    $timeout(function () {
+                        var e = document.getElementById($scope.id);
+                        VMasker(e).maskPattern(appConfig.get("/masks/cpf"));
+                    })
+                }
+            },
+            link: function (scope) {
+                scope.init();
             }
-        }
+        };
 
         formlyConfig.setType(fieldObj);
 

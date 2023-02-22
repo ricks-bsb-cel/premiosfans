@@ -17,30 +17,231 @@ ngModule = angular.module('directives.cartos-admin.directives.new-account', [])
 
             $ctrl.userAccount = userAccount;
 
-            $ctrl.fields = [
-                {
-                    template: '<h5>Usuário Principal</h5>'
-                },
-                {
-                    key: 'cpf',
-                    type: 'cpf',
-                    className: 'col-12',
-                    templateOptions: {
-                        label: 'CPF'
+            const
+                fieldsUser = [
+                    {
+                        key: 'cpf',
+                        type: 'cpf',
+                        templateOptions: {
+                            label: 'CPF'
+                        },
+                        ngModelElAttrs: { disabled: 'true' },
+                        className: "col-4"
                     },
-                    ngModelElAttrs: { disabled: 'true' }
-                },
-                {
-                    key: 'alias',
-                    type: 'input',
-                    className: 'col-12',
-                    templateOptions: {
-                        label: 'Apelido'
+                    {
+                        key: 'alias',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Apelido'
+                        },
+                        ngModelElAttrs: { disabled: 'true' },
+                        className: "col-8"
+                    }
+                ],
+                fieldsCompanyData = [
+                    {
+                        key: 'cnpj',
+                        type: 'cnpj',
+                        templateOptions: {
+                            label: 'CNPJ da Empresa'
+                        },
+                        className: "col-12"
                     },
-                    ngModelElAttrs: { disabled: 'true' }
-                },
+                    {
+                        key: 'companyName',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Nome Oficial da Empresa',
+                            minwidth: 3,
+                            maxwidth: 120,
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'tradingName',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Nome de Fantasia',
+                            minwidth: 3,
+                            maxwidth: 120,
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'dateStartCompany',
+                        type: 'data',
+                        templateOptions: {
+                            label: 'Data de Abertura da Empresa',
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'phone',
+                        type: 'telefone',
+                        templateOptions: {
+                            label: 'Telefone/Celular',
+                            required: true
+                        },
+                        className: "col-12"
+                    }
+                ],
+                fieldsPersonalData = [
+                    {
+                        key: 'cpf',
+                        type: 'cpf',
+                        templateOptions: {
+                            label: 'CPF do Representante',
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'name',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Nome do Representante',
+                            minwidth: 3,
+                            maxwidth: 120,
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'birthdate',
+                        type: 'data',
+                        templateOptions: {
+                            label: 'Data de Nascimento',
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'phone',
+                        type: 'telefone',
+                        templateOptions: {
+                            label: 'Telefone/Celular',
+                            required: true
+                        },
+                        className: "col-12"
+                    }
+                ],
+                fieldsAddress = [
+                    {
+                        key: 'addressType',
+                        type: 'select',
+                        templateOptions: {
+                            label: 'Tipo do Endereço',
+                            required: true,
+                            options: [
+                                { name: 'PJ', value: 'PJ' },
+                                { name: 'Casa', value: 'Casa' },
+                                { name: 'Escritório', value: 'Escritório' },
+                                { name: 'Trabalho', value: 'Trabalho' }
+                            ]
+                        },
+                        defaultValue: 'PJ',
+                        className: 'col-6'
+                    },
+                    {
+                        key: 'postalCode',
+                        type: 'mask-pattern',
+                        templateOptions: {
+                            label: 'CEP',
+                            type: 'text',
+                            mask: '99 999 999',
+                            required: true
+                        },
+                        className: "col-6"
+                    },
+                    {
+                        key: 'street',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Rua, Avenida, Quadra, etc',
+                            minwidth: 3,
+                            maxwidth: 120,
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'number',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Número',
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'district',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Bairro',
+                            required: true
+                        },
+                        className: "col-12"
+                    },
+                    {
+                        key: 'city',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Cidade',
+                            required: true
+                        },
+                        className: "col-6"
+                    },
+                    {
+                        key: 'state',
+                        templateOptions: {
+                            label: 'Estado',
+                            type: 'text',
+                            required: true
+                        },
+                        type: 'ng-selector-estado',
+                        className: "col-6"
+                    },
+                    {
+                        key: 'complement',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Complemento',
+                            required: true
+                        },
+                        className: "col-12"
+                    }
+                ];
 
-            ];
+            $ctrl.forms = {
+                user: {
+                    title: "Usuário",
+                    fields: fieldsUser,
+                    data: $ctrl.userAccount
+                },
+                empresa: {
+                    title: "Empresa",
+                    fields: fieldsCompanyData,
+                    data: {}
+                },
+                empresaAddress: {
+                    title: "Endereço da Empresa",
+                    fields: fieldsAddress,
+                    data: {}
+                },
+                representante: {
+                    title: "Representante",
+                    fields: fieldsPersonalData,
+                    data: {}
+                },
+                representanteAddress: {
+                    title: "Endereço do Representante",
+                    fields: fieldsAddress,
+                    data: {}
+                },
+            };
 
             $ctrl.ok = function () {
                 if ($ctrl.form.$invalid) {
@@ -70,7 +271,7 @@ ngModule = angular.module('directives.cartos-admin.directives.new-account', [])
                         templateUrl: 'cartos-admin/directives/new-account/edit.html',
                         controller: 'cartosAdminNewAccountController',
                         controllerAs: '$ctrl',
-                        size: 'lg',
+                        size: 'xl',
                         backdrop: false,
                         resolve: {
                             userAccount: function () {

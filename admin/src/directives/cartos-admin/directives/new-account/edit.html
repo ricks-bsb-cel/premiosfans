@@ -6,16 +6,45 @@
 <div class="modal-body" id="modal-body">
 
     <wait-overlay ready="$ctrl.ready">
-        <form novalidate>
-            <formly-form
-                class="row"
-                model="$ctrl.userAccount"
-                fields="$ctrl.fields"
-                form="$ctrl.form"
-                novalidate
-            >
-            </formly-form>
-        </form>
+
+        <div class="row">
+            <div class="col-4 pr-1">
+                <div class="btn-group-vertical btn-block">
+                    <button
+                        ng-repeat="(type, obj) in $ctrl.forms"
+                        type="button"
+                        class="btn btn-default"
+                        ng-bind="::obj.title"
+                    ></button>
+                </div>
+            </div>
+            <div class="col-8">
+                <div
+                    ng-repeat="(type, obj) in $ctrl.forms"
+                    class="card"
+                >
+                    <div class="card-header">
+                        <h3
+                            class="card-title"
+                            ng-bind="::obj.title"
+                        ></h3>
+                    </div>
+                    <div class="card-body">
+                        <form novalidate>
+                            <formly-form
+                                class="row"
+                                model="obj.data"
+                                fields="obj.fields"
+                                form="obj.form"
+                                novalidate
+                            >
+                            </formly-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </wait-overlay>
 
 </div>
