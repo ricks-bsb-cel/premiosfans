@@ -142,7 +142,7 @@ const ngModule = angular.module('collection.campanhas', [])
 
             let result = {
                 id: campanha.id || 'new',
-                ativo: typeof campanha.ativo === 'function' ? campanha.ativo : false,
+                ativo: typeof campanha.ativo === 'boolean' ? campanha.ativo : false,
                 guidCampanha: campanha.guidCampanha || globalFactory.guid(),
                 titulo: campanha.titulo,
                 subTitulo: campanha.subTitulo || null,
