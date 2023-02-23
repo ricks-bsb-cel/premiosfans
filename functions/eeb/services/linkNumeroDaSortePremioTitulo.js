@@ -132,6 +132,8 @@ const toBigQueryTablePremiosCompras = (numeroDaSorte, sorteioPremio, tituloPremi
         idCompra: tituloPremio.idTituloCompra,
         idCampanha: tituloPremio.idCampanha,
 
+        posPremio: sorteioPremio.pos,
+
         uidComprador: tituloPremio.uidComprador,
 
         numeroDaSorte: parseInt(numeroDaSorte.numero),

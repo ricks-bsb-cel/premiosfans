@@ -140,6 +140,8 @@ const tablesStructures = {
             idCompra STRING(28) NOT NULL,
             idCampanha STRING(28) NOT NULL,
 
+            posPremio INT64 NOT NULL,
+
             uidComprador STRING NOT NULL,
             
             numeroDaSorte INT64 NOT NULL,
@@ -148,6 +150,39 @@ const tablesStructures = {
             premioValor NUMERIC(15,2) NOT NULL,
 
             dtSorteio DATE NOT NULL,
+
+            dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
+        )`
+    },
+
+    "bigQueryTablePixIn": { // Premios das compras (depois do pagamento)
+        "createTable": `CREATE TABLE {datasetId}.{tableName} (
+            accountId STRING(38) NOT NULL,
+            accountAgency STRING NOT NULL,
+            accountBankId STRING NOT NULL,
+            accountCompanyName STRING NOT NULL,
+            accountDocumentNumber STRING(14) NOT NULL,
+            accountEmail STRING NOT NULL,
+            accountNumber STRING NOT NULL,
+            accountPersonType STRING NOT NULL,
+            accountType STRING NOT NULL,
+
+            amount NUMERIC(15,2) NOT NULL,
+            category STRING NOT NULL,
+
+            payerAccount STRING NOT NULL,
+            payerAccountType STRING NOT NULL,
+            payerAgency STRING,
+            payerBankIspb STRING,
+            payerName STRING,
+            payerDocument STRING,
+            
+            operationNumber STRING NOT NULL,
+            transactionId STRING NOT NULL,
+            txId STRING,
+
+            createdAt TIMESTAMP,
+            updatedAt TIMESTAMP,
 
             dtInclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL
         )`
