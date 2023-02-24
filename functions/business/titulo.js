@@ -51,6 +51,7 @@ const getById = idTitulo => {
                     });
 
                     const premio = {
+                        pos: p.pos,
                         premioDescricao: p.premioDescricao,
                         premioValor: p.premioValor,
                         numerosDaSorte: p.numerosDaSorte
@@ -72,8 +73,20 @@ const getById = idTitulo => {
                 result.sorteios = _.sortBy(result.sorteios, ['sorteioDtSorteio_yyyymmdd'])
                     .map((s, i) => {
                         s.pos = i + 1;
+
                         return s;
                     });
+
+                result.sorteios.map(s => {
+                    s.premios = _.sortBy(s.premios, ['pos'])
+                        .map((p, i) => {
+                            p.pos = i + 1;
+
+                            return p;
+                        })
+
+                    return s;
+                })
 
                 return resolve(result);
             })

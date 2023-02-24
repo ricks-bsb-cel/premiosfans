@@ -106,6 +106,7 @@ class Service extends eebService {
                     // Dados do Prêmio
                     result.data.tituloPremio.premioDescricao = result.data.premio.descricao;
                     result.data.tituloPremio.premioValor = result.data.premio.valor;
+                    result.data.tituloPremio.pos = result.data.premio.pos; // Indispensável!
                     result.data.tituloPremio.numerosDaSorte = [];
                     result.data.tituloPremio.qtdNumerosDaSortePorTitulo = result.data.titulo.qtdNumerosDaSortePorTitulo;
                     result.data.tituloPremio.idTituloCompra = result.data.titulo.idTituloCompra;

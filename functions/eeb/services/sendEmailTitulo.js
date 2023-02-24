@@ -35,6 +35,66 @@ class Service extends eebService {
         super(request, response, parm, method);
     }
 
+    async run() {
+
+        const result = {
+            success: true,
+            host: this.parm.host
+        };
+
+        result.data = await schema().validateAsync(this.parm.data);
+        result.titulo = await buTitulo.getById(result.data.idTitulo);
+
+        result.email = result.titulo.email;
+
+        result.tituloCompra = await collectionTitulosCompra.getDoc(result.titulo.idTituloCompra);
+
+        if (result.data.showDataOnly) return (this.parm.async ? { success: true, email: result.email } : result);
+
+        // Envio do Email via Sendgrid
+        const sgMail = require('@sendgrid/mail');
+        sgMail.setApiKey(sendGridKey);
+
+        const parm = {
+            from: {
+                email: 'nao-responda@premios.fans',
+                name: 'Premios.Fans'
+            },
+            personalizations: [{
+                to: [
+                    {
+                        email: result.titulo.email,
+                        name: result.titulo.nome
+                    }
+                ],
+                dynamic_template_data: result.titulo,
+                subject: '%F0%9F%92%B0 Seus Números da Sorte ~ Certificado ' + result.titulo.idTitulo,
+                substitutions: {
+                    subject: '%F0%9F%92%B0 Seus Números da Sorte ~ Certificado ' + result.titulo.idTitulo
+                }
+            }],
+            template_id: templateId
+        };
+
+        const sendResult = await sgMail.send(parm);
+
+        sendResult.forEach(s => {
+            if (s) {
+                acompanhamentoTituloCompra.setEmailEnviado(
+                    result.tituloCompra,
+                    result.titulo.idTitulo,
+                    {
+                        payload: parm,
+                        result: s.headers
+                    }
+                );
+            }
+        })
+
+        return (this.parm.async ? { success: true, email: result.email } : sendResult);
+
+    }
+    /*
     run() {
         return new Promise((resolve, reject) => {
 
@@ -123,6 +183,7 @@ class Service extends eebService {
 
         })
     }
+    */
 
 }
 
