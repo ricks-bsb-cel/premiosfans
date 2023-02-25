@@ -36,6 +36,19 @@ ngModule = angular.module('directives.cartos-admin.directives.new-account', [])
                         },
                         ngModelElAttrs: { disabled: 'true' },
                         className: "col-8"
+                    },
+                    {
+                        key: 'soTestando',
+                        type: 'image-storage-upload',
+                        templateOptions: {
+                            slimOptions: {
+                                size: '512:512'
+                            },
+                            screenSize: {
+                                width: '100px',
+                                height: '100px'
+                            }
+                        }
                     }
                 ],
                 fieldsCompanyData = [

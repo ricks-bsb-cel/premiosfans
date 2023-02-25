@@ -1,0 +1,12 @@
+<div
+    class="form-group image-storage-upload"
+    ng-style="{
+        'width':options.templateOptions.screenSize.width,
+        'height':options.templateOptions.screenSize.height
+    }"
+>
+    <div class="slim" id="{{id}}">
+        <img ng-src="{{model[options.key]}}" alt="Procurar imagem" />
+        <input type="file" name="slim[]" accept="image/*" style="display: none;" />
+    </div>
+</div>
