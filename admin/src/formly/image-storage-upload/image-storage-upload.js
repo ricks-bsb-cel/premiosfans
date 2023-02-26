@@ -21,9 +21,8 @@ const ngModule = angular.module('admin.formly.image-storage-upload', [])
                     ratio = '1:1';
 
                 let
-                    element = null,
-                    slimElement = null,
-                    slimObj = null;
+                    slimObj = null,
+                    slimElement = null;
 
                 $scope.id = `${$scope.options.key}-image-storage-upload-${globalFactory.generateRandomId(7)}`
 
@@ -34,10 +33,10 @@ const ngModule = angular.module('admin.formly.image-storage-upload', [])
                 $scope.options.templateOptions.slimOptions.minSize ??= minSize;
                 $scope.options.templateOptions.slimOptions.ratio ??= ratio;
 
-                $scope.init = e => {
-                    element = e;
+                $scope.init = _ => {
 
                     let slimOptions = {
+                        elementId: $scope.id,
                         instantEdit: false,
                         edit: true,
                         size: $scope.options.templateOptions.slimOptions.size,
@@ -52,8 +51,10 @@ const ngModule = angular.module('admin.formly.image-storage-upload', [])
                         buttonCancelTitle: "Cancelar",
                         buttonConfirmLabel: "Salvar",
                         buttonConfirmTitle: "Salvar",
-                        didInit: function (slimObj, slimElement) {
-                            console.info('didInit', slimObj, slimElement);
+
+                        /*
+                        didInit: function (obj, element) {
+                            console.info('didInit', obj, element);
 
                             const input = $(`#${$scope.id} input[type=file]`)[0];
 
@@ -89,7 +90,6 @@ const ngModule = angular.module('admin.formly.image-storage-upload', [])
                             })
 
                         },
-                        /*
                         didConfirm: function (obj, element) {
                             console.info('didConfirm', obj, element);
 
@@ -99,10 +99,12 @@ const ngModule = angular.module('admin.formly.image-storage-upload', [])
                                     callback(file);
                                 }
                             });
-
-                            return false;
+                        },
+                        didLoad: function () {
+                            return true;
                         },
                         */
+
                         service: function (blobFile, progress, success, failure) {
                             console.info('service', progress);
 
@@ -114,17 +116,19 @@ const ngModule = angular.module('admin.formly.image-storage-upload', [])
                     slimOptions = {
                         ...slimOptions,
                         ...$scope.options.templateOptions.slimOptions
-                    }
+                    };
 
                     $timeout(_ => {
                         slimElement = document.getElementById($scope.id);
+                        console.info(slimElement, slimOptions);
+
                         slimObj = new Slim(slimElement, slimOptions);
                     })
                 }
 
             },
-            link: function (scope, element) {
-                scope.init(element);
+            link: function (scope) {
+                scope.init();
             }
         }
 
