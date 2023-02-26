@@ -141,7 +141,7 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 			const saveData = _ => {
 				if (!currentUser || !$scope.data) { return; }
 
-				const path = `/zoeAccount/${currentUser.uid}/pf`;
+				const path = `/pedidosAberturaConta/${currentUser.uid}/pf`;
 
 				$scope.data.dtInicio = $scope.data.dtInicio || appFirestoreHelper.currentTimestamp();
 				$scope.data.dtUltimaEdicao = appFirestoreHelper.currentTimestamp();
