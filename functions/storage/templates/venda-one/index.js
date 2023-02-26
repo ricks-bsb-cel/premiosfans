@@ -455,6 +455,8 @@ angular.module('app', [])
 
                                     if (e.data && e.data.error) {
                                         Swal.fire('Dados inválidos', e.data.error, 'error');
+                                    } else {
+                                        Swal.fire('Gerando PIX', 'A preparação do PIX está demorando um pouco. Vamos enviar um eMail para você assim que o pedido de pagamento estiver pronto. Você também pode acompanhar seus pedidos de compra e solicitar o pagamento por aqui mesmo! Está logo abaixo dos dados da campanha.', 'success');
                                     }
                                 })
 
@@ -491,8 +493,8 @@ angular.module('app', [])
                     element = e;
                     formClienteFactory.delegate = {
                         sendPedidoCompra: sendPedidoCompra,
-                        showFormCliente: compra => {
-                            if (compra) setDadosCompra(compra);
+                        showFormCliente: (lastCompra) => {
+                            if (lastCompra) setDadosCompra(lastCompra);
 
                             $("#form-cliente").show();
                             initMasks();
@@ -545,8 +547,8 @@ angular.module('app', [])
                                     icon: 'success',
                                     html: `<h3 class="mb-10">Copiado!</h3>`,
                                     width: '240px',
-                                    timer: 1200,
-                                    showConfirmButton: false
+                                    timer: 1800,
+                                    showConfirmButton: false 
                                 });
                             })
                             .catch(e => {
@@ -595,7 +597,13 @@ angular.module('app', [])
                 }
 
                 $scope.enviarCertificado = _ => {
-                    Swal.fire('Certificado', `Os certificados dos seus títulos foram enviados para o seu email.`, 'success');
+                    Swal.fire({
+                        icon: 'success',
+                        html: `<h3 class="mb-10">Os certificados dos seus títulos foram enviados para o seu email!</h3>`,
+                        width: '360px',
+                        timer: 2400,
+                        showConfirmButton: false
+                    });
                 }
 
             },

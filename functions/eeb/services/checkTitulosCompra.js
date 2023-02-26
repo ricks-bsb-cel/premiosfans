@@ -198,6 +198,12 @@ class Service extends eebService {
                         p.numerosDaSorte.forEach(n => {
                             promiseCheckNumeros.push(checkNumeroTituloPremio(result.data.tituloCompra, p.idCampanha, p.idTitulo, p.idPremio, p.id, n));
                         })
+
+                        // Tem que ter a posição (pos). Sem isso vira uma zona!
+                        if (!p.pos || p.pos <= 0) {
+                            addError(`titulosPremios`, `A posição do prêmio (campo pos) do idTitulo [${p.idTitulo}], idPremio [${p.idPremio}], idPremioTitulo [${p.id}] é inválida`);
+                        }
+
                     })
 
                     return acompanhamentoTituloCompra.setValidacaoEmAndamento(result.data.tituloCompra, promiseCheckNumeros.length);

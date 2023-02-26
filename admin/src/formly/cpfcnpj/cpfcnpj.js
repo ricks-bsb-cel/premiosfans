@@ -10,8 +10,7 @@ const ngModule = angular.module('admin.formly.cpfcnpj', [])
             templateUrl: 'cpfcnpj/cpfcnpj.html',
             controller: function ($scope, $timeout, globalFactory, appConfig) {
 
-                var id = $scope.options.id + "_cpfcnpj";
-
+                $scope.id = $scope.options.id + "_cpfcnpj_" + globalFactory.generateRandomId(7);
                 $scope.value = $scope.model[$scope.options.key + '_formatted'] || $scope.model['cpf_formatted'] || null;
 
                 $scope.isValid = true;
@@ -49,16 +48,21 @@ const ngModule = angular.module('admin.formly.cpfcnpj', [])
                     c.value = VMasker.toPattern(v, masks[m]);
                 }
 
-                $timeout(function () {
-                    var e = document.getElementById(id);
-                    var mask = [
-                        appConfig.get("/masks/cpf"),
-                        appConfig.get("/masks/cnpj")
-                    ];
-                    VMasker(e).maskPattern(mask[($scope.value || '').length === 18 ? 1 : 0]);
-                    e.addEventListener('input', inputHandler.bind(undefined, mask, 14), false);
-                })
+                $scope.init = _ => {
+                    $timeout(function () {
+                        var e = document.getElementById($scope.id);
+                        var mask = [
+                            appConfig.get("/masks/cpf"),
+                            appConfig.get("/masks/cnpj")
+                        ];
+                        VMasker(e).maskPattern(mask[($scope.value || '').length === 18 ? 1 : 0]);
+                        e.addEventListener('input', inputHandler.bind(undefined, mask, 14), false);
+                    })
+                }
 
+            },
+            link: function (scope) {
+                scope.init();
             }
         }
 

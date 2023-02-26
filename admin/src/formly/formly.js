@@ -15,6 +15,7 @@ import email from './email/email';
 import range from './range/range';
 import colorPicker from './color-picker/color-picker';
 import imageUpload from './image-upload/image-upload';
+import imageStorageUpload from './image-storage-upload/image-storage-upload';
 import radios from './radios/radios';
 import customCheckbox from './custom-checkbox/custom-checkbox';
 import reais from './reais/reais';
@@ -62,6 +63,7 @@ const ngModule = angular
 			range.name,
 			colorPicker.name,
 			imageUpload.name,
+			imageStorageUpload.name,
 			radios.name,
 			customCheckbox.name,
 			reais.name,

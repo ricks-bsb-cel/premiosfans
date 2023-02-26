@@ -9,10 +9,10 @@ const production = false;
 
 console.info(`on ${production ? 'Production' : 'Dev'}...`);
 
-let sassOptions = {sourceMap: !production};
+let sassOptions = { sourceMap: !production };
 
-if(production){
-	sassOptions.sassOptions= {
+if (production) {
+	sassOptions.sassOptions = {
 		outputStyle: production ? 'compressed' : 'none'
 	};
 }
@@ -34,6 +34,18 @@ const rules = [
 				return resourcePath.replace(/^.+[\\/](assets|src)(.+[\\/]).*?$/, `/assets$2${url}`).replace(/\\/g, '/');
 			}
 		}
+	},
+	{
+		test: /\.(png|jpg|gif)$/i,
+		use: [
+			{
+				loader: 'file-loader',
+				options: {
+					name: '[name].[ext]',
+					outputPath: '../images/',
+				},
+			},
+		],
 	},
 	{
 		test: /[\\/]src[\\/]directives[\\/].+\.html$/,

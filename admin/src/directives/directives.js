@@ -34,6 +34,8 @@ import sorteiosCampanha from './sorteios-campanha/sorteios-campanha';
 import sorteioCampanhaPremios from './sorteio-campanha-premios/sorteio-campanha-premios';
 import inputDate from './input-date/input-date';
 
+import cartosAdmin from './cartos-admin/cartos-admin';
+
 const ngModule = angular.module('directives', [
     loginBox.name,
     navbarTopLeft.name,
@@ -69,7 +71,8 @@ const ngModule = angular.module('directives', [
     influencersCampanha.name,
     sorteiosCampanha.name,
     sorteioCampanhaPremios.name,
-    inputDate.name
+    inputDate.name,
+    cartosAdmin.name
 ]);
 
 export default ngModule;

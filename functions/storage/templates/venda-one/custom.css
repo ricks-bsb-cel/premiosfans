@@ -92,24 +92,10 @@ dialog#modal-regulamento .content h4 {
     font-size: 0.9em;
 }
 
-/*
-table.label-description tr td:nth-child(1) {
-    font-size: 0.9em;
-    min-width: 110px;
+article.botao-compra{
+    border: 2px solid silver;
+    border-radius: 5px;
 }
-
-table.label-description tr td:nth-child(2) {
-    font-family: 'Courier New', Courier, monospace;
-}
-
-table.label-description tr td:nth-child(2) span {
-    display: block;
-    width: calc(100% - 45px);
-    white-space: nowrap;
-    overflow: hidden !important;
-    text-overflow: ellipsis;
-}
-*/
 
 .full-width {
     width: 100%;

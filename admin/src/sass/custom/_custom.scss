@@ -12,6 +12,10 @@
     text-align: center;
 }
 
+.slim .slim-status .slim-error{
+    display: none;
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
@@ -317,8 +321,12 @@ badge-true-false.link .badge {
 }
 
 .popover {
-    line-height: 1.25 !important;
+    line-height: 0.25em !important;
     background-color: floralwhite;
+
+    .popover-body {
+        font-size: 0.85em;
+    }
 }
 
 .flex-end {

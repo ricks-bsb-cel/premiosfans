@@ -1,0 +1,86 @@
+<div class="card cartos-admin">
+    <div class="card-header">
+        <h3 class="card-title">
+            User:
+            <strong ng-if="serviceUserCredential.alias" ng-bind="serviceUserCredential.alias"></strong>
+            <small ng-bind="serviceUserCredential.cpf | cpfCnpj"></small>
+
+        </h3>
+        <div class="card-tools">
+            <button ng-click="editCartosUserAlias()" type="button" class="btn btn-tool">
+                <i class="fas fa-user-edit"></i>
+                Apelido
+            </button>
+            <button type="button" class="btn btn-tool">
+                <i class="fas fa-sync"></i>
+                Atualizar Dados
+            </button>
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body pl-1 pt-3">
+        <i ng-if="!ready" class="fas fa-sync-alt fa-spin m-3 wait"></i>
+
+        <div
+            ng-if="ready"
+            treecontrol
+            class="tree-classic"
+            tree-model="treeViewData"
+            options="treeOptions"
+            selected-node="node1"
+            on-selection="nodeSelected(node)"
+            style="zoom:1.1"
+        >
+
+            <small ng-bind="node.nodeType"></small>
+
+            <span ng-if="node.isRoot" ng-bind="node.nome"></span>
+
+            <div ng-if="node.nodeType==='account-root'" class="actions">
+                <a class="link" ng-click="newAccount()" uib-popover="Preparar nova conta" popover-placement="right">
+                    <i class="fas fa-plus-circle"></i>
+                </a>
+            </div>
+
+            <div ng-if="node.nodeType==='pix-root'" class="actions">
+                <a class="link" uib-popover="Adicionar uma nova chave" popover-placement="right">
+                    <i class="fas fa-plus-circle"></i>
+                </a>
+            </div>
+
+            <!-- Accounts -->
+            <span 
+                ng-if="node.nodeType==='account'"
+                class="badge"
+                ng-bind="node.personType"
+                ng-class="{
+                    'bg-info': node.personType==='PF',
+                    'bg-success': node.personType==='PJ'
+                }"
+            ></span>
+            <strong class="monospace" ng-if="node.nodeType==='account'" ng-bind="node.number"></strong>
+            <span ng-if="node.nodeType==='account'" ng-bind="node.title"></span>
+            <small class="monospace" ng-if="node.nodeType==='account'" ng-bind="node.documentNumber | cpfCnpj"></small>
+
+            <div ng-if="node.nodeType==='account'" class="actions">
+                <a class="link" uib-popover="Clonar..." popover-placement="right">
+                    <i class="far fa-clone"></i>
+                </a>
+            </div>
+
+            <!-- PixKeys -->
+            <strong class="monospace" ng-if="node.nodeType==='pixkey'" ng-bind="node.key"></strong>
+            <span ng-if="node.nodeType==='pixkey' && node.type==='EVP'" class="badge bg-info">Aleatória</span>
+            <span ng-if="node.nodeType==='pixkey' && node.type==='EMAIL'" class="badge bg-info">Email</span>
+
+            <div ng-if="node.nodeType==='pixkey'" class="actions">
+                <a class="link" uib-popover="Exclusão da chave PIX." popover-placement="right">
+                    <i class="far fa-trash-alt"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -54,7 +54,9 @@ const ngModule = angular.module('views.contratos-edit', [
 				return;
 			}
 
-			if (typeof $scope.campanha.ativo === 'undefined') $scope.campanha.ativo = false;
+			if (typeof $scope.campanha.ativo === 'undefined'){
+				$scope.campanha.ativo = false;
+			}
 
 			if ($scope.campanha.influencers.filter(f => { return f.selected; }).length === 0) {
 				alertFactory.error('Selecione um ou mais Influencers.');
@@ -106,28 +108,26 @@ const ngModule = angular.module('views.contratos-edit', [
 				}
 			];
 
-			if ($scope.campanha && !$scope.campanha.ativo) {
+			nav.push(
+				{
+					id: 'save',
+					label: 'Salvar',
+					onClick: save,
+					icon: 'far fa-save'
+				}
+			);
+
+			if ($scope.campanha && !$scope.campanha.ativo && $scope.campanha.id) {
 				nav.push(
 					{
-						id: 'save',
-						label: 'Salvar',
-						onClick: save,
-						icon: 'far fa-save'
+						id: 'ativar',
+						label: 'Ativar',
+						onClick: _ => {
+							$scope.ativar();
+						},
+						icon: 'fa fa-check'
 					}
 				);
-
-				if ($scope.campanha.id) {
-					nav.push(
-						{
-							id: 'ativar',
-							label: 'Ativar',
-							onClick: _ => {
-								$scope.ativar();
-							},
-							icon: 'fa fa-check'
-						}
-					);
-				}
 			}
 
 			navbarTopLeftFactory.reset();
@@ -166,7 +166,7 @@ const ngModule = angular.module('views.contratos-edit', [
 								type: 'text',
 								required: false,
 								minlength: 3,
-								maxlength: 64
+								maxlength: 1024
 							},
 							type: 'input',
 							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'

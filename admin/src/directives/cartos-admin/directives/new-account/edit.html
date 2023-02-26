@@ -1,0 +1,54 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Nova Conta Cartos
+    </h3>
+</div>
+<div class="modal-body" id="modal-body">
+
+    <wait-overlay ready="$ctrl.ready">
+
+        <div class="row">
+            <div class="col-4 pr-1">
+                <div class="btn-group-vertical btn-block">
+                    <button
+                        ng-repeat="(type, obj) in $ctrl.forms"
+                        type="button"
+                        class="btn btn-default"
+                        ng-bind="::obj.title"
+                    ></button>
+                </div>
+            </div>
+            <div class="col-8">
+                <div
+                    ng-repeat="(type, obj) in $ctrl.forms"
+                    class="card"
+                >
+                    <div class="card-header">
+                        <h3
+                            class="card-title"
+                            ng-bind="::obj.title"
+                        ></h3>
+                    </div>
+                    <div class="card-body">
+                        <form novalidate>
+                            <formly-form
+                                class="row"
+                                model="obj.data"
+                                fields="obj.fields"
+                                form="obj.form"
+                                novalidate
+                            >
+                            </formly-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </wait-overlay>
+
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()" ng-if="!$ctrl.error">Salvar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
+</div>

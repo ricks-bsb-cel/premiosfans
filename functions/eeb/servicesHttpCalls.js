@@ -24,6 +24,11 @@ api.post("/v1/receiver/:method", (request, response) => {
     initFirebase.call(receiver.pubSubReceiver, request, response);
 })
 
+api.post("/v1/receiver/:servicePath/:method", (request, response) => {
+    const receiver = require('./eventBusServicePubSubReceiver');
+    initFirebase.call(receiver.pubSubReceiver, request, response);
+})
+
 // Subscrições em DeadLettering apontam para cá...
 api.post("/v1/dead-lettering", (request, response) => {
     const deadLettering = require('./eventBusServicePubSubDeadLetterReceiver');
@@ -57,7 +62,6 @@ api.post("/v1/generate-templates", (request, response) => {
 api.post("/v1/generate-one-template", (request, response) => {
     initFirebase.call(require('./services/generateOneTemplate').callRequest, request, response);
 })
-
 
 api.post("/v1/ativar-campanha", (request, response) => {
     initFirebase.call(require('./services/ativarCampanha').callRequest, request, response);
@@ -170,6 +174,13 @@ api.post("/v1/pixPreGenerate", (request, response) => {
 api.post("/v1/pixFindNotUsed", (request, response) => {
     initFirebase.call(require('./services/pixStoreGetNotUsedPix').callRequest, request, response);
 })
+
+
+// BigQuery Tests
+api.post("/v1/bq/add-row", (request, response) => {
+    initFirebase.call(require('./services/bigquery/bigqueryAddRow').callRequest, request, response);
+})
+
 
 /* Cartos
 

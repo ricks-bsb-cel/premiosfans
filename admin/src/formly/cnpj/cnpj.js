@@ -10,10 +10,9 @@ const ngModule = angular.module('admin.formly.cnpj', [])
             extends: 'input',
             templateUrl: 'cnpj/cnpj.html',
             controller: function ($scope, $timeout, globalFactory) {
-
-                var id = $scope.options.id + "_cnpj";
-
                 $scope.globalFactory = globalFactory;
+
+                $scope.id = $scope.options.id + "_cnpj" + globalFactory.generateRandomId(7);
                 $scope.value = $scope.model[$scope.options.key + '_formatted'] || null;
 
                 if (!$scope.value && $scope.model[$scope.options.key]) {
@@ -29,10 +28,12 @@ const ngModule = angular.module('admin.formly.cnpj', [])
                     }, true);
                 }
 
-                $timeout(function () {
-                    var e = document.getElementById(id);
-                    VMasker(e).maskPattern('99.999.999/9999-99');
-                })
+                $scope.init = _ => {
+                    $timeout(function () {
+                        var e = document.getElementById($scope.id);
+                        VMasker(e).maskPattern('99.999.999/9999-99');
+                    })
+                }
 
             },
             defaultOptions: {
@@ -58,6 +59,9 @@ const ngModule = angular.module('admin.formly.cnpj', [])
                         }
                     }
                 }
+            },
+            link: function (scope) {
+                scope.init();
             }
         }
 

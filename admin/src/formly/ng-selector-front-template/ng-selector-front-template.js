@@ -11,13 +11,18 @@ const ngModule = angular.module('admin.formly.ng-selector-front-template', [])
             controller: function ($scope, appAuthHelper, collectionFrontTemplates) {
                 $scope.collectionFrontTemplates = collectionFrontTemplates;
 
-                appAuthHelper.ready()
-                    .then(_ => {
-                        $scope.collectionFrontTemplates.collection.startSnapshot({
-                            filter: [{ field: "ativo", operator: "==", value: true }]
-                        });
-                    })
+                $scope.init = _ => {
+                    appAuthHelper.ready()
+                        .then(_ => {
+                            $scope.collectionFrontTemplates.collection.startSnapshot({
+                                filter: [{ field: "ativo", operator: "==", value: true }]
+                            });
+                        })
+                }
 
+            },
+            link: function (scope) {
+                scope.init();
             }
         };
 

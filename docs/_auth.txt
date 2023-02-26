@@ -22,3 +22,8 @@ ricardo.fermino@ycard.app       Não tem github
 ycard.app@gmail.com             Não tem github
 
 ricardo.fermino@outlook.com.br  Não tem github
+
+Site                                    User                                Senha
+--------------------------------------- ----------------------------------- -------------------
+adm@zoepay.app                          adm@zoepay.app                      yri1m4kt6@rckx3b
+

@@ -70,7 +70,10 @@ async function conciliacao(payload) {
     await collectionCartosPix.merge(cartosPix.id, updateCartosPix);
 
     // Dispara o evento de pagamento, que dispara o de verificação, o de email, etc...
-    await pagarCompra.call({ idTituloCompra: tituloCompra.id });
+    await pagarCompra.call({
+        idTituloCompra: tituloCompra.id,
+        cartosPixId: cartosPix.id
+    });
 
     return {
         success: true
