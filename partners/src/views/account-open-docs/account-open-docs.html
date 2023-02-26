@@ -1,0 +1,27 @@
+<form ng-if="ready" ng-submit="close()" class="content mt-3 account-open-docs" autocomplete="off" novalidate>
+
+	<p class="color-white mb-3">
+		Precisamos de imagens em boa qualidade do seu <strong>Documento de Identidade</strong> ou <strong>Habilitação</strong>, e uma foto da sua face (selfie).
+	</p>
+
+	<div class="card card-style m-0">
+		<div class="content">
+			<formly-form
+				model="forms.imagens.model"
+				fields="forms.imagens.fields"
+				form="forms.imagens.form"
+				novalidate
+			>
+			</formly-form>
+		</div>
+	</div>
+
+	<div class="row mt-4">
+		<div class="col-12">
+			<button type="submit" class="btn btn-full gradient-highlight rounded-s shadow-bg shadow-bg-s">
+				Enviar
+			</button>
+		</div>
+	</div>
+
+</form>

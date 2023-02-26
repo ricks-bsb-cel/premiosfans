@@ -1,0 +1,128 @@
+<section class="content m-0 index">
+
+	<div
+		class="card card-style bg-5 mb-2 shadow-card shadow-card-l index-usuario-logado ng-scope"
+		style="height: 215px;background-image:url('https://images.pexels.com/photos/2387793/pexels-photo-2387793.jpeg?auto=compress&cs=tinysrgb&w=700&h=500&dpr=1');"
+	>
+		<div class="card-top p-3">
+			<a
+				data-bs-toggle="offcanvas"
+				data-bs-target="#menu-card-more"
+				class="icon icon-xxs bg-white color-black float-end"
+				style="margin-top:1px;"
+			>
+				<i class="bi bi-three-dots font-19"></i>
+			</a>
+		</div>
+		<div class="card-center">
+			<div
+				ng-if="currentUser.account"
+				class="bg-theme px-3 py-2 rounded-end d-inline-block"
+			>
+				<h1 class="font-13 my-n1">
+					<a class="color-theme" data-bs-toggle="collapse" href="#balance3" aria-controls="balance2">
+						Exibir Saldo
+					</a>
+				</h1>
+				<div class="collapse" id="balance3">
+					<h2 class="color-theme font-26">
+						<small>R$</small>
+						125.00
+					</h2>
+				</div>
+			</div>
+		</div>
+		<div class="card-top no-click font-12 p-3 color-white font-monospace">
+			<h4 class="color-white">{{currentUser.displayName}}</h4>
+			<spam class="color-white">{{zoeAccount.cpf_formatted}}</spam>
+		</div>
+		<strong class="card-bottom no-click p-3 text-start color-white font-monospace">
+			Abertura de Conta em Andamento
+		</strong>
+		<strong
+			ng-if="currentUser.account"
+			class="card-bottom no-click p-3 text-end color-white font-monospace"
+		>
+			<small>Abertura:</small>
+			06/2022
+		</strong>
+		<div class="card-overlay bg-black opacity-50"></div>
+	</div>
+	<div class="content py-2 mt-3">
+		<div class="d-flex text-center">
+
+			<div class="me-auto">
+				<a href="#!/conteudo/user-salarios" class="icon icon-xxl rounded-m bg-theme shadow-m">
+					<i class="font-28 opacity-70 bi bi-currency-dollar"></i>
+				</a>
+				<h6 class="font-16 opacity-80 font-500 mb-0 pt-2">Salário</h6>
+			</div>
+
+			<div class="m-auto">
+				<a href="#!/conteudo/user-extrato" class="icon icon-xxl rounded-m bg-theme shadow-m">
+					<i class="font-28 opacity-70 color-blue-dark bi bi-card-checklist"></i>
+				</a>
+				<h6 class="font-16 opacity-80 font-500 mb-0 pt-2">Extrato</h6>
+			</div>
+
+			<div class="m-auto">
+				<a href="#!/conteudo/user-pix" class="icon icon-xxl rounded-m bg-theme shadow-m">
+					<i class="font-28 opacity-70 color-gradient-blue bi bi-x-diamond-fill"></i>
+				</a>
+				<h6 class="font-16 opacity-80 font-500 mb-0 pt-2">Pix</h6>
+			</div>
+
+			<div class="ms-auto">
+				<a href="#!/conteudo/user-pagar-conta" class="icon icon-xxl rounded-m bg-theme shadow-m">
+					<i class="font-28 opacity-70 color-blue bi bi-upc"></i>
+				</a>
+				<h6 class="font-16 opacity-80 font-500 mb-0 pt-2">Pagar</h6>
+			</div>
+
+		</div>
+
+	</div>
+
+	<div class="card card-style gradient-blue shadow-bg shadow-bg-s mb-4 ng-scope">
+		<div class="content">
+			<a href="#!/solicitar-emprestimo-pf" class="d-flex">
+				<div class="align-self-center">
+					<h1 class="mb-0 font-40">
+						<i class="bi bi-cash-stack color-white pe-3"></i>
+					</h1>
+				</div>
+				<div class="align-self-center">
+					<h4 class="color-white font-700 mb-0 mt-0 pt-1">
+						Simule seu Emprestimo
+					</h4>
+				</div>
+				<div class="align-self-center ms-auto">
+					<i class="bi bi-arrow-right-short color-white d-block pt-1 font-20 opacity-50"></i>
+				</div>
+			</a>
+		</div>
+	</div>
+
+	<div class="card card-style">
+		<div class="content mb-0">
+			<h3>Empréstimos</h3>
+			<p class="mb-2 mt-2">
+				Veja como solicitar seu empréstimo de forma simples e realizar seus sonhos!
+			</p>
+			<div class="row">
+				<div class="col-12 mt-2">
+					<img src="https://images.pexels.com/photos/372042/pexels-photo-372042.jpeg?auto=compress&cs=tinysrgb&w=700&h=400&dpr=1"
+					class="img-fluid rounded-xs mb-3"
+					alt="img"
+				>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div id="menu-notifications"
+	class="offcanvas offcanvas-top offcanvas-detached rounded-m"
+>
+	<menu-notifications></menu-notifications>
+</div>

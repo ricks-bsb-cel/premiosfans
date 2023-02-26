@@ -1,0 +1,106 @@
+<div class="content abrir-conta-pf-block m-1">
+    <div class="swiper">
+        <div class="swiper-wrapper">
+            <div ng-repeat="p in pages" class="swiper-slide">
+                
+                <div
+                    class="card card-style m-2"
+                    ng-class="{'opacity-0':!p.ready}"
+                >
+
+                    <abrir-conta-pf-block-resumo
+                        ng-if="p.tipo==='resumo'"
+                        data="data"
+                    >
+                    </abrir-conta-pf-block-resumo>
+
+                    <div ng-if="p.tipo==='resumo'" class="row m-1 mb-4">
+                        <div ng-if="!$first" class="col-6">
+                            <a ng-click="prev()" class="btn-full btn gradient-blue shadow-bg shadow-bg-m">
+                                Voltar
+                            </a>
+                        </div>
+                        <div
+                            ng-click="enviar()"
+                            ng-class="{'col-6':!$first,'col-12':$first}"
+                        >
+                            <button class="btn-full btn gradient-green shadow-bg shadow-bg-m">
+                                Confirmar
+                            </button>
+                        </div>
+                    </div>
+
+                    <form
+                        ng-if="p.tipo!=='resumo'"
+                        ng-submit="next()"
+                        autocomplete="on"
+                        class="pt-1"
+                        novalidate
+                    >
+
+                        <div class="content">
+                            <h4>{{p.title}}</h4>
+
+                            <p class="mb-2" ng-if="p.textBefore">{{p.textBefore}}</p>
+
+                            <block-html
+                                sigla="p.htmlBlock"
+                                delegate="htmlBlockDelegate"
+                            ></block-html>
+
+                            <formly-form
+                                ng-if="p.fields"
+                                class="row"
+                                model="data"
+                                fields="p.fields"
+                                form="p.form"
+                                novalidate
+                            >
+                            </formly-form>
+                            
+                        </div>
+
+                        <div
+                            class="content mt-0"
+                        >
+
+                            <div
+                                ng-if="p.errorMessage"
+                                class="card card-style m-0 bg-red-dark alert-dismissible show shadow-bg shadow-bg-m fade p-0">
+                                <div class="content my-3">
+                                    <div class="d-flex">
+                                        <div class="align-self-center no-click">
+                                            <i class="bi bi-exclamation-circle font-36 d-block color-white"></i>
+                                        </div>
+                                        <div class="align-self-center no-click">
+                                            <p class="color-white mb-0 font-500 font-14 ps-3 pe-4 line-height-s">
+                                                {{p.errorMessage}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div ng-if="!$first" class="col-6">
+                                    <a ng-click="prev()" class="btn-full btn gradient-blue shadow-bg shadow-bg-m">
+                                        Voltar
+                                    </a>
+                                </div>
+                                <div ng-class="{'col-6':!$first,'col-12':$first}">
+                                    <button type="submit" class="btn-full btn gradient-green shadow-bg shadow-bg-m">
+                                        Avançar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<phone-auth delegate="phoneAuthDelegate"></phone-auth>

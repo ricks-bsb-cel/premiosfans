@@ -1,0 +1,70 @@
+<div class="card card-style account-details">
+    <div class="content">
+
+        <div class="d-flex">
+            <div class="mt-1">
+                <p class="color-highlight font-600 mb-n1">
+                    {{title}}
+                </p>
+                <h1 class="mb-0">{{accountData.displayName || accountData.nome}}</h1>
+            </div>
+        </div>
+
+        <div class="row mt-2 mb-2 details-list">
+
+            <!--
+            <h5 class="col-4 text-start font-14">Situação</h5>
+            <h5 class="col-8 text-end font-15">
+                <span class="bg-green-dark px-2 rounded-s">Não Solicitada</span>
+            </h5>
+            -->
+
+            <h5 ng-if="type==='pf'" class="col-5 text-start font-14">CPF:</h5>
+            <h5 ng-if="type==='pf'" class="col-7 text-end font-15 font-200 opacity-7">{{::accountData.cpf | formatCPF}}</h5>
+
+            <h5 ng-if="type==='pj'" class="col-5 text-start font-14">CNPJ:</h5>
+            <h5 ng-if="type==='pj'" class="col-7 text-end font-15 font-200 opacity-7">{{::accountData.cnpj | formatCNPJ}}</h5>
+
+            <h5 ng-if="type==='pf'" class="col-5 text-start font-14">Email</h5>
+            <h5 ng-if="type==='pf'" class="col-7 text-end font-15 font-200 opacity-7">{{::accountData.email}}</h5>
+
+            <h5 ng-if="type==='pf'" class="col-5 text-start font-14">Celular</h5>
+            <h5 ng-if="type==='pf'" class="col-7 text-end font-15 font-200 opacity-7">{{::accountData.phoneNumber_formatted}}</h5>
+
+            <h5 ng-if="type==='pf'" class="col-5 text-start font-14">Nascimento</h5>
+            <h5 ng-if="type==='pf'" class="col-7 text-end font-15 font-200 opacity-7">{{::accountData.dtNascimento}}</h5>
+
+            <h5 ng-if="type==='pj'" class="col-5 text-start font-14">Nome de Fantasia</h5>
+            <h5 ng-if="type==='pj'" class="col-7 text-end font-15 font-200 opacity-7">{{::accountData.nomeFantasia}}</h5>
+
+            <h5 ng-if="type==='pj'" class="col-5 text-start font-14">Abertura</h5>
+            <h5 ng-if="type==='pj'" class="col-7 text-end font-15 font-200 opacity-7">{{::accountData.dtAbertura}}</h5>
+        </div>
+
+        <div class="divider mb-3"></div>
+       
+        <div class="row mt-2 mb-2 details-list">
+            <h5 class="col-4 text-start font-14">Rua/Quadra</h5>
+            <h5 class="col-8 text-end font-15 font-200 opacity-7">{{::accountData.endereco_rua}}</h5>
+
+            <h5 class="col-4 text-start font-14">Número</h5>
+            <h5 class="col-8 text-end font-15 font-200 opacity-7">{{::accountData.endereco_numero}}</h5>
+
+            <h5 class="col-4 text-start font-14">Bairro</h5>
+            <h5 class="col-8 text-end font-15 font-200 opacity-7">{{::accountData.endereco_bairro}}</h5>
+
+            <h5 ng-if="accountData.endereco_complemento" class="col-5 text-start font-14">Complemento</h5>
+            <h5 ng-if="accountData.endereco_complemento" class="col-7 text-end font-15 font-200 opacity-7">{{::accountData.endereco_complemento}}</h5>
+
+            <h5 class="col-4 text-start font-14">Cidade</h5>
+            <h5 class="col-8 text-end font-15 font-200 opacity-7">{{::accountData.endereco_cidade}}</h5>
+
+            <h5 class="col-4 text-start font-14">Estado</h5>
+            <h5 class="col-8 text-end font-15 font-200 opacity-7">{{::accountData.endereco_estado}}</h5>
+
+            <h5 class="col-4 text-start font-14">CEP</h5>
+            <h5 class="col-8 text-end font-15 font-200 opacity-7">{{::accountData.endereco_cep}}</h5>
+        </div>
+
+    </div>
+</div>

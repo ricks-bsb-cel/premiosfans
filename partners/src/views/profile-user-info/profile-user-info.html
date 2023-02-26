@@ -1,0 +1,32 @@
+<section class="content m-0 profile-user-info">
+	<form ng-if="ready" ng-submit="onSubmit()" class="content m-0" novalidate>
+
+		<div ng-if="newUser" class="alert p-0 fade show mt-3" role="alert">
+			<div class="card card-style gradient-green shadow-bg shadow-bg-s">
+				<div class="content">
+					<div class="d-flex">
+						<div class="align-self-center">
+							<h1 class="mb-0 font-40"><i class="bi bi-check-circle color-white pe-3"></i></h1>
+						</div>
+						<div class="align-self-center">
+							<h5 class="color-white font-700 mb-0 mt-0">
+								Você precisa atualizar seus dados antes de continuar...
+							</h5>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card card-style mt-1">
+			<div class="content">
+				<h4 class="pb-4 color-blue-dark">Informações pessoais</h4>
+				<formly-form model="formly.model" fields="formly.fields" form="formly.form" novalidate>
+					<button type="submit" class="btn btn-full gradient-highlight shadow-bg shadow-bg-s mt-4">
+						Atualizar Meus Dados
+					</button>
+				</formly-form>
+			</div>
+		</div>
+	</form>
+</section>

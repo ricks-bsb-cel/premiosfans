@@ -1,0 +1,6 @@
+<select
+    class="form-select rounded-xs"
+    ng-model="model[options.key]"
+    aria-label="Estado">
+    <option ng-repeat="option in selectOptions" value="{{option.id}}">{{option.label}}</option>
+</select>

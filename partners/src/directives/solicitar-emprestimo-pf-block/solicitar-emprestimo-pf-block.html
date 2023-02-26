@@ -1,0 +1,115 @@
+<div class="content solicitar-emprestimo-pf-block m-1">
+    <div class="swiper">
+        <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+
+                <div class="card card-style m-2" ng-class="{'opacity-0':!ready}">
+
+                    <form ng-submit="next()" autocomplete="on" class="pt-1" novalidate>
+
+                        <div class="content">
+
+                            <block-html sigla="'app-emprestimo-valor-top'" , delegate="htmlBlockDelegate"></block-html>
+
+                            <div class="form-custom mt-4 m-2 mb-4 form-label form-icon">
+                                <i class="bi bi-cash-stack font-17"></i>
+                                <input type="tel" maxlength="6" ng-model="valorSimulacao" class="form-control rounded-xs font-22" style="font-weight:bold;" id="valorDesejado" placeholder="Valor desejado" />
+                                <label for="valorDesejado" class="color-highlight">Valor desejado</label>
+                            </div>
+
+                            <block-html sigla="'app-emprestimo-valor-bottom'" , delegate="htmlBlockDelegate"></block-html>
+
+                        </div>
+
+                        <div class="content mt-0">
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <button type="submit" class="btn-full btn gradient-green shadow-bg shadow-bg-m">
+                                        Simular
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="swiper-slide">
+
+                <div class="card card-style m-2" ng-class="{'opacity-0':!ready}">
+
+                    <form ng-submit="next()" autocomplete="on" class="pt-1" novalidate>
+
+                        <div class="content">
+
+                            <block-html class="mb-2" sigla="'app-emprestimo-simulacao'"></block-html>
+
+                            <a 
+                                ng-repeat="p in simulacao"
+                                ng-click="check(p)"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#menu-bill"
+                                class="opcao d-flex py-1 mb-2"
+                                ng-class="{'mt-4':$first}"
+                            >
+                                <div class="align-self-center">
+                                    <div
+                                        class="form-check form-check-custom"
+                                        style="top:3px;position:relative;"    
+                                    >
+                                        <label ng-click="check(p)" class="form-check-label color-black opacity-80" for="opcoesSimulacao">
+                                            <strong class="font-20 mr-1 ml-1">{{p.qtdParcelas}}</strong>
+                                            <span class="font-19 opacity-80" ng-if="p.qtdParcelas===1">parcela de</span>
+                                            <span class="font-19 opacity-80" ng-if="p.qtdParcelas>1">parcelas de</span>                                                
+                                        </label>
+                                        <i ng-if="p.checked" class="color-green-dark bi bi-check-circle" style="font-size:22px;"></i>
+                                        <i ng-if="!p.checked" class="color-highlight bi bi-circle opacity-80" style="font-size:22px;"></i>
+                                    </div>
+
+                                </div>
+                                <div class="align-self-center ms-auto text-end">
+                                    <span class="pt-1 font-18 color-black mb-n1 opacity-80">
+                                        <small>R$</small>
+                                        {{p.valor || reais}}<small>,00</small>
+                                    </span>
+                                    <!--
+                                    <p class="mb-0 font-11 color-red-light">Bill Unpaid</p>
+                                    -->
+                                </div>
+                            </a>
+
+                        </div>
+
+                        <div class="content mt-0">
+
+                            <div class="row mt-4">
+                                <div ng-if="swiper.activeIndex>0" class="col-6">
+                                    <a ng-click="prev()" class="btn-full btn gradient-blue shadow-bg shadow-bg-m">
+                                        Voltar
+                                    </a>
+                                </div>
+                                <div ng-class="{
+                                        'col-6':swiper.activeIndex>0,
+                                        'col-12':swiper.activeIndex===0
+                                    }">
+                                    <button type="submit" class="btn-full btn gradient-green shadow-bg shadow-bg-m">
+                                        Seguinte
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<phone-auth delegate="phoneAuthDelegate"></phone-auth>

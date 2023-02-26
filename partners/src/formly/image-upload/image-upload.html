@@ -1,0 +1,39 @@
+<div class="image-upload {{options.className}}">
+    <div class="form-group">
+        <div class="slim" id="{{options.key}}_slim">
+
+            <img
+                ng-src="/api/utils/v1/img/{{model[options.key]}}"
+                alt="Procurar imagem"
+            />
+
+            <img
+                ng-hide="model[options.key]"
+                src="//zoepay.app/images/addphoto.jpg"
+                alt="help"
+                class="img-help"
+            />
+
+            <input type="file" name="slim[]" accept="image/*" style="display: none;" />
+
+            <div
+                ng-if="showProgress"
+                class="progress rounded-xs bg-theme border border-yellow-light"
+                style="height: 30px"
+            >
+                <div
+                    class="progress-bar gradient-yellow text-start ps-3 font-600 font-10"
+                    role="progressbar"
+                    ng-style="{'width':percentProgress + '%'}"
+                    aria-valuenow="{{percentProgress}}"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                >
+                    {{percentProgress}}%
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+</div>
