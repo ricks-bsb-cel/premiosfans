@@ -7,7 +7,7 @@ const hbsPath = path.join(__dirname, '/hbs');
 const hbsFile = path.join(hbsPath, '/home.hbs');
 
 exports.get = (request, response) => {
-    var render = {
+    const render = {
         version: global.getVersionId(),
         versionDate: global.getVersionDate()
     }
