@@ -1,0 +1,51 @@
+<div class="content abrir-conta-pj-block-resumo m-1">
+
+    <div class="content">
+        <div class="d-flex pb-4">
+            <div class="align-self-center ps-1">
+                <h4 class="pt-1 mb-n1">{{data.nome}}</h4>
+                <p class="mb-0 mt-1 font-16 opacity-70">
+                    <small>CPF:</small>
+                    {{data.cpf_formatted}}
+                </p>
+            </div>
+            <div class="align-self-center ms-auto text-end">
+                <h4 class="pt-1 font-14 mb-n1 color-green-dark">
+                </h4>
+                <p class="mb-0 font-11">
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <strong class="col-5 color-theme">Celular</strong>
+            <strong ng-if="!data.semCelular" class="col-7 text-end color-highlight">{{data.celular_formatted}}</strong>
+            <strong ng-if="data.semCelular" class="col-7 text-end color-highlight">Não possui Celular</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+            
+            <strong class="col-5 color-theme">eMail</strong>
+            <strong ng-if="!data.semEmail" class="col-7 text-end color-highlight">{{data.email}}</strong>
+            <strong ng-if="data.semEmail" class="col-7 text-end color-highlight">Não possui eMail</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong class="col-7 color-theme">Data de Nascimento</strong>
+            <strong class="col-5 text-end color-highlight">{{data.dtNascimento}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong class="col-5 color-theme">Endereço</strong>
+            <strong class="col-7 text-end color-highlight">
+                <span>{{data.logradouro}}</span>
+                <span>{{data.numero}}</span>
+                <span>{{data.bairro}}</span>
+                <span>{{data.complemento}}</span><br />
+                <span>{{data.cidade}}/{{data.uf}}</span><br />
+                <span>{{data.cep}}</span>
+            </strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+            
+            <strong class="col-5 color-theme">Estado Civil</strong>
+            <strong class="col-7 text-end color-highlight">{{data.estadoCivil | estadoCivil}}</strong>
+            
+        </div>
+    </div>
+
+</div>

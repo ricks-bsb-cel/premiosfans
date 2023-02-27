@@ -17,6 +17,7 @@ import viewAccountChooseType from './account-choose-type/account-choose-type';
 import viewAccountInfo from './account-info/account-info';
 
 import viewAberturaContaSwpPF from './abertura-conta-swp-pf/abertura-conta-swp-pf';
+import viewAberturaContaSwpPJ from './abertura-conta-swp-pj/abertura-conta-swp-pj';
 import viewSolicitarEmprestimoPF from './solicitar-emprestimo-pf/solicitar-emprestimo-pf';
 
 let ngModule = angular.module('views', [
@@ -37,6 +38,7 @@ let ngModule = angular.module('views', [
 	viewAccountInfo.name,
 
 	viewAberturaContaSwpPF.name,
+	viewAberturaContaSwpPJ.name,
 	viewSolicitarEmprestimoPF.name,
 	
 	viewAccountStatus.name

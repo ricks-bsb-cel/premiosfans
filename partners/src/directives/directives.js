@@ -20,6 +20,10 @@ import canvarCartosUserRegistration from './canvas-cartos-user-registration/canv
 
 import abrirContaPFBlock from './abrir-conta-pf-block/abrir-conta-pf-block';
 import abrirContaPFBlockResumo from './abrir-conta-pf-block-resumo/abrir-conta-pf-block-resumo';
+
+import abrirContaPJBlock from './abrir-conta-pj-block/abrir-conta-pj-block';
+import abrirContaPJBlockResumo from './abrir-conta-pj-block-resumo/abrir-conta-pj-block-resumo';
+
 import solicitarEmprestimoPfBlock from './solicitar-emprestimo-pf-block/solicitar-emprestimo-pf-block';
 
 const ngModule = angular.module('directives', [
@@ -36,8 +40,13 @@ const ngModule = angular.module('directives', [
     closeCanvasOnClick.name,
     accountDetails.name,
     canvarCartosUserRegistration.name,
+    
     abrirContaPFBlock.name,
     abrirContaPFBlockResumo.name,
+
+    abrirContaPJBlock.name,
+    abrirContaPJBlockResumo.name,
+    
     blockHtml.name,
     blockConteudo.name,
     solicitarEmprestimoPfBlock.name,
