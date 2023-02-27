@@ -9,13 +9,15 @@
     <div class="divider divider-margins mt-2 mb-2"></div>
 
     <div ng-show="currentContent===contentEnviarCodigo" class="content mt-0">
+        <!--
         <block-html sigla="'app-autenticacao-celular'" extra1="phoneData.celular_formatted"></block-html>
-
+        -->
     </div>
 
     <div ng-show="currentContent===contentReceberCodigo" class="content mt-0">
+        <!--
         <block-html sigla="'app-autenticacao-celular-receber-codigo'" extra1="phoneData.celular_formatted"></block-html>
-
+        -->
         <div class="form-custom mt-3 form-icon form-label">
             <i class="bi bi-phone font-20"></i>
             <input type="tel" ng-model="codigo" maxlength="6" class="form-control codigo rounded-xs" />

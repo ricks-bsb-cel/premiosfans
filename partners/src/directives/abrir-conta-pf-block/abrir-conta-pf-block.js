@@ -19,6 +19,8 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 			$location
 		) {
 
+			const databaseKey = 'pedidosAberturaConta';
+
 			let currentUser = null;
 
 			$scope.swiper;
@@ -86,6 +88,15 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 				})
 			}
 
+			async function initOpenAccount() {
+				currentUser = await getCurrentUser();
+
+				$scope.data = {};
+
+				return null;
+			}
+
+			/*
 			const initOpenAccount = _ => {
 				return new Promise((resolve, reject) => {
 					getCurrentUser()
@@ -103,6 +114,7 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 						})
 				})
 			}
+			*/
 
 			$scope.htmlBlockDelegate = {
 				ready: data => {
@@ -141,7 +153,7 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 			const saveData = _ => {
 				if (!currentUser || !$scope.data) { return; }
 
-				const path = `/pedidosAberturaConta/${currentUser.uid}/pf`;
+				const path = `/${databaseKey}/${currentUser.uid}/pf`;
 
 				$scope.data.dtInicio = $scope.data.dtInicio || appFirestoreHelper.currentTimestamp();
 				$scope.data.dtUltimaEdicao = appFirestoreHelper.currentTimestamp();
@@ -174,10 +186,11 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 									return reject();
 								}
 
+								return resolve();
+
+								/*
 								userService.checkCpfAberturaConta($scope.data.cpf, result => {
-
 									if (result.error) {
-
 										alertFactory.success(result.msg).then(_ => {
 											$location.path('/splash');
 											$location.replace();
@@ -185,10 +198,10 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 
 										return;
 									}
-
 									setErrorMessage(currentIndex);
 									return resolve();
 								})
+								*/
 
 							})
 						}
@@ -258,6 +271,7 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 									return resolve();
 								}
 
+								/*
 								$scope.phoneAuthDelegate.continue = user => {
 									currentUser = user;
 
@@ -268,9 +282,13 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 
 									return resolve();
 								}
+								*/
 
 								saveData();
 
+								return resolve();
+
+								/*
 								if (!currentUser.isAnonymous && currentUser.phoneNumber.includes($scope.data.celular)) {
 									return resolve();
 								} else {
@@ -280,6 +298,7 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 										cpf: $scope.data.cpf
 									});
 								}
+								*/
 
 							})
 						}
@@ -508,7 +527,6 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 						],
 						validation: currentIndex => {
 							return new Promise((resolve, reject) => {
-
 								if (!$scope.data.estadoCivil) {
 									setErrorMessage(currentIndex, 'Informe o seu estado civil');
 									return reject();
@@ -573,7 +591,7 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 										ratio: '8:5',
 										storage: {
 											imageName: 'doc-frente',
-											filename: `/zoeAccount/${currentUser.uid}/pf/doc-frente-${globalFactory.guid()}`
+											filename: `/${databaseKey}/${currentUser.uid}/pf/doc-frente-${globalFactory.guid()}`
 										}
 									}
 								},
@@ -597,7 +615,7 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 										ratio: '8:5',
 										storage: {
 											imageName: 'doc-verso',
-											filename: `/zoeAccount/${currentUser.uid}/pf/doc-verso-${globalFactory.guid()}`
+											filename: `/${databaseKey}/${currentUser.uid}/pf/doc-verso-${globalFactory.guid()}`
 										}
 									}
 								},
@@ -621,7 +639,7 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 										ratio: '1:1',
 										storage: {
 											imageName: 'selfie',
-											filename: `/zoeAccount/${currentUser.uid}/pf/selfie-${globalFactory.guid()}`
+											filename: `/${databaseKey}/${currentUser.uid}/pf/selfie-${globalFactory.guid()}`
 										}
 									}
 								},
@@ -693,7 +711,6 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 			}
 
 			$scope.init = _ => {
-
 				appAuthHelper.ready()
 					.then(_ => {
 						return initOpenAccount();
@@ -704,7 +721,6 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 					.catch(e => {
 						console.error(e);
 					})
-
 			}
 
 		}

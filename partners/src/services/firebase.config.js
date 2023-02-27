@@ -5,16 +5,17 @@ import { initializeApp } from 'firebase/app';
 const ngModule = angular.module('services.firebase.config', [])
 
 	/*
-	"apiKey": "AIzaSyDs5zG6hxdlEEtxz-7YMKFLAjlyZEWVCY4",
-	"authDomain": "zoepaygateway.firebaseapp.com",
-	"databaseURL": "https://zoepaygateway-default-rtdb.firebaseio.com",
-	"projectId": "zoepaygateway",
-	"storageBucket": "zoepaygateway.appspot.com",
-	"messagingSenderId": "408824775847",
-	"appId": "1:408824775847:web:5db114351e8cc1e849c782"
+	apiKey: "AIzaSyCAWlJXzEptl2TJ8J4CWeBUaA15o-hSqSs",
+	authDomain: "premios-fans.firebaseapp.com",
+	databaseURL: "https://premios-fans-default-rtdb.firebaseio.com",
+	projectId: "premios-fans",
+	storageBucket: "premios-fans.appspot.com",
+	messagingSenderId: "801994869227",
+	appId: "1:801994869227:web:188d640a390d22aa4831ae",
+	measurementId: "G-XTRQ740MSL"
 	*/
 
-	.constant('firebaseConfigBase64', 'eyJhcGlLZXkiOiJBSXphU3lEczV6RzZoeGRsRUV0eHotN1lNS0ZMQWpseVpFV1ZDWTQiLCJhdXRoRG9tYWluIjoiem9lcGF5Z2F0ZXdheS5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vem9lcGF5Z2F0ZXdheS1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20iLCJwcm9qZWN0SWQiOiJ6b2VwYXlnYXRld2F5Iiwic3RvcmFnZUJ1Y2tldCI6InpvZXBheWdhdGV3YXkuYXBwc3BvdC5jb20iLCJtZXNzYWdpbmdTZW5kZXJJZCI6IjQwODgyNDc3NTg0NyIsImFwcElkIjoiMTo0MDg4MjQ3NzU4NDc6d2ViOjVkYjExNDM1MWU4Y2MxZTg0OWM3ODIifQ==')
+	.constant('firebaseConfigBase64', 'eyJhcGlLZXkiOiAiQUl6YVN5Q0FXbEpYekVwdGwyVEo4SjRDV2VCVWFBMTVvLWhTcVNzIiwiYXV0aERvbWFpbiI6InByZW1pb3MtZmFucy5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vcHJlbWlvcy1mYW5zLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbSIsInByb2plY3RJZCI6InByZW1pb3MtZmFucyIsInN0b3JhZ2VCdWNrZXQiOiJwcmVtaW9zLWZhbnMuYXBwc3BvdC5jb20iLCJtZXNzYWdpbmdTZW5kZXJJZCI6ICI4MDE5OTQ4NjkyMjciLCJhcHBJZCI6IjE6ODAxOTk0ODY5MjI3OndlYjoxODhkNjQwYTM5MGQyMmFhNDgzMWFlIiwibWVhc3VyZW1lbnRJZCI6IkctWFRSUTc0ME1TTCJ9')
 
 	.constant('firebaseErrorCodes',
 		[
@@ -79,7 +80,6 @@ const ngModule = angular.module('services.firebase.config', [])
 			firebaseConfigBase64,
 			appService
 		) {
-
 			const jsonfirebaseConfig = Buffer.from(firebaseConfigBase64, 'base64').toString();
 			const firebaseConfig = JSON.parse(jsonfirebaseConfig);
 			const app = initializeApp(firebaseConfig);

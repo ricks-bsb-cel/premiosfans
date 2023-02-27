@@ -2,7 +2,6 @@
 
 import run from './run';
 import apiUrls from './api-urls';
-import { words } from 'lodash';
 
 const ngModule = angular.module('config', [
 	apiUrls.name
@@ -10,7 +9,7 @@ const ngModule = angular.module('config', [
 	.run(run)
 
 	.value('globalParms', {
-		appName: 'Zoepay Client Login',
+		appName: 'PremiosFans Partners',
 		appUrl: 'https://zoepay.app',
 		appVersion: '0.1.0',
 		logoImg: '/adm/img/logo.png'
@@ -101,8 +100,6 @@ const ngModule = angular.module('config', [
 						label: 'splash'
 					}
 				});
-
-			// $locationProvider.html5Mode(true);
 
 		}
 	)

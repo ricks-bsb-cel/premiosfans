@@ -22,6 +22,7 @@ const ngModule = angular.module('directives.block-html', [])
 					const c = appFirestore.collection(db, '_htmlBlock');
 
 					let q = appFirestore.query(c);
+					
 					q = appFirestore.query(q, appFirestore.where('sigla', '==', sigla));
 					q = appFirestore.query(q, appFirestore.limit(1));
 

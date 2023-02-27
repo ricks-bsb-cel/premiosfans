@@ -7,7 +7,6 @@ const ngModule = angular.module('directives.abrir-conta-pf-block-resumo', [])
 			$scope
 		) {
 
-
 		}
 	)
 
