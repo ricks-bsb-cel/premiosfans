@@ -13,39 +13,25 @@ const ngModule = angular.module('directives.block-html', [])
 		appFirestore
 	) {
 
-		const getTemplate = sigla => {
-			return new Promise((resolve, reject) => {
+		async function getTemplate(sigla) {
+			await appAuthHelper.ready();
 
-				return appAuthHelper.ready().then(_ => {
+			let result = "<i>404 * Not Found</i>";
+			const db = appFirestore.firestore;
+			const c = appFirestore.collection(db, '_htmlBlock');
 
-					const db = appFirestore.firestore;
-					const c = appFirestore.collection(db, '_htmlBlock');
+			let q = appFirestore.query(c);
 
-					let q = appFirestore.query(c);
-					
-					q = appFirestore.query(q, appFirestore.where('sigla', '==', sigla));
-					q = appFirestore.query(q, appFirestore.limit(1));
+			q = appFirestore.query(q, appFirestore.where('sigla', '==', sigla));
+			q = appFirestore.query(q, appFirestore.limit(1));
 
-					appFirestore.getDocs(q)
-						.then(data => {
+			const data = await appFirestore.getDocs(q);
 
-							if (data.empty) {
-								return resolve("<i>404 * Not Found</i>");
-							} else {
-								data.forEach(d => {
-									d = angular.merge(d.data(), { id: d.id });
-									return resolve(d);
-								})
-							}
-
-						})
-						.catch(e => {
-							console.error(e);
-							return reject(e);
-						})
-
-				})
+			data.forEach(d => {
+				result = angular.merge(d.data(), { id: d.id });
 			})
+
+			return result;
 		};
 
 		return {
@@ -56,15 +42,16 @@ const ngModule = angular.module('directives.block-html', [])
 	.directive('blockHtml', function ($compile, blockHtmlFactory) {
 		return {
 			restrict: 'E',
-			link: function (scope, element, attrs) {
-				blockHtmlFactory.getTemplate(scope.sigla)
-					.then(data => {
-						const el = $compile(data.html)(scope);
-						element.append(el);
-						if (scope.delegate && typeof scope.delegate.ready === 'function') {
-							scope.delegate.ready(data);
-						}
-					})
+			link: function (scope, element) {
+				blockHtmlFactory.getTemplate(scope.sigla).then(data => {
+					const el = $compile(data.html)(scope);
+
+					element.append(el);
+
+					if (scope.delegate && typeof scope.delegate.ready === 'function') {
+						scope.delegate.ready(data);
+					}
+				})
 			},
 			scope: {
 				sigla: '=',

@@ -1,6 +1,6 @@
 'use strict';
 
-import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithRedirect, signOut, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 
 const ngModule = angular.module('services.app-auth', [])
 
@@ -12,7 +12,8 @@ const ngModule = angular.module('services.app-auth', [])
 			signInWithRedirect: signInWithRedirect,
 			signOut: signOut,
 			onAuthStateChanged: onAuthStateChanged,
-			signInWithEmailAndPassword: signInWithEmailAndPassword
+			signInWithEmailAndPassword: signInWithEmailAndPassword,
+			signInAnonymously: signInAnonymously
 		}
 	})
 

@@ -5,57 +5,29 @@
 const ngModule = angular.module('services.app-auth-helper', [])
 
 	.factory('appAuthHelper', function (
-		globalFactory,
 		appConfig,
 		appAuth,
 		$cookies,
 		$q,
 		$timeout,
-		firebaseAuthMessages,
 		waitUiFactory,
-		appDatabase,
-		alertFactory,
 		$http,
 		$window,
 		$location,
 		URLs
 	) {
 
-		let recaptchaVerifier,
-			currentUser = null,
+		let currentUser = null,
 			authReady = false,
-			widgetId = null,
-			confirmationResult = null,
 			reloadOnSignout = true,
+			lastToken = null,
 
 			appUserData = null,
-
-			snapshotAppUserData = null,
 
 			unsubscribeOnAuthStateChanged,
 			unsubscribeOnIdTokenChanged,
 
 			notifyUserDataChanged = [];
-
-
-		const initAppUserData = uid => {
-
-			const path = `zoeAccount/${uid}/pf`;
-			snapshotAppUserData = appDatabase.ref(appDatabase.database, path);
-
-			refreshUserData();
-
-			appDatabase.onValue(snapshotAppUserData, snapshot => {
-
-				appUserData = snapshot.val() || {};
-
-				notifyUserDataChanged.forEach(notify => {
-					notify.call(appUserData);
-				})
-
-			});
-
-		}
 
 		const clearSessions = toLogin => {
 
@@ -113,66 +85,26 @@ const ngModule = angular.module('services.app-auth-helper', [])
 
 		}
 
-		const refreshUserData = _ => {
-			$http({
-				url: URLs.user.account.refresh,
-				method: 'get',
-				headers: { 'Authorization': 'Bearer ' + token() }
-			}).then(
-				function () { },
-				function (e) {
-					console.error(e);
-				}
-			);
-		}
-
-		const updateUser = attrs => {
-
-			if (!attrs.data || !attrs.data.cpf || !attrs.data.phoneNumber) {
-				throw new Error('Parm error...');
-			}
-
-			let data = { ...attrs.data };
-			data.dtNascimento = data.dtNascimento_yyyymmdd;
-
-			$http({
-				url: URLs.user.updateUserInfo,
-				method: 'post',
-				headers: {
-					'Authorization': 'Bearer ' + token()
-				},
-				data: data
-			}).then(
-				function (response) {
-					if (typeof attrs.success === 'function') {
-						attrs.success(response.data);
-					}
-				},
-				function (e) {
-					console.error(e);
-					if (typeof attrs.error === 'function') {
-						attrs.error(e);
-					}
-				}
-			);
-
-		}
-
 		const setUserCookies = (user, callback) => {
-			user.getIdToken(true)
-				.then(token => {
+			if (!user) return;
 
+			user.getIdToken(true).then(token => {
+
+				if (lastToken !== token) {
 					if ($window.location.hostname === 'localhost') {
-						console.info(token);
-						console.info(`UID: ${user.uid}`);
+						console.group('User');
+						console.log('Token', token);
+						console.log(`UID: ${user.uid}`);
+						console.groupEnd();
 					}
 
 					$cookies.put('__session', token);
 
-					if (typeof callback === 'function') {
-						callback();
-					}
-				})
+					lastToken = token;
+				}
+
+				typeof callback === 'function' && callback(token);
+			})
 		}
 
 		const checkTokenChange = _ => {
@@ -199,14 +131,16 @@ const ngModule = angular.module('services.app-auth-helper', [])
 			return auth.currentUser.accessToken;
 		}
 
-		const redirectToIndex = _ => {
+		const redirectToIndex = hidePreloader => {
+
+			hidePreloader = typeof hidePreloader === 'boolean' ? hidePreloader : true;
 
 			if ($location.path() !== '/index') {
 				$location.path('/index');
 				$location.replace();
 			}
 
-			preloaderHide();
+			hidePreloader && preloaderHide();
 		}
 
 		const _getAuth = _ => {
@@ -250,42 +184,26 @@ const ngModule = angular.module('services.app-auth-helper', [])
 			auth.languageCode = 'BR';
 
 			appConfig.init(_ => {
-
 				unsubscribeOnAuthStateChanged = appAuth.onAuthStateChanged(auth, user => {
-
 					currentUser = user;
 					authReady = true;
 
 					if (currentUser) {
-
 						if (!currentUser.isAnonymous) {
-							setUserCookies(user);
-							initAppUserData(user.uid);
+							clearSessions();
+
+							return _signOut(true);
 						}
 
+						setUserCookies(user);
 						checkTokenChange();
-
-					} else {
-
-						clearSessions();
-
-						if (reloadOnSignout) {
-							redirectToIndex();
-						}
-
-						if (snapshotAppUserData) {
-							appDatabase.off(snapshotAppUserData);
-							snapshotAppUserData = null;
-						}
-
-					}
-
-					if (reloadOnSignout) {
 						preloaderHide();
+
+						return;
 					}
 
+					appAuth.signInAnonymously(auth);
 				})
-
 			});
 
 		}
@@ -296,8 +214,8 @@ const ngModule = angular.module('services.app-auth-helper', [])
 
 			if (reloadOnSignout) {
 				preloaderShow();
-				unsubscribeOnAuthStateChanged();
-				unsubscribeOnIdTokenChanged();
+				typeof unsubscribeOnAuthStateChanged === 'function' && unsubscribeOnAuthStateChanged();
+				typeof unsubscribeOnIdTokenChanged === 'function' && unsubscribeOnIdTokenChanged();
 			}
 
 			const auth = appAuth.getAuth();
@@ -374,165 +292,6 @@ const ngModule = angular.module('services.app-auth-helper', [])
 			})
 		};
 
-		const initRecaptchaVerifier = attrs => {
-
-			if (recaptchaVerifier) {
-				return;
-			}
-
-			try {
-				const auth = appAuth.getAuth();
-
-				auth.useDeviceLanguage();
-
-				recaptchaVerifier = new appAuth.RecaptchaVerifier(attrs.container, {
-					"size": "invisible",
-					"callback": response => {
-
-						recaptchaVerifier.render()
-							.then(wid => {
-								widgetId = wid;
-								if (typeof attrs.ready === 'function') {
-									attrs.ready();
-								}
-							})
-							.catch(e => {
-								console.error(e);
-								if (typeof attrs.error === 'function') {
-									attrs.error(e);
-								}
-							})
-
-					},
-					"expired-callback": function () {
-						console.info('expired');
-						if (typeof attrs.expired === 'function') {
-							attrs.expired();
-						}
-					},
-					"error-callback": e => {
-						console.error(e);
-					}
-				}, auth);
-
-			} catch (e) {
-				console.error(e);
-				if (typeof attrs.error === 'function') {
-					attrs.error(e);
-				}
-			}
-
-		};
-
-		const sendCodeToNumber = attrs => {
-
-			if (currentUser && !currentUser.isAnonymous) {
-				throw new Error('Um usuário autenticado já está logado...');
-			}
-
-			const appVerifier = recaptchaVerifier;
-			const auth = appAuth.getAuth();
-
-			attrs.celular = globalFactory.onlyNumbers(attrs.celular);
-
-			if (!attrs.celular || attrs.celular.length !== 11) {
-				if (typeof attrs.error === 'function') {
-					attrs.error('Informe o número do celular com 11 dígitos...');
-				}
-				return;
-			}
-
-			attrs.celular = '+55' + attrs.celular;
-
-			appAuth.signInWithPhoneNumber(auth, attrs.celular, appVerifier)
-				.then(result => {
-					confirmationResult = result;
-					if (typeof attrs.success === 'function') {
-						attrs.success();
-					}
-				}).catch(e => {
-					if (typeof attrs.error === 'function') {
-						attrs.error(e);
-					}
-				});
-
-		};
-
-		const checkCode = attrs => {
-
-			attrs.codigo = globalFactory.onlyNumbers(attrs.codigo);
-
-			if (!attrs.codigo || attrs.codigo.length !== 6) {
-				if (typeof attrs.error === 'function') {
-					attrs.error('Informe o número o código com 6 dígitos...');
-				}
-				return;
-			}
-
-			const auth = appAuth.getAuth();
-			let user = null;
-			let checkPromisse;
-
-			if (currentUser && currentUser.isAnonymous) {
-				const credential = appAuth.PhoneAuthProvider.credential(confirmationResult.verificationId, attrs.codigo);
-				checkPromisse = appAuth.linkWithCredential(auth.currentUser, credential);
-			} else {
-				checkPromisse = confirmationResult.confirm(attrs.codigo);
-			}
-
-			return checkPromisse
-
-				.then(confirmResult => {
-					user = confirmResult.user;
-
-					return initAppUser(attrs.cpf, attrs.celular);
-				})
-
-				.then(_ => {
-					// Se o usuário já está com a submissão de conta pronta, reload...
-
-					if (user.accountSubmitted) {
-						$window.location.reload();
-					}
-
-					currentUser = user;
-
-					setUserCookies(user, _ => {
-						if (typeof attrs.success === 'function') {
-							attrs.success(user);
-						}
-					})
-
-				})
-
-				.catch(e => {
-
-					waitUiFactory.stop();
-
-					if (e.code === 'auth/account-exists-with-different-credential') {
-
-						alertFactory.error('Este número de celular já está vinculado à uma conta. Utilize a opção "Acesse sua Conta".').then(_ => {
-							_signOut();
-						})
-
-						return;
-					}
-
-					const message = firebaseAuthMessages[e.code] || e.message;
-
-					alertFactory.error(message);
-
-					if (typeof attrs.error === 'function') {
-						attrs.error(e);
-					}
-
-				})
-		};
-
-		const getCartosAccounts = _ => {
-			return appUserData.userData?.account?.cartos?.accounts || [];
-		}
-
 		const getUserClaims = _ => {
 			return new Promise((resolve, reject) => {
 				currentUser.getIdTokenResult()
@@ -550,12 +309,7 @@ const ngModule = angular.module('services.app-auth-helper', [])
 			getAuth: _getAuth,
 			signOut: _signOut,
 			ready: _ready,
-			initRecaptchaVerifier: initRecaptchaVerifier,
-			sendCodeToNumber: sendCodeToNumber,
-			checkCode: checkCode,
-			updateUser: updateUser,
 			destroyNotifyUserDataChanged: destroyNotifyUserDataChanged,
-			getCartosAccounts: getCartosAccounts,
 			signInAnonymously: signInAnonymously,
 			getUserClaims: getUserClaims,
 			initAppUser: initAppUser,

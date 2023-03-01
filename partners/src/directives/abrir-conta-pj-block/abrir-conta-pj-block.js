@@ -8,7 +8,6 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 		function (
 			$scope,
 			$timeout,
-			userService,
 			globalFactory,
 			waitUiFactory,
 			utilsService,
@@ -25,8 +24,15 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 
 			$scope.swiper;
 			$scope.ready = false;
+
 			$scope.data = {
+				companyData: {},
+				personalData: {},
+				addressCompany: {},
+				addressPersonal: {},
+				images: {}
 			};
+
 			$scope.pages = null;
 
 			$scope.phoneAuthDelegate = {};
@@ -92,8 +98,6 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 			async function initOpenAccount() {
 				currentUser = await getCurrentUser();
 
-				$scope.data = {};
-
 				return null;
 			}
 
@@ -127,7 +131,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 				}
 			}
 
-			const loadCep = cep => {
+			const loadCep = (cep, obj) => {
 				return new Promise(resolve => {
 
 					cep = globalFactory.onlyNumbers(cep);
@@ -137,10 +141,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					utilsService.getCep({
 						cep: cep,
 						success: data => {
-							$scope.data.logradouro = data.logradouro;
-							$scope.data.bairro = data.bairro;
-							$scope.data.cidade = data.cidade;
-							$scope.data.uf = data.estado;
+							obj.street = data.logradouro;
+							obj.district = data.bairro;
+							obj.city = data.cidade;
+							obj.state = data.estado;
 
 							return resolve();
 						},
@@ -169,9 +173,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-empresa-cnpj",
+						data: $scope.data.companyData,
 						fields: [
 							{
-								key: 'empresa_cnpj',
+								key: 'cnpj',
 								templateOptions: {
 									required: true
 								},
@@ -180,7 +185,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						],
 						validation: currentIndex => {
 							return new Promise((resolve, reject) => {
-								if (!$scope.data.empresa_cnpj) {
+								if (!$scope.data.companyData.cnpj) {
 									setErrorMessage(currentIndex, 'Informe o seu CNPJ corretamente');
 									return reject();
 								}
@@ -193,9 +198,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-empresa-nome",
+						data: $scope.data.companyData,
 						fields: [
 							{
-								key: 'empresa_nome',
+								key: 'companyName',
 								templateOptions: {
 									label: 'Nome',
 									type: 'text',
@@ -206,7 +212,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 								className: 'mt-2'
 							},
 							{
-								key: 'empresa_nomeFantasia',
+								key: 'tradingName',
 								templateOptions: {
 									label: 'Nome Fantasia',
 									type: 'text',
@@ -219,7 +225,12 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						],
 						validation: currentIndex => {
 							return new Promise((resolve, reject) => {
-								if (!$scope.data.empresa_nome || $scope.data.empresa_nome <= 3 || !$scope.data.empresa_nomeFantasia || $scope.data.empresa_nomeFantasia <= 3) {
+								if (
+									!$scope.data.companyData.companyName ||
+									$scope.data.companyData.companyName <= 3 ||
+									!$scope.data.companyData.tradingName ||
+									$scope.data.companyData.tradingName <= 3
+								) {
 									setErrorMessage(currentIndex, 'Informe o nome e nome de fantasia da empresa');
 									return reject();
 								}
@@ -232,9 +243,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-empresa-dtabertura",
+						data: $scope.data.companyData,
 						fields: [
 							{
-								key: 'dtAbertura',
+								key: 'dateStartCompany',
 								type: 'data',
 								templateOptions: {
 									required: true
@@ -244,24 +256,25 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						validation: currentIndex => {
 							return new Promise((resolve, reject) => {
 
-								if (!$scope.data.dtAbertura) {
+								if (!$scope.data.companyData.dateStartCompany) {
 									setErrorMessage(currentIndex, 'Informe uma data de abertura válida');
 									return reject();
 								}
 
-								if (!globalFactory.isValidDtNascimento($scope.data.dtAbertura)) {
+								if (!globalFactory.isValidDtNascimento($scope.data.companyData.dateStartCompany)) {
 									setErrorMessage(currentIndex, 'A idade deve ser entre 16 e 120 anos');
 									return reject();
 								}
 
 								setErrorMessage(currentIndex);
-								
+
 								return resolve();
 							})
 						}
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-cpf",
+						data: $scope.data.personalData,
 						fields: [
 							{
 								key: 'cpf',
@@ -274,36 +287,21 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						validation: currentIndex => {
 							return new Promise((resolve, reject) => {
 
-								if (!$scope.data.cpf) {
+								if (!$scope.data.personalData.cpf) {
 									setErrorMessage(currentIndex, 'Informe o seu CPF corretamente');
 									return reject();
 								}
 
 								return resolve();
-
-								/*
-								userService.checkCpfAberturaConta($scope.data.cpf, result => {
-									if (result.error) {
-										alertFactory.success(result.msg).then(_ => {
-											$location.path('/splash');
-											$location.replace();
-										})
-
-										return;
-									}
-									setErrorMessage(currentIndex);
-									return resolve();
-								})
-								*/
-
 							})
 						}
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-nome",
+						data: $scope.data.personalData,
 						fields: [
 							{
-								key: 'nome',
+								key: 'name',
 								templateOptions: {
 									type: 'text',
 									maxlength: 128,
@@ -314,9 +312,8 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						],
 						validation: currentIndex => {
 							return new Promise((resolve, reject) => {
-
-								if (!$scope.data.nome || $scope.data.nome <= 3) {
-									setErrorMessage(currentIndex, 'Informe o seu Nome completo');
+								if (!$scope.data.personalData.name || $scope.data.personalData.name <= 3) {
+									setErrorMessage(currentIndex, 'Informe o nome completo do responsável');
 									return reject();
 								}
 
@@ -327,9 +324,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-celular",
+						data: $scope.data.personalData,
 						fields: [
 							{
-								key: 'celular',
+								key: 'phone',
 								templateOptions: {
 									type: 'text',
 									required: true
@@ -340,7 +338,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						validation: (currentIndex) => {
 							return new Promise((resolve, reject) => {
 
-								if (!$scope.data.celular) {
+								if (!$scope.data.personalData.phone) {
 									setErrorMessage(currentIndex, 'Informe um número de celular válido');
 									return reject();
 								}
@@ -353,6 +351,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-email",
+						data: $scope.data.personalData,
 						fields: [
 							{
 								key: 'email',
@@ -366,7 +365,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						validation: (currentIndex) => {
 							return new Promise((resolve, reject) => {
 
-								if (!$scope.data.email || !globalFactory.emailIsValid($scope.data.email)) {
+								if (!$scope.data.personalData.email || !globalFactory.emailIsValid($scope.data.personalData.email)) {
 									setErrorMessage(currentIndex, 'Informe um email válido');
 									return reject();
 								}
@@ -379,9 +378,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-dtnascimento",
+						data: $scope.data.personalData,
 						fields: [
 							{
-								key: 'dtNascimento',
+								key: 'birthdate',
 								type: 'data',
 								templateOptions: {
 									required: true
@@ -391,27 +391,29 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						validation: currentIndex => {
 							return new Promise((resolve, reject) => {
 
-								if (!$scope.data.dtNascimento) {
+								if (!$scope.data.personalData.birthdate) {
 									setErrorMessage(currentIndex, 'Informe uma data de nascimento válida');
 									return reject();
 								}
 
-								if (!globalFactory.isValidDtNascimento($scope.data.dtNascimento)) {
+								if (!globalFactory.isValidDtNascimento($scope.data.personalData.birthdate)) {
 									setErrorMessage(currentIndex, 'A idade deve ser entre 16 e 120 anos');
 									return reject();
 								}
 
 								setErrorMessage(currentIndex);
+
 								return resolve();
 							})
 						}
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-endereco-cep",
+						data: $scope.data.addressPersonal,
 						tipo: 'cep',
 						fields: [
 							{
-								key: 'cep',
+								key: 'postalCode',
 								templateOptions: {
 									type: 'text',
 									mask: '99 999 999',
@@ -422,24 +424,23 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 						],
 						validation: (currentIndex) => {
 							return new Promise((resolve, reject) => {
-
-								if (!$scope.data.cep) {
+								if (!$scope.data.addressPersonal.postalCode) {
 									setErrorMessage(currentIndex, 'Informe um CEP válido');
 									return reject();
 								}
 
 								setErrorMessage(currentIndex);
+
 								return resolve();
-
-
 							})
 						}
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-endereco-logradouro",
+						data: $scope.data.addressPersonal,
 						fields: [
 							{
-								key: 'logradouro',
+								key: 'street',
 								templateOptions: {
 									label: 'Logradouro',
 									type: 'text',
@@ -450,17 +451,16 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 								type: 'input'
 							},
 							{
-								key: 'numero',
+								key: 'number',
 								templateOptions: {
 									label: 'Número',
 									type: 'text',
 									maxlength: 128
 								},
 								type: 'input'
-							}
-							,
+							},
 							{
-								key: 'bairro',
+								key: 'district',
 								templateOptions: {
 									label: 'Bairro',
 									type: 'text',
@@ -468,14 +468,15 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 									required: true
 								},
 								type: 'input'
-							},
+							}
 						]
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-endereco-cidade-estado",
+						data: $scope.data.addressPersonal,
 						fields: [
 							{
-								key: 'cidade',
+								key: 'city',
 								templateOptions: {
 									label: 'Cidade',
 									type: 'text',
@@ -485,7 +486,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 								type: 'input'
 							},
 							{
-								key: 'uf',
+								key: 'state',
 								templateOptions: {
 									label: 'Estado',
 									type: 'text',
@@ -497,9 +498,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-endereco-complemento",
+						data: $scope.data.addressPersonal,
 						fields: [
 							{
-								key: 'complemento',
+								key: 'complement',
 								templateOptions: {
 									maxlength: 256
 								},
@@ -509,10 +511,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-doc-frente",
-						imageName: 'doc-frente',
+						data: $scope.data.images,
 						fields: [
 							{
-								key: 'imagem_doc_frente',
+								key: 'documentFront',
 								type: 'image-upload',
 								templateOptions: {
 									slimOptions: {
@@ -533,10 +535,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-doc-verso",
-						imageName: 'doc-verso',
+						data: $scope.data.images,
 						fields: [
 							{
-								key: 'imagem_doc_verso',
+								key: 'documentBack',
 								type: 'image-upload',
 								templateOptions: {
 									slimOptions: {
@@ -557,10 +559,10 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					},
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-selfie",
-						isImage: 'selfie',
+						data: $scope.data.images,
 						fields: [
 							{
-								key: 'imagem_doc_selfie',
+								key: 'documentFace',
 								type: 'image-upload',
 								templateOptions: {
 									slimOptions: {
@@ -609,22 +611,18 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 					if (page.form && typeof page.validation === 'function') {
 
 						page.validation($scope.swiper.activeIndex, page)
-
 							.then(_ => {
-
 								if (page.tipo === 'cep') {
-									return loadCep($scope.data.cep);
+									return loadCep(page.data.postalCode, page.data);
 								} else {
 									return;
 								}
 							})
-
 							.then(_ => {
 								saveData();
-								$scope.swiper.slideNext();
-							})
 
-							.catch(_ => { })
+								$scope.swiper.slideNext();
+							});
 
 					} else {
 						saveData();

@@ -12,34 +12,30 @@ var ngModule = angular.module('views.abertura-conta-swp-pj', [
 		appAuthHelper,
 		pageHeaderFactory
 	) {
-
 		$scope.ready = false;
 
 		pageHeaderFactory.setModeLight('Abertura de Conta');
 
-		appAuthHelper.ready()
-			.then(currentUser => {
+		appAuthHelper.ready().then(currentUser => {
 
- 				/*
-				if (currentUser.isAnonymous && currentUser.customData.accountSubmitted) {
-					$location.path('/index-user');
-					$location.replace();
-					return;
-				}
+			/*
+			if (currentUser.isAnonymous && currentUser.customData.accountSubmitted) {
+				$location.path('/index-user');
+				$location.replace();
+				return;
+			}
 
-				if (currentUser.isAnonymous || currentUser.customData.accountSubmitted) {
-					$location.path('/index');
-					$location.replace();
-					return;
-				}
-				*/
+			if (currentUser.isAnonymous || currentUser.customData.accountSubmitted) {
+				$location.path('/index');
+				$location.replace();
+				return;
+			}
+			*/
 
-				$scope.ready = true;
-			})
-			.catch(e => {
-				console.info(e);
-			})
-
+			$scope.ready = true;
+		}).catch(e => {
+			console.info(e);
+		});
 
 		/*
 		$scope.$on('$destroy', function () {
