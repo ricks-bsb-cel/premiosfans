@@ -26,6 +26,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 			$scope.ready = false;
 
 			$scope.data = {
+				encerrado: false,
 				companyData: {},
 				personalData: {},
 				addressCompany: {},
@@ -39,31 +40,22 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 
 			$scope.enviar = _ => {
 
+				$scope.data.dtFinal = appFirestoreHelper.currentTimestamp();
+				$scope.data.encerrado = true;
+
 				saveData();
 
-				appAuthHelper.initAppUser(
-					$scope.data.cpf,
-					$scope.data.celular,
-					true
-				)
-
+				alertFactory.success('Sua conta foi solicitada com sucesso. Acompanhe a abertura aqui pelo App!')
 					.then(_ => {
+						$timeout(_ => {
+							$location.path('/splash');
+							$location.replace();
 
-						alertFactory.success('Sua conta foi solicitada com sucesso. Acompanhe a abertura aqui pelo App!')
-							.then(_ => {
-								$timeout(_ => {
-									$location.path('/splash');
-									$location.replace();
-									// Foda-se... tô cansado...
-									$timeout(_ => { window.location.reload() });
-								})
-							})
-
+							// Foda-se... tô cansado...
+							$timeout(_ => { window.location.reload() });
+						})
 					})
 
-					.catch(e => {
-						console.error(e);
-					})
 			}
 
 			const setErrorMessage = (activeIndex, message) => {
@@ -100,26 +92,6 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 
 				return null;
 			}
-
-			/*
-			const initOpenAccount = _ => {
-				return new Promise((resolve, reject) => {
-					getCurrentUser()
-						.then(user => {
-							currentUser = user;
-							return appDatabaseHelper.once(`/zoeAccount/${currentUser.uid}/pj`);
-						})
-						.then(data => {
-							$scope.data = data || {};
-							return resolve();
-						})
-						.catch(e => {
-							console.error(e);
-							return reject(e);
-						})
-				})
-			}
-			*/
 
 			$scope.htmlBlockDelegate = {
 				ready: data => {
@@ -162,6 +134,8 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 
 				$scope.data.dtInicio = $scope.data.dtInicio || appFirestoreHelper.currentTimestamp();
 				$scope.data.dtUltimaEdicao = appFirestoreHelper.currentTimestamp();
+
+				console.info($scope.data);
 
 				appDatabaseHelper.set(path, $scope.data);
 			}
@@ -272,6 +246,110 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 							})
 						}
 					},
+
+					{
+						htmlBlock: "app-folha-abertura-conta-pj-empresa-endereco-cep",
+						data: $scope.data.addressCompany,
+						tipo: 'cep',
+						fields: [
+							{
+								key: 'postalCode',
+								templateOptions: {
+									type: 'text',
+									mask: '99 999 999',
+									required: true
+								},
+								type: 'mask-pattern'
+							}
+						],
+						validation: (currentIndex) => {
+							return new Promise((resolve, reject) => {
+								if (!$scope.data.addressCompany.postalCode) {
+									setErrorMessage(currentIndex, 'Informe um CEP válido');
+									return reject();
+								}
+
+								setErrorMessage(currentIndex);
+
+								return resolve();
+							})
+						}
+					},
+					{
+						htmlBlock: "app-folha-abertura-conta-pj-empresa-endereco-logradouro",
+						data: $scope.data.addressCompany,
+						fields: [
+							{
+								key: 'street',
+								templateOptions: {
+									label: 'Logradouro',
+									type: 'text',
+									maxlength: 128,
+									required: true
+								},
+								className: 'mt-5',
+								type: 'input'
+							},
+							{
+								key: 'number',
+								templateOptions: {
+									label: 'Número',
+									type: 'text',
+									maxlength: 128
+								},
+								type: 'input'
+							},
+							{
+								key: 'district',
+								templateOptions: {
+									label: 'Bairro',
+									type: 'text',
+									maxlength: 128,
+									required: true
+								},
+								type: 'input'
+							}
+						]
+					},
+					{
+						htmlBlock: "app-folha-abertura-conta-pj-empresa-endereco-cidade-estado",
+						data: $scope.data.addressCompany,
+						fields: [
+							{
+								key: 'city',
+								templateOptions: {
+									label: 'Cidade',
+									type: 'text',
+									maxlength: 128,
+									required: true
+								},
+								type: 'input'
+							},
+							{
+								key: 'state',
+								templateOptions: {
+									label: 'Estado',
+									type: 'text',
+									required: true
+								},
+								type: 'ng-selector-estado'
+							}
+						]
+					},
+					{
+						htmlBlock: "app-folha-abertura-conta-pj-empresa-endereco-complemento",
+						data: $scope.data.addressCompany,
+						fields: [
+							{
+								key: 'complement',
+								templateOptions: {
+									maxlength: 256
+								},
+								type: 'input'
+							}
+						]
+					},
+
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-cpf",
 						data: $scope.data.personalData,
@@ -407,6 +485,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 							})
 						}
 					},
+
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-responsavel-endereco-cep",
 						data: $scope.data.addressPersonal,
@@ -509,6 +588,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 							}
 						]
 					},
+
 					{
 						htmlBlock: "app-folha-abertura-conta-pj-doc-frente",
 						data: $scope.data.images,
@@ -626,6 +706,7 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 
 					} else {
 						saveData();
+
 						$scope.swiper.slideNext();
 					}
 				}

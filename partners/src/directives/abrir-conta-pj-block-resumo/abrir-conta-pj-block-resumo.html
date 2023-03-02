@@ -3,47 +3,62 @@
     <div class="content">
         <div class="d-flex pb-4">
             <div class="align-self-center ps-1">
-                <h4 class="pt-1 mb-n1">{{data.nome}}</h4>
-                <p class="mb-0 mt-1 font-16 opacity-70">
-                    <small>CPF:</small>
-                    {{data.cpf_formatted}}
+                <h4 class="pt-1 mb-n1">{{data.companyData.companyName}}</h4>
+                <p class="mb-0 mt-1 font-16 opacity-90">
+                    <small>CNPJ:</small>
+                    {{data.companyData.cnpj_formatted}}
                 </p>
-            </div>
-            <div class="align-self-center ms-auto text-end">
-                <h4 class="pt-1 font-14 mb-n1 color-green-dark">
-                </h4>
-                <p class="mb-0 font-11">
-                </p>
+                <p class="mb-0 mt-1 font-16">
+                    {{data.companyData.tradingName}}
+                </p>                
             </div>
         </div>
         <div class="row">
-            <strong class="col-5 color-theme">Celular</strong>
-            <strong ng-if="!data.semCelular" class="col-7 text-end color-highlight">{{data.celular_formatted}}</strong>
-            <strong ng-if="data.semCelular" class="col-7 text-end color-highlight">Não possui Celular</strong>
-            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
-            
-            <strong class="col-5 color-theme">eMail</strong>
-            <strong ng-if="!data.semEmail" class="col-7 text-end color-highlight">{{data.email}}</strong>
-            <strong ng-if="data.semEmail" class="col-7 text-end color-highlight">Não possui eMail</strong>
-            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
-
-            <strong class="col-7 color-theme">Data de Nascimento</strong>
-            <strong class="col-5 text-end color-highlight">{{data.dtNascimento}}</strong>
+            <strong class="col-5 color-theme">Abertura</strong>
+            <strong class="col-7 text-end color-highlight">{{data.companyData.dateStartCompany}}</strong>
             <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
 
             <strong class="col-5 color-theme">Endereço</strong>
             <strong class="col-7 text-end color-highlight">
-                <span>{{data.logradouro}}</span>
-                <span>{{data.numero}}</span>
-                <span>{{data.bairro}}</span>
-                <span>{{data.complemento}}</span><br />
-                <span>{{data.cidade}}/{{data.uf}}</span><br />
-                <span>{{data.cep}}</span>
+                <span>{{data.addressCompany.street}}</span>
+                <span>{{data.addressCompany.number}}</span>
+                <span>{{data.addressCompany.district}}</span>
+                <span>{{data.addressCompany.complement}}</span><br />
+                <span>{{data.addressCompany.city}}/{{data.addressCompany.state}}</span><br />
+                <span>{{data.addressCompany.postalCode}}</span>
+            </strong>
+
+            <h3 class="pb-1">Responsável</h3>
+
+            <h4 class="pb-2">{{data.personalData.name}}</h4>
+
+            <strong class="col-5 color-theme">CPF</strong>
+            <strong class="col-7 text-end color-highlight">{{data.personalData.cpf_formatted}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong class="col-5 color-theme">Email</strong>
+            <strong class="col-7 text-end color-highlight">{{data.personalData.email}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong class="col-5 color-theme">Celular</strong>
+            <strong class="col-7 text-end color-highlight">{{data.personalData.phone_formatted}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+            
+            <strong class="col-7 color-theme">Data de Nascimento</strong>
+            <strong class="col-5 text-end color-highlight">{{data.personalData.birthdate}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong class="col-5 color-theme">Endereço</strong>
+            <strong class="col-7 text-end color-highlight">
+                <span>{{data.addressPersonal.street}}</span>
+                <span>{{data.addressPersonal.number}}</span>
+                <span>{{data.addressPersonal.district}}</span>
+                <span>{{data.addressPersonal.complement}}</span><br />
+                <span>{{data.addressPersonal.city}}/{{data.addressPersonal.state}}</span><br />
+                <span>{{data.addressPersonal.postalCode}}</span>
             </strong>
             <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
             
-            <strong class="col-5 color-theme">Estado Civil</strong>
-            <strong class="col-7 text-end color-highlight">{{data.estadoCivil | estadoCivil}}</strong>
             
         </div>
     </div>
