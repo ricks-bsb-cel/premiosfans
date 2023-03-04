@@ -34,7 +34,7 @@ const ngModule = angular.module('views.titulos-compras', [
 			if (termo) {
 				attrFilter.filter.push({ field: "keywords", operator: "array-contains", value: termo });
 			} else {
-				attrFilter.limit = 60;
+				attrFilter.limit = 240;
 				toastrFactory.info('Apenas os primeiros ' + attrFilter.limit + ' registros serão apresentados... Informe um termo de pesquisa para buscar dados mais específicos.');
 			}
 

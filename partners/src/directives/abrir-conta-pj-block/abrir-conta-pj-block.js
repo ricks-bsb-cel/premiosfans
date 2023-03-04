@@ -96,10 +96,17 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 			$scope.htmlBlockDelegate = {
 				ready: data => {
 					const f = $scope.pages.findIndex(f => { return f.htmlBlock === data.sigla; });
+
 					if (f >= 0) { $scope.pages[f].ready = true; }
+
 					$timeout(_ => {
 						$scope.swiper.update();
+
+						if (data.sigla === 'app-folha-abertura-conta-pj-boasvindas') {
+							waitUiFactory.hide();
+						}
 					})
+
 				}
 			}
 
@@ -713,9 +720,11 @@ const ngModule = angular.module('directives.abrir-conta-pj-block', [])
 
 				$scope.ready = true;
 
+				/*
 				$timeout(_ => {
 					waitUiFactory.hide()
 				}, 500)
+				*/
 
 			}
 
