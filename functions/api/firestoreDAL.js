@@ -30,6 +30,8 @@ class collectionClass {
 
             let doc;
 
+            delete data.id;
+
             if (id) {
                 doc = admin.firestore().collection(this.collectionName).doc(id);
             } else {
@@ -280,6 +282,10 @@ exports.influencers = _ => {
 
 exports.campanhas = _ => {
     return new collectionClass('campanhas');
+}
+
+exports.fcmTokens = _ => {
+    return new collectionClass('fcmTokens');
 }
 
 exports.campanhasInfluencers = _ => {

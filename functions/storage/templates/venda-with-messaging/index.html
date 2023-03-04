@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en" ng-app="app" data-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="description" content="{{campanha.description}}">
+
+    <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <meta name="robots" content="noindex,nofollow">
+
+    <title>
+        Premios Fans ~ {{influencer.nomeExibicao}}
+    </title>
+
+    <meta property="og:title" content="Prêmios Fans ~ {{campanha.titulo}}">
+    <meta property="og:description" content="{{campanha.description}}">
+    <meta property="og:site_name" content="Prêmios Fans ~ {{campanha.titulo}}">
+    <meta property="og:url" content="/app/{{campanha.id}}/{{influencer.id}}">
+    <meta property="og:image" content="{{campanha.thumb}}">
+    <meta property="og:type" content="webpage">
+    <meta property="og:type" content="website">
+    <meta property="og:type" content="video.movie">
+    <meta property="og:locale" content="pt_BR">
+
+    <meta property="premiosfans:template" content="{{campanha.idTemplate}}">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="stylesheet" href="/assets/pico/css/pico.min.css">
+    <link rel="stylesheet" href="/assets/pico/bootstrap-grid/css/pico-bootstrap-grid.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.7/dist/sweetalert2.min.css">
+
+    <!-- https://icons.getbootstrap.com/ -->
+
+    <link rel="stylesheet" href="/templates/venda-with-messaging/custom.css?v={{version}}">
+
+    <style>
+        .wait {
+            background: rgba(0, 0, 0, 0.4);
+            position: fixed;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            cursor: wait;
+        }
+
+        .wait svg {
+            background: transparent;
+            position: fixed;
+            width: 120px;
+            height: 120px;
+            top: calc(50% - 60px);
+            left: calc(50% - 60px);
+        }
+    </style>
+
+</head>
+
+<body ng-controller="mainController">
+
+    <nav id="top" class="container-fluid">
+        <ul>
+            <li>
+                <a href="/" class="contrast p-0" onclick="event.preventDefault()">
+                    <img src="/assets/imgs/logos/logo-white.png" class="logo" />
+                    <img src="/assets/imgs/logos/text-white.png" class="logo-text" />
+                </a>
+            </li>
+        </ul>
+        <ul>
+            <!--
+            <li>
+                <a href="https://picocss.com#examples" class="primary white">
+                    Resultados
+                </a>
+            </li>
+            -->
+            <li>
+                <details role="list" dir="rtl" style="padding-bottom:5px;">
+                    <summary aria-haspopup="listbox" role="link" class="primary hamburguer white">
+                        <i class="bi bi-list white"></i>
+                    </summary>
+                    <ul role="listbox">
+                        <li><a href="../recuperar/" class="primary">Recuperar Compras</a></li>
+                        <li><a class="link" ng-click="showRegulamento()">Regulamento</a></li>
+                        <li><a href="../preview-rtl/">Sobre a Empresa</a></li>
+                        <li><a href="../classless/">Contato</a></li>
+                    </ul>
+                </details>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="hero" data-theme="light" style="background-image: url({{campanha.imagePrincipal}});">
+        <header class="container">
+        </header>
+    </div>
+
+    <section class="m-0 p-5">
+        <a href="#compra-rapida" role="button" class="display:block;" style="width:100%;">
+            Quero Participar!
+        </a>
+    </section>
+
+    <nav class="container-fluid">
+        <ul>
+            <li class="p-10">
+                <small>Edição:</small>
+                <strong>2</strong>
+            </li>
+        </ul>
+        <ul>
+            <li class="p-10">
+                <a class="link" ng-click="showRegulamento()" class="primary">
+                    Regulamento
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="container pt-20 pb-0">
+
+        <section id="campanha">
+            <hgroup>
+                <h2>{{campanha.titulo}}</h2>
+                {{#if campanha.subTitulo}}
+                <h3 class="mt-10">{{campanha.subTitulo}}</h3>
+                {{/if}}
+            </hgroup>
+            {{#if campanha.detalhes}}
+            {{{campanha.detalhes}}}
+            {{/if}}
+        </section>
+
+        <compras-cliente></compras-cliente>
+
+        <section id="compra-rapida">
+            <div class="container p-0">
+                <form>
+                    <article class="pt-20 pb-20 mb-0">
+                        <hgroup class="mt-10">
+                            <h2>Compra Rápida</h2>
+                            <h3>Acredite em sua sorte e invista em sua vitória! Escolha quantos títulos você deseja e
+                                <strong>compre agora</strong>! 
+                            </h3>
+                        </hgroup>
+
+                        <div class="row">
+                            {{#each config.sugestoes}}
+                                <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
+                                    <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
+                                        <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
+                                            class="m-0 mb-20 p-10 botao-compra">
+                                            <div class="sugestao text-center">
+                                                <h3 class="mb-0 mt-10">
+                                                    {{{this.qtdExibicao}}}
+                                                </h3>
+                                                <p class="mb-10 mt-10" style="line-height:18px;">
+                                                    <span>{{this.chances}}</span>
+                                                    <small>chances<br />de ganhar!</small>
+                                                </p>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
+
+                        <h2 id="vl-total" class="mb-0" style="display: none;">
+                            <small>Total:</small>
+                            <strong ng-bind="vlCompra | currency:'R$ '"></strong>
+                        </h2>
+                    </article>
+
+                    <form-cliente></form-cliente>
+
+                    <button ng-click="openSell()" class="mt-10 open-sell">
+                        Comprar
+                        <br ng-if="qtd" />
+                        <span ng-if="qtd" style="color:white;">
+                            <strong ng-bind="qtd"></strong>
+                            <small ng-if="qtd===1" style="color:white;">Título,</small>
+                            <small ng-if="qtd>1" style="color:white;">Títulos,</small>
+                            <strong ng-bind="vlCompra | currency:'R$ '"></strong>
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section id="premios">
+            <div class="container p-0">
+                <article class="pt-20 pb-20 mb-0">
+
+                    <hgroup class="mt-10">
+                        <h2>Prêmios desta edição</h2>
+                        <h3>Confira as datas e prêmios desta edicão do Prêmios Fans.<br />
+                            São
+                            <strong style="color: var(--primary);font-size:1.2em;">
+                                {{campanha.qtdPremios}}
+                            </strong>
+                            chances de ganhar!</strong>
+                        </h3>
+                    </hgroup>
+
+                    <div class="row">
+                        {{#each campanhaSorteios}}
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                            <article class="m-0 mb-20 p-10">
+                                <div class="sorteio text-center">
+                                    <div class="ribbon ribbon-top-left">
+                                        <span>
+                                            {{this.qtdPremios}}
+                                            Prêmios
+                                        </span>
+                                    </div>
+
+                                    <p class="mb-5">
+                                        {{{this.titulo_html}}}
+                                    </p>
+
+                                    <p class="mb-5">
+                                        <small>Dia</small>
+                                        {{{this.dtSorteio}}}
+                                    </p>
+
+                                    <h2 class="m-0 valor mb-5">
+                                        {{{this.vlTotalPremios_html}}}
+                                    </h2>
+
+                                    {{#each this.premios}}
+                                    <footer data-id-premio="{{this.id}}" class="pb-5">
+                                        {{this.descricao}}
+                                    </footer>
+                                    {{/each}}
+
+                                </div>
+
+                            </article>
+                        </div>
+                        {{/each}}
+                    </div>
+
+                    <a href="#compra-rapida" style="display: block;" class="mt-0" role="button">
+                        Garanta o <strong>seu</strong> Título!
+                    </a>
+
+                </article>
+            </div>
+        </section>
+
+        <section>
+            <div class="container p-0 faq">
+                <article class="pt-20 pb-20 mb-0">
+                    <hgroup class="mt-10">
+                        <h2>Perguntas Frequentes</h2>
+                        <h3>
+                            Caso tenha qualquer dúvida, estamos à disposição para esclarecer.
+                            Basta entrar em contato conosco por meio do nosso WhatsApp.
+                        </h3>
+                    </hgroup>
+
+                    <div class="row">
+                        {{#each faq}}
+                        <details>
+                            <summary style="line-height:1.4em;">{{this.pergunta}}</summary>
+                            <div class="resposta">{{{this.resposta}}}</div>
+                        </details>
+                        {{/each}}
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <pagar-compra></pagar-compra>
+        <detalhes-compra></detalhes-compra>
+        <modal-regulamento></modal-regulamento>
+
+        {{#if campanha.rodape}}
+            <section id="rodape">
+                {{{campanha.rodape}}}
+            </section>
+        {{/if}}
+
+    </main>
+
+    <footer class="container text-center pt-0">
+        <small>
+            <a href="#top">Resultados</a>
+            •
+            <a class="link" ng-click="showRegulamento()">Regulamento</a>
+            •
+            <a href="#top">Sobre a Empresa</a>
+            •
+            <a href="#top">Contato</a>
+            •
+            <a href="#top">Topo</a>
+        </small>
+        <p>
+            <small style="font-family:monospace;font-size:0.7em;margin-top:20px;display:block;">
+                v {{version}}<br />
+                {{versionDate}}
+            </small>
+        </p>
+    </footer>
+
+    <div id="wait" class="wait">
+        <svg class="wait" version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
+            enable-background="new 0 0 100 100" xml:space="preserve">
+            <path fill="yellow"
+                d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3 c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="2s" from="0 50 50"
+                    to="360 50 50" repeatCount="indefinite" />
+            </path>
+            <path fill="yellow"
+                d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7 c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="0 50 50"
+                    to="-360 50 50" repeatCount="indefinite" />
+            </path>
+            <path fill="yellow"
+                d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5 L82,35.7z">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="2s" from="0 50 50"
+                    to="360 50 50" repeatCount="indefinite" />
+            </path>
+        </svg>
+    </div>
+
+    <script type="text/ng-template" version="{{version}}" id="form-cliente.htm">
+        <article
+            id="form-cliente"
+            class="pt-20 pb-20 mb-0 mt-5"
+            style="display: none;"
+        >
+            <hgroup class="mt-10">
+                <h2>Informe seus dados</h2>
+                <h3>
+                    Preenche direitinho, se não como vamos te encontrar quando você ganhar?
+                </h3>
+            </hgroup>
+            <form form="form" ng-controller="formClienteController" autocomplete="on" novalidate>
+                <div class="row">
+                    <label class="col-md-6" for="nome">
+                        Nome *
+                        <input type="text" ng-model="compra.nome" name="name" autocomplete="name" placeholder="Nome completo">
+                    </label>
+
+                    <label class="col-md-6" for="email">
+                        Email *
+                        <input type="text" ng-model="compra.email" name="email" autocomplete="email" placeholder="Seu melhor email">
+                    </label>
+                </div>
+
+                <div class="row">
+                    <label class="col-md-6" for="celular">
+                        Celular *
+                        <input type="tel" ng-model="compra.celular" autocomplete="mobile" name="celular">
+                    </label>
+
+                    <label class="col-md-6" for="cpf">
+                        CPF *
+                        <input type="tel" ng-model="compra.cpf" name="cpf">
+                    </label>
+                </div>
+
+                <fieldset>
+                    <label for="idade">
+                        <input ng-model="compra.idade" type="checkbox" id="idade" name="idade">
+                        Declaro que tenho mais que 16 anos completos
+                    </label>
+                    <label for="termos">
+                        <input ng-model="compra.termos" type="checkbox" id="termos" name="termos">
+                        Concordo com os Termos e Condições de Uso do Premios Fans
+                    </label>
+                </fieldset>
+            </form>
+
+        </article>
+	</script>
+
+    <script type="text/ng-template" version="{{version}}" id="compras-cliente.htm">
+        <div
+            class="compras-cliente"
+            ng-if="compras.length>0"
+        >
+            <article class="pt-20 pb-20 mb-0">
+                <hgroup class="mt-10">
+                    <h2>Suas compras</h2>
+                    <h3>Veja abaixo as suas compras solicitadas e já concluídas. Você pode realizar o pagamento de compras pendentes em até 24 horas.</h3>
+                </hgroup>
+
+                <details open
+                    ng-repeat="c in compras | orderBy:'dtInclusao'"
+                    id="titulo-compra-[[c.id]]"
+                    id-titulo-compra="[[c.id]]"
+                    ng-class="{last:$last}"
+                >
+                    <summary>
+                        em
+                        <strong ng-bind="::c.dtInclusao | ddmmhhmm"></strong>
+                        <small>
+                            ~
+                            <strong ng-bind="::c.qtdTitulos"></strong>
+                            Titulo(s)
+                        </small>
+                    </summary>
+
+                    <table class="label-description">
+                        <tbody>
+                            <tr>
+                                <td ng-bind="::c.compradorNome">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td ng-bind="::c.compradorEmailHide">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td >
+                                    <small>CPF:</small>
+                                    <span class="monospace" ng-bind="::c.compradorCpfHide"></span>
+                                </td>
+                            </tr>
+                            <tr ng-if="c.situacao==='pago'">
+                                <td>
+                                    <span class="monospace" ng-bind="::c.dtPagamento | ddmmhhmm"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <button 
+                        ng-if="c.situacao==='aguardando-pagamento'"
+                        ng-click="pagar(c)"
+                        class="full-width">Pagar</button>
+
+                    <button 
+                        ng-if="c.situacao==='pago'"
+                        ng-click="pagar(c)"
+                        class="full-width outline">Detalhes</button>
+
+                    <div ng-if="!$last" class="mb-40"></div>
+                </details>
+            </article>
+        </div>
+    </script>
+
+    <script type="text/ng-template" version="{{version}}" id="modal-pagar-compra.htm">
+        <dialog ng-show="visible" id="pagar-compra">
+            <article class="pt-20" style="position: relative;">
+                <div ng-show="compra.situacao === 'aguardando-pagamento'" class="block">
+                    <img src="/assets/imgs/close.svg" ng-click="close()" class="close" />
+
+                    <h3 class="mb-20 text-center">
+                        Pagar Compra
+                    </h3>
+
+                    <ol class="mb-10">
+                        <li>Copie o código PIX abaixo:</li>
+                    </ol>
+                    
+                    <p ng-bind="compra.pixData.EMV" class="pix-copia-cola"></p>
+
+                    <button
+                        ng-click="CopyPixToClipboard()"
+                        role="button"
+                        id="pix-copia-cola"
+                        class="mb-10"
+                    >
+                        Copiar Código PIX
+                    </button>
+
+                    <ol start="2" class="mb-0">
+                        <li class="mb-10">Acesse sua conta bancária no Internet Banking ou através do app;</li>
+                        <li class="mb-10">Escolha pagar via <strong>PIX Copia e Cola</strong></li>
+                        <li class="mb-10">Cole o codigo PIX que você copiou e finalize o pagamento</li>
+                    </ol>
+                    
+                    <p class="p-10 pt-5 m-0 text-center">
+                        ou abra o aplicativo do seu banco e utilize o QRCode abaixo:
+                    </p>
+
+                    <img
+                        class="pix-qrcode"
+                        ng-if="compra.pixData.Imagem"
+                        ng-src="data:image/png;base64,[[compra.pixData.Imagem]]"
+                    />
+
+                    <ol start="5" class="mb-0">
+                        <li class="mb-10 mt-10">
+                            Seu pagamento será identificado em até 5 minutos, seu(s) título(s) serão gerados
+                            e você os recebera no email <strong ng-bind="compra.compradorEmail"></strong>.<br />
+                            Boa Sorte!
+                        </li>
+                    </ol>
+
+                </div>
+
+                <div ng-show="compra.situacao === 'pago' && !compra.pronto" class="block">
+                    <h3 class="mb-20 text-center">
+                        Preparando Títulos
+                    </h3>
+
+                    <p class="p-10 pt-5 pb-20 m-0 text-center msg">
+                    </p>
+
+                    <progress value="" max=""></progress>
+                </div>
+
+                <div ng-show="compra.situacao === 'pago' && compra.pronto" class="block">
+                    <img src="/assets/imgs/close.svg" ng-click="close()" class="close" />
+
+                    <h3 class="mb-20 text-center">
+                        Detalhes da Compra
+                    </h3>
+
+                    <table class="label-description" style="zoom:0.9;">
+                        <tbody>
+                            <tr>
+                                <td>Nome:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorNome"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Email:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorEmailHide"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CPF:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorCpfHide"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Celular:</td>
+                                <td>
+                                    <span ng-bind="::compra.compradorCelular"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Pago em:</td>
+                                <td>
+                                    <span ng-bind="::compra.dtPagamento"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Qtd Títulos:</td>
+                                <td>
+                                    <span ng-bind="::compra.qtdTitulos"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Código Compra:</td>
+                                <td>
+                                    <span ng-bind="::compra.id"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="p-10 pt-5 pb-20 m-0">
+                        Títulos da sua Compra:
+                    </p>
+
+                    <ol>
+                        <li ng-repeat="t in compra.titulos">
+                            <span style="font-family:monospace;" ng-bind="t.id"></span>
+                            <!-- <a style="font-family:monospace;" href="[[t.link]]" target="_blank" ng-bind="t.id"></a> -->
+                        </li>
+                    </ol>
+
+                </div>
+
+                <footer class="mt-0">
+                    <button ng-if="compra.situacao === 'pago' && compra.pronto" class="mb-10 outline" ng-click="enviarCertificado()" style="padding:10px;font-size:1rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-at" viewBox="0 0 16 16" style="margin-bottom:4px;margin-right:5px;">
+                            <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2H2Zm3.708 6.208L1 11.105V5.383l4.708 2.825ZM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2-7-4.2Z"/>
+                            <path d="M14.247 14.269c1.01 0 1.587-.857 1.587-2.025v-.21C15.834 10.43 14.64 9 12.52 9h-.035C10.42 9 9 10.36 9 12.432v.214C9 14.82 10.438 16 12.358 16h.044c.594 0 1.018-.074 1.237-.175v-.73c-.245.11-.673.18-1.18.18h-.044c-1.334 0-2.571-.788-2.571-2.655v-.157c0-1.657 1.058-2.724 2.64-2.724h.04c1.535 0 2.484 1.05 2.484 2.326v.118c0 .975-.324 1.39-.639 1.39-.232 0-.41-.148-.41-.42v-2.19h-.906v.569h-.03c-.084-.298-.368-.63-.954-.63-.778 0-1.259.555-1.259 1.4v.528c0 .892.49 1.434 1.26 1.434.471 0 .896-.227 1.014-.643h.043c.118.42.617.648 1.12.648Zm-2.453-1.588v-.227c0-.546.227-.791.573-.791.297 0 .572.192.572.708v.367c0 .573-.253.744-.564.744-.354 0-.581-.215-.581-.8Z"/>
+                        </svg>
+                        Enviar Certificado(s)...
+                    </button>
+
+                    <button ng-if="compra.situacao === 'pago' && compra.pronto" class="mb-0" ng-click="close()">
+                        Fechar
+                    </button>
+
+                    <small
+                        class="id-compra"
+                        ng-bind="compra.id"
+                        ng-class="{'mt-20':compra.situacao === 'pago' && compra.pronto}"
+                    ></small>
+                </footer>
+            </article>
+
+        </dialog>
+    </script>
+
+    <script type="text/ng-template" version="{{version}}" id="faq.htm">
+        <section>
+            <div class="container p-0">
+                <article class="pt-20 pb-20 mb-0">
+                    <hgroup class="mt-10">
+                        <h2>Perguntas Frequentes</h2>
+                        <h3>Resolva suas dúvidas:</h3>
+                    </hgroup>
+
+                    <div class="row">
+                        <details ng-repeat="f in list" style="line-height: 1.4rem;">
+                            <summary ng-bind="::f.p"></summary>
+                            <div ng-bind-html="::f.r"></div>
+                        </details>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </script>
+
+    <script type="text/ng-template" version="{{version}}" id="modal-regulamento.htm">
+        <dialog
+            ng-show="visible"
+            id="modal-regulamento"
+        >
+            <article class="pt-20">
+                <h3 class="mb-20">Regulamento da Campanha</h3>
+                <div class=content>
+                    {{{campanha.regulamento}}}
+                </div>
+                <footer>
+                    <button class="mb-0" ng-click="close()">
+                        Fechar
+                    </button>
+                </footer>
+            </article>
+        </dialog>
+    </script>
+
+    <script>
+        var _version = "{{version}}";
+        var _idCampanha = "{{campanha.id}}";
+        var _idInfluencer = "{{influencer.id}}";
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="/assets/angular/angular-locale_pt-br.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/vanilla-masker@1.1.1/build/vanilla-masker.min.js"></script>
+    <script src="/assets/moment.min.js"></script>
+
+    <script type="module" src="/templates/venda-with-messaging/index.js?v={{version}}"></script>
+
+</body>
+
+</html>

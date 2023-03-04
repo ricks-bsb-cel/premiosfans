@@ -257,7 +257,9 @@ const loadTemplateFiles = template => { // Resposável por buscar os templates n
         let files;
 
         storage.bucket(template.bucket).getFiles({
-            prefix: template.storagePathDev
+            prefix: template.storagePathDev,
+            versions: false,
+            autoPaginate: false
         })
 
             .then(([getFilesResult]) => {
@@ -304,6 +306,12 @@ const loadTemplateFiles = template => { // Resposável por buscar os templates n
 const getFileContent = file => { // Responsável por carregar o conteúdo do arquivo do Storage
     return new Promise((resolve, reject) => {
 
+        console.log('getFileContent');
+        console.log(file.name, file.generation || 'void');
+
+        // Caminho correto: premios-fans.appspot.com/storage/prod/templates/venda-with-messaging
+        // Caminho no Log:                           storage/dev/templates/venda-with-messaging/index.js
+
         const streamToString = (stream, callback) => {
             const chunks = [];
             stream.on('data', (chunk) => { chunks.push(chunk.toString()); });
@@ -318,7 +326,13 @@ const getFileContent = file => { // Responsável por carregar o conteúdo do arq
             return stream;
         }
 
-        return file.download(function (e, contents) {
+        const options = {
+            customHeaders: {
+                'Cache-Control': 'no-cache'
+            }
+        };
+
+        return file.download(options, function (e, contents) {
             if (!e) {
                 const stream = bufferToStream(contents);
                 streamToString(stream, result => {

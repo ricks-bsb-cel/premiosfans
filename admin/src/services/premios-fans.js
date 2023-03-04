@@ -12,7 +12,7 @@ const ngModule = angular.module('services.premios-fans', [])
         ) {
 
             const getUrlEndPoint = url => {
-                const localUrl = 'http://localhost:5000';
+                const localUrl = 'http://localhost:5002';
                 const gatewayUrl = 'https://premios-fans-a8fj1dkb.uc.gateway.dev';
 
                 return (window.location.hostname === 'localhost' ? localUrl : gatewayUrl) + url;

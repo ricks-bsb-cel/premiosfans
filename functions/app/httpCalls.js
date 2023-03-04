@@ -32,9 +32,11 @@ app.get('/app/:idInfluencer/:idCampanha', (request, response) => {
     initFirebase.call(require('./home').getApp, request, response);
 });
 
+/*
 app.get('/template/:nome', (request, response) => {
     initFirebase.call(require('./home').getTemplate, request, response);
 });
+*/
 
 // Busca por Template
 // Template main, que está em functions/storage/templates/main
