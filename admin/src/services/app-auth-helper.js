@@ -22,6 +22,7 @@ const ngModule = angular.module('services.app-auth-helper', [])
 		var currentUser = null;
 		var userProfile = null;
 		var authReady = false;
+		var lastUserAccessToken = null;
 
 		const clearSessions = () => {
 			currentUser = null;
@@ -36,16 +37,22 @@ const ngModule = angular.module('services.app-auth-helper', [])
 		}
 
 		const setUserCookies = user => {
-			console.info(user.accessToken);
+			if (window.location.hostname === 'localhost' && lastUserAccessToken !== user.accessToken) {
+				lastUserAccessToken = user.accessToken;
+				
+				console.group('User Info');
+				console.info(user.uid);
+				console.info(user.accessToken);
+				console.groupEnd();
+			}
+
 			$cookies.put('__session', user.accessToken);
 		}
 
 		const checkTokenChange = () => {
 			const auth = appAuth.getAuth();
-			
-			auth.onIdTokenChanged(user => {
-				console.info('IdTokenChanged');
 
+			auth.onIdTokenChanged(user => {
 				currentUser = user;
 
 				if (!user) {

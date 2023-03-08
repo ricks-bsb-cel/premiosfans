@@ -441,6 +441,41 @@ paths:
           description: Success
 
 
+  /api/eeb/v1/uft:
+    post:
+      tags:
+      - EEB
+      summary: Update FCM Token
+      operationId: eeb-update-fcm-token
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-update-fcm-token
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
+
 securityDefinitions:
   firebase:
     authorizationUrl: ""

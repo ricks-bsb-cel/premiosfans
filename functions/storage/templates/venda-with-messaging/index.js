@@ -64,11 +64,10 @@ angular.module('app', [])
         }
     })
 
-    .factory('init', function ($q, global, $timeout) {
+    .factory('init', function ($q, global, $http, $timeout) {
         let app = null,
             token = null,
             isReady = false,
-            messaging = null,
             TitulosComprasUsuario = [],
             observerTitulosComprasUsuario = {},
             guidUser = window.localStorage.guidUser;
@@ -80,13 +79,13 @@ angular.module('app', [])
 
         const init = _ => {
             app = initializeApp(firebaseConfig);
-            messaging = getMessaging(app);
             global.unblockUi();
 
             stateChanged();
         }
 
         const initMessaging = user => {
+            user = user || getCurrentUser();
             const messaging = getMessaging();
 
             if ('Notification' in window) {
@@ -94,7 +93,15 @@ angular.module('app', [])
                     if (permission === 'granted') {
                         getToken(messaging, { vapidKey: messagingKey }).then(currentToken => {
                             if (currentToken) {
-                                console.info(guidUser, currentToken, user ? user.uid : null);
+                                const data = {
+                                    idCampanha: _idCampanha,
+                                    fcmToken: currentToken,
+                                    guidUser: window.localStorage.guidUser
+                                };
+
+                                if (user) data.uidUser = user.uid;
+
+                                $http({ url: 'https://premios-fans-a8fj1dkb.uc.gateway.dev/api/eeb/v1/uft', method: 'post', data: data });
                             }
                         }).catch(e => {
                             console.error(e);
@@ -154,8 +161,6 @@ angular.module('app', [])
 
                     initUser(user);
                 }
-
-                initMessaging(user);
 
                 isReady = true;
             })
@@ -299,14 +304,16 @@ angular.module('app', [])
                             url: getUrlEndPoint('/api/eeb/v1/generate-compra?async=false'),
                             method: 'post',
                             data: data,
+                            timeout: 30 * 1000,
                             headers: { 'Authorization': 'Bearer ' + token }
                         })
-
                     })
 
                     .then(
                         function (response) {
                             global.unblockUi();
+                            
+                            init.initMessaging();
 
                             return resolve(response);
                         },

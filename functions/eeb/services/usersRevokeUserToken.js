@@ -3,7 +3,6 @@
 const eebService = require('../eventBusService').abstract;
 const { getAuth } = require("firebase-admin/auth");
 
-
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js

@@ -1,18 +1,21 @@
 "use strict";
 
+const admin = require("firebase-admin");
+
 const eebService = require('../eventBusService').abstract;
-const global = require("../../global");
 const Joi = require('joi');
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
 const collectionFcmTokens = firestoreDAL.fcmTokens();
+const collectionCampanha = firestoreDAL.campanhas();
 
 const schema = _ => {
     const schema = Joi.object({
-        fcmToken: Joi.string().token().max(512).required(),
-        guidUser: Joi.string().token().min(16).max(64).required(),
-        userUid: Joi.string().token().max(512).optional()
+        idCampanha: Joi.string().token().min(18).max(22).required(),
+        fcmToken: Joi.string().min(32).max(512).required(),
+        guidUser: Joi.string().min(16).max(64).required(),
+        uidUser: Joi.string().token().max(512).optional()
     });
 
     return schema;
@@ -28,32 +31,65 @@ class Service extends eebService {
 
     async run() {
 
-        const
+        let
             toSave = {},
-            result = {
-                success: true,
-                host: this.parm.host,
-                data: {}
-            };
+            currentDoc = null,
+            user = null;
+        const result = {
+            campanha: null,
+            success: true,
+            host: this.parm.host,
+            parm: {}
+        };
 
-        result.data = await schema().validateAsync(this.parm.data);
+        result.parm = await schema().validateAsync(this.parm.data);
 
-        // Verifica se o token já existe (ele é a chave de tudo)
-        const currentToken = await collectionFcmTokens.get({
-            filter: { fcmToken: data.fcmToken },
-            limit: 1
-        })
+        if (result.parm.uidUser) {
+            user = await admin.auth().getUser(result.parm.uidUser);
 
-        if (currentToken.length > 0) {
-            toSave = currentToken[0];
-        } else {
-            toSave = result.data;
-            global.setDateTime(toSave, 'inclusao');
+            if (!user) {
+                throw new Error('User not found...');
+            }
         }
 
-        global.setDateTime(toSave, 'alteracao');
+        // Tenta localizar pelo UID do usuário
+        if (result.parm.uidUser) {
+            currentDoc = await collectionFcmTokens.get({
+                filter: { uidUser: result.parm.uidUser },
+                limit: 1
+            })
+        }
 
-        return await collectionFcmTokens.insertUpdate(toSave.id || null, toSave);
+        // Se não localizado pelo UID do Usuário, tenta localizar pelo token mesmo
+        if (!currentDoc || currentDoc.length === 0) {
+            currentDoc = await collectionFcmTokens.get({
+                filter: { fcmToken: result.parm.fcmToken },
+                limit: 1
+            })
+        }
+
+        // Valida se a campanha realmente existe
+        if (result.parm.idCampanha) {
+            result.campanha = await collectionCampanha.getDoc(result.parm.idCampanha);
+        }
+
+        if (currentDoc.length > 0) {
+            toSave = { ...currentDoc[0], ...result.parm };
+        } else {
+            toSave = result.parm;
+        }
+
+        toSave.campanhas = toSave.campanhas || [];
+
+        if (!toSave.campanhas.includes(toSave.idCampanha)) {
+            toSave.campanhas.push(toSave.idCampanha);
+        }
+
+        delete toSave.idCampanha;
+
+        const insertUpdateResult = await collectionFcmTokens.insertUpdate(toSave.id || null, toSave);
+
+        return insertUpdateResult;
     }
 
 }
@@ -62,10 +98,6 @@ exports.Service = Service;
 
 const call = (data, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
-
-    if (!data.idCampanha) {
-        throw new Error('invalid parm');
-    }
 
     const service = new Service(request, response, {
         name: 'update-fcm-token',
@@ -81,13 +113,5 @@ const call = (data, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-
-    if (!request.body) {
-        return response.status(500).json({
-            success: false,
-            error: 'Invalid parms'
-        })
-    }
-
     return call(request.body, request, response);
 }

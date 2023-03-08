@@ -5,9 +5,202 @@
     --border-radius: 0;
 }
 
+/*
+div.panel{
+    background: #003a68;
+    position: relative;
+    overflow: hidden;
+}
+
+div.panel img.background{
+    width: 100%;
+    height: 80vw;
+    object-fit: cover;
+    object-position: center top;
+    max-height: 540px;
+}
+
+div.panel img.capa{
+    position: absolute;
+    bottom: -55px;
+    right: -50px;
+    max-height: 480px;
+    height: 100%;
+    object-fit: cover;
+}
+*/
+
 html {
     scroll-behavior: smooth;
+    font-family: 'Montserrat', sans-serif;
 }
+
+/*
+div.panel{
+    background: #003a68;
+    background-image: url("/templates/venda-with-messaging/panel-background.png");
+    background-position: center;
+    background-size: cover;
+    position: relative;
+    height: 462px;
+    overflow: hidden;
+}
+*/
+
+div.panel{
+    height: 462px;
+    overflow: hidden;
+    position: relative;
+}
+
+div.panel::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #003a68;
+    background-image: url("/templates/venda-with-messaging/panel-background.png");
+    background-position: center;
+    background-size: cover;
+    filter: brightness(0.75); 
+    z-index: -1;
+}
+
+div.panel strong{
+    
+}
+
+div.panel .container{
+    padding: 0 0 0 15px;
+    margin-top: 10px;
+}
+
+div.panel .container a{
+    padding: 2px 15px;
+    background: #EFC832;
+    border-radius: 15px;
+    font-size: 1.1em;
+    margin-top: 10px;
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+}
+
+div.panel .container a .strong{
+    font-size: 1.1em;
+}
+
+div.panel .yellow{
+    color: #EFC832;
+}
+
+div.panel img.capa{
+    position: absolute;
+    bottom: -55px;
+    right: -70px;
+    width: 120%;
+    max-width: 500px;
+    pointer-events: none;
+}
+
+div.panel h1,
+div.panel h2,
+div.panel h3,
+div.panel p{
+    color: white;
+    padding: 0;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+div.panel .subtitle{
+    text-align: left;
+    line-height: 1.2em;
+    z-index: 1;
+    position: relative;
+}
+
+div.panel .title-1{
+    text-align: left;
+    line-height: 1.2em;
+    position: relative;
+    z-index: 1;
+}
+
+div.panel .title-2{
+    font-size: 1.6em;
+    font-weight: 900;
+    line-height: 1.2em;
+}
+
+div.panel .title-3{
+    font-size: 3em;
+    line-height: 1em;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+div.panel .title-4{
+    font-size: 1.6em;
+    font-weight: 800;
+    letter-spacing: 2px;
+    line-height: 1em;
+}
+
+div.panel p{
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+div.panel .subtitle-1{
+    margin-top: 10px;
+}
+div.panel .subtitle-2{}
+div.panel .subtitle-3{}
+div.panel .subtitle-4{
+    margin-top: 10px;
+}
+div.panel .subtitle-5{}
+div.panel .subtitle-6{}
+
+/*
+@media (max-width: 576px) {
+    div.panel h1,
+    div.panel h2,
+    div.panel h3,
+    div.panel p{
+        text-align: center;
+    }
+}
+*/
+
+/*
+#top {
+    background: rgb(0, 64, 125);
+    background: linear-gradient(0deg, rgba(0, 64, 125, 1) 0%, rgba(1, 81, 154, 1) 38%, rgba(1, 81, 154, 1) 100%);
+}
+*/
+
+#top .logo {
+    height: 40px;
+    padding: 3px;
+    margin: 2px;
+}
+
+#top .logo-text {
+    height: 22px;
+    margin-bottom: 5px;
+}
+
+#top .white {
+    color: white;
+}
+
+
+
+
+
 
 details summary {
     line-height: 1.4rem;
@@ -171,24 +364,6 @@ h2.valor small.cents {
     font-size: 1.1rem;
     margin-right: 0.4rem;
     cursor: pointer;
-}
-
-#top {
-    background: rgb(0, 64, 125);
-    background: linear-gradient(0deg, rgba(0, 64, 125, 1) 0%, rgba(1, 81, 154, 1) 38%, rgba(1, 81, 154, 1) 100%);
-}
-
-#top .logo {
-    height: 45px;
-}
-
-#top .logo-text {
-    height: 22px;
-    margin-bottom: 5px;
-}
-
-#top .white {
-    color: white;
 }
 
 #pagar-compra .close{

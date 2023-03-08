@@ -14,6 +14,10 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,400;0,500;0,600;0,700;0,800;0,900;1,100&display=swap" rel="stylesheet">
+
     <meta name="robots" content="noindex,nofollow">
 
     <title>
@@ -44,72 +48,60 @@
     <link rel="stylesheet" href="/templates/venda-with-messaging/custom.css?v={{version}}">
 
     <style>
-        .wait {
-            background: rgba(0, 0, 0, 0.4);
-            position: fixed;
-            height: 100%;
-            width: 100%;
-            top: 0;
-            cursor: wait;
-        }
-
-        .wait svg {
-            background: transparent;
-            position: fixed;
-            width: 120px;
-            height: 120px;
-            top: calc(50% - 60px);
-            left: calc(50% - 60px);
-        }
+    .wait{background:rgba(0,0,0,.4);position:fixed;height:100%;width:100%;top:0;cursor:wait}.wait svg{background:0 0;position:fixed;width:120px;height:120px;top:calc(50% - 60px);left:calc(50% - 60px)}
     </style>
 
 </head>
 
 <body ng-controller="mainController">
 
-    <nav id="top" class="container-fluid">
-        <ul>
-            <li>
-                <a href="/" class="contrast p-0" onclick="event.preventDefault()">
-                    <img src="/assets/imgs/logos/logo-white.png" class="logo" />
-                    <img src="/assets/imgs/logos/text-white.png" class="logo-text" />
-                </a>
-            </li>
-        </ul>
-        <ul>
-            <!--
-            <li>
-                <a href="https://picocss.com#examples" class="primary white">
-                    Resultados
-                </a>
-            </li>
-            -->
-            <li>
-                <details role="list" dir="rtl" style="padding-bottom:5px;">
-                    <summary aria-haspopup="listbox" role="link" class="primary hamburguer white">
-                        <i class="bi bi-list white"></i>
-                    </summary>
-                    <ul role="listbox">
-                        <li><a href="../recuperar/" class="primary">Recuperar Compras</a></li>
-                        <li><a class="link" ng-click="showRegulamento()">Regulamento</a></li>
-                        <li><a href="../preview-rtl/">Sobre a Empresa</a></li>
-                        <li><a href="../classless/">Contato</a></li>
-                    </ul>
-                </details>
-            </li>
-        </ul>
-    </nav>
+    <div class="panel">
+        <img class="capa" src="/templates/venda-with-messaging/panel-main.png?v={{version}}" alt="banner" />
 
-    <div class="hero" data-theme="light" style="background-image: url({{campanha.imagePrincipal}});">
-        <header class="container">
-        </header>
+        <nav id="top" class="container-fluid">
+            <ul>
+                <li>
+                    <a href="/" class="contrast p-0" onclick="event.preventDefault()">
+                        <img src="/templates/venda-with-messaging/logo.png" class="logo" />
+                    </a>
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    <details role="list" dir="rtl" style="padding-bottom:5px;">
+                        <summary aria-haspopup="listbox" role="link" class="primary hamburguer white">
+                            <i class="bi bi-list white"></i>
+                        </summary>
+                        <ul role="listbox">
+                            <li><a href="../recuperar/" class="primary">Recuperar Compras</a></li>
+                            <li><a class="link" ng-click="showRegulamento()">Regulamento</a></li>
+                            <li><a href="../preview-rtl/">Sobre a Empresa</a></li>
+                            <li><a href="../classless/">Contato</a></li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="container">
+            <h1 class="title-1">Comprou, a sorte</h1>
+            <h2 class="title-2 yellow">Acelerou ao seu favor!</h2>
+
+            <h2 class="title-3">R$ 250 MIL</h2>
+            <h2 class="title-4 yellow">em prêmios</h2>
+
+            <a href="#compra-rapida">por apenas <strong>R$ 29,90</strong></a>
+
+            <p class="subtitle subtitle-1">Concorra <strong class="yellow">22 vezes</strong></p>
+            <p class="subtitle subtitle-2">São <strong>22 Chances</strong></p>
+            <p class="subtitle subtitle-3 yellow">de ser sorteado</p>
+
+            <p class="subtitle subtitle-4"><strong>1 Fiat Fastback<strong></p>
+            <p class="subtitle subtitle-5"><strong>15 iPhones</strong> 11 64<small style="color:white;">GB</small></p>
+            <p class="subtitle subtitle-6"><strong>6 Motos</strong> Honda CG</p>
+        </div>
+
     </div>
-
-    <section class="m-0 p-5">
-        <a href="#compra-rapida" role="button" class="display:block;" style="width:100%;">
-            Quero Participar!
-        </a>
-    </section>
 
     <nav class="container-fluid">
         <ul>
@@ -133,7 +125,7 @@
             <hgroup>
                 <h2>{{campanha.titulo}}</h2>
                 {{#if campanha.subTitulo}}
-                <h3 class="mt-10">{{campanha.subTitulo}}</h3>
+                    <h3 class="mt-10">{{campanha.subTitulo}}</h3>
                 {{/if}}
             </hgroup>
             {{#if campanha.detalhes}}
