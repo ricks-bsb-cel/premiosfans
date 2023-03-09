@@ -26,6 +26,7 @@
     "consolidate": "^0.16.0",
     "cookie-parser": "^1.4.6",
     "cookies": "^0.8.0",
+    "crypto": "^1.0.1",
     "cryptr": "^6.0.3",
     "express": "^4.18.2",
     "express-minify-html": "^0.12.0",

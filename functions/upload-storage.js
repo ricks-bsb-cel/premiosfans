@@ -4,6 +4,7 @@ const glob = require('glob')
 const path = require('path');
 const readline = require('readline');
 const fs = require('fs');
+const crypto = require('crypto');
 const moment = require("moment-timezone");
 
 readline.emitKeypressEvents(process.stdin);
@@ -12,7 +13,7 @@ process.stdin.setRawMode(true);
 const serviceAccount = require('./premios-fans-firebase-adminsdk-ga8ql-fed7f24f67.json');
 
 const storagePath = path.join(__dirname, 'storage');
-const bucketName = 'premios-fans.appspot.com';
+const bucketName = 'premios-fans-templates';
 
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
@@ -31,7 +32,8 @@ admin.initializeApp({
     measurementId: "G-XTRQ740MSL"
 });
 
-const templatePath = 'storage/dev/templates/';
+const storage = admin.storage();
+const localTemplatePath = 'storage';
 
 const
     rl = readline.createInterface({
@@ -39,19 +41,53 @@ const
         output: process.stdout
     });
 
-const
-    interval = null;
+function endExecution(code) {
+    process.exit(code || 0);
+}
 
-let
-    lastResult,
-    running = false,
-    prodVersionConfig,
-    totalUploaded;
+function getLocalFileMd5Hash(file) {
+    const fileData = fs.readFileSync(file);
+    return crypto.createHash('md5').update(fileData).digest('base64');
+}
 
+async function getStorageFiles() {
+    const [files] = await storage.bucket(bucketName).getFiles();
+
+    return files;
+}
+
+async function getLocalFiles() {
+    const files = await glob.sync(`${localTemplatePath}/**/*.*`);
+    const result = [];
+
+    files.forEach(f => {
+        result.push({
+            file: f,
+            md5Hash: getLocalFileMd5Hash(f),
+            changed: false
+        })
+    })
+
+    return result;
+}
+
+async function uploadToStorage(localFiles) {
+    for (const f of localFiles) {
+        const fileName = path.basename(f.file);
+        const fileDir = path.dirname(f.file);
+
+        // Faz upload do arquivo para o Google Cloud Storage
+        const [file] = await storage.bucket(bucketName).upload(f.file, {
+            destination: `${fileDir}/${fileName}`,
+        });
+
+        console.log(`Arquivo ${f.file} enviado para o bucket ${bucketName} [${file.metadata.md5Hash}], ${file.metadata.size} bytes`);
+    }
+}
 
 console.clear();
-console.info("*** upload-storage - Premios Fans Storage Upload ***");
-console.info(`Local Storage Path: ${storagePath}`);
+console.info("*** upload-storage - Storage Upload ***");
+console.info(`Local Storage Path: ${localTemplatePath}`);
 
 const init = _ => {
 
@@ -67,13 +103,8 @@ const init = _ => {
                     rl.close();
                     break;
                 case 'r':
-                case 'r dev':
-                case 'run dev':
-                    uploadTemplates('dev');
-                    break;
-                case 'r prod':
-                case 'run prod':
-                    uploadTemplates('prod');
+                case 'run':
+                    uploadData();
                     break;
                 default:
                     showHelp();
@@ -92,250 +123,50 @@ const init = _ => {
     showHelp();
 }
 
-const uploadTemplates = env => {
-    env = env || 'dev';
+async function uploadData() {
 
-    if (running) return;
+    try {
 
-    running = true;
-    prodVersionConfig = getProdVersionConfig();
+        const filesOnStorage = await getStorageFiles();
+        let localFiles = await getLocalFiles();
 
-    let files;
+        // Remove da lista de arquivos locais os arquivos que tem o mesmo md5Hash (pois não foram alterados) ou que não existem no storage
+        localFiles = localFiles.map(localFile => {
+            const i = filesOnStorage.findIndex(storageFile => storageFile.name === localFile.file);
 
-    if (env === 'prod') {
-        console.clear();
-        console.info(`Uploading to Prod ~ Bucket ${bucketName} ~ Path: ${prodVersionConfig.path}`);
+            localFile.changed = (i < 0 || (i >= 0 && localFile.md5Hash !== filesOnStorage[i].metadata.md5Hash));
+
+            return localFile;
+        }).filter(f => f.changed);
+
+        console.info('local files');
+
+        localFiles.forEach(f => {
+            console.info(f.file, f.md5Hash, f.changed);
+        })
+
+        console.info('on storage');
+
+        filesOnStorage.forEach(f => {
+            console.info(f.name, f.metadata.md5Hash);
+        })
+
+        await uploadToStorage(localFiles);
+
+        endExecution();
+    }
+    catch (e) {
+        console.error(e);
+        endExecution();
     }
 
-    return backupProdFiles(env) // Será ignorado se env !== prod
-
-        .then(_ => {
-            return getFiles(env);
-        })
-
-        .then(getFilesResult => {
-            files = getFilesResult;
-
-            return uploadAllFiles(files);
-        })
-
-        .then(_ => {
-            const templates = [],
-                updatePromise = [];
-
-            files
-                .filter(f => {
-                    return f.source.endsWith('index.html');
-                })
-                .forEach(f => {
-                    const i = templates.findIndex(t => {
-                        return t.name === f.template;
-                    });
-
-                    if (i < 0) {
-                        const t = {
-                            nome: f.template,
-                            bucket: bucketName,
-                            localPath: f.source,
-                            storagePathDev: f.destinationDev.replace('/index.html', ''),
-                            data: f.data,
-                            ativo: true
-                        };
-
-                        if (env === 'prod') {
-                            t.storagePathProd = f.destinationProd.replace('/index.html', '');
-                            t.version = f.idProdVersion;
-                        }
-
-                        templates.push(t);
-                        updatePromise.push(admin.firestore().collection('frontTemplates').doc(t.nome).set(t, { merge: true }));
-                    }
-                })
-
-            return Promise.all(updatePromise);
-        })
-
-        .then(_ => {
-            running = false;
-        })
-
-        .catch(e => {
-            console.error(e);
-
-            process.exit(0);
-        })
-
-}
-
-const uploadAllFiles = f => {
-    return new Promise((resolve, reject) => {
-        const files = f.slice();
-
-        totalUploaded = 0;
-
-        const uploadNextFile = _ => {
-
-            if (!files.length) {
-                if (totalUploaded) {
-                    console.info(`${totalUploaded} file(s) uploaded`);
-                    console.info();
-                }
-                return resolve();
-            }
-
-            const nextFile = files.shift();
-
-            if (!nextFile.upload) {
-                uploadNextFile();
-                return;
-            }
-
-            const options = {
-                destination: nextFile.destination
-            };
-
-            console.info(`Uploading ${nextFile.destination}`);
-
-            admin.storage().bucket(bucketName).upload(nextFile.source, options)
-                .then(_ => {
-                    totalUploaded++;
-
-                    uploadNextFile();
-                })
-                .catch(e => {
-                    console.error(e);
-                    return reject(e);
-                })
-
-        }
-
-        uploadNextFile();
-    })
-}
-
-const getFiles = env => {
-    env = env || 'dev';
-
-    const hoje = moment().tz("America/Sao_Paulo");
-    const idProdVersion = hoje.format("YYYY-MM-DD-HH-mm-ss");
-
-    return new Promise((resolve, reject) => {
-        const files = glob.sync('storage/**/*.*');
-
-        let result = [];
-
-        files.forEach(f => {
-            const d = f.substring(8);
-            const s = path.join(storagePath, d);
-
-            const fileStat = fs.statSync(s);
-
-            const file = {
-                source: s,
-                mtimeMs: fileStat.mtimeMs,
-                ctimeMs: fileStat.ctimeMs
-            };
-
-            file.destinationDev = `storage/dev/${d}`;
-            file.destination = env === 'dev' ? `storage/dev/${d}` : `${prodVersionConfig.path}/${d}`;
-            file.upload = env === 'prod' || checkUpload(file);
-            file.data = prodVersionConfig.data;
-
-            result.push(file);
-        })
-
-        result = result.map(r => {
-            if (r.destinationDev.startsWith(templatePath)) {
-                r.template = r.destinationDev.substring(templatePath.length).split('/')[0];
-            }
-
-            r.destinationProd = r.destinationDev.replace('/dev/', `/prod/`);
-            r.idProdVersion = idProdVersion;
-
-            return r;
-        })
-
-        lastResult = result.slice();
-
-        return resolve(result);
-    })
-}
-
-const checkUpload = file => {
-    if (!lastResult || lastResult.length === 0) {
-        return true;
-    }
-
-    const i = lastResult.findIndex(f => {
-        return f.source === file.source;
-    })
-
-    // Se não encontrado, upload...
-    if (i < 0) return true;
-
-    return lastResult[i].mtimeMs !== file.mtimeMs ||
-        lastResult[i].ctimeMs !== file.ctimeMs;
-}
-
-const getProdVersionConfig = _ => {
-    const hoje = moment().tz("America/Sao_Paulo");
-    const id = hoje.format("YYYY-MM-DD-HH-mm-ss");
-
-    return {
-        name: 'v ' + hoje.format('YYYY-MM-DD HH-mm-ss'),
-        id: id,
-        bucket: bucketName,
-        path: `storage/prod`,
-        data: hoje.format('DD/MM/YYYY HH:mm:ss')
-    };
-}
-
-const backupProdFiles = env => {
-    return new Promise((resolve, reject) => {
-
-        if (env !== 'prod') {
-            return resolve();
-        }
-        const hoje = moment().tz("America/Sao_Paulo");
-        const backupId = hoje.format("YYYY-MM-DD-HH-mm-ss");
-
-        const promises = [];
-
-        const options = {
-            prefix: 'storage/prod'
-        }
-
-        admin.storage().bucket(bucketName).getFiles(options)
-
-            .then(([files]) => {
-
-                files.forEach(f => {
-                    promises.push(f.copy(f.name.replace('/prod/', `/prod-${backupId}/`)));
-                })
-
-                return Promise.all(promises);
-            })
-
-            .then(_ => {
-                console.info(`* Prod backup created: v ${backupId}`);
-
-                return resolve();
-            })
-
-            .catch(e => {
-                console.error(e);
-                return reject(e);
-            })
-
-    })
 }
 
 const showHelp = () => {
     console.info();
     console.info('upload-storage CLI Commands');
     console.info('---------------------------');
-    console.info('\tr || r dev || run dev: run dev immediately');
-    console.info('\trun prod: run prod immediately');
+    console.info('\tr || run: just run immediately');
     console.info('\tquit || q: quits ');
     console.info();
 }
