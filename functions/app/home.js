@@ -8,6 +8,11 @@ const fs = require('fs');
 
 const bucketName = 'premios-fans.appspot.com';
 
+const GoogleCloudStorage = require('../api/googleCloudStorage');
+const templateBucket = "premios-fans-templates";
+const templateBucketPath = "storage/templates";
+const templateStorage = new GoogleCloudStorage(templateBucket, templateBucketPath);
+
 const defaultTemplateConfig = {
     qtdMaximaCompraSugerida: 6,
     qtdMaximaCompra: 12,
@@ -70,6 +75,74 @@ const fakeData = {
         ]
     },
     config: defaultTemplateConfig
+}
+
+// Este sempre vai retornar o index.html
+exports.getWithUrl = (request, response) => {
+    const url = request.params.url;
+    const debug = request.query && request.query.debug === 'true';
+    const type = debug ? 'debug' : 'min';
+
+    let dirFile2 = getParam(request, 'dirFile2'),
+        dirFile3 = getParam(request, 'dirFile3'),
+        dirFile4 = getParam(request, 'dirFile4'),
+        dirFile5 = getParam(request, 'dirFile5');
+
+    if (!dirFile2 && !dirFile3 && !dirFile4 && !dirFile5) dirFile2 = 'index.html';
+
+    // Localiza a URL no RTDB
+    return admin.database().ref(`/urlCampanha/${url}`).once("value")
+        .then(urlData => {
+
+            if (!urlData.exists()) {
+                return response.status(404).json({
+                    success: false,
+                    url: url,
+                    error: 'not found'
+                })
+            }
+
+            urlData = urlData.val();
+
+            let file = `templates/${urlData.idTemplate}/${urlData.idCampanha}/${urlData.idInfluencer}/${type}`;
+
+            if (dirFile2) file += '/' + dirFile2;
+            if (dirFile3) file += '/' + dirFile3;
+            if (dirFile4) file += '/' + dirFile4;
+            if (dirFile5) file += '/' + dirFile5;
+
+            return templateStorage.responseFile(response, file);
+        })
+        .catch(e => {
+            return response.status(500).json({
+                success: false,
+                url: url,
+                error: JSON.stringify(e)
+            })
+        })
+}
+
+exports.getTemplateFile = (request, response) => {
+    const debug = request.query && request.query.debug === 'true';
+
+    let
+        dirFile1 = getParam(request, 'dirFile1'),
+        dirFile2 = getParam(request, 'dirFile2'),
+        dirFile3 = getParam(request, 'dirFile3'),
+        dirFile4 = getParam(request, 'dirFile4'),
+        dirFile5 = getParam(request, 'dirFile5');
+
+    let file = `templates`;
+
+    if (dirFile1) file += dirFile1;
+    if (dirFile2) file += dirFile2;
+    if (dirFile3) file += dirFile3;
+    if (dirFile4) file += dirFile4;
+    if (dirFile5) file += dirFile5;
+
+    console.info("***", file);
+
+    return templateStorage.responseFile(response, file);
 }
 
 exports.getApp = (request, response) => {
@@ -242,74 +315,103 @@ const getParam = (request, name) => {
     }
 }
 
-const compileApp = (sourceData, obj) => {
-    return new Promise((resolve, reject) => {
+// passar para async
+async function compileApp(sourceData, obj, minifyExtension) {
+    const render = { ...obj };
 
-        const render = { ...obj };
+    try {
+        render.config = render.config || defaultTemplateConfig;
+        render.config.sugestoes = [];
 
-        try {
-            render.config = render.config || defaultTemplateConfig;
-            render.config.sugestoes = [];
-
-            if (render.campanha.images && render.campanha.images.length) {
-                render.campanha.imagePrincipal = render.campanha.images[0].secure_url;
-            } else {
-                render.campanha.imagePrincipal = fakeData.campanha.images[0].secure_url
-            }
-
-            render.campanha.thumb = render.campanha.imagePrincipal.replace('/upload/', '/upload/c_thumb,h_500,w_500/');
-
-            for (let i = 1; i <= 6; i++) {
-                render.config.sugestoes.push({
-                    id: global.generateRandomId(7),
-                    qtd: i,
-                    qtdExibicao: `<strong>${i}</strong> <small>Título${i > 1 ? 's' : ''}</small>`,
-                    vlTotal: render.campanha.vlTitulo * i,
-                    vlTotal_html: global.formatMoney(render.campanha.vlTitulo * i, true, true),
-                    chances: parseInt((render.campanha.qtdPremios * i).toFixed(0))
-                })
-            }
-
-            render.campanhaSorteios = render.campanhaSorteios.map((s, i) => {
-
-                s.premios = render.campanhaSorteiosPremios
-                    .filter(f => {
-                        return f.idSorteio === s.id;
-                    })
-                    .map(p => {
-                        p.valor_html = global.formatMoney(p.valor, true, true);
-
-                        return p;
-                    })
-
-                s.titulo = (i + 1) + 'º Sorteio';
-                s.titulo_html = `<strong>${i + 1}º</strong> <small>Sorteio</small>`;
-                s.vlTotalPremios_html = global.formatMoney(s.vlTotalPremios, true, true);
-
-                s.premios = _.orderBy(s.premios, ['pos']);
-
-                return s;
-            })
-
-            render.campanhaSorteios = _.orderBy(render.campanhaSorteios, ['dtSorteio_yyyymmdd']);
-
-            render.campanha.description =
-                render.campanha.detalhes ||
-                render.campanha.subTitulo ||
-                render.campanha.titulo;
-
-            let compiled = global.compile(sourceData, render);
-
-            // Substitui os marcadores do AngularJS (que foram criados com [[ e ]] e não {{ e }}
-            compiled = compiled.split('[[').join('{{');
-            compiled = compiled.split(']]').join('}}');
-
-            return resolve(compiled);
-        } catch (e) {
-            console.error(e);
-            return reject(e);
+        if (render.campanha.images && render.campanha.images.length) {
+            render.campanha.imagePrincipal = render.campanha.images[0].secure_url;
+        } else {
+            render.campanha.imagePrincipal = fakeData.campanha.images[0].secure_url
         }
-    })
+
+        render.campanha.thumb = render.campanha.imagePrincipal.replace('/upload/', '/upload/c_thumb,h_500,w_500/');
+
+        for (let i = 1; i <= 6; i++) {
+            render.config.sugestoes.push({
+                id: global.generateRandomId(7),
+                qtd: i,
+                qtdExibicao: `<strong>${i}</strong> <small>Título${i > 1 ? 's' : ''}</small>`,
+                vlTotal: render.campanha.vlTitulo * i,
+                vlTotal_html: global.formatMoney(render.campanha.vlTitulo * i, true, true),
+                chances: parseInt((render.campanha.qtdPremios * i).toFixed(0))
+            })
+        }
+
+        render.campanhaSorteios = render.campanhaSorteios.map((s, i) => {
+
+            s.premios = render.campanhasSorteiosPremios
+                .filter(f => {
+                    return f.idSorteio === s.id;
+                })
+                .map(p => {
+                    p.valor_html = global.formatMoney(p.valor, true, true);
+
+                    return p;
+                })
+
+            s.titulo = (i + 1) + 'º Sorteio';
+            s.titulo_html = `<strong>${i + 1}º</strong> <small>Sorteio</small>`;
+            s.vlTotalPremios_html = global.formatMoney(s.vlTotalPremios, true, true);
+
+            s.premios = _.orderBy(s.premios, ['pos']);
+
+            return s;
+        })
+
+        render.campanhasSorteios = _.orderBy(render.campanhasSorteios, ['dtSorteio_yyyymmdd']);
+
+        render.campanha.description =
+            render.campanha.detalhes ||
+            render.campanha.subTitulo ||
+            render.campanha.titulo;
+
+        let compiled = global.compile(sourceData, render);
+
+        // Substitui os marcadores do AngularJS (que foram criados com [[ e ]] e não {{ e }}
+        compiled = compiled.split('[[').join('{{');
+        compiled = compiled.split(']]').join('}}');
+
+        switch (minifyExtension) {
+            case ".html":
+                const minify = require('html-minifier').minify;
+
+                compiled = minify(compiled, {
+                    collapseWhitespace: true,
+                    removeComments: true,
+                    preserveLineBreaks: false
+                });
+
+                break;
+            case ".js":
+                const UglifyJS = require("uglify-js");
+                const uglifyResult = UglifyJS.minify(compiled, {
+                    mangle: false,
+                });
+
+                compiled = uglifyResult.code;
+
+                break;
+            case ".css":
+                const CleanCSS = require('clean-css');
+
+                compiled = new CleanCSS().minify(compiled).styles;
+
+                break;
+            default:
+                break;
+        }
+
+        return compiled;
+    } catch (e) {
+        console.error(e);
+
+        throw new Error(e);
+    }
 }
 
 exports.defaultTemplateConfig = defaultTemplateConfig;

@@ -5,10 +5,21 @@ const Handlebars = require("handlebars");
 const functions = require("firebase-functions");
 const moment = require("moment-timezone");
 const randomstring = require("randomstring");
+const { performance } = require('perf_hooks');
 const path = require('path');
 const _ = require("lodash");
 const fs = require("fs");
 
+var pStart = null;
+
+exports.performanceStart = _ => {
+    pStart = performance.now();
+}
+
+exports.performanceEnd = _ => {
+    const end = performance.now();
+    return end - pStart;
+}
 
 const encryptString = (value, secret) => {
     try {

@@ -36,7 +36,7 @@
 
     <meta property="premiosfans:template" content="{{campanha.idTemplate}}">
 
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico">
 
     <link rel="stylesheet" href="/assets/pico/css/pico.min.css">
     <link rel="stylesheet" href="/assets/pico/bootstrap-grid/css/pico-bootstrap-grid.min.css">
@@ -45,7 +45,7 @@
 
     <!-- https://icons.getbootstrap.com/ -->
 
-    <link rel="stylesheet" href="/templates/venda-with-messaging/custom.css?v={{version}}">
+    <link rel="stylesheet" href="/storage/{{idTemplate}}/{{idCampanha}}/{{idInfluencer}}/{{env}}/custom.css?v={{version}}">
 
     <style>
     .wait{background:rgba(0,0,0,.4);position:fixed;height:100%;width:100%;top:0;cursor:wait}.wait svg{background:0 0;position:fixed;width:120px;height:120px;top:calc(50% - 60px);left:calc(50% - 60px)}
@@ -647,12 +647,12 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-    <script src="/assets/angular/angular-locale_pt-br.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/vanilla-masker@1.1.1/build/vanilla-masker.min.js"></script>
+    <script src="/assets/angular/angular-locale_pt-br.min.js"></script>
     <script src="/assets/moment.min.js"></script>
 
-    <script type="module" src="/templates/venda-with-messaging/index.js?v={{version}}"></script>
+    <script type="module" src="/storage/{{idTemplate}}/{{idCampanha}}/{{idInfluencer}}/{{env}}/index.js?v={{version}}"></script>
 
 </body>
 

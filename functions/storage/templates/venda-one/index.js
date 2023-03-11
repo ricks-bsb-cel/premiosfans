@@ -16,6 +16,7 @@ const firebaseConfig = {
     measurementId: "G-XTRQ740MSL"
 };
 
+// Messaging Key
 const messagingKey = "BIY0gJcJ_octWgJgtcayla50bdJrhDetP6iekjYBkU93_tolz0Kw1HLa4tScldEWkHcrgxzolAqBpV7GkeceN3g";
 
 angular.module('app', [])

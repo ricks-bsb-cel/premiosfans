@@ -1,17 +1,18 @@
 'use strict';
 
 const express = require('express');
-const engines = require('consolidate');
-const minifyHTML = require('express-minify-html');
+// const engines = require('consolidate');
+// const minifyHTML = require('express-minify-html');
 
 const initFirebase = require('../initFirebase');
 
-const handlebarsRegisterHelpers = require('../handlebarsRegisterHelpers');
+// const handlebarsRegisterHelpers = require('../handlebarsRegisterHelpers');
 
-handlebarsRegisterHelpers.run();
+// handlebarsRegisterHelpers.run();
 
 const app = express();
 
+/*
 app.use(minifyHTML({
     override: true,
     exception_url: false,
@@ -24,15 +25,18 @@ app.use(minifyHTML({
         minifyJS: true
     }
 }));
+*/
 
+/*
 app.engine('hbs', engines.handlebars);
 app.set('view engine', 'hbs');
+*/
 
+/*
 app.get('/app/:idInfluencer/:idCampanha', (request, response) => {
     initFirebase.call(require('./home').getApp, request, response);
 });
 
-/*
 app.get('/template/:nome', (request, response) => {
     initFirebase.call(require('./home').getTemplate, request, response);
 });
@@ -51,12 +55,21 @@ app.get('/', (request, response) => {
 });
 */
 
+/*
 app.get('/:dirFile1/:dirFile2?/:dirFile3?/:dirFile4?/:dirFile5?', (request, response) => {
     initFirebase.call(require('./home').getStorageFile, request, response);
 });
+*/
 
-app.get('/', (request, response) => {
-    return response.json({ root: 'root' }).end();
+app.get('/storage/:dirFile1/:dirFile2?/:dirFile3?/:dirFile4?/:dirFile5?', (request, response) => {
+    initFirebase.call(require('./home').getTemplateFile, request, response);
 })
+
+app.get('/:url', (request, response) => {
+    initFirebase.call(require('./home').getWithUrl, request, response);
+})
+
+app.get('/', (request, response) => { return response.json({ root: 'root' }).end(); })
+app.get('', (request, response) => { return response.json({ root: 'root' }).end(); })
 
 exports.mainApp = app;

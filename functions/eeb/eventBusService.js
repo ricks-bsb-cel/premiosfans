@@ -17,6 +17,8 @@ const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
 const helper = require('./eventBusServiceHelper');
 
+const { performance } = require('perf_hooks');
+
 const projectName = 'premios-fans';
 const projectLocation = 'us-central1';
 
@@ -199,7 +201,7 @@ class eventBusService {
 
         return new Promise((resolve, reject) => {
 
-            let result;
+            let result, performanceStart;
 
             return initFirebase.init()
                 .then(app => {
@@ -222,6 +224,8 @@ class eventBusService {
                     this.parm = { ...this.parm, ...userInfoResult };
                     this.parm.attributes.user_uid = userInfoResult.user_uid;
 
+                    performanceStart = performance.now();
+
                     // Dispara de acordo com o o tipo.
                     if (this.parm.async) { // Async... envia para o Pub/Sub
                         if (this.parm.delay) {
@@ -237,6 +241,7 @@ class eventBusService {
                 .then(startResult => {
                     result = startResult;
                     result.async = this.parm.async;
+                    result.runTime = ((performance.now() - performanceStart) / 1000).toFixed(3);
 
                     if (this.response) { // A chamada foi REST
                         if (this.parm.source === 'run') {

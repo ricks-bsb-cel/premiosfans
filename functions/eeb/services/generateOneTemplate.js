@@ -1,6 +1,15 @@
 "use strict";
 
-const admin = require('firebase-admin');
+/*
+Tudo o que eu sempre sonhei
+Tanto que eu consegui
+É tão bom estar aqui
+Quanto ainda está por vir?
+*/
+
+const global = require('../../global');
+
+// const admin = require('firebase-admin');
 const { Storage } = require('@google-cloud/storage');
 const _ = require('lodash');
 const Joi = require('joi');
@@ -10,26 +19,26 @@ const eebService = require('../eventBusService').abstract;
 
 const app = require('../../app/home');
 
+const GoogleCloudStorage = require('../../api/googleCloudStorage');
+const templateBucket = "premios-fans-templates";
+const templateBucketPath = "storage/templates";
+const templateStorage = new GoogleCloudStorage(templateBucket, templateBucketPath);
+
 /*
 https://cloud.google.com/nodejs/docs/reference/storage/latest
 https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 */
 
 const firestoreDAL = require('../../api/firestoreDAL');
-const global = require('../../global');
 
 const collectionCampanhas = firestoreDAL.campanhas();
 const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
 const collectionCampanhasSorteios = firestoreDAL.campanhasSorteios();
 const collectionCampanhasSorteiosPremios = firestoreDAL.campanhasSorteiosPremios();
 
-const collectionFrontTemplates = firestoreDAL.frontTemplates();
 const collectionInfluencers = firestoreDAL.influencers();
-const collectionAppLinks = firestoreDAL.appLinks();
 
 const collectionFaq = firestoreDAL.faq();
-
-const storage = new Storage();
 
 const schema = _ => {
     const schema = Joi.object({
@@ -49,261 +58,173 @@ class Service extends eebService {
         super(request, response, parm, method);
     }
 
-    run() {
-        return new Promise((resolve, reject) => {
+    async run() {
+        const version = global.generateRandomId(7);
 
-            const version = global.generateRandomId(7);
+        const dataResult = await schema().validateAsync(this.parm.data);
 
-            const result = {
-                success: true,
-                host: this.parm.host
-            };
+        let result = { ...dataResult };
 
-            let saveLink, idTemplate, idInfluencer, idCampanha;
+        [
+            result.influencer,
+            result.campanha,
+            result.campanhaInfluencer,
+            result.campanhasSorteios,
+            result.campanhasSorteiosPremios,
+            result.faq
+        ] = await Promise.all([
+            collectionInfluencers.getDoc(result.idInfluencer),
+            collectionCampanhas.getDoc(result.idCampanha),
+            collectionCampanhasInfluencers.get({
+                filter: [
+                    { field: "idCampanha", condition: "==", value: result.idCampanha },
+                    { field: "idInfluencer", condition: "==", value: result.idInfluencer }
+                ],
+                empty: false
+            }),
+            collectionCampanhasSorteios.get({
+                filter: [
+                    { field: "idCampanha", condition: "==", value: result.idCampanha },
+                ],
+                empty: false
+            }),
+            collectionCampanhasSorteiosPremios.get({
+                filter: [
+                    { field: "idCampanha", condition: "==", value: result.idCampanha },
+                ],
+                empty: false
+            }),
+            collectionFaq.get()
+        ]);
 
-            return schema().validateAsync(this.parm.data)
+        result.version = version;
+        result.versionDate = global.todayMoment().toString('DD/MM HH:mm:ss');
 
-                .then(dataResult => {
-                    idCampanha = dataResult.idCampanha;
-                    idInfluencer = dataResult.idInfluencer;
-                    idTemplate = dataResult.idTemplate;
+        // Ordena os sorteios
+        result.campanhaSorteios = _.orderBy(result.campanhasSorteios, ['dtSorteio_yyyymmdd']);
 
-                    // Carga dos dados
-                    const promises = [
-                        collectionFrontTemplates.getDoc(idTemplate),
-                        collectionInfluencers.getDoc(idInfluencer),
-                        collectionCampanhas.getDoc(idCampanha),
-                        collectionCampanhasInfluencers.get({
-                            filter: [
-                                { field: "idCampanha", condition: "==", value: idCampanha },
-                                { field: "idInfluencer", condition: "==", value: idInfluencer }
-                            ]
-                        }),
-                        collectionCampanhasSorteios.get({
-                            filter: [
-                                { field: "idCampanha", condition: "==", value: idCampanha },
-                            ]
-                        }),
-                        collectionCampanhasSorteiosPremios.get({
-                            filter: [
-                                { field: "idCampanha", condition: "==", value: idCampanha },
-                            ]
-                        }),
-                        collectionFaq.get()
-                    ];
+        result.files = await loadTemplateFiles(result.idTemplate);
 
-                    return Promise.all(promises);
-                })
+        if (result.files.length === 0) {
+            throw new Error('Invalid template ID');
+        }
 
-                .then(promisesResult => {
-                    result.template = promisesResult[0];
-                    result.influencer = promisesResult[1];
-                    result.campanha = promisesResult[2];
-                    result.campanhaInfluencer = promisesResult[3];
-                    result.campanhaSorteios = promisesResult[4];
-                    result.campanhaSorteiosPremios = promisesResult[5];
-                    result.faq = promisesResult[6];
+        result.sendResult = await compileAndSendToStorage(result);
 
-                    if (!result.template) throw new Error('Template not found');
-                    if (!result.influencer) throw new Error('Influencer not found');
-                    if (!result.campanha) throw new Error('Campanha not found');
-                    if (!result.campanhaInfluencer || result.campanhaInfluencer.length === 0) throw new Error('Influencer da Campanha not found');
-                    if (!result.campanhaSorteios || result.campanhaSorteios.length === 0) throw new Error('Sorteios da Campanha not found');
-                    if (!result.campanhaSorteiosPremios || result.campanhaSorteiosPremios === 0) throw new Error('Premios da not found');
-
-                    result.version = version;
-                    result.versionDate = global.todayMoment().toString('DD/MM HH:mm:ss');
-
-                    // Ordenações
-                    result.campanhaSorteios = _.orderBy(result.campanhaSorteios, ['dtSorteio_yyyymmdd']);
-
-                    return loadTemplateFiles(result.template);
-                })
-
-                .then(files => {
-                    result.template.files = files;
-
-                    return compileAndSendToStorage(result);
-                })
-
-                .then(sendResult => {
-                    result.sendResult = sendResult;
-
-                    saveLink = {
-                        idTemplate: result.template.id,
-                        idInfluencer: result.influencer.id,
-                        idCampanha: result.campanha.id,
-                        link: `/app/${result.influencer.id}/${result.campanha.id}`,
-                        version: version,
-                        empresas_reference: collectionInfluencers.getReference(result.influencer.id),
-                        campanhas_reference: collectionCampanhas.getReference(result.campanha.id),
-                        keywords: global.generateKeywords(
-                            result.influencer.nome,
-                            result.influencer.nomeExibicao,
-                            result.influencer.email,
-                            result.influencer.celular,
-                            result.campanha.titulo,
-                            result.campanha.url
-                        )
-                    };
-
-                    global.setDateTime(saveLink, 'dtInclusao');
-
-                    return collectionAppLinks.get({
-                        filter: {
-                            idTemplate: saveLink.idTemplate,
-                            idInfluencer: saveLink.idInfluencer,
-                            idCampanha: saveLink.idCampanha
-                        },
-                        limit: 1
-                    });
-                })
-
-                .then(resultAppLinks => {
-                    return collectionAppLinks.insertUpdate(
-                        resultAppLinks.length ? resultAppLinks[0].id : null,
-                        saveLink
-                    )
-                })
-
-                .then(_ => {
-                    return resolve(this.parm.async ? { success: true } : result);
-                })
-
-                .catch(e => {
-                    console.error(e);
-                    return reject(e);
-                })
-
-        })
+        return {
+            success: true,
+            files: result.files.length
+        }
     }
 
 }
 
-const compileAndSendToStorage = (data) => {
-    return new Promise((resolve, reject) => {
-        const storagePath = `app/${data.influencer.id}/${data.campanha.id}`;
+async function compileAndSendToStorage(data) {
+    /*
+    Este método usa o data.template.files, compilando o conteúdo com o objeto data completo, e
+    enviando para 2 diretórios do storage:
+        - templates/<idTemplate>/<idCampanha>/<idInfluencer>/min        // Minified
+        - templates/<idTemplate>/<idCampanha>/<idInfluencer>/debug      // Normal
+    */
+    const
+        storagePathDebug = `templates/${data.idTemplate}/${data.idCampanha}/${data.idInfluencer}/debug`,
+        storagePathMin = `templates/${data.idTemplate}/${data.idCampanha}/${data.idInfluencer}/min`;
 
-        const promises = [];
+    data.env = "debug";
+    const promisePathDebug = data.files.map(file => compileAndSaveContentOnStorage(storagePathDebug, file, data));
+    const saveFilesResultsDebug = await Promise.all(promisePathDebug);
 
-        data.template.files.forEach(file => {
-            promises.push(compileAndSaveContentOnStorage(storagePath, file, data));
-        })
+    data.env = "min";
+    const promisePathMin = data.files.map(file => compileAndSaveContentOnStorage(storagePathMin, file, data, path.extname(file.fileName)));
+    const saveFilesResultsMin = await Promise.all(promisePathMin);
 
-        return Promise.all(promises)
-
-            .then(saveFilesResults => {
-                return resolve(
-                    saveFilesResults.map(f => {
-                        return {
-                            bucket: f.bucket.name,
-                            file: {
-                                name: f.file.name,
-                                size: f.file.metadata.size,
-                                md5Hash: f.file.metadata.md5Hash
-                            }
-                        }
-                    })
-                );
-            })
-
-            .catch(e => {
-                return reject(e);
-            })
-
-    })
+    return saveFilesResultsDebug.concat(saveFilesResultsMin);
 }
 
-const compileAndSaveContentOnStorage = (storagePath, file, obj) => {
-    return new Promise((resolve, reject) => {
-        const storageDest = `${storagePath}/${path.basename(file.name)}`;
+async function compileAndSaveContentOnStorage(storagePath, file, obj, minifyExtension) {
+    try {
+        const storageDest = `${storagePath}/${file.fileName}`;
+        const compiledData = await app.compileApp(file.content, obj, minifyExtension);
 
-        const fileOptions = {
-            uploadType: { resumable: false },
-            contentType: global.getContentTypeByExtension(storageDest)
+        await templateStorage.write(storageDest, compiledData)
+
+        return;
+    } catch (e) {
+        console.error(e);
+
+        throw new Error(e);
+    }
+
+    /*
+    const storageDest = `${storagePath}/${path.basename(file.name)}`;
+
+    const fileOptions = {
+        uploadType: { resumable: false },
+        contentType: global.getContentTypeByExtension(storageDest)
+    };
+
+    const compiledData = await app.compileApp(file.content, obj);
+
+    const bucket = admin.storage().bucket(obj.template.bucket);
+    const storageFile = bucket.file(storageDest, fileOptions);
+
+    storageFile.save(compiledData, e => {
+        if (e) {
+            console.error(e);
+
+            throw new Error(e);
+        } else {
+            return {
+                bucket: bucket,
+                file: storageFile
+            };
+        }
+    });
+    */
+}
+
+async function loadTemplateFiles(template) { // Resposável por listar os arquivos do template
+
+    const path = templateBucketPath + "/" + template;
+    const files = await templateStorage.getFiles(path);
+    const promises = files.map(f => templateStorage.read(f.name));
+
+    return await Promise.all(promises);;
+
+    /*
+    let [files] = await storage.bucket(template.bucket).getFiles({
+        prefix: template.storagePathDev,
+        versions: false,
+        autoPaginate: false
+    });
+
+    files = files.map(f => {
+        return {
+            name: f.name,
+            file: f,
+            metadata: {
+                id: f.metadata.id,
+                size: f.metadata.size
+            }
         };
+    });
 
-        app.compileApp(file.content, obj)
+    const promises = files.map(f => getFileContent(f.file));
+    const filesContent = await Promise.all(promises);
 
-            .then(compiledData => {
-                const bucket = admin.storage().bucket(obj.template.bucket);
-                const storageFile = bucket.file(storageDest, fileOptions);
+    filesContent.forEach((c, i) => {
+        files[i].content = c;
 
-                storageFile.save(compiledData, e => {
-                    if (e) {
-                        console.error(e);
-                        return reject(e);
-                    } else {
-                        return resolve(
-                            {
-                                bucket: bucket,
-                                file: storageFile
-                            }
-                        );
-                    }
-                });
-            })
-
-            .catch(e => {
-                return reject(e);
-            })
-
+        // Não preciso mais do objeto File
+        delete files[i].file;
     })
+
+    return files;
+    */
 }
 
-const loadTemplateFiles = template => { // Resposável por buscar os templates no Storage
-    return new Promise((resolve, reject) => {
-
-        let files;
-
-        storage.bucket(template.bucket).getFiles({
-            prefix: template.storagePathDev,
-            versions: false,
-            autoPaginate: false
-        })
-
-            .then(([getFilesResult]) => {
-                files = getFilesResult;
-
-                files = files.map(f => {
-                    return {
-                        name: f.name,
-                        file: f,
-                        metadata: {
-                            id: f.metadata.id,
-                            size: f.metadata.size
-                        }
-                    };
-                });
-
-                const promises = [];
-
-                files.forEach(f => {
-                    promises.push(getFileContent(f.file));
-                })
-
-                return Promise.all(promises);
-            })
-
-            .then(filesContent => {
-                filesContent.forEach((c, i) => {
-                    files[i].content = c;
-
-                    // Não preciso mais do objeto File
-                    delete files[i].file;
-                })
-
-                return resolve(files);
-            })
-
-            .catch(e => {
-                return reject(e);
-            })
-
-    })
-}
-
-const getFileContent = file => { // Responsável por carregar o conteúdo do arquivo do Storage
+/*
+async function getFileContent(file) { // Responsável por carregar o conteúdo do arquivo do Storage
     return new Promise((resolve, reject) => {
 
         console.log('getFileContent');
@@ -345,6 +266,7 @@ const getFileContent = file => { // Responsável por carregar o conteúdo do arq
         });
     })
 }
+*/
 
 exports.Service = Service;
 

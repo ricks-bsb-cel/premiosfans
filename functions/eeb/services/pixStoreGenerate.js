@@ -5,6 +5,12 @@ const Joi = require('joi');
 const pixStoreHelper = require('./pixStoreHelper');
 
 /*
+Pensando que então, dali pra frente
+Seja qual for tua idade
+O melhor ainda vai estar por vir
+*/
+
+/*
 o Pré-Generate PIX gera um PIX e o deixa pronto para uso em uma compra futura.
 Os PIXs pre gerados são armazenados na colection cartosPixPreGenerated, e não estão vinculados à nenhuma compra.
 */

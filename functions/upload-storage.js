@@ -34,6 +34,7 @@ admin.initializeApp({
 
 const storage = admin.storage();
 const localTemplatePath = 'storage';
+let interval = null;
 
 const
     rl = readline.createInterface({
@@ -53,7 +54,14 @@ function getLocalFileMd5Hash(file) {
 async function getStorageFiles() {
     const [files] = await storage.bucket(bucketName).getFiles();
 
-    return files;
+    const result = files.map(f => {
+        return {
+            name: f.name,
+            md5Hash: f.metadata.md5Hash
+        }
+    })
+
+    return result;
 }
 
 async function getLocalFiles() {
@@ -62,7 +70,7 @@ async function getLocalFiles() {
 
     files.forEach(f => {
         result.push({
-            file: f,
+            name: f,
             md5Hash: getLocalFileMd5Hash(f),
             changed: false
         })
@@ -72,16 +80,20 @@ async function getLocalFiles() {
 }
 
 async function uploadToStorage(localFiles) {
+    console.info('Uploading...');
+
     for (const f of localFiles) {
-        const fileName = path.basename(f.file);
-        const fileDir = path.dirname(f.file);
+        const fileName = path.basename(f.name);
+        const fileDir = path.dirname(f.name);
 
         // Faz upload do arquivo para o Google Cloud Storage
-        const [file] = await storage.bucket(bucketName).upload(f.file, {
+        const [file] = await storage.bucket(bucketName).upload(f.name, {
             destination: `${fileDir}/${fileName}`,
         });
 
-        console.log(`Arquivo ${f.file} enviado para o bucket ${bucketName} [${file.metadata.md5Hash}], ${file.metadata.size} bytes`);
+        console.log(`Arquivo ${f.name} enviado para o bucket ${bucketName} [${file.metadata.md5Hash}], ${file.metadata.size} bytes`);
+        
+        rl.prompt();
     }
 }
 
@@ -106,6 +118,14 @@ const init = _ => {
                 case 'run':
                     uploadData();
                     break;
+                case 's':
+                case 'start':
+                    startInterval(10);
+                    break;
+                case 'e':
+                case 'end':
+                    stopInterval();
+                    break;
                 default:
                     showHelp();
 
@@ -115,16 +135,14 @@ const init = _ => {
         })
 
         .on('close', function () {
-            interval && clearInterval(interval);
             console.log('😎 Have a nice day!');
-            process.exit(0);
+            endExecution();
         });
 
     showHelp();
 }
 
 async function uploadData() {
-
     try {
 
         const filesOnStorage = await getStorageFiles();
@@ -132,41 +150,58 @@ async function uploadData() {
 
         // Remove da lista de arquivos locais os arquivos que tem o mesmo md5Hash (pois não foram alterados) ou que não existem no storage
         localFiles = localFiles.map(localFile => {
-            const i = filesOnStorage.findIndex(storageFile => storageFile.name === localFile.file);
+            const i = filesOnStorage.findIndex(storageFile => storageFile.name === localFile.name);
 
-            localFile.changed = (i < 0 || (i >= 0 && localFile.md5Hash !== filesOnStorage[i].metadata.md5Hash));
+            localFile.changed = (i < 0 || (i >= 0 && localFile.md5Hash !== filesOnStorage[i].md5Hash));
 
             return localFile;
         }).filter(f => f.changed);
 
-        console.info('local files');
+        /*
+        if (localFiles.length) {
+            console.info('local files');
+            console.table(localFiles);
+        }else{
+            console.info('No files to update');
+        }
 
-        localFiles.forEach(f => {
-            console.info(f.file, f.md5Hash, f.changed);
-        })
+        if (filesOnStorage.length) {
+            console.info('on storage');
+            console.table(filesOnStorage);
+        }
+        */
 
-        console.info('on storage');
-
-        filesOnStorage.forEach(f => {
-            console.info(f.name, f.metadata.md5Hash);
-        })
-
-        await uploadToStorage(localFiles);
-
-        endExecution();
+        if (localFiles.length) {
+            console.info();
+            await uploadToStorage(localFiles);
+        }
     }
     catch (e) {
         console.error(e);
         endExecution();
     }
-
 }
+
+function startInterval(i) {
+    interval = setInterval(uploadData, i * 1000);
+    console.info('Interval start...');
+}
+
+function stopInterval() {
+    if (interval) {
+        clearInterval(interval);
+        console.info('Interval end...');
+    }
+}
+
 
 const showHelp = () => {
     console.info();
     console.info('upload-storage CLI Commands');
     console.info('---------------------------');
     console.info('\tr || run: just run immediately');
+    console.info('\tstart || s: Start Interval  (10 seconds)');
+    console.info('\tend || e: End Interval ');
     console.info('\tquit || q: quits ');
     console.info();
 }

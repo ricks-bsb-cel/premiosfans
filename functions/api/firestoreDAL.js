@@ -147,6 +147,10 @@ class collectionClass {
                     result = orderArray(result, attrs.order);
                 }
 
+                if (typeof attrs.empty === 'boolean' && attrs.empty === false && result.length === 0) {
+                    throw new Error(`A consulta na coleção ${this.collection} não retornou nenhum registro...`);
+                }
+
                 return resolve(result);
             }).catch(e => {
                 return reject(new Error(e));
@@ -328,7 +332,7 @@ exports.cartosPixKeys = _ => {
     return new collectionClass('cartosPixKeys');
 }
 
-exports.cartosPixPreGenerated = _ =>{
+exports.cartosPixPreGenerated = _ => {
     return new collectionClass('cartosPixPreGenerated');
 }
 

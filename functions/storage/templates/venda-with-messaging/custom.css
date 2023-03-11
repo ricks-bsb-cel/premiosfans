@@ -1,51 +1,13 @@
-/* Global CSS variables */
 :root {
     --spacing-company: 16rem;
     --font-weight: 400;
     --border-radius: 0;
 }
 
-/*
-div.panel{
-    background: #003a68;
-    position: relative;
-    overflow: hidden;
-}
-
-div.panel img.background{
-    width: 100%;
-    height: 80vw;
-    object-fit: cover;
-    object-position: center top;
-    max-height: 540px;
-}
-
-div.panel img.capa{
-    position: absolute;
-    bottom: -55px;
-    right: -50px;
-    max-height: 480px;
-    height: 100%;
-    object-fit: cover;
-}
-*/
-
 html {
     scroll-behavior: smooth;
     font-family: 'Montserrat', sans-serif;
 }
-
-/*
-div.panel{
-    background: #003a68;
-    background-image: url("/templates/venda-with-messaging/panel-background.png");
-    background-position: center;
-    background-size: cover;
-    position: relative;
-    height: 462px;
-    overflow: hidden;
-}
-*/
 
 div.panel{
     height: 462px;
@@ -163,6 +125,7 @@ div.panel .subtitle-4{
 }
 div.panel .subtitle-5{}
 div.panel .subtitle-6{}
+
 
 /*
 @media (max-width: 576px) {
