@@ -1,6 +1,16 @@
 @import "swal";
 @import "formly";
 
+.one-line{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.description-block > .description-text {
+    text-transform: initial;
+}
+
 .percent-center {
     position: fixed;
     z-index: 10000;

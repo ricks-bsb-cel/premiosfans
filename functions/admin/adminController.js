@@ -7,7 +7,7 @@ const secret = require('../secretManager');
 const helper = require('../eeb/eventBusServiceHelper');
 
 exports.getPermissions = user => {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         const version = global.getVersionId();
 
         let result = {

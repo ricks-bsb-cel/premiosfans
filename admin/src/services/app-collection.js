@@ -23,6 +23,8 @@ const ngModule = angular.module('services.app-collection', [])
 			this.empty = false;
 			this.unsubscribeSnapshot = null;
 
+			this.callDataReadyTimeout = null;
+
 			var onLoadFinishAttr = null;
 			var onLoadFinishCallback = null;
 
@@ -105,6 +107,7 @@ const ngModule = angular.module('services.app-collection', [])
 
 			this.destroySnapshot = () => {
 				onLoadFinishCallback = null;
+
 				if (typeof this.unsubscribeSnapshot === 'function') {
 					this.unsubscribeSnapshot();
 				}
@@ -124,7 +127,6 @@ const ngModule = angular.module('services.app-collection', [])
 				parms.loadReferences = parms.loadReferences || [];
 
 				appAuthHelper.ready()
-
 					.then(_ => {
 
 						try {
@@ -225,6 +227,15 @@ const ngModule = angular.module('services.app-collection', [])
 
 									}
 
+									// Evento que permite pegar os dados no fim do load
+									if (typeof parms.dataReady === 'function') {
+										if (this.callDataReadyTimeout) $timeout.cancel(this.callDataReadyTimeout);
+										this.callDataReadyTimeout = $timeout(_ => {
+											parms.dataReady(this.data);
+											this.callDataReadyTimeout = null;
+										}, 1000);
+									}
+
 								});
 
 								finishLoad();
@@ -238,6 +249,8 @@ const ngModule = angular.module('services.app-collection', [])
 						}
 					})
 			}
+
+
 
 			this.loadReferenceOnDoc = (doc, references) => {
 				references.forEach(r => {
@@ -260,6 +273,7 @@ const ngModule = angular.module('services.app-collection', [])
 			this.onLoadFinish = (callback, loadFinishAttr) => {
 				onLoadFinishCallback = callback;
 				onLoadFinishAttr = loadFinishAttr;
+
 				if (this.data.length > 0) {
 					callback(getData());
 				}

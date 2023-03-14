@@ -567,6 +567,16 @@ treecontrol.tree-boot .tree-label:hover {
   width: 208px;
 }
 
+.one-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.description-block > .description-text {
+  text-transform: initial;
+}
+
 .percent-center {
   position: fixed;
   z-index: 10000;
@@ -1191,6 +1201,30 @@ image-gallery .image .actions a.active {
   padding: 0px 0px 0px 2px;
   border-radius: 50%;
 }
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-list/influencers-campanha-list.scss ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************/
+
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-treeview/influencers-campanha-treeview.scss ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************/
+influencers-campanha-treeview .actions {
+  display: inline-block;
+  padding-left: 5px;
+}
+influencers-campanha-treeview .actions a {
+  padding-top: 1px;
+}
+influencers-campanha-treeview .actions a i {
+  font-size: 1.1em;
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-widget/influencers-campanha-widget.scss ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************/
+.influencers-campanha-widget.navbar {
+  position: relative;
+  top: -20px;
+}
 /*!***************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha/influencers-campanha.scss ***!
   \***************************************************************************************************************************************************************************************************************************************************************************************/
@@ -1770,13 +1804,9 @@ user-panel i.fa.fa-refresh {
 /*!****************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/views/influencers/influencers.scss ***!
   \****************************************************************************************************************************************************************************************************************************************************************/
-.influencers table .nome-fantasia img {
+.influencers table img {
   height: 60px;
   border-radius: 4px;
-}
-.influencers table .nome-fantasia span {
-  vertical-align: top;
-  padding-left: 5px;
 }
 /*!**************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/views/messagesReceived/messagesReceived.scss ***!

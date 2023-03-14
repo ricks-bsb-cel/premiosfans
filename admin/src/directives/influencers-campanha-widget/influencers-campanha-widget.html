@@ -1,0 +1,70 @@
+<nav class="influencers-campanha-widget navbar navbar-expand navbar-light">
+    <ul class="navbar-nav">
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">
+                <i class="fas fa-plus-circle"></i>
+                Adicionar
+            </a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">
+                <i class="fas fa-refresh"></i>
+                Gerar Templates
+            </a>
+        </li>
+    </ul>
+
+    <form class="form-inline ml-3">
+        <div class="input-group input-group-sm">
+            <input class="form-control form-control-navbar" type="search" placeholder="Procurar" aria-label="search">
+            <div class="input-group-append">
+                <button class="btn btn-navbar" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+</nav>
+<div class="row influencers-campanha-widget">
+    <div
+        ng-repeat="influencer in list"
+        class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"  
+    >
+        <div class="card card-widget widget-user shadow">
+            <div class="widget-user-header bg-info">
+                <h3 class="widget-user-username one-line">
+                    {{influencer.nomeExibicao}}
+                </h3>
+                <h5 class="widget-user-desc">
+                    <small class="one-line">
+                        {{influencer.nome}}
+                    </small>
+                </h5>
+            </div>
+            <div class="widget-user-image">
+                <img ng-if="influencer.images && influencer.images[0]"  class="img-circle elevation-2" ng-src="{{influencer.images[0].secure_url}}" alt="{{influencer.nomeExibicao}}">
+                <img ng-if="!influencer.images || !influencer.images[0]" class="img-circle elevation-2" src="/assets/imgs/user.png" alt="{{influencer.nomeExibicao}}">
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-6 border-right">
+                        <div class="description-block">
+                            <h5 class="description-header">0</h5>
+                            <small class="description-text">Vendas</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="description-block">
+                            <h5 class="description-header">
+                                <small>R$</small>
+                                0<small>.00</small>
+                            </h5>
+                            <small class="description-text">Comissão</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

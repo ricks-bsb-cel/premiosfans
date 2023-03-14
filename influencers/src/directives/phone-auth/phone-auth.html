@@ -1,0 +1,48 @@
+<div id="phone-auth" style="width: 340px;height: 260px;" class="offcanvas offcanvas-modal rounded-m">
+
+    <div class="d-flex mx-3 mt-3 py-1">
+        <div class="align-self-center">
+            <h3 class="mb-n1">Autenticação do Celular</h3>
+        </div>
+    </div>
+
+    <div class="divider divider-margins mt-2 mb-2"></div>
+
+    <div ng-show="currentContent===contentEnviarCodigo" class="content mt-0">
+        <!--
+        <block-html sigla="'app-autenticacao-celular'" extra1="phoneData.celular_formatted"></block-html>
+        -->
+    </div>
+
+    <div ng-show="currentContent===contentReceberCodigo" class="content mt-0">
+        <!--
+        <block-html sigla="'app-autenticacao-celular-receber-codigo'" extra1="phoneData.celular_formatted"></block-html>
+        -->
+        <div class="form-custom mt-3 form-icon form-label">
+            <i class="bi bi-phone font-20"></i>
+            <input type="tel" ng-model="codigo" maxlength="6" class="form-control codigo rounded-xs" />
+        </div>
+    </div>
+
+    <div class="content mt-0" style="bottom:0;position:absolute;width:calc(100% - 30px);">
+        <div class="row mt-4">
+            <div class="col-5">
+                <button ng-if="currentContent===contentEnviarCodigo" ng-click="close()" class="btn-full btn gradient-red shadow-bg shadow-bg-m">
+                    Corrigir
+                </button>
+                <button ng-if="currentContent===contentReceberCodigo" ng-click="voltar()" class="btn-full btn gradient-red shadow-bg shadow-bg-m">
+                    Voltar
+                </button>
+            </div>
+            <div class="col-7">
+                <button ng-if="currentContent===contentEnviarCodigo" ng-click="sendCode()" class="btn-full btn gradient-green shadow-bg shadow-bg-m">
+                    Enviar Código
+                </button>
+                <button ng-if="currentContent===contentReceberCodigo" ng-click="checkCode()" class="btn-full btn gradient-green shadow-bg shadow-bg-m">
+                    Verificar Código
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

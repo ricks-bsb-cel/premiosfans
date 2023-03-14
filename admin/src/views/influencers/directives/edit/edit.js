@@ -20,13 +20,14 @@ const ngModule = angular.module('view.influencers.edit', [])
                 {
                     key: 'cpfcnpj',
                     type: 'cpfcnpj',
-                    className: 'col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7',
+                    className: 'col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-5',
                     templateOptions: {
                         label: 'CPF/CNPJ',
                         type: 'text',
                         required: true
                     }
                 },
+                /*
                 {
                     key: 'url',
                     templateOptions: {
@@ -36,6 +37,7 @@ const ngModule = angular.module('view.influencers.edit', [])
                     type: 'input',
                     className: 'col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-5'
                 },
+                */
                 {
                     key: 'nome',
                     templateOptions: {

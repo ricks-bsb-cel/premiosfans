@@ -1,0 +1,18 @@
+<div class="form-group radios mt-2">
+
+    <div ng-repeat="o in to.options" class="form-check form-check-custom">
+        <input
+            class="form-check-input"
+            type="radio"
+            name="{{to.inputName}}"
+            ng-model="model[options.key]"
+            id="{{to.inputName}}-{{o.id}}"
+            value="{{o.value}}"
+        >
+        <label class="form-check-label" for="{{to.inputName}}-{{o.id}}">{{o.label}}</label>
+        <i class="is-checked color-green-dark bi bi-check-circle"></i>
+        <i class="is-unchecked color-highlight bi bi-circle"></i>
+    </div>
+
+</div>
+

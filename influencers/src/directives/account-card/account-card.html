@@ -1,0 +1,42 @@
+<div
+    class="card card-style bg-5 shadow-card shadow-card-l account-card"
+    style="height:200px;background-image:url('https://picsum.photos/seed/{{id}}/700/466');"
+>
+    <div class="card-top p-3">
+        <a
+            href="#"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#menu-card-more"
+            class="icon icon-xxs bg-white color-black float-end bs-toggle"
+        >
+            <i class="bi bi-three-dots font-18"></i>
+        </a>
+    </div>
+    <div class="card-center">
+        <div class="bg-theme px-3 py-2 rounded-end d-inline-block">
+            <h1 class="font-13 my-n1">
+                <a
+                    class="color-theme bs-toggle"
+                    data-bs-toggle="collapse"
+                    href="#{{id}}"
+                    aria-controls="{{id}}"
+                >
+                    Ver Saldo
+                </a>
+            </h1>
+            <div class="collapse" id="{{id}}">
+                <h2 class="color-theme font-26">$26,315</h2>
+            </div>
+        </div>
+    </div>
+    <strong class="card-top no-click font-12 p-3 color-white font-monospace">
+        {{accountData.title}}
+    </strong>
+    <strong class="card-bottom no-click p-3 text-start color-white font-monospace">
+        {{accountData.bankId}}
+        {{accountData.agency}}
+        {{accountData.number}}
+    </strong>
+    <strong class="card-bottom no-click p-3 text-end color-white font-monospace">08 / 2025</strong>
+    <div class="card-overlay bg-black opacity-50"></div>
+</div>

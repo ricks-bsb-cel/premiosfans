@@ -1,0 +1,15 @@
+<div
+	class="form-custom form-label form-border mb-3 bg-transparent"
+	ng-class="{
+		'nao-editavel':!!options.ngModelElAttrs.disabled,
+		'is-invalid': options.formControl.$invalid,
+		'is-valid': options.formControl.$valid,
+	}"
+>
+	<formly-transclude></formly-transclude>
+	<label class="form-label-always-active color-highlight">
+		{{options.templateOptions.label}}
+	</label>
+	<span class="obs" ng-if="options.templateOptions.required && !options.ngModelElAttrs.disabled">(obrigatório)</span>
+	<span class="obs" ng-if="!!options.ngModelElAttrs.disabled">(não editável)</span>
+</div>

@@ -1,0 +1,14 @@
+<div class="email">
+    <div class="form-group">
+        <input
+            type="email"
+            id="{{options.id}}_email"
+            ng-model="value"
+            class="form-control"
+            style="text-transform:lowercase;"
+            ng-class="{invalid:!isEmpty && !isValid}"
+            ng-disabled="to.disabled()"
+            autocomplete="on"
+        >
+    </div>
+</div>

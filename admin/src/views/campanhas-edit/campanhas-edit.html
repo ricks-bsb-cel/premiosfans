@@ -4,7 +4,7 @@
 
     <wait-overlay ready="ready" class="container-fluid">
         <div class="row">
-            
+
             <!--
             <div ng-if="campanha" class="col-12">
                 <div ng-if="campanha.ativo" class="alert alert-danger">
@@ -29,7 +29,8 @@
 
                     <div class="card-body p-3">
                         <form novalidate>
-                            <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.main.fields" form="forms.main.form" novalidate>
+                            <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.main.fields"
+                                form="forms.main.form" novalidate>
                             </formly-form>
                         </form>
                     </div>
@@ -40,7 +41,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
-                            Imagens de Capa
+                            Imagem Principal
                         </h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -76,7 +77,6 @@
                         <p>Números de 0 (zero) a {{qtdNumeros()}}</p>
                     </div>
                 </div>
-
             </div>
 
             <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
@@ -93,145 +93,125 @@
                     </div>
                     <div class="card-body">
 
-                        <ul
-                            class="nav nav-tabs"
-                            id="tab-conteudo"
-                            role="tablist"
-                        >
+                        <ul class="nav nav-tabs" id="tab-conteudo" role="tablist">
                             <li class="nav-item">
-                                <a
-                                    id="tab-content-detalhes-tab"
-                                    data-bs-target="#tab-content-detalhes"
-                                    aria-controls="tab-content-detalhes-tab"
-                                    class="nav-link active"
-                                    data-bs-toggle="tab"
-                                    role="tab"
-                                    aria-selected="true"
-                                >
+                                <a id="tab-content-sorteios-tab" data-bs-target="#tab-content-sorteios"
+                                    aria-controls="tab-content-sorteios-tab" class="nav-link active" data-bs-toggle="tab"
+                                    role="tab" aria-selected="true">
+                                    Sorteios
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a id="tab-content-influencers-tab" data-bs-target="#tab-content-influencers"
+                                    aria-controls="tab-content-influencers-tab" class="nav-link" data-bs-toggle="tab"
+                                    role="tab" aria-selected="true">
+                                    Influencers
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a id="tab-content-detalhes-tab" data-bs-target="#tab-content-detalhes"
+                                    aria-controls="tab-content-detalhes-tab" class="nav-link"
+                                    data-bs-toggle="tab" role="tab" aria-selected="true">
                                     Detalhes da Campanha
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a
-                                    id="tab-content-regulamento-tab"
-                                    data-bs-target="#tab-content-regulamento"
-                                    aria-controls="tab-content-regulamento-tab"
-                                    class="nav-link"
-                                    data-bs-toggle="tab"
-                                    role="tab"
-                                    aria-selected="true"
-                                >
+                                <a id="tab-content-regulamento-tab" data-bs-target="#tab-content-regulamento"
+                                    aria-controls="tab-content-regulamento-tab" class="nav-link" data-bs-toggle="tab"
+                                    role="tab" aria-selected="true">
                                     Regulamento
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a
-                                    id="tab-content-termos-tab"
-                                    data-bs-target="#tab-content-termos"
-                                    aria-controls="tab-content-termos-tab"
-                                    class="nav-link"
-                                    data-bs-toggle="tab"
-                                    role="tab"
-                                    aria-selected="true"
-                                >
+                                <a id="tab-content-termos-tab" data-bs-target="#tab-content-termos"
+                                    aria-controls="tab-content-termos-tab" class="nav-link" data-bs-toggle="tab"
+                                    role="tab" aria-selected="true">
                                     Termos de Uso
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a
-                                    id="tab-content-politica-tab"
-                                    data-bs-target="#tab-content-politica"
-                                    aria-controls="tab-content-politica-tab"
-                                    class="nav-link"
-                                    data-bs-toggle="tab"
-                                    role="tab"
-                                    aria-selected="true"
-                                >
+                                <a id="tab-content-politica-tab" data-bs-target="#tab-content-politica"
+                                    aria-controls="tab-content-politica-tab" class="nav-link" data-bs-toggle="tab"
+                                    role="tab" aria-selected="true">
                                     Política de Privacidade
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a
-                                    id="tab-content-rodape-tab"
-                                    data-bs-target="#tab-content-rodape"
-                                    aria-controls="tab-content-rodape-tab"
-                                    class="nav-link"
-                                    data-bs-toggle="tab"
-                                    role="tab"
-                                    aria-selected="true"
-                                >
+                                <a id="tab-content-rodape-tab" data-bs-target="#tab-content-rodape"
+                                    aria-controls="tab-content-rodape-tab" class="nav-link" data-bs-toggle="tab"
+                                    role="tab" aria-selected="true">
                                     Rodapé
                                 </a>
                             </li>
                         </ul>
-                        
+
                         <div class="tab-content">
-                            <div
-                                id="tab-content-detalhes"
-                                aria-labelledby="tab-content-detalhes-tab"
-                                class="tab-pane fade pt-3 show active"
-                                role="tabpanel"
-                            >
-                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.detalhes.fields" form="forms.detalhes.form" novalidate>
-                                </formly-form>
+                            <div id="tab-content-sorteios" aria-labelledby="tab-content-sorteios-tab" class="tab-pane fade pt-3 show active" role="tabpanel">
+                                <sorteios-campanha sorteios="campanha.sorteios" class="pr-2 pl-2">
+                                </sorteio-campanha>
                             </div>
 
                             <div
-                                id="tab-content-regulamento"
-                                aria-labelledby="tab-content-regulamento-tab"
-                                class="tab-pane fade pt-3"
+                                id="tab-content-influencers"
+                                aria-labelledby="tab-content-influencers-tab"
+                                class="tab-pane fade pt-0 mt-0"
                                 role="tabpanel"
                             >
-                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.regulamento.fields" form="forms.regulamento.form" novalidate>
-                                </formly-form>
+                                <influencers-campanha-widget
+                                    class="col-12"
+                                    influencers="campanha.influencers"
+                                    style="position: relative;"
+                                >
+                                </influencers-campanha-widget>                    
+                                
+                                <!--                                
+                                <influencers-campanha-treeview class="col-12" influencers="campanha.influencers">
+                                </influencers-campanha-treeview>                    
+
+                                <influencers-campanha class="col-12" influencers="campanha.influencers">
+                                </influencers-campanha>   
+                                -->                 
                             </div>
-                
-                            <div
-                                id="tab-content-termos"
-                                aria-labelledby="tab-content-termos-tab"
-                                class="tab-pane fade pt-3"
-                                role="tabpanel"
-                            >
-                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.termos.fields" form="forms.termos.form" novalidate>
+
+                            <div id="tab-content-detalhes" aria-labelledby="tab-content-detalhes-tab" class="tab-pane fade pt-3" role="tabpanel">
+                                <formly-form ng-if="forms.main" class="row" model="campanha"
+                                    fields="forms.detalhes.fields" form="forms.detalhes.form" novalidate>
                                 </formly-form>
                             </div>
 
-                            <div
-                                id="tab-content-politica"
-                                aria-labelledby="tab-content-politica-tab"
-                                class="tab-pane fade pt-3"
-                                role="tabpanel"
-                            >
-                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.politica.fields" form="forms.politica.form" novalidate>
+                            <div id="tab-content-regulamento" aria-labelledby="tab-content-regulamento-tab" class="tab-pane fade pt-3" role="tabpanel">
+                                <formly-form ng-if="forms.main" class="row" model="campanha"
+                                    fields="forms.regulamento.fields" form="forms.regulamento.form" novalidate>
                                 </formly-form>
                             </div>
 
-                            <div
-                                id="tab-content-rodape"
-                                aria-labelledby="tab-content-rodape-tab"
-                                class="tab-pane fade pt-3"
-                                role="tabpanel"
-                            >
-                                <formly-form ng-if="forms.main" class="row" model="campanha" fields="forms.rodape.fields" form="forms.rodape.form" novalidate>
+                            <div id="tab-content-termos" aria-labelledby="tab-content-termos-tab" class="tab-pane fade pt-3" role="tabpanel">
+                                <formly-form ng-if="forms.main" class="row" model="campanha"
+                                    fields="forms.termos.fields" form="forms.termos.form" novalidate>
+                                </formly-form>
+                            </div>
+
+                            <div id="tab-content-politica" aria-labelledby="tab-content-politica-tab" class="tab-pane fade pt-3" role="tabpanel">
+                                <formly-form ng-if="forms.main" class="row" model="campanha"
+                                    fields="forms.politica.fields" form="forms.politica.form" novalidate>
+                                </formly-form>
+                            </div>
+
+                            <div id="tab-content-rodape" aria-labelledby="tab-content-rodape-tab" class="tab-pane fade pt-3" role="tabpanel">
+                                <formly-form ng-if="forms.main" class="row" model="campanha"
+                                    fields="forms.rodape.fields" form="forms.rodape.form" novalidate>
                                 </formly-form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <influencers-campanha class="col-12" influencers="campanha.influencers">
-            </influencers-campanha>
-
-            <sorteios-campanha
-                sorteios="campanha.sorteios"
-                class="pr-2 pl-2">
-            </sorteio-campanha>
-
         </div>
     </wait-overlay>
 </section>

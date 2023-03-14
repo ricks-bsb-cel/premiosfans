@@ -10,10 +10,9 @@
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
+                                    <th class="img"></th>
                                     <th class="nome">Nome</th>
-                                    <th class="nome-exibicao">Nome Exibição</th>
-                                    <th class="celular">Celular</th>
-                                    <th class="email">eMail</th>
+                                    <th class="celular">Contato</th>
                                     <th class="ativa center">Ativo</th>
                                     <th class="id right">ID</th>
                                 </tr>
@@ -21,23 +20,21 @@
                             <tbody>
                                 <tr ng-repeat="r in collectionEmpresas.collection.data">
 
-                                    <td class="nome-fantasia">
+                                    <td class="img">
+                                        <img ng-if="r.images && r.images.length" ng-src="{{r.images[0].secure_url}}" />
+                                        <img ng-if="!r.images || r.images.length===0" src="/assets/imgs/user.png" />
+                                    </td>
+
+                                    <td class="nome">
                                         <a href="#" ng-click="edit(r)">
-                                            <img ng-if="r.images && r.images.length" ng-src="{{r.images[0].secure_url}}" />
-                                            <span>{{r.nome}}</span>
+                                            <h5 class="mb-0">{{r.nome}}</h5>
+                                            {{r.nomeExibicao}}
                                         </a>
                                     </td>
 
-                                    <td class="celular">
-                                        {{r.nomeExibicao}}
-                                    </td>
-
-                                    <td class="celular">
-                                        {{r.celular_formatted}}
-                                    </td>
-
                                     <td class="email">
-                                        {{r.email}}
+                                        {{r.email}}<br />
+                                        {{r.celular_formatted}}
                                     </td>
 
                                     <td class="ativa center">
