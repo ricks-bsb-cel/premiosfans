@@ -57,6 +57,7 @@ const ngModule = angular.module('views.campanhas', [
 
 		$scope.$on('$destroy', function () {
 			$scope.collectionCampanhas.collection.destroySnapshot();
+
 		});
 
 	});

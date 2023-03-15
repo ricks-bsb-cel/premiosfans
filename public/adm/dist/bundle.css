@@ -820,8 +820,12 @@ table td.actions {
   padding-top: 9px !important;
 }
 table td.actions a {
+  cursor: pointer;
   margin-right: 10px;
   font-size: 1.2em;
+}
+table td.actions a i.fa, table td.actions a i.fas {
+  font-size: 1.1em;
 }
 
 @media (max-width: 576px) {
@@ -868,14 +872,16 @@ table td.actions a {
   margin-top: 30px;
 }
 
+/*
 .popover {
-  line-height: 0.25em !important;
-  background-color: floralwhite;
-}
-.popover .popover-body {
-  font-size: 0.85em;
-}
+    line-height: 0.25em !important;
+    background-color: floralwhite;
 
+    .popover-body {
+        font-size: 0.85em;
+    }
+}
+*/
 .flex-end {
   justify-content: flex-end;
 }
@@ -949,11 +955,12 @@ div.selector-container.disabled {
   background: white;
 }
 
+/*
 .note-editor .note-toolbar .note-dropdown-menu,
 .note-popover .popover-content .note-dropdown-menu {
-  min-width: 220px;
+    min-width: 220px;
 }
-
+*/
 .note-editor .dropdown-toggle::after {
   display: none;
 }
@@ -1230,6 +1237,13 @@ image-gallery .image .actions a.active {
 .influencers-campanha-list .img {
   padding: 0 0 0 10px;
   width: 0;
+}
+
+.influencers-campanha-list tr.disabled span,
+.influencers-campanha-list tr.disabled small,
+.influencers-campanha-list tr.disabled strong,
+.influencers-campanha-list tr.disabled img {
+  opacity: 0.5;
 }
 /*!***************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha/influencers-campanha.scss ***!

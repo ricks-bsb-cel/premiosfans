@@ -6,6 +6,10 @@ const path = require('path');
 const _ = require("lodash");
 const fs = require('fs');
 
+const minify = require('html-minifier').minify;
+const UglifyJS = require("uglify-js");
+const CleanCSS = require('clean-css');
+
 const bucketName = 'premios-fans.appspot.com';
 
 const GoogleCloudStorage = require('../api/googleCloudStorage');
@@ -83,8 +87,9 @@ exports.getWithUrl = (request, response) => {
     const debug = request.query && request.query.debug === 'true';
     const type = debug ? 'debug' : 'min';
 
-    let dirFile2 = getParam(request, 'dirFile2'),
-        dirFile3 = getParam(request, 'dirFile3'),
+    let dirFile2 = getParam(request, 'dirFile2');
+
+    const dirFile3 = getParam(request, 'dirFile3'),
         dirFile4 = getParam(request, 'dirFile4'),
         dirFile5 = getParam(request, 'dirFile5');
 
@@ -123,9 +128,7 @@ exports.getWithUrl = (request, response) => {
 }
 
 exports.getTemplateFile = (request, response) => {
-    const debug = request.query && request.query.debug === 'true';
-
-    let
+    const
         dirFile1 = getParam(request, 'dirFile1'),
         dirFile2 = getParam(request, 'dirFile2'),
         dirFile3 = getParam(request, 'dirFile3'),
@@ -139,8 +142,6 @@ exports.getTemplateFile = (request, response) => {
     if (dirFile3) file += dirFile3;
     if (dirFile4) file += dirFile4;
     if (dirFile5) file += dirFile5;
-
-    console.info("***", file);
 
     return templateStorage.responseFile(response, file);
 }
@@ -378,8 +379,6 @@ async function compileApp(sourceData, obj, minifyExtension) {
 
         switch (minifyExtension) {
             case ".html":
-                const minify = require('html-minifier').minify;
-
                 compiled = minify(compiled, {
                     collapseWhitespace: true,
                     removeComments: true,
@@ -388,17 +387,12 @@ async function compileApp(sourceData, obj, minifyExtension) {
 
                 break;
             case ".js":
-                const UglifyJS = require("uglify-js");
-                const uglifyResult = UglifyJS.minify(compiled, {
+                compiled = UglifyJS.minify(compiled, {
                     mangle: false,
-                });
-
-                compiled = uglifyResult.code;
+                }).code;
 
                 break;
             case ".css":
-                const CleanCSS = require('clean-css');
-
                 compiled = new CleanCSS().minify(compiled).styles;
 
                 break;

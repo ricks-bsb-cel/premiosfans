@@ -10,7 +10,7 @@ const path = require('path');
 const _ = require("lodash");
 const fs = require("fs");
 
-var pStart = null;
+let pStart = null;
 
 exports.performanceStart = _ => {
     pStart = performance.now();
@@ -18,6 +18,7 @@ exports.performanceStart = _ => {
 
 exports.performanceEnd = _ => {
     const end = performance.now();
+
     return end - pStart;
 }
 

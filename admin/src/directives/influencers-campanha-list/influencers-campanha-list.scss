@@ -1,9 +1,16 @@
-.influencers-campanha-list.navbar{
+.influencers-campanha-list.navbar {
     position: relative;
     top: -20px;
 }
 
-.influencers-campanha-list .img{
+.influencers-campanha-list .img {
     padding: 0 0 0 10px;
     width: 0;
+}
+
+.influencers-campanha-list tr.disabled span,
+.influencers-campanha-list tr.disabled small,
+.influencers-campanha-list tr.disabled strong,
+.influencers-campanha-list tr.disabled img {
+    opacity: 0.5;
 }

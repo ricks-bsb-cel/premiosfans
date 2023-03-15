@@ -12,6 +12,7 @@ const ngModule = angular.module('views.contratos-edit', [
 		$routeParams,
 		navbarTopLeftFactory,
 		collectionCampanhas,
+		collectionCampanhasInfluencers,
 		appAuthHelper,
 		toastrFactory,
 		alertFactory,
@@ -65,13 +66,18 @@ const ngModule = angular.module('views.contratos-edit', [
 				.then(saveResult => {
 					blockUiFactory.stop();
 
-					$scope.campanha.id = $scop.campanha.id || saveResult.campanha.id;
+					$scope.campanha.id = $scope.campanha.id || saveResult.campanha.id;
+
+					influencersOnChange();
 
 					if (close) $location.path('/campanhas');
 				})
 				.catch(e => {
 					blockUiFactory.stop();
-					toastrFactory.error(e.data.error);
+
+					toastrFactory.error('Erro salvando campanha...');
+
+					console.error(e);
 				})
 
 		}
@@ -325,66 +331,66 @@ const ngModule = angular.module('views.contratos-edit', [
 			return total;
 		}
 
-		const loadCampanha = idCampanha => {
-			collectionCampanhas.get(idCampanha)
+		async function loadCampanha(idCampanha) {
+			$scope.campanha = await collectionCampanhas.get(idCampanha);
 
-				.then(result => {
-					$scope.campanha = { ...result };
+			$scope.campanha.vlTitulo = $scope.campanha.vlTitulo || _vlTitulo;
+			$scope.campanha.qtdGrupos = $scope.campanha.qtdGrupos || _qtdGrupos;
+			$scope.campanha.qtdNumerosPorGrupo = $scope.campanha.qtdNumerosPorGrupo || _qtdNumerosPorGrupo;
+			$scope.campanha.qtdNumerosDaSortePorTitulo = $scope.campanha.qtdNumerosDaSortePorTitulo || _qtdNumerosDaSortePorTitulo;
 
-					$scope.campanha.vlTitulo = $scope.campanha.vlTitulo || _vlTitulo;
-					$scope.campanha.qtdGrupos = $scope.campanha.qtdGrupos || _qtdGrupos;
-					$scope.campanha.qtdNumerosPorGrupo = $scope.campanha.qtdNumerosPorGrupo || _qtdNumerosPorGrupo;
-					$scope.campanha.qtdNumerosDaSortePorTitulo = $scope.campanha.qtdNumerosDaSortePorTitulo || _qtdNumerosDaSortePorTitulo;
+			influencersOnChange();
 
-					showNavbar();
+			showNavbar();
 
-					$scope.ready = true;
-				})
-
-				.catch(e => {
-					console.error(e);
-				})
+			$scope.ready = true;
 		}
 
-		const init = _ => {
-			appAuthHelper.ready()
-				.then(_ => {
+		async function init() {
+			await appAuthHelper.ready();
 
-					if ($scope.idCampanha && $scope.idCampanha !== 'new') {
-						initForms();
+			if ($scope.idCampanha && $scope.idCampanha !== 'new') {
+				initForms();
 
-						loadCampanha($scope.idCampanha);
-					} else {
-						// New
-						$scope.campanha = {
-							guidCampanha: globalFactory.guid(),
-							qtdGrupos: _qtdGrupos,
-							qtdNumerosPorGrupo: _qtdNumerosPorGrupo,
-							qtdNumerosDaSortePorTitulo: _qtdNumerosDaSortePorTitulo,
-							vlTitulo: _vlTitulo,
-							influencers: [],
-							sorteios: [_sorteio]
-						};
+				loadCampanha($scope.idCampanha);
+			} else {
+				// Nova Campanha
+				$scope.campanha = {
+					guidCampanha: globalFactory.guid(),
+					qtdGrupos: _qtdGrupos,
+					qtdNumerosPorGrupo: _qtdNumerosPorGrupo,
+					qtdNumerosDaSortePorTitulo: _qtdNumerosDaSortePorTitulo,
+					vlTitulo: _vlTitulo,
+					influencers: [],
+					sorteios: [_sorteio]
+				};
 
-						initForms();
-						showNavbar();
+				initForms();
+				showNavbar();
 
-						$scope.ready = true;
-					}
+				$scope.ready = true;
+			}
 
-				})
-
-				.catch(e => {
-					console.error(e);
-				})
 		}
 
-		$timeout(_ => {
-			init();
-		})
+		const influencersOnChange = _ => {
+			collectionCampanhasInfluencers.collection.destroySnapshot();
+
+			collectionCampanhasInfluencers.collection.startSnapshot({
+				filter: [
+					{ field: "idCampanha", operator: "==", value: $scope.campanha.id },
+				],
+				dataReady: function (data) {
+					$scope.campanha.influencers = data;
+				}
+			});
+		}
+
+		$timeout(_ => { init(); })
 
 		$scope.$on('$destroy', function () {
 			$scope.collectionCampanhas.collection.destroySnapshot();
+			collectionCampanhasInfluencers.collection.destroySnapshot();
 		});
 
 	});

@@ -10,9 +10,10 @@ exports.get = (request, response) => {
 
     const types = ['parceiro', 'influencer'];
 
-    let
+    const
         version = global.getVersionId(),
-        versionDate = global.getVersionDate(),
+        versionDate = global.getVersionDate();
+    let
         type = request.query.type || 'parceiro';
 
     if (!types.includes(type)) type = types[0];

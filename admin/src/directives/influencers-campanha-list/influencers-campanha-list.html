@@ -1,7 +1,7 @@
 <nav class="influencers-campanha-list navbar navbar-expand navbar-light">
     <ul class="navbar-nav">
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" ng-click="add()" class="nav-link">
+            <a ng-if="showAdd()" href="#" ng-click="add()" class="nav-link">
                 <i class="fas fa-plus-circle"></i>
                 Adicionar
             </a>
@@ -34,21 +34,25 @@
                 <th>Contato</th>
                 <th>Acessos</th>
                 <th class="right">Comissão</th>
+                <th class="actions"></th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="influencer in list">
+            <tr ng-repeat="influencer in list" ng-class="{disabled:!influencer.ativo}">
                 <td class="img">
-                    <img ng-if="influencer.images && influencer.images[0]" ng-src="{{influencer.images[0].secure_url}}" alt="{{influencer.nome}}" class="img-circle img-size-64 mr-2">
-                    <img ng-if="!influencer.images || !influencer.images[0]"  src="/assets/imgs/user.png" alt="{{influencer.nome}}" class="img-circle img-size-64 mr-2">
+                    <img ng-if="influencer.images && influencer.images[0]" ng-src="{{influencer.images[0].secure_url}}"
+                        alt="{{influencer.nome}}" class="img-circle img-size-64 mr-2">
+                    <img ng-if="!influencer.images || !influencer.images[0]" src="/assets/imgs/user.png"
+                        alt="{{influencer.nome}}" class="img-circle img-size-64 mr-2">
                 </td>
                 <td>
-                    {{influencer.nomeExibicao}}<br />
-                    {{influencer.nome}}
+                    <span>{{influencer.nomeExibicao}}</span>
+                    <br />
+                    <span>{{influencer.nome}}</span>
                 </td>
                 <td>
-                    {{influencer.email}}<br/>
-                    {{influencer.celular_formatted}}
+                    <span>{{influencer.email}}</span><br />
+                    <span>{{influencer.celular_formatted}}</span>
                 </td>
                 <td>
                     <small>Acessos</small>: <strong>0</strong><br />
@@ -56,6 +60,15 @@
                 </td>
                 <td class="right">
                     <small>R$</small> <strong>0</strong><small>.00</small>
+                </td>
+                <td class="actions right">
+                    <a href="#" class="link">
+                        <i class="far fa-edit"></i>
+                    </a>
+                    <a href="#" ng-click="enableDisable(influencer)" class="link" uib-popover="Habilitar/Desabilitar Influencer na Campanha">
+                        <i ng-if="influencer.ativo"  class="far fa-check-square"></i>
+                        <i ng-if="!influencer.ativo" class="far fa-square"></i>
+                    </a>
                 </td>
             </tr>
         </tbody>

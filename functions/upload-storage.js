@@ -5,14 +5,11 @@ const path = require('path');
 const readline = require('readline');
 const fs = require('fs');
 const crypto = require('crypto');
-const moment = require("moment-timezone");
 
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
 const serviceAccount = require('./premios-fans-firebase-adminsdk-ga8ql-fed7f24f67.json');
-
-const storagePath = path.join(__dirname, 'storage');
 const bucketName = 'premios-fans-templates';
 
 /*
@@ -92,7 +89,7 @@ async function uploadToStorage(localFiles) {
         });
 
         console.log(`Arquivo ${f.name} enviado para o bucket ${bucketName} [${file.metadata.md5Hash}], ${file.metadata.size} bytes`);
-        
+
         rl.prompt();
     }
 }

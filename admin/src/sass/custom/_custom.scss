@@ -277,8 +277,13 @@ table td.actions {
     padding-top: 9px !important;
 
     a{
+        cursor: pointer;
         margin-right: 10px;
         font-size: 1.2em;
+
+        i.fa, i.fas{
+            font-size: 1.1em;
+        }
     }
 }
 
@@ -334,6 +339,7 @@ table td.actions {
     margin-top: 30px;
 }
 
+/*
 .popover {
     line-height: 0.25em !important;
     background-color: floralwhite;
@@ -342,6 +348,7 @@ table td.actions {
         font-size: 0.85em;
     }
 }
+*/
 
 .flex-end {
     justify-content: flex-end;
@@ -418,10 +425,12 @@ div.selector-container.disabled {
     background: white;
 }
 
+/*
 .note-editor .note-toolbar .note-dropdown-menu,
 .note-popover .popover-content .note-dropdown-menu {
     min-width: 220px;
 }
+*/
 
 .note-editor .dropdown-toggle::after {
     display: none;

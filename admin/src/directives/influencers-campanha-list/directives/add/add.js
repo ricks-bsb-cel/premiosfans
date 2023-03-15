@@ -7,6 +7,7 @@ let ngModule = angular.module('view.influencersCampanhaList.add', [])
             $uibModalInstance,
             collectionEmpresas,
             premiosFansService,
+            toastrFactory,
             campanha
         ) {
 
@@ -35,6 +36,8 @@ let ngModule = angular.module('view.influencersCampanhaList.add', [])
                         }
                     })
                 });
+
+                toastrFactory.info(`Os influencers selecionados serão verificados e adicionados à Campanha. Aguarde alguns segundos...`);
 
                 $uibModalInstance.close($ctrl.list.filter(f => f.selected));
             };

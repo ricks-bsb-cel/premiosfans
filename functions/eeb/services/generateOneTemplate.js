@@ -10,7 +10,6 @@ Quanto ainda está por vir?
 const global = require('../../global');
 
 // const admin = require('firebase-admin');
-const { Storage } = require('@google-cloud/storage');
 const _ = require('lodash');
 const Joi = require('joi');
 
@@ -60,10 +59,8 @@ class Service extends eebService {
 
     async run() {
         const version = global.generateRandomId(7);
-
         const dataResult = await schema().validateAsync(this.parm.data);
-
-        let result = { ...dataResult };
+        const result = { ...dataResult };
 
         [
             result.influencer,
@@ -189,7 +186,7 @@ async function loadTemplateFiles(template) { // Resposável por listar os arquiv
     const files = await templateStorage.getFiles(path);
     const promises = files.map(f => templateStorage.read(f.name));
 
-    return await Promise.all(promises);;
+    return await Promise.all(promises);
 
     /*
     let [files] = await storage.bucket(template.bucket).getFiles({

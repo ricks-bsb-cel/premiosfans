@@ -61,7 +61,7 @@ class Service extends eebService {
 
         const id = promiseResult[2] && promiseResult[2].length ? promiseResult[2][0].id : null;
 
-        let toAdd = promiseResult[2] && promiseResult[2].length ? promiseResult[2][0] : {
+        const toAdd = promiseResult[2] && promiseResult[2].length ? promiseResult[2][0] : {
             idCampanha: result.data.idCampanha,
             idInfluencer: result.data.idInfluencer
         };
@@ -73,12 +73,12 @@ class Service extends eebService {
             const templateExist = await templateStorage.directoryExists(templateDir);
 
             if (!templateExist) throw new Error(`O template ${result.data.idTemplate} não foi encontrado em ${templateBucket}/${templateDir}`);
-        
+
             toAdd.idTemplate = result.data.idTemplate;
         }
 
-        toAdd.ativo  = result.data.ativo;
-        
+        toAdd.ativo = result.data.ativo;
+
         if (!id) global.setDateTime(toAdd, 'dtInclusao');
         global.setDateTime(toAdd, 'dtAlteracao');
 

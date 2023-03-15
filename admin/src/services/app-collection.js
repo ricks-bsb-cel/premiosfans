@@ -1,4 +1,4 @@
-'use strict';
+
 
 const ngModule = angular.module('services.app-collection', [])
 
@@ -110,6 +110,7 @@ const ngModule = angular.module('services.app-collection', [])
 
 				if (typeof this.unsubscribeSnapshot === 'function') {
 					this.unsubscribeSnapshot();
+					this.unsubscribeSnapshot = null;
 				}
 			}
 
@@ -249,8 +250,6 @@ const ngModule = angular.module('services.app-collection', [])
 						}
 					})
 			}
-
-
 
 			this.loadReferenceOnDoc = (doc, references) => {
 				references.forEach(r => {

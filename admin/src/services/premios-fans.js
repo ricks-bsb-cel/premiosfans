@@ -304,7 +304,7 @@ const ngModule = angular.module('services.premios-fans', [])
                 }
 
                 $http({
-                    url: getUrlEndPoint('/api/eeb/v1/add-influencer-to-campanha?async=false'),
+                    url: getUrlEndPoint('/api/eeb/v1/add-influencer-to-campanha?async=true'),
                     method: 'post',
                     data: attrs.data,
                     headers: {
@@ -314,15 +314,11 @@ const ngModule = angular.module('services.premios-fans', [])
 
                     .then(
                         function (response) {
-                            toastrFactory.info(`A influencer [${attrs.data.idInfluencer}] será adicionado na campanha em alguns instantes...`);
-
                             typeof attrs.success === 'function' && attrs.success(response.data.data);
                         },
                         function (e) {
                             console.error(e);
 
-                            toastrFactory.error(`Erro solicitando que o influencer [${attrs.data.idInfluencer}] seja adicionado na campanha...`);
-                            
                             typeof attrs.error === 'function' && attrs.error(e);
                         }
                     );
