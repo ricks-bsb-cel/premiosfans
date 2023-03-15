@@ -30,9 +30,7 @@ import selectEmpresa from './select-empresa/select-empresa';
 import moeda from './moeda/moeda';
 import premiosCampanha from './premios-campanha/premios-campanha';
 import influencersCampanha from './influencers-campanha/influencers-campanha';
-import influencersCampanhaTreeview from './influencers-campanha-treeview/influencers-campanha-treeview';
 import influencersCampanhaList from './influencers-campanha-list/influencers-campanha-list';
-import influencersCampanhaWidget from './influencers-campanha-widget/influencers-campanha-widget';
 import sorteiosCampanha from './sorteios-campanha/sorteios-campanha';
 import sorteioCampanhaPremios from './sorteio-campanha-premios/sorteio-campanha-premios';
 import inputDate from './input-date/input-date';
@@ -72,9 +70,7 @@ const ngModule = angular.module('directives', [
     moeda.name,
     premiosCampanha.name,
     influencersCampanha.name,
-    influencersCampanhaTreeview.name,
     influencersCampanhaList.name,
-    influencersCampanhaWidget.name,
     sorteiosCampanha.name,
     sorteioCampanhaPremios.name,
     inputDate.name,

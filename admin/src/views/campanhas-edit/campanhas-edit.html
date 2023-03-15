@@ -5,14 +5,6 @@
     <wait-overlay ready="ready" class="container-fluid">
         <div class="row">
 
-            <!--
-            <div ng-if="campanha" class="col-12">
-                <div ng-if="campanha.ativo" class="alert alert-danger">
-                    Esta campanha está ativa e não pode ser alterada!
-                </div>
-            </div>
-            -->
-
             <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
                 <div class="card">
                     <div class="card-header">
@@ -81,18 +73,7 @@
 
             <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            Conteúdos
-                        </h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </div>
                     <div class="card-body">
-
                         <ul class="nav nav-tabs" id="tab-conteudo" role="tablist">
                             <li class="nav-item">
                                 <a id="tab-content-sorteios-tab" data-bs-target="#tab-content-sorteios"
@@ -102,7 +83,7 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item">
+                            <li class="nav-item" ng-if="campanha.id">
                                 <a id="tab-content-influencers-tab" data-bs-target="#tab-content-influencers"
                                     aria-controls="tab-content-influencers-tab" class="nav-link" data-bs-toggle="tab"
                                     role="tab" aria-selected="true">
@@ -150,7 +131,6 @@
                                 </a>
                             </li>
                         </ul>
-
                         <div class="tab-content">
                             <div id="tab-content-sorteios" aria-labelledby="tab-content-sorteios-tab" class="tab-pane fade pt-3 show active" role="tabpanel">
                                 <sorteios-campanha sorteios="campanha.sorteios" class="pr-2 pl-2">
@@ -158,25 +138,18 @@
                             </div>
 
                             <div
+                                ng-if="campanha.id"
                                 id="tab-content-influencers"
                                 aria-labelledby="tab-content-influencers-tab"
                                 class="tab-pane fade pt-0 mt-0"
                                 role="tabpanel"
                             >
-                                <influencers-campanha-widget
+                                <influencers-campanha-list
                                     class="col-12"
-                                    influencers="campanha.influencers"
+                                    campanha="campanha"
                                     style="position: relative;"
                                 >
-                                </influencers-campanha-widget>                    
-                                
-                                <!--                                
-                                <influencers-campanha-treeview class="col-12" influencers="campanha.influencers">
-                                </influencers-campanha-treeview>                    
-
-                                <influencers-campanha class="col-12" influencers="campanha.influencers">
-                                </influencers-campanha>   
-                                -->                 
+                                </influencers-campanha-list>                    
                             </div>
 
                             <div id="tab-content-detalhes" aria-labelledby="tab-content-detalhes-tab" class="tab-pane fade pt-3" role="tabpanel">

@@ -51,10 +51,6 @@
                 "function": "mainPartners"
             },
             {
-                "source": "/influencers",
-                "function": "mainInfluencers"
-            },
-            {
                 "source": "/api/auth/**",
                 "function": "auth"
             },

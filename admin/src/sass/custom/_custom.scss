@@ -272,12 +272,16 @@ badge-true-false.link .badge {
     }
 }
 
-/*
-.note-editable * {
-    line-height: inherit !important;
-    font-size: initial !important;
- }
- */
+table td.actions {
+    width: 150px;
+    padding-top: 9px !important;
+
+    a{
+        margin-right: 10px;
+        font-size: 1.2em;
+    }
+}
+
 
 @media (max-width: 576px) {
     .hide-xs {

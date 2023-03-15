@@ -7,7 +7,6 @@ const storage = new Storage();
 
 class GoogleCloudStorage {
     constructor(bucket, defaultPath) {
-        console.info('bucket name', bucket);
         this.bucket = storage.bucket(bucket);
         this.defaultPath = defaultPath || null;
     }
@@ -85,6 +84,24 @@ class GoogleCloudStorage {
         });
 
         return files;
+    }
+
+    async directoryExists(directoryPrefix) {
+        try {
+            const options = {
+                prefix: directoryPrefix,
+                autoPaginate: false,
+                maxResults: 1,
+            };
+
+            const [files] = await this.bucket.getFiles(options);
+
+            return files.length > 0;
+        } catch (e) {
+            console.error(e);
+
+            return false;
+        }
     }
 
     responseFile(response, filePath) {

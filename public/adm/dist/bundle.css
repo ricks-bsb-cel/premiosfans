@@ -815,12 +815,15 @@ badge-true-false.link .badge {
   width: 100%;
 }
 
-/*
-.note-editable * {
-    line-height: inherit !important;
-    font-size: initial !important;
- }
- */
+table td.actions {
+  width: 150px;
+  padding-top: 9px !important;
+}
+table td.actions a {
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
 @media (max-width: 576px) {
   .hide-xs {
     display: none;
@@ -1201,29 +1204,32 @@ image-gallery .image .actions a.active {
   padding: 0px 0px 0px 2px;
   border-radius: 50%;
 }
+/*!******************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-list/directives/add/add.scss ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************/
+.influencers-campanha-list-add-modal tr {
+  cursor: pointer;
+}
+
+.influencers-campanha-list-add-modal .img {
+  width: 0;
+  padding: 0 0 0 20px;
+}
+
+.influencers-campanha-list-add-modal table .actions {
+  width: 20px;
+}
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-list/influencers-campanha-list.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************/
-
-/*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-treeview/influencers-campanha-treeview.scss ***!
-  \*********************************************************************************************************************************************************************************************************************************************************************************************************/
-influencers-campanha-treeview .actions {
-  display: inline-block;
-  padding-left: 5px;
-}
-influencers-campanha-treeview .actions a {
-  padding-top: 1px;
-}
-influencers-campanha-treeview .actions a i {
-  font-size: 1.1em;
-}
-/*!*****************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-widget/influencers-campanha-widget.scss ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************************************/
-.influencers-campanha-widget.navbar {
+.influencers-campanha-list.navbar {
   position: relative;
   top: -20px;
+}
+
+.influencers-campanha-list .img {
+  padding: 0 0 0 10px;
+  width: 0;
 }
 /*!***************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha/influencers-campanha.scss ***!

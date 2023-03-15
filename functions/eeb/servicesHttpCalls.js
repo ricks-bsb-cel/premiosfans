@@ -1,4 +1,4 @@
-"use strict";
+ "use strict";
 
 const express = require("express");
 const cors = require('cors')
@@ -117,6 +117,10 @@ api.post("/v1/generate-pedido-pagamento-compra", (request, response) => {
 
 api.post("/v1/uft", (request, response) => {
     initFirebase.call(require('./services/updateFcmToken').callRequest, request, response);
+})
+
+api.post("/v1/add-influencer-to-campanha", (request, response) => {
+    initFirebase.call(require('./services/addInfluencerToCampanha').callRequest, request, response);
 })
 
 

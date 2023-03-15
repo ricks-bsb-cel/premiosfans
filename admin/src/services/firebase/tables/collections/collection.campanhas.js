@@ -21,119 +21,77 @@ const ngModule = angular.module('collection.campanhas', [])
 
         var firebaseCollection = new appCollection(attr);
 
-        const get = idCampanha => {
-            return $q((resolve, reject) => {
+        async function get(idCampanha) {
 
-                const promises = [
-                    appFirestoreHelper.getDoc(attr.collection, idCampanha),
-                    collectionCampanhasInfluencers.get(idCampanha),
-                    collectionCampanhasSorteios.get(idCampanha),
-                    collectionCampanhasSorteiosPremios.get(idCampanha)
-                ];
+            const getData = await Promise.all([
+                appFirestoreHelper.getDoc(attr.collection, idCampanha),
+                collectionCampanhasInfluencers.get(idCampanha),
+                collectionCampanhasSorteios.get(idCampanha),
+                collectionCampanhasSorteiosPremios.get(idCampanha)
+            ]);
 
-                return Promise.all(promises)
+            let campanha = getData[0],
+                influencers = getData[1],
+                sorteios = getData[2],
+                premios = getData[3];
 
-                    .then(promisesResult => {
-                        let campanha = promisesResult[0],
-                            influencers = promisesResult[1],
-                            sorteios = promisesResult[2],
-                            premios = promisesResult[3];
+            if (!sorteios || sorteios.length === 0) {
+                sorteios.push({
+                    ativo: false,
+                    idCampanha: campanha.id,
+                    guidSorteio: globalFactory.guid(),
+                    deleted: false,
+                    premios: []
+                })
+            }
 
-                        if (!sorteios || sorteios.length === 0) {
-                            sorteios.push({
-                                ativo: false,
-                                idCampanha: campanha.id,
-                                guidSorteio: globalFactory.guid(),
-                                deleted: false,
-                                premios: []
-                            })
-                        }
+            campanha.influencers = influencers;
+            campanha.sorteios = globalFactory.sortArray(sorteios, 'dtSorteio_yyyymmdd');
 
-                        campanha.influencers = influencers;
-                        campanha.sorteios = globalFactory.sortArray(sorteios, 'dtSorteio_yyyymmdd');
+            campanha.qtdGrupos = campanha.qtdGrupos || 100;
+            campanha.qtdNumerosPorGrupo = campanha.qtdNumerosPorGrupo || 1000;
 
-                        campanha.qtdGrupos = campanha.qtdGrupos || 100;
-                        campanha.qtdNumerosPorGrupo = campanha.qtdNumerosPorGrupo || 1000;
+            campanha.sorteios = campanha.sorteios.map(s => {
+                s.premios = premios.filter(f => {
+                    return f.idSorteio === s.id;
+                }).map(p => {
+                    p.deleted = false;
+                    return p;
+                });
 
-                        campanha.sorteios = campanha.sorteios.map(s => {
-                            s.premios = premios
-                                .filter(f => {
-                                    return f.idSorteio === s.id;
-                                })
-                                .map(p => {
-                                    p.deleted = false;
-                                    return p;
-                                });
+                s.premios = globalFactory.sortArray(s.premios, 'pos');
+                s.deleted = false;
 
-                            s.premios = globalFactory.sortArray(s.premios, 'pos');
-                            s.deleted = false;
+                return s;
+            });
 
-                            return s;
-                        });
-
-                        return resolve(campanha);
-                    })
-
-                    .catch(e => {
-                        return reject(e);
-                    })
-
-            })
+            return campanha;
         }
 
-        const save = campanha => {
-            return $q((resolve, reject) => {
+        async function save(campanha) {
 
-                // Não modifique o objeto que está no AngularJS...
-                let result = {},
-                    toSave = { ...campanha };
+            let result = {},
+                toSave = { ...campanha }; // Não modifique o objeto que está no AngularJS...
 
-                toSave = sanitize(toSave);
+            toSave = sanitize(toSave);
 
-                let id = toSave.id || 'new';
+            let id = toSave.id || 'new';
 
-                delete toSave.id;
+            delete toSave.id;
 
-                firebaseCollection.addOrUpdateDoc(id, toSave)
+            result.campanha = await firebaseCollection.addOrUpdateDoc(id, toSave);
+            result.sorteios = await collectionCampanhasSorteios.save(result.campanha, campanha.sorteios);
+            // result.influencers = await collectionCampanhasInfluencers.save(result.campanha, campanha.influencers);
 
-                    .then(campanhaSaved => {
+            await removeDeletedSorteios(campanha);
 
-                        result.campanha = campanhaSaved;
-
-                        // Salva os influencers
-                        return collectionCampanhasInfluencers.save(result.campanha, campanha.influencers);
-                    })
-
-                    .then(dadosInfluencers => {
-                        result.influencers = dadosInfluencers;
-
-                        return collectionCampanhasSorteios.save(result.campanha, campanha.sorteios);
-                    })
-
-                    .then(dadosSorteios => {
-                        result.sorteios = dadosSorteios;
-
-                        return removeDeletedSorteios(campanha);
-                    })
-
-                    .then(_ => {
-                        return resolve(result);
-                    })
-
-
-                    .catch(function (e) {
-                        console.error(e);
-
-                        return reject(e);
-                    })
-
-            })
+            return result;
         }
 
         const sanitize = campanha => {
 
             if (!campanha.titulo) throw new Error(`O nome da campanha é obrigatório`);
-            if (!campanha.url) throw new Error(`A URL da campanha é obrigatório`);
+            // if (!campanha.url) throw new Error(`A URL da campanha é obrigatório`);
             if (!campanha.template) throw new Error(`O Template da campanha é obrigatório`);
             if (!campanha.vlTitulo) throw new Error(`O Valor do Título é obrigatório`);
             if (!campanha.qtdNumerosDaSortePorTitulo) throw new Error(`A quantidade de números da sorte por título é obrigatório`);
@@ -148,7 +106,7 @@ const ngModule = angular.module('collection.campanhas', [])
                 subTitulo: campanha.subTitulo || null,
                 detalhes: campanha.detalhes || null,
                 template: campanha.template,
-                url: campanha.url,
+                // url: campanha.url,
                 vlTitulo: campanha.vlTitulo,
                 qtdNumerosDaSortePorTitulo: campanha.qtdNumerosDaSortePorTitulo,
                 qtdSorteios: 0,

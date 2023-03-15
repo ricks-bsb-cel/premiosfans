@@ -296,6 +296,38 @@ const ngModule = angular.module('services.premios-fans', [])
                     );
             }
 
+            const addInfluencerToCampanha = attrs => {
+                attrs.data = attrs.data || {};
+
+                if (!attrs.data.idCampanha || !attrs.data.idInfluencer) {
+                    throw new Error('Informe idCampanha e idInfluencer');
+                }
+
+                $http({
+                    url: getUrlEndPoint('/api/eeb/v1/add-influencer-to-campanha?async=false'),
+                    method: 'post',
+                    data: attrs.data,
+                    headers: {
+                        'Authorization': 'Bearer ' + appAuthHelper.token
+                    }
+                })
+
+                    .then(
+                        function (response) {
+                            toastrFactory.info(`A influencer [${attrs.data.idInfluencer}] será adicionado na campanha em alguns instantes...`);
+
+                            typeof attrs.success === 'function' && attrs.success(response.data.data);
+                        },
+                        function (e) {
+                            console.error(e);
+
+                            toastrFactory.error(`Erro solicitando que o influencer [${attrs.data.idInfluencer}] seja adicionado na campanha...`);
+                            
+                            typeof attrs.error === 'function' && attrs.error(e);
+                        }
+                    );
+            }
+
             return {
                 generateTemplates: generateTemplates,
                 pagarTituloCompra: pagarTituloCompra,
@@ -304,7 +336,8 @@ const ngModule = angular.module('services.premios-fans', [])
                 checkPixStorage: checkPixStorage,
                 cep: cep,
                 cnpj: cnpj,
-                refreshCartosPixKeys: refreshCartosPixKeys
+                refreshCartosPixKeys: refreshCartosPixKeys,
+                addInfluencerToCampanha: addInfluencerToCampanha
             };
 
         });

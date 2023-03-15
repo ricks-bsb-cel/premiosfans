@@ -1,0 +1,46 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+        Adicionar Influencer na Campanha
+    </h3>
+</div>
+<div class="modal-body p-0" id="modal-body">
+    <wait-overlay ready="$ctrl.ready">
+        <table class="table table-striped table-valign-middle mb-0" ng-if="$ctrl.list.length">
+            <thead>
+                <tr>
+                    <th class="img"></th>
+                    <th>Nome</th>
+                    <th>Contato</th>
+                    <th class="actions"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="influencer in $ctrl.list | orderBy:nome">
+                    <td class="img">
+                        <img ng-if="influencer.images && influencer.images[0]" ng-src="{{influencer.images[0].secure_url}}" alt="{{influencer.nome}}" class="img-circle img-size-32 mr-2">
+                        <img ng-if="!influencer.images || !influencer.images[0]"  src="/assets/imgs/user.png" alt="{{influencer.nome}}" class="img-circle img-size-32 mr-2">
+                    </td>
+                    <td>
+                        {{influencer.nomeExibicao}}<br />
+                        <small>{{influencer.nome}}</small>    
+                    </td>
+                    <td>
+                        {{influencer.email}}<br/>
+                        {{influencer.celular_formatted}}
+                    </td>
+                    <td class="actions right">
+                        <a href="#" uib-popover="Adicionar">
+                            <i ng-click="influencer.selected=false" ng-if="influencer.selected"  class="far fa-check-square"></i>
+                            <i ng-click="influencer.selected=true" ng-if="!influencer.selected" class="far fa-square"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </wait-overlay>
+</div>
+<div class="modal-footer" ng-if="$ctrl.ready">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">Salvar</button>
+    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancelar</button>
+
+</div>

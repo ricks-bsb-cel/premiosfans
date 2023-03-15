@@ -19,7 +19,7 @@ partners.use(minifyHTML({
         removeComments: true,
         collapseWhitespace: true,
         collapseBooleanAttributes: true,
-        removeAttributeQuotes: true,
+        removeAttributeQuotes: false,
         removeEmptyAttributes: true,
         minifyJS: true
     }

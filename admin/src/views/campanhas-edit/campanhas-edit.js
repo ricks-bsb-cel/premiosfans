@@ -28,6 +28,7 @@ const ngModule = angular.module('views.contratos-edit', [
 		const _qtdNumerosPorGrupo = 100;
 		const _qtdNumerosDaSortePorTitulo = 2;
 		const _vlTitulo = 10;
+
 		const _sorteio = {
 			ativo: false,
 			dtSorteio: null,
@@ -47,28 +48,26 @@ const ngModule = angular.module('views.contratos-edit', [
 			faixa: null
 		};
 
-		const save = _ => {
+		const save = close => {
+
+			close = typeof close === 'boolean' ? close : false;
 
 			if (!$scope.forms.main.form.$valid) {
 				alertFactory.error('Existe um ou mais campos obrigatórios não preenchidos. Verifique.');
 				return;
 			}
 
-			if (typeof $scope.campanha.ativo === 'undefined'){
-				$scope.campanha.ativo = false;
-			}
-
-			if ($scope.campanha.influencers.filter(f => { return f.selected; }).length === 0) {
-				alertFactory.error('Selecione um ou mais Influencers.');
-				return;
-			}
+			if (typeof $scope.campanha.ativo === 'undefined') $scope.campanha.ativo = false;
 
 			blockUiFactory.start();
 
 			collectionCampanhas.save($scope.campanha)
 				.then(saveResult => {
-					$location.path('/campanhas');
 					blockUiFactory.stop();
+
+					$scope.campanha.id = $scop.campanha.id || saveResult.campanha.id;
+
+					if (close) $location.path('/campanhas');
 				})
 				.catch(e => {
 					blockUiFactory.stop();
@@ -76,6 +75,8 @@ const ngModule = angular.module('views.contratos-edit', [
 				})
 
 		}
+
+		const saveAndClose = _ => { save(true); }
 
 		const generateTemplates = _ => {
 			premiosFansService.generateTemplates({
@@ -99,13 +100,15 @@ const ngModule = angular.module('views.contratos-edit', [
 				{
 					id: 'back',
 					route: '/campanhas/'
-				},
+				}
+				/*
 				{
 					id: 'generage',
 					label: 'Gerar Templates',
 					onClick: generateTemplates,
 					icon: 'fas fa-refresh'
 				}
+				*/
 			];
 
 			nav.push(
@@ -114,6 +117,12 @@ const ngModule = angular.module('views.contratos-edit', [
 					label: 'Salvar',
 					onClick: save,
 					icon: 'far fa-save'
+				},
+				{
+					id: 'save',
+					label: 'Salvar e Fechar',
+					onClick: saveAndClose,
+					icon: 'fas fa-save'
 				}
 			);
 
@@ -148,8 +157,9 @@ const ngModule = angular.module('views.contratos-edit', [
 								maxlength: 64
 							},
 							type: 'input',
-							className: 'col-xs-12 col-sm-12 col-md-8 col-lg-9 col-xl-9'
+							className: 'col-12'
 						},
+						/*
 						{
 							key: 'url',
 							templateOptions: {
@@ -159,6 +169,7 @@ const ngModule = angular.module('views.contratos-edit', [
 							type: 'input',
 							className: 'col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3'
 						},
+						*/
 						{
 							key: 'subTitulo',
 							templateOptions: {

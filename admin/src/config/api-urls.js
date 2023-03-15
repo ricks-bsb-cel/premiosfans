@@ -3,12 +3,16 @@
 const endPoints = _ => {
 
 	let host = '';
-	
+
 	let result = {
 		apiConfig: host + '/api/v1/api-config',
 
 		collections: {
 			clientes: host + '/api/collections/v1/clientes'
+		},
+
+		campanhas: {
+			addInfluencerToCampanha: host + '/api/eeb/v1/add-influencer-to-campanha'
 		},
 
 		clientes: {
