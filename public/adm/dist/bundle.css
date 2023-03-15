@@ -827,6 +827,11 @@ table td.actions a {
 table td.actions a i.fa, table td.actions a i.fas {
   font-size: 1.1em;
 }
+table td.actions a.disabled {
+  opacity: 0.2;
+  pointer-events: none;
+  color: initial;
+}
 
 @media (max-width: 576px) {
   .hide-xs {

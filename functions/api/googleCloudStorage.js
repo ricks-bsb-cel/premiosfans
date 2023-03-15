@@ -104,6 +104,19 @@ class GoogleCloudStorage {
         }
     }
 
+    async getDirectories(directoryPrefix) {
+        if (directoryPrefix.slice(-1) !== '/') directoryPrefix += '/';
+        const options = {
+            prefix: directoryPrefix
+        };
+
+        const [files] = await this.bucket.getFiles(options);
+
+        return files
+            .filter(file => file.isDirectory())
+            .map(directory => directory.name);
+    }
+
     responseFile(response, filePath) {
         const fileRef = this.bucket.file(filePath);
         const render = { storageFile: filePath };

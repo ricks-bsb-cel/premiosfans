@@ -285,6 +285,12 @@ table td.actions {
             font-size: 1.1em;
         }
     }
+
+    a.disabled{
+        opacity: 0.2;
+        pointer-events: none;
+        color: initial;
+    }
 }
 
 

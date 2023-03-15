@@ -7,6 +7,7 @@ Tanto que eu consegui
 Quanto ainda está por vir?
 */
 
+const admin = require("firebase-admin");
 const global = require('../../global');
 
 // const admin = require('firebase-admin');
@@ -42,8 +43,7 @@ const collectionFaq = firestoreDAL.faq();
 const schema = _ => {
     const schema = Joi.object({
         idCampanha: Joi.string().token().min(18).max(22).required(),
-        idInfluencer: Joi.string().token().min(18).max(22).required(),
-        idTemplate: Joi.string().required()
+        idInfluencer: Joi.string().token().min(18).max(22).required()
     });
 
     return schema;
@@ -97,6 +97,13 @@ class Service extends eebService {
         result.version = version;
         result.versionDate = global.todayMoment().toString('DD/MM HH:mm:ss');
 
+        result.idTemplate = result.campanhaInfluencer.idTemplate ||
+            result.campanha.idTemplate ||
+            result.campanha.template ||
+            null;
+
+        if (!result.idTemplate) throw new Error(`Não existe template selecionado para o Influencer nem para a Campanha`);
+
         // Ordena os sorteios
         result.campanhaSorteios = _.orderBy(result.campanhasSorteios, ['dtSorteio_yyyymmdd']);
 
@@ -108,9 +115,21 @@ class Service extends eebService {
 
         result.sendResult = await compileAndSendToStorage(result);
 
+        // Antes de retornar, criar a URL padrão
+        const urlPath = `/urlCampanha/${result.idCampanha}-${result.idInfluencer}`;
+        const urlData = {
+            idCampanha: result.idCampanha,
+            idInfluencer: result.idInfluencer,
+            idTemplate: result.idTemplate,
+            dtInclusao: global.nowDateTime()
+        };
+
+        await admin.database().ref(urlPath).set(urlData);
+
         return {
             success: true,
-            files: result.files.length
+            storagePathDebug: result.sendResult.storagePathDebug,
+            storagePathMin: result.sendResult.storagePathMin
         }
     }
 
@@ -135,7 +154,11 @@ async function compileAndSendToStorage(data) {
     const promisePathMin = data.files.map(file => compileAndSaveContentOnStorage(storagePathMin, file, data, path.extname(file.fileName)));
     const saveFilesResultsMin = await Promise.all(promisePathMin);
 
-    return saveFilesResultsDebug.concat(saveFilesResultsMin);
+    return {
+        storagePathDebug: storagePathDebug,
+        storagePathMin: storagePathMin,
+        files: saveFilesResultsDebug.concat(saveFilesResultsMin)
+    }
 }
 
 async function compileAndSaveContentOnStorage(storagePath, file, obj, minifyExtension) {
@@ -267,7 +290,7 @@ async function getFileContent(file) { // Responsável por carregar o conteúdo d
 
 exports.Service = Service;
 
-const call = (idTemplate, idInfluencer, idCampanha, request, response) => {
+const call = (idCampanha, idInfluencer, request, response) => {
     const eebAuthTypes = require('../eventBusService').authType;
 
     const service = new Service(request, response, {
@@ -276,9 +299,8 @@ const call = (idTemplate, idInfluencer, idCampanha, request, response) => {
         debug: request && request.query.debug ? request.query.debug === 'true' : false,
         auth: eebAuthTypes.internal,
         data: {
-            idTemplate: idTemplate,
-            idInfluencer: idInfluencer,
-            idCampanha: idCampanha
+            idCampanha: idCampanha,
+            idInfluencer: idInfluencer
         }
     });
 
@@ -288,16 +310,5 @@ const call = (idTemplate, idInfluencer, idCampanha, request, response) => {
 exports.call = call;
 
 exports.callRequest = (request, response) => {
-    const idTemplate = request.body.idTemplate;
-    const idInfluencer = request.body.idInfluencer; // Código da empresa
-    const idCampanha = request.body.idCampanha;
-
-    if (!idTemplate || !idInfluencer || !idCampanha) {
-        return response.status(500).json({
-            success: false,
-            error: 'Invalid parms'
-        })
-    }
-
-    return call(idTemplate, idInfluencer, idCampanha, request, response);
+    return call(request.body.idCampanha, request.body.idInfluencer, request, response);
 }

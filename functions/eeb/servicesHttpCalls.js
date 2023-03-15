@@ -55,11 +55,13 @@ api.post("/v1/whr/:source/:type?", (request, response) => {
     initFirebase.call(require('./services/webhook').callRequest, request, response);
 })
 
+/*
 api.post("/v1/generate-templates", (request, response) => {
     initFirebase.call(require('./services/generateTemplates').callRequest, request, response);
 })
+*/
 
-api.post("/v1/generate-one-template", (request, response) => {
+api.post("/v1/generate-template", (request, response) => {
     initFirebase.call(require('./services/generateOneTemplate').callRequest, request, response);
 })
 

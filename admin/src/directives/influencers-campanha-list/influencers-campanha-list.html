@@ -65,6 +65,14 @@
                     <a href="#" class="link">
                         <i class="far fa-edit"></i>
                     </a>
+                    <a href="#" 
+                        ng-click="generateTemplateInfluencer(influencer)"
+                        class="link"
+                        ng-class="{disabled:!influencer.ativo}"
+                        uib-popover="Gerar template do influencer"
+                    >
+                        <i class="fas fa-sync-alt"></i>
+                    </a>
                     <a href="#" ng-click="enableDisable(influencer)" class="link" uib-popover="Habilitar/Desabilitar Influencer na Campanha">
                         <i ng-if="influencer.ativo"  class="far fa-check-square"></i>
                         <i ng-if="!influencer.ativo" class="far fa-square"></i>

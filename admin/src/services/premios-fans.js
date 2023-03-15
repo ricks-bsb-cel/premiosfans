@@ -18,20 +18,21 @@ const ngModule = angular.module('services.premios-fans', [])
                 return (window.location.hostname === 'localhost' ? localUrl : gatewayUrl) + url;
             }
 
-            const generateTemplates = attrs => {
+            const generateTemplate = attrs => {
                 attrs = attrs || {
                     blockUi: true
                 };
 
                 attrs.data = attrs.data || {};
 
-                attrs.data.idCampanha = attrs.data.idCampanha || 'all';
-                attrs.data.idInfluencer = attrs.data.idInfluencer || 'all';
+                if(!attrs.data.idCampanha || !attrs.data.idInfluencer) throw new Error('')
+
+                toastrFactory.info('O template está gerado...');
 
                 if (attrs.blockUi) blockUiFactory.start();
 
                 $http({
-                    url: getUrlEndPoint('/api/eeb/v1/generate-templates'),
+                    url: getUrlEndPoint('/api/eeb/v1/generate-template?async=false'),
                     method: 'post',
                     data: attrs.data,
                     headers: {
@@ -41,16 +42,14 @@ const ngModule = angular.module('services.premios-fans', [])
 
                     .then(
                         function (response) {
-                            if (attrs.blockUi) blockUiFactory.stop();
-                            toastrFactory.info('Os templates estão sendo gerados...');
                             if (typeof attrs.success === 'function') {
                                 attrs.success(response.data.data);
                             }
                         },
                         function (e) {
-                            if (attrs.blockUi) blockUiFactory.stop();
                             console.error(e);
-                            toastrFactory.error('Erro solicitando geração de templates...');
+                            toastrFactory.error('Erro na geração do template...');
+
                             if (typeof attrs.error === 'function') {
                                 attrs.error(e);
                             }
@@ -325,7 +324,7 @@ const ngModule = angular.module('services.premios-fans', [])
             }
 
             return {
-                generateTemplates: generateTemplates,
+                generateTemplate: generateTemplate,
                 pagarTituloCompra: pagarTituloCompra,
                 checkTituloCompra: checkTituloCompra,
                 ativarCampanha: ativarCampanha,

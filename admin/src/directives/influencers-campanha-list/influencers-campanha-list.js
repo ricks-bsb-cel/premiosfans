@@ -96,6 +96,17 @@ let ngModule = angular.module('directives.influencers-campanha-list', [
                 }
             }
 
+            $scope.generateTemplateInfluencer = influencer => {
+                if (!influencer.ativo) return;
+                
+                premiosFansService.generateTemplate({
+                    data: {
+                        idCampanha: influencer.idCampanha,
+                        idInfluencer: influencer.idInfluencer
+                    }
+                })
+            }
+
 
             $scope.destroy = _ => {
                 if (endWatch) endWatch();

@@ -66,7 +66,8 @@ class Service extends eebService {
             idInfluencer: result.data.idInfluencer
         };
 
-        if (result.data.idTemplate) toAdd.idTemplate = result.data.idTemplate;
+        // Todo influencer ou tem um template ou usa o que já está selecionado na Campanha
+        toAdd.idTemplate = result.data.idTemplate || result.campanhas.idTemplate;
 
         if (result.data.idTemplate) {
             const templateDir = `storage/templates/${result.data.idTemplate}`;
