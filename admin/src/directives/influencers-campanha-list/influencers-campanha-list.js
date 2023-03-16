@@ -1,9 +1,11 @@
 'use strict';
 
 import addWidget from "./directives/add/add";
+import edit from "./directives/edit/edit";
 
 let ngModule = angular.module('directives.influencers-campanha-list', [
-    addWidget.name
+    addWidget.name,
+    edit.name
 ])
 
     .controller('influencersCampanhaListController',
@@ -13,6 +15,7 @@ let ngModule = angular.module('directives.influencers-campanha-list', [
             collectionEmpresas,
             premiosFansService,
             influencersCampanhaListAddFactory,
+            influencersCampanhaListEditFactory,
             blockUiFactory,
             toastrFactory,
             alertFactory
@@ -27,6 +30,10 @@ let ngModule = angular.module('directives.influencers-campanha-list', [
 
             $scope.add = _ => {
                 influencersCampanhaListAddFactory.add($scope.campanha);
+            }
+
+            $scope.edit = data => {
+                influencersCampanhaListEditFactory.edit(data);
             }
 
             const init = _ => {

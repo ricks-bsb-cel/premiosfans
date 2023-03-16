@@ -39,7 +39,7 @@ div.panel .container{
     margin-top: 10px;
 }
 
-div.panel .container a{
+div.panel .container a.yellow{
     padding: 2px 15px;
     background: #EFC832;
     border-radius: 15px;
@@ -54,8 +54,12 @@ div.panel .container a .strong{
     font-size: 1.1em;
 }
 
-div.panel .yellow{
+div.panel .color-yellow{
     color: #EFC832;
+}
+
+div.panel .background-yellow{
+    background: #EFC832;
 }
 
 div.panel img.capa{
@@ -620,4 +624,9 @@ input[type=submit] {
 .swal2-title {
     padding: 0.5em 1em 0 !important;
     line-height: 1.2em !important;
+}
+
+.card-influencer {
+    border-top: 2px solid white;
+    background: #003a68;
 }

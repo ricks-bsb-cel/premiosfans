@@ -32,7 +32,7 @@ const ngModule = angular.module('services.premios-fans', [])
                 if (attrs.blockUi) blockUiFactory.start();
 
                 $http({
-                    url: getUrlEndPoint('/api/eeb/v1/generate-template?async=false'),
+                    url: getUrlEndPoint('/api/eeb/v1/generate-template?async=true'),
                     method: 'post',
                     data: attrs.data,
                     headers: {

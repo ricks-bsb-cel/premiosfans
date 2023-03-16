@@ -62,7 +62,10 @@
                     <small>R$</small> <strong>0</strong><small>.00</small>
                 </td>
                 <td class="actions right">
-                    <a href="#" class="link">
+                    <a ng-href="/{{influencer.idCampanha}}-{{influencer.idInfluencer}}" target="_blank" class="link" uib-popover="Abrir página">
+                        <i class="fas fa-link"></i>
+                    </a>
+                    <a href="#" ng-click="edit(influencer)" class="link" uib-popover="Editar">
                         <i class="far fa-edit"></i>
                     </a>
                     <a href="#" 

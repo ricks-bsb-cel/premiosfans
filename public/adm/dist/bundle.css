@@ -1231,6 +1231,10 @@ image-gallery .image .actions a.active {
 .influencers-campanha-list-add-modal table .actions {
   width: 20px;
 }
+/*!********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-list/directives/edit/edit.scss ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************/
+
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha-list/influencers-campanha-list.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -1249,6 +1253,10 @@ image-gallery .image .actions a.active {
 .influencers-campanha-list tr.disabled strong,
 .influencers-campanha-list tr.disabled img {
   opacity: 0.5;
+}
+
+.influencers-campanha-list table .actions {
+  width: 170px;
 }
 /*!***************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[8].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[8].use[3]!./src/directives/influencers-campanha/influencers-campanha.scss ***!

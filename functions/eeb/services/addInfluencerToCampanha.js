@@ -47,7 +47,11 @@ class Service extends eebService {
 
         result.data = await schema().validateAsync(this.parm.data);
 
-        const promiseResult = await Promise.all([
+        let [
+            campanha,
+            influencer,
+            campanhaInfluencer
+        ] = await Promise.all([
             collectionCampanha.getDoc(result.data.idCampanha),
             collectionInfluencer.getDoc(result.data.idInfluencer),
             collectionCampanhasInfluencers.get({
@@ -59,24 +63,27 @@ class Service extends eebService {
             })
         ])
 
-        const id = promiseResult[2] && promiseResult[2].length ? promiseResult[2][0].id : null;
+        if (!campanha) throw new Error('Campanha não existe');
+        if (!influencer) throw new Error('Influencer não existe');
 
-        const toAdd = promiseResult[2] && promiseResult[2].length ? promiseResult[2][0] : {
+        // O influencer pode ou não já estár vinculado à campanha
+        campanhaInfluencer = campanhaInfluencer && campanhaInfluencer.length ? campanhaInfluencer[0] : null;
+
+        const id = campanhaInfluencer ? campanhaInfluencer.id : null;
+        const toAdd = campanhaInfluencer || {
             idCampanha: result.data.idCampanha,
             idInfluencer: result.data.idInfluencer
         };
 
         // Todo influencer ou tem um template ou usa o que já está selecionado na Campanha
-        toAdd.idTemplate = result.data.idTemplate || result.campanhas.idTemplate;
+        toAdd.idTemplate = result.data.idTemplate ||
+            result.campanhas.idTemplate ||
+            result.campanhas.template;
 
-        if (result.data.idTemplate) {
-            const templateDir = `storage/templates/${result.data.idTemplate}`;
-            const templateExist = await templateStorage.directoryExists(templateDir);
+        const templateDir = `storage/templates/${toAdd.idTemplate}`;
+        const templateExist = await templateStorage.directoryExists(templateDir);
 
-            if (!templateExist) throw new Error(`O template ${result.data.idTemplate} não foi encontrado em ${templateBucket}/${templateDir}`);
-
-            toAdd.idTemplate = result.data.idTemplate;
-        }
+        if (!templateExist) throw new Error(`O template ${result.data.idTemplate} não foi encontrado em ${templateBucket}/${templateDir}`);
 
         toAdd.ativo = result.data.ativo;
 

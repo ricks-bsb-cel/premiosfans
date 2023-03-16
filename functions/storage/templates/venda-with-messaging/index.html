@@ -58,7 +58,7 @@
     <div class="panel">
         <img class="capa" src="/templates/venda-with-messaging/panel-main.png?v={{version}}" alt="banner" />
 
-        <nav id="top" class="container-fluid">
+        <nav id="top" class="container">
             <ul>
                 <li>
                     <a href="/" class="contrast p-0" onclick="event.preventDefault()">
@@ -101,209 +101,198 @@
             <p class="subtitle subtitle-6"><strong>6 Motos</strong> Honda CG</p>
         </div>
 
+        <div class="container">
+            <card-influencer></card-influencer>
+        </div>
     </div>
 
-    <nav class="container-fluid">
-        <ul>
-            <li class="p-10">
-                <small>Edição:</small>
-                <strong>2</strong>
-            </li>
-        </ul>
-        <ul>
-            <li class="p-10">
-                <a class="link" ng-click="showRegulamento()" class="primary">
-                    Regulamento
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <div class="container">
+        <main class="pt-20 pb-0">
 
-    <main class="container pt-20 pb-0">
-
-        <section id="campanha">
-            <hgroup>
-                <h2>{{campanha.titulo}}</h2>
-                {{#if campanha.subTitulo}}
-                    <h3 class="mt-10">{{campanha.subTitulo}}</h3>
+            <section id="campanha">
+                <hgroup>
+                    <h2>{{campanha.titulo}}</h2>
+                    {{#if campanha.subTitulo}}
+                        <h3 class="mt-10">{{campanha.subTitulo}}</h3>
+                    {{/if}}
+                </hgroup>
+                {{#if campanha.detalhes}}
+                {{{campanha.detalhes}}}
                 {{/if}}
-            </hgroup>
-            {{#if campanha.detalhes}}
-            {{{campanha.detalhes}}}
-            {{/if}}
-        </section>
+            </section>
 
-        <compras-cliente></compras-cliente>
+            <compras-cliente></compras-cliente>
 
-        <section id="compra-rapida">
-            <div class="container p-0">
-                <form>
+            <section id="compra-rapida">
+                <div class="container p-0">
+                    <form>
+                        <article class="pt-20 pb-20 mb-0">
+                            <hgroup class="mt-10">
+                                <h2>Compra Rápida</h2>
+                                <h3>Acredite em sua sorte e invista em sua vitória! Escolha quantos títulos você deseja e
+                                    <strong>compre agora</strong>! 
+                                </h3>
+                            </hgroup>
+
+                            <div class="row">
+                                {{#each config.sugestoes}}
+                                    <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
+                                        <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
+                                            <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
+                                                class="m-0 mb-20 p-10 botao-compra">
+                                                <div class="sugestao text-center">
+                                                    <h3 class="mb-0 mt-10">
+                                                        {{{this.qtdExibicao}}}
+                                                    </h3>
+                                                    <p class="mb-10 mt-10" style="line-height:18px;">
+                                                        <span>{{this.chances}}</span>
+                                                        <small>chances<br />de ganhar!</small>
+                                                    </p>
+                                                </div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+
+                            <h2 id="vl-total" class="mb-0" style="display: none;">
+                                <small>Total:</small>
+                                <strong ng-bind="vlCompra | currency:'R$ '"></strong>
+                            </h2>
+                        </article>
+
+                        <form-cliente></form-cliente>
+
+                        <button ng-click="openSell()" class="mt-10 open-sell">
+                            Comprar
+                            <br ng-if="qtd" />
+                            <span ng-if="qtd" style="color:white;">
+                                <strong ng-bind="qtd"></strong>
+                                <small ng-if="qtd===1" style="color:white;">Título,</small>
+                                <small ng-if="qtd>1" style="color:white;">Títulos,</small>
+                                <strong ng-bind="vlCompra | currency:'R$ '"></strong>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="premios">
+                <div class="container p-0">
                     <article class="pt-20 pb-20 mb-0">
+
                         <hgroup class="mt-10">
-                            <h2>Compra Rápida</h2>
-                            <h3>Acredite em sua sorte e invista em sua vitória! Escolha quantos títulos você deseja e
-                                <strong>compre agora</strong>! 
+                            <h2>Prêmios desta edição</h2>
+                            <h3>Confira as datas e prêmios desta edicão do Prêmios Fans.<br />
+                                São
+                                <strong style="color: var(--primary);font-size:1.2em;">
+                                    {{campanha.qtdPremios}}
+                                </strong>
+                                chances de ganhar!</strong>
                             </h3>
                         </hgroup>
 
                         <div class="row">
-                            {{#each config.sugestoes}}
-                                <div data-id="{{this.id}}" class="col-6 col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2">
-                                    <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
-                                        <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
-                                            class="m-0 mb-20 p-10 botao-compra">
-                                            <div class="sugestao text-center">
-                                                <h3 class="mb-0 mt-10">
-                                                    {{{this.qtdExibicao}}}
-                                                </h3>
-                                                <p class="mb-10 mt-10" style="line-height:18px;">
-                                                    <span>{{this.chances}}</span>
-                                                    <small>chances<br />de ganhar!</small>
-                                                </p>
-                                            </div>
-                                        </article>
+                            {{#each campanhaSorteios}}
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                                <article class="m-0 mb-20 p-10">
+                                    <div class="sorteio text-center">
+                                        <div class="ribbon ribbon-top-left">
+                                            <span>
+                                                {{this.qtdPremios}}
+                                                Prêmios
+                                            </span>
+                                        </div>
+
+                                        <p class="mb-5">
+                                            {{{this.titulo_html}}}
+                                        </p>
+
+                                        <p class="mb-5">
+                                            <small>Dia</small>
+                                            {{{this.dtSorteio}}}
+                                        </p>
+
+                                        <h2 class="m-0 valor mb-5">
+                                            {{{this.vlTotalPremios_html}}}
+                                        </h2>
+
+                                        {{#each this.premios}}
+                                        <footer data-id-premio="{{this.id}}" class="pb-5">
+                                            {{this.descricao}}
+                                        </footer>
+                                        {{/each}}
+
                                     </div>
-                                </div>
+
+                                </article>
+                            </div>
                             {{/each}}
                         </div>
 
-                        <h2 id="vl-total" class="mb-0" style="display: none;">
-                            <small>Total:</small>
-                            <strong ng-bind="vlCompra | currency:'R$ '"></strong>
-                        </h2>
+                        <a href="#compra-rapida" style="display: block;" class="mt-0" role="button">
+                            Garanta o <strong>seu</strong> Título!
+                        </a>
+
                     </article>
-
-                    <form-cliente></form-cliente>
-
-                    <button ng-click="openSell()" class="mt-10 open-sell">
-                        Comprar
-                        <br ng-if="qtd" />
-                        <span ng-if="qtd" style="color:white;">
-                            <strong ng-bind="qtd"></strong>
-                            <small ng-if="qtd===1" style="color:white;">Título,</small>
-                            <small ng-if="qtd>1" style="color:white;">Títulos,</small>
-                            <strong ng-bind="vlCompra | currency:'R$ '"></strong>
-                        </span>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <section id="premios">
-            <div class="container p-0">
-                <article class="pt-20 pb-20 mb-0">
-
-                    <hgroup class="mt-10">
-                        <h2>Prêmios desta edição</h2>
-                        <h3>Confira as datas e prêmios desta edicão do Prêmios Fans.<br />
-                            São
-                            <strong style="color: var(--primary);font-size:1.2em;">
-                                {{campanha.qtdPremios}}
-                            </strong>
-                            chances de ganhar!</strong>
-                        </h3>
-                    </hgroup>
-
-                    <div class="row">
-                        {{#each campanhaSorteios}}
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-                            <article class="m-0 mb-20 p-10">
-                                <div class="sorteio text-center">
-                                    <div class="ribbon ribbon-top-left">
-                                        <span>
-                                            {{this.qtdPremios}}
-                                            Prêmios
-                                        </span>
-                                    </div>
-
-                                    <p class="mb-5">
-                                        {{{this.titulo_html}}}
-                                    </p>
-
-                                    <p class="mb-5">
-                                        <small>Dia</small>
-                                        {{{this.dtSorteio}}}
-                                    </p>
-
-                                    <h2 class="m-0 valor mb-5">
-                                        {{{this.vlTotalPremios_html}}}
-                                    </h2>
-
-                                    {{#each this.premios}}
-                                    <footer data-id-premio="{{this.id}}" class="pb-5">
-                                        {{this.descricao}}
-                                    </footer>
-                                    {{/each}}
-
-                                </div>
-
-                            </article>
-                        </div>
-                        {{/each}}
-                    </div>
-
-                    <a href="#compra-rapida" style="display: block;" class="mt-0" role="button">
-                        Garanta o <strong>seu</strong> Título!
-                    </a>
-
-                </article>
-            </div>
-        </section>
-
-        <section>
-            <div class="container p-0 faq">
-                <article class="pt-20 pb-20 mb-0">
-                    <hgroup class="mt-10">
-                        <h2>Perguntas Frequentes</h2>
-                        <h3>
-                            Caso tenha qualquer dúvida, estamos à disposição para esclarecer.
-                            Basta entrar em contato conosco por meio do nosso WhatsApp.
-                        </h3>
-                    </hgroup>
-
-                    <div class="row">
-                        {{#each faq}}
-                        <details>
-                            <summary style="line-height:1.4em;">{{this.pergunta}}</summary>
-                            <div class="resposta">{{{this.resposta}}}</div>
-                        </details>
-                        {{/each}}
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <pagar-compra></pagar-compra>
-        <detalhes-compra></detalhes-compra>
-        <modal-regulamento></modal-regulamento>
-
-        {{#if campanha.rodape}}
-            <section id="rodape">
-                {{{campanha.rodape}}}
+                </div>
             </section>
-        {{/if}}
 
-    </main>
+            <section>
+                <div class="container p-0 faq">
+                    <article class="pt-20 pb-20 mb-0">
+                        <hgroup class="mt-10">
+                            <h2>Perguntas Frequentes</h2>
+                            <h3>
+                                Caso tenha qualquer dúvida, estamos à disposição para esclarecer.
+                                Basta entrar em contato conosco por meio do nosso WhatsApp.
+                            </h3>
+                        </hgroup>
 
-    <footer class="container text-center pt-0">
-        <small>
-            <a href="#top">Resultados</a>
-            •
-            <a class="link" ng-click="showRegulamento()">Regulamento</a>
-            •
-            <a href="#top">Sobre a Empresa</a>
-            •
-            <a href="#top">Contato</a>
-            •
-            <a href="#top">Topo</a>
-        </small>
-        <p>
-            <small style="font-family:monospace;font-size:0.7em;margin-top:20px;display:block;">
-                v {{version}}<br />
-                {{versionDate}}
+                        <div class="row">
+                            {{#each faq}}
+                                <details>
+                                    <summary style="line-height:1.4em;">{{this.pergunta}}</summary>
+                                    <div class="resposta">{{{this.resposta}}}</div>
+                                </details>
+                            {{/each}}
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <pagar-compra></pagar-compra>
+            <detalhes-compra></detalhes-compra>
+            <modal-regulamento></modal-regulamento>
+
+            {{#if campanha.rodape}}
+                <section id="rodape">
+                    {{{campanha.rodape}}}
+                </section>
+            {{/if}}
+
+        </main>
+
+        <footer class="text-center pt-0">
+            <small>
+                <a href="#top">Resultados</a>
+                •
+                <a class="link" ng-click="showRegulamento()">Regulamento</a>
+                •
+                <a href="#top">Sobre a Empresa</a>
+                •
+                <a href="#top">Contato</a>
+                •
+                <a href="#top">Topo</a>
             </small>
-        </p>
-    </footer>
+            <p>
+                <small style="font-family:monospace;font-size:0.7em;margin-top:20px;display:block;">
+                    v {{version}}<br />
+                    {{versionDate}}
+                </small>
+            </p>
+        </footer>
+    </div>
 
     <div id="wait" class="wait">
         <svg class="wait" version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg"
@@ -569,7 +558,6 @@
                     <ol>
                         <li ng-repeat="t in compra.titulos">
                             <span style="font-family:monospace;" ng-bind="t.id"></span>
-                            <!-- <a style="font-family:monospace;" href="[[t.link]]" target="_blank" ng-bind="t.id"></a> -->
                         </li>
                     </ol>
 
@@ -599,26 +587,6 @@
         </dialog>
     </script>
 
-    <script type="text/ng-template" version="{{version}}" id="faq.htm">
-        <section>
-            <div class="container p-0">
-                <article class="pt-20 pb-20 mb-0">
-                    <hgroup class="mt-10">
-                        <h2>Perguntas Frequentes</h2>
-                        <h3>Resolva suas dúvidas:</h3>
-                    </hgroup>
-
-                    <div class="row">
-                        <details ng-repeat="f in list" style="line-height: 1.4rem;">
-                            <summary ng-bind="::f.p"></summary>
-                            <div ng-bind-html="::f.r"></div>
-                        </details>
-                    </div>
-                </article>
-            </div>
-        </section>
-    </script>
-
     <script type="text/ng-template" version="{{version}}" id="modal-regulamento.htm">
         <dialog
             ng-show="visible"
@@ -636,6 +604,14 @@
                 </footer>
             </article>
         </dialog>
+    </script>
+
+    <script type="text/ng-template" version="{{version}}" id="card-influencer.htm">
+        <div class="card-influencer">
+            <div class="influencer-photo">
+                <img src="foto_do_usuario.jpg" alt="Foto do Usuário">
+            </div>
+        </div>
     </script>
 
     <script>
