@@ -22,11 +22,9 @@
         class="align-self-center me-auto"
         ng-if="fullMode() || loginMode()"
     >
-        <p
-            ng-if="!currentUser || currentUser.isAnonymous || !currentUser.customData.accountSubmitted"
-            class="color-highlight color-white"
-        >
-            Parceiros
+        <p class="color-highlight color-white">
+            <span ng-if="type==='parceiro'">Parceiros</span>
+            <span ng-if="type==='influencer'">Influencers</span>
         </p>
         <h1 class="color-white">
             Premios Fans

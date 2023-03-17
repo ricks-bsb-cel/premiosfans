@@ -8,7 +8,6 @@ const ngModule = angular.module('directives.abrir-conta-pf-block', [])
 		function (
 			$scope,
 			$timeout,
-			userService,
 			globalFactory,
 			waitUiFactory,
 			utilsService,

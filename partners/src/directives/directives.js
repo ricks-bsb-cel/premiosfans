@@ -24,6 +24,9 @@ import abrirContaPFBlockResumo from './abrir-conta-pf-block-resumo/abrir-conta-p
 import abrirContaPJBlock from './abrir-conta-pj-block/abrir-conta-pj-block';
 import abrirContaPJBlockResumo from './abrir-conta-pj-block-resumo/abrir-conta-pj-block-resumo';
 
+import abrirContaInfluencer from './abrir-conta-influencer/abrir-conta-influencer';
+import abrirContaInfluencerResumo from './abrir-conta-influencer-resumo/abrir-conta-influencer-resumo';
+
 import solicitarEmprestimoPfBlock from './solicitar-emprestimo-pf-block/solicitar-emprestimo-pf-block';
 
 const ngModule = angular.module('directives', [
@@ -46,6 +49,9 @@ const ngModule = angular.module('directives', [
 
     abrirContaPJBlock.name,
     abrirContaPJBlockResumo.name,
+
+    abrirContaInfluencer.name,
+    abrirContaInfluencerResumo.name,
     
     blockHtml.name,
     blockConteudo.name,

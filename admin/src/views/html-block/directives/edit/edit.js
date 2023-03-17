@@ -51,7 +51,6 @@ ngModule = angular.module('view.htmlBlock.edit', [])
             ];
 
             $ctrl.ok = function () {
-
                 if ($ctrl.form.$invalid) {
                     alertFactory.error('Verifique os dados informados nos campos.', 'Dados inválidos');
                     return;

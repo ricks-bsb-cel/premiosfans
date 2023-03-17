@@ -1,6 +1,6 @@
 <section class="content html-block">
 
-    <search-filter></search-filter>
+    <search-filter filter="filter"></search-filter> 
 
     <wait-overlay ready="user" class="container-fluid">
         <div class="row">
@@ -19,6 +19,7 @@
                                 <tr>
                                     <th class="sigla">Sigla</th>
                                     <th class="id">ID</th>
+                                    <th class="options"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -32,6 +33,11 @@
                                         <span class="monospace">
                                             {{c.id}}
                                         </span>
+                                    </td>
+                                    <td class="options">
+                                        <a href="#" ng-click="clone(c)" class="ng-scope">
+                                            <i class="fa fa-clone" aria-hidden="true"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             </tbody>

@@ -152,7 +152,7 @@ class Service extends eebService {
                             filter: [
                                 { field: "idCampanha", condition: "==", value: result.data.titulo.idCampanha },
                                 { field: "idInfluencer", condition: "==", value: result.data.titulo.idInfluencer },
-                                { field: "selected", condition: "==", value: true }
+                                { field: "ativo", condition: "==", value: true }
                             ]
                         }),
                         collectionCampanhasSorteiosPremios.get({
@@ -176,7 +176,7 @@ class Service extends eebService {
                     }
 
                     if (result.data.campanhaInfluencer.length !== 1) {
-                        throw new Error(`Influencer ${result.data.idInfluencer} não vinculado à campanha ${result.data.idCampanha}`);
+                        throw new Error(`Influencer ${result.data.titulo.idInfluencer} não vinculado à campanha ${result.data.titulo.idCampanha}`);
                     }
 
                     result.data.campanhaInfluencer = result.data.campanhaInfluencer[0];

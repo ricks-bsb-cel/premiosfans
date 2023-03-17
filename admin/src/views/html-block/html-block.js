@@ -37,10 +37,42 @@ const ngModule = angular.module('views.html-block', [
 
 		}
 
+		const startSnapshot = termo => {
+			var attrFilter = { 
+				filter: []
+			};
+
+			if (termo) {
+				attrFilter.filter.push({ field: "keywords", operator: "array-contains", value: termo });
+			} else {
+				attrFilter.limit = 240;
+				toastrFactory.info('Apenas os primeiros ' + attrFilter.limit + ' registros serão apresentados... Informe um termo de pesquisa para buscar dados mais específicos.');
+			}
+
+			$scope.collectionHtmlBlock.collection.startSnapshot(attrFilter);
+		}
+
+		$scope.clone = data => {
+			data = { ...data };
+
+			data.id = 'new';
+			data.sigla += '-copy';
+
+			delete data.$$hashKey;
+
+			$scope.collectionHtmlBlock.save(data);
+		}
+
+		$scope.filter = {
+			run: function (termo) {
+				startSnapshot(termo);
+			}
+		}
+
 		appAuthHelper.ready()
 			.then(_ => {
 				$scope.user = appAuthHelper.user;
-				$scope.collectionHtmlBlock.collection.startSnapshot();
+				// $scope.collectionHtmlBlock.collection.startSnapshot();
 				showMenu();
 			})
 

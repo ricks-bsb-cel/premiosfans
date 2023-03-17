@@ -7,6 +7,7 @@ const ngModule = angular.module('collection.htmlBlock', [])
         appFirestoreHelper,
         appAuthHelper,
         appCollection,
+        globalFactory,
         $q
     ) {
 
@@ -16,7 +17,7 @@ const ngModule = angular.module('collection.htmlBlock', [])
             filterEmpresa: false,
             orderBy: 'sigla'
         };
-        
+
         var firebaseCollection = new appCollection(attr);
 
         var save = function (data) {
@@ -31,6 +32,7 @@ const ngModule = angular.module('collection.htmlBlock', [])
                         var update = {
                             sigla: data.sigla || null,
                             html: data.html,
+                            keywords: globalFactory.generateKeywords(data.sigla),
                             dtAlteracao: appFirestoreHelper.currentTimestamp()
                         };
 

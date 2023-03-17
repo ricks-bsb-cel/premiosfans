@@ -21,6 +21,8 @@ var ngModule = angular.module('views.index', [
 		$scope.canCreateAccount = false;
 		$scope.continueCreateAccount = false;
 
+		$scope.type = _config.type
+
 		pageHeaderFactory.setModeFull();
 		footerBarFactory.hide();
 

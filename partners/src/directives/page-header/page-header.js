@@ -72,6 +72,7 @@ const ngModule = angular.module('directives.page-header', [])
 
 			$scope.ready = false;
 			$scope.currentUser = null;
+			$scope.type = _config.type;
 
 			$scope.titulo = _ => {
 				return pageHeaderFactory.titulo;

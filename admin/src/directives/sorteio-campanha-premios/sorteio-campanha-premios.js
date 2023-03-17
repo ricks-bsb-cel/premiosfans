@@ -11,13 +11,6 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
 
             $scope.add = _ => {
 
-                /*
-                if ($scope.sorteio.premios.length >= 5) {
-                    alertFactory.error('Cada sorteio pode ter no máximo 5 prêmios');
-                    return;
-                }
-                */
-
                 $scope.sorteio.premios = $scope.sorteio.premios || [];
 
                 $scope.sorteio.premios.push({

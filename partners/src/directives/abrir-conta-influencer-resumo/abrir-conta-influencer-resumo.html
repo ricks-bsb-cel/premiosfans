@@ -1,0 +1,71 @@
+<div class="content abrir-conta-influencer-block-resumo m-1">
+
+    <div class="content">
+        <div class="d-flex pb-4">
+            <div class="align-self-center ps-1">
+                <h4 class="pt-1 mb-n1">{{data.companyData.companyName}}</h4>
+                <p class="mb-0 mt-1 font-16 opacity-90">
+                    <small>CNPJ:</small>
+                    {{data.companyData.cnpj_formatted}}
+                </p>
+                <p class="mb-0 mt-1 font-16">
+                    {{data.companyData.tradingName}}
+                </p>                
+            </div>
+        </div>
+        <div class="row">
+            <strong class="col-5 color-theme">Abertura</strong>
+            <strong class="col-7 text-end color-highlight">{{data.companyData.dateStartCompany}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <h3 class="pb-1">Responsável</h3>
+
+            <h4 class="pb-2">{{data.personalData.name}}</h4>
+
+            <strong class="col-5 color-theme">CPF</strong>
+            <strong class="col-7 text-end color-highlight">{{data.personalData.cpf_formatted}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong class="col-5 color-theme">Email</strong>
+            <strong class="col-7 text-end color-highlight">{{data.personalData.email}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong class="col-5 color-theme">Celular</strong>
+            <strong class="col-7 text-end color-highlight">{{data.personalData.phone_formatted}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+            
+            <strong class="col-7 color-theme">Data de Nascimento</strong>
+            <strong class="col-5 text-end color-highlight">{{data.personalData.birthdate}}</strong>
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong class="col-5 color-theme">Endereço</strong>
+
+            <strong class="col-7 text-end color-highlight">
+                <span>{{data.addressPersonal.street}}</span>
+                <span>{{data.addressPersonal.number}}</span>
+                <span>{{data.addressPersonal.district}}</span>
+                <span>{{data.addressPersonal.complement}}</span><br />
+                <span>{{data.addressPersonal.city}}/{{data.addressPersonal.state}}</span><br />
+                <span>{{data.addressPersonal.postalCode}}</span>
+            </strong>
+
+            <div class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+            
+            <h3 class="pb-1">Redes Sociais</h3>
+
+            <strong ng-if="data.personalData.redeSocialInstagram" class="col-5 color-theme">Instagram</strong>
+            <strong ng-if="data.personalData.redeSocialInstagram" class="col-7 text-end color-highlight">{{data.personalData.redeSocialInstagram}}</strong>
+            <div  ng-if="data.personalData.redeSocialInstagram" class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong ng-if="data.personalData.redeSocialFacebook" class="col-5 color-theme">Facebook</strong>
+            <strong ng-if="data.personalData.redeSocialFacebook"  class="col-7 text-end color-highlight">{{data.personalData.redeSocialFacebook}}</strong>
+            <div ng-if="data.personalData.redeSocialFacebook"  class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+
+            <strong ng-if="data.personalData.redeSocialTikToc" class="col-5 color-theme">Tiktoc</strong>
+            <strong ng-if="data.personalData.redeSocialTikToc"  class="col-7 text-end color-highlight">{{data.personalData.redeSocialTikToc}}</strong>
+            <div ng-if="data.personalData.redeSocialTikToc"  class="col-12 mt-2 mb-2"><div class="divider my-0"></div></div>
+            
+        </div>
+    </div>
+
+</div>

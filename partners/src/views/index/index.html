@@ -6,31 +6,46 @@
         <img src="/partners/assets/logos/full-white.png" alt="logo" />
 	</div>
 
-	<div
-		class="col-12 mb-n2 text-start"
-	>
-		<a href="#!/abertura-conta-swp-pj" class="default-link card card-style" style="height:90px">
+	<div class="col-12 mb-n2 text-start">
+
+		<a ng-if="type==='parceiro'" href="#!/abertura-conta-swp-pj" class="default-link card card-style" style="height:90px">
 			<div class="card-center px-4">
 				<div class="d-flex">
-					
 					<div class="align-self-center">
 						<span class="icon icon-m rounded-s gradient-blue shadow-bg shadow-bg-xs">
 							<i class="bi bi-wallet font-20 color-white"></i>
 						</span>
 					</div>
 
-					<div
-						class="align-self-center ps-3 ms-1"
-					>
+					<div class="align-self-center ps-3 ms-1">
 						<h1 class="font-20 mb-n1">Abertura de Conta</h1>
 						<p class="mb-0 mt-1 font-12 opacity-80">
 							Solicite a abertura de Conta de Pessoa Jurídica de Parceiro
 						</p>
 					</div>
-
 				</div>
 			</div>
 		</a>
+
+		<a ng-if="type==='influencer'" href="#!/abertura-conta-swp-influencer" class="default-link card card-style" style="height:90px">
+			<div class="card-center px-4">
+				<div class="d-flex">
+					<div class="align-self-center">
+						<span class="icon icon-m rounded-s gradient-blue shadow-bg shadow-bg-xs">
+							<i class="bi bi-instagram font-20 color-white"></i>
+						</span>
+					</div>
+
+					<div class="align-self-center ps-3 ms-1">
+						<h1 class="font-20 mb-n1">Cadastro de Influencer</h1>
+						<p class="mb-0 mt-1 font-12 opacity-80">
+							Crie seu cadastro e seja um Influencer parceiro do Premios Fans
+						</p>
+					</div>
+				</div>
+			</div>
+		</a>
+
 	</div>
 
 </section>
