@@ -1,0 +1,479 @@
+swagger: '2.0'
+
+info:
+  title: Premios Fans API
+  description: Premios Fans Authenticated API
+  version: "1.0.0"
+  contact:
+    email: dev@zoepay.com.br
+
+# https://stackoverflow.com/questions/64281334/cors-errors-when-trying-to-fetch-from-new-google-cloud-api-gateway
+
+host: "premios-fans-a8fj1dkb.uc.gateway.dev"
+x-google-endpoints:
+- name: "premios-fans-a8fj1dkb.uc.gateway.dev"
+  allowCors: True
+
+schemes:
+- https
+
+produces: 
+- application/json
+
+paths:
+
+  /api/eeb/v1/test:
+    get:
+      tags:
+      - EEB Test
+      summary: EEB Test Getter
+      operationId: eeb-test-get
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    post:
+      tags:
+      - EEB Test
+      summary: EEB Test Getter
+      operationId: eeb-test-post
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+
+  /api/users/v1/user:
+    get:
+      tags:
+      - Usuários
+      summary: Informações do Usuário
+      operationId: current-user-info
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/users
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+
+  /api/eeb/v1/generate-template:
+    post:
+      tags:
+      - EEB
+      summary: Gera template de um influencer/campanha
+      operationId: eeb-generate-template
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-generate-template
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
+  /api/eeb/v1/generate-titulo:
+    post:
+      tags:
+      - EEB
+      summary: Gera um Título
+      operationId: eeb-generate-titulo
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-generate-titulo
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
+  /api/eeb/v1/pagar-compra:
+    post:
+      tags:
+      - EEB
+      summary: Pagamento Manual da Compra (apenas para SuperUsuários)
+      operationId: eeb-pagar-compra
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-pagar-compra
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
+  /api/eeb/v1/check-one-titulo-compra:
+    post:
+      tags:
+      - EEB
+      summary: Verificação de uma compra
+      operationId: eeb-check-one-titulo-compra
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-check-one-titulo-compra
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
+  /api/eeb/v1/whr/{source}/{type}:
+    post:
+      tags:
+      - eeb
+      summary: eeb
+      description: |
+        WebHooks
+      operationId: post-eeb-webhook-source-type
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      produces:
+      - application/json
+      parameters:
+        - in: path
+          name: source
+          description: Source
+          required: true
+          type: string
+        - in: path
+          name: type
+          description: Type
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+    options:
+      tags:
+        - eeb
+      summary: CORS
+      description: Habilitação do Cors no Google Gateway Api.
+      operationId: cors-post-eeb-webhook-source-type
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - in: path
+          name: source
+          description: Source
+          required: true
+          type: string
+        - in: path
+          name: type
+          description: Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+
+  /api/eeb/v1/cartos/{method}:
+    post:
+      tags:
+      - Cartos
+      summary: Serviços Cartos
+      operationId: cartos-services
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      parameters:
+        - in: path
+          name: method
+          description: Método
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - Cartos
+      summary: CORS
+      description: Habilitação do Cors no Google Gateway Api.
+      operationId: cors-cartos-services
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - in: path
+          name: method
+          description: Método
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+
+  /api/eeb/v1/generate-compra:
+    post:
+      tags:
+      - EEB
+      summary: Geração de uma compra (e seu pix de pagamento)
+      operationId: eeb-generate-compra
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-generate-compra
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
+  /api/eeb/v1/psc:
+    post:
+      tags:
+      - EEB
+      summary: PixStore Check
+      operationId: eeb-pix-store-check
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      security:
+      - firebase: []
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-pix-store-check
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
+
+  /api/eeb/v1/uft:
+    post:
+      tags:
+      - EEB
+      summary: Update FCM Token
+      operationId: eeb-update-fcm-token
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+        "500":
+          description: Erro na requisição
+          schema:
+            $ref: "#/definitions/ApiError"
+        "401":
+          description: Token JWT expirado. Você deve gerar um novo e tentar novamente.
+          schema:
+            $ref: "#/definitions/GatewayError"
+    options:
+      tags:
+        - EEB
+      summary: CORS
+      operationId: cors-eeb-update-fcm-token
+      x-google-backend:
+        address: https://us-central1-premios-fans.cloudfunctions.net/eeb
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        '200':
+          description: Success
+
+
+securityDefinitions:
+  firebase:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://securetoken.google.com/premios-fans"
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    x-google-audiences: "premios-fans"
+
+definitions:
+
+  ApiError:
+    properties:
+      error:
+        type: string
+      datetimeserver:
+        description: Data e hora do servidor
+        type: string
+      code:
+        description: HTTP Result
+        type: integer
+        format: int32
+      versionId:
+        description: Versão do aplicativo no backend
+        type: string
+

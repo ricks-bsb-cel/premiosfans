@@ -47,50 +47,55 @@ class Service extends eebService {
 
         result.data = await schema().validateAsync(this.parm.data);
 
-        let [
-            campanha,
-            influencer,
-            campanhaInfluencer
-        ] = await Promise.all([
-            collectionCampanha.getDoc(result.data.idCampanha),
-            collectionInfluencer.getDoc(result.data.idInfluencer),
-            collectionCampanhasInfluencers.get({
-                filter: [
-                    { field: "idCampanha", condition: "==", value: result.data.idCampanha },
-                    { field: "idInfluencer", condition: "==", value: result.data.idInfluencer },
-                ],
-                limit: 1
-            })
-        ])
+        try {
 
-        if (!campanha) throw new Error('Campanha não existe');
-        if (!influencer) throw new Error('Influencer não existe');
+            let [
+                campanha,
+                influencer,
+                campanhaInfluencer
+            ] = await Promise.all([
+                collectionCampanha.getDoc(result.data.idCampanha),
+                collectionInfluencer.getDoc(result.data.idInfluencer),
+                collectionCampanhasInfluencers.get({
+                    filter: [
+                        { field: "idCampanha", condition: "==", value: result.data.idCampanha },
+                        { field: "idInfluencer", condition: "==", value: result.data.idInfluencer },
+                    ],
+                    limit: 1
+                })
+            ])
 
-        // O influencer pode ou não já estár vinculado à campanha
-        campanhaInfluencer = campanhaInfluencer && campanhaInfluencer.length ? campanhaInfluencer[0] : null;
+            if (!campanha) throw new Error('Campanha não existe');
+            if (!influencer) throw new Error('Influencer não existe');
 
-        const id = campanhaInfluencer ? campanhaInfluencer.id : null;
-        const toAdd = campanhaInfluencer || {
-            idCampanha: result.data.idCampanha,
-            idInfluencer: result.data.idInfluencer
-        };
+            // O influencer pode ou não já estár vinculado à campanha
+            campanhaInfluencer = campanhaInfluencer && campanhaInfluencer.length ? campanhaInfluencer[0] : null;
 
-        // Todo influencer ou tem um template ou usa o que já está selecionado na Campanha
-        toAdd.idTemplate = result.data.idTemplate ||
-            result.campanhas.idTemplate ||
-            result.campanhas.template;
+            const id = campanhaInfluencer ? campanhaInfluencer.id : null;
+            const toAdd = campanhaInfluencer || {
+                idCampanha: result.data.idCampanha,
+                idInfluencer: result.data.idInfluencer
+            };
 
-        const templateDir = `storage/templates/${toAdd.idTemplate}`;
-        const templateExist = await templateStorage.directoryExists(templateDir);
+            // Todo influencer ou tem um template ou usa o que já está selecionado na Campanha
+            toAdd.idTemplate = result.data.idTemplate || campanha.idTemplate || campanha.template;
 
-        if (!templateExist) throw new Error(`O template ${result.data.idTemplate} não foi encontrado em ${templateBucket}/${templateDir}`);
+            const templateDir = `storage/templates/${toAdd.idTemplate}`;
+            const templateExist = await templateStorage.directoryExists(templateDir);
 
-        toAdd.ativo = result.data.ativo;
+            if (!templateExist) throw new Error(`O template ${result.data.idTemplate} não foi encontrado em ${templateBucket}/${templateDir}`);
 
-        if (!id) global.setDateTime(toAdd, 'dtInclusao');
-        global.setDateTime(toAdd, 'dtAlteracao');
+            toAdd.ativo = result.data.ativo;
 
-        return await collectionCampanhasInfluencers.set(id, toAdd, true);
+            if (!id) global.setDateTime(toAdd, 'dtInclusao');
+            global.setDateTime(toAdd, 'dtAlteracao');
+
+            return await collectionCampanhasInfluencers.set(id, toAdd, true);
+        } catch (e) {
+            console.error(e);
+
+            throw new Error(e);
+        }
     }
 
 }

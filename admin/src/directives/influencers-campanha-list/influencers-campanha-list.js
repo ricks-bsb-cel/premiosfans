@@ -76,13 +76,9 @@ let ngModule = angular.module('directives.influencers-campanha-list', [
             }
 
             const enableDisableInfluencer = (data, nome) => {
-                blockUiFactory.start();
-
                 premiosFansService.addInfluencerToCampanha({
                     data: data,
                     success: function () {
-                        blockUiFactory.stop();
-
                         if (data.ativo) {
                             toastrFactory.info(`O influencer ${nome} será ativado na campanha. Aguarde alguns instantes...`);
                         } else {
@@ -90,7 +86,6 @@ let ngModule = angular.module('directives.influencers-campanha-list', [
                         }
                     }
                 })
-
             }
 
             $scope.enableDisable = influencerCampanha => {

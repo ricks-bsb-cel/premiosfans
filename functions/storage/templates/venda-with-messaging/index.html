@@ -53,10 +53,10 @@
 
 </head>
 
-<body ng-controller="mainController">
+<body class="background-default-color" ng-controller="mainController">
 
     <div class="panel">
-        <img class="capa" src="/templates/venda-with-messaging/panel-main.png?v={{version}}" alt="banner" />
+        <img class="capa" ng-src="{{campanha.imagePrincipal}}" alt="{{campanha.titulo}}" />
 
         <nav id="top" class="container">
             <ul>
@@ -72,11 +72,15 @@
                         <summary aria-haspopup="listbox" role="link" class="primary hamburguer white">
                             <i class="bi bi-list white"></i>
                         </summary>
-                        <ul role="listbox">
-                            <li><a href="../recuperar/" class="primary">Recuperar Compras</a></li>
-                            <li><a class="link" ng-click="showRegulamento()">Regulamento</a></li>
-                            <li><a href="../preview-rtl/">Sobre a Empresa</a></li>
-                            <li><a href="../classless/">Contato</a></li>
+                        <ul role="listbox color-dark" style="margin-right: 20px;">
+                            <!--
+                            <li><a class="link color-dark" href="../recuperar/">Recuperar Compras</a></li>
+                            -->
+                            <li><a class="link color-dark" ng-click="showRegulamento()">Regulamento</a></li>
+                            <li><a class="link color-dark" href="../preview-rtl/">Sobre a Empresa</a></li>
+                            <!--
+                            <li><a class="link color-dark" href="../classless/">Contato</a></li>
+                            -->
                         </ul>
                     </details>
                 </li>
@@ -90,7 +94,7 @@
             <h2 class="title-3">R$ 250 MIL</h2>
             <h2 class="title-4 yellow">em prêmios</h2>
 
-            <a href="#compra-rapida">por apenas <strong>R$ 29,90</strong></a>
+            <a class="action" href="#compra-rapida">por apenas <strong>R$ 29,90</strong></a>
 
             <p class="subtitle subtitle-1">Concorra <strong class="yellow">22 vezes</strong></p>
             <p class="subtitle subtitle-2">São <strong>22 Chances</strong></p>
@@ -100,15 +104,16 @@
             <p class="subtitle subtitle-5"><strong>15 iPhones</strong> 11 64<small style="color:white;">GB</small></p>
             <p class="subtitle subtitle-6"><strong>6 Motos</strong> Honda CG</p>
         </div>
-
-        <div class="container">
-            <card-influencer></card-influencer>
-        </div>
     </div>
 
-    <div class="container">
+    <div class="container influencer">
+        <card-influencer></card-influencer>
+    </div>
+
+    <div class="container background-default-color">
         <main class="pt-20 pb-0">
 
+            <!--
             <section id="campanha">
                 <hgroup>
                     <h2>{{campanha.titulo}}</h2>
@@ -120,15 +125,16 @@
                 {{{campanha.detalhes}}}
                 {{/if}}
             </section>
+            -->
 
             <compras-cliente></compras-cliente>
 
             <section id="compra-rapida">
                 <div class="container p-0">
                     <form>
-                        <article class="pt-20 pb-20 mb-0">
-                            <hgroup class="mt-10">
-                                <h2>Compra Rápida</h2>
+                        <article class="pt-20 pb-0 mb-0 mt-0">
+                            <hgroup class="mt-0">
+                                <h2 class="mb-10">Compra Rápida</h2>
                                 <h3>Acredite em sua sorte e invista em sua vitória! Escolha quantos títulos você deseja e
                                     <strong>compre agora</strong>! 
                                 </h3>
@@ -140,13 +146,13 @@
                                         <div class="col-compra-rapida" ng-class="{selected:selected==='{{this.id}}'}">
                                             <article ng-click="selectQtd('{{this.id}}',{{this.vlTotal}},{{this.qtd}})"
                                                 class="m-0 mb-20 p-10 botao-compra">
-                                                <div class="sugestao text-center">
-                                                    <h3 class="mb-0 mt-10">
+                                                <div class="sugestao text-center mt-10 mb-20">
+                                                    <h3 class="color-dark mb-0" class="mb-0 mt-10">
                                                         {{{this.qtdExibicao}}}
                                                     </h3>
                                                     <p class="mb-10 mt-10" style="line-height:18px;">
-                                                        <span>{{this.chances}}</span>
-                                                        <small>chances<br />de ganhar!</small>
+                                                        <span class="color-dark" >{{this.chances}}</span>
+                                                        <small class="color-dark" >chances<br />de ganhar!</small>
                                                     </p>
                                                 </div>
                                             </article>
@@ -155,7 +161,7 @@
                                 {{/each}}
                             </div>
 
-                            <h2 id="vl-total" class="mb-0" style="display: none;">
+                            <h2 id="vl-total" class="pb-20" style="display: none;">
                                 <small>Total:</small>
                                 <strong ng-bind="vlCompra | currency:'R$ '"></strong>
                             </h2>
@@ -163,13 +169,13 @@
 
                         <form-cliente></form-cliente>
 
-                        <button ng-click="openSell()" class="mt-10 open-sell">
+                        <button ng-click="openSell()" class="mt-10 color-dark open-sell">
                             Comprar
                             <br ng-if="qtd" />
-                            <span ng-if="qtd" style="color:white;">
+                            <span ng-if="qtd">
                                 <strong ng-bind="qtd"></strong>
-                                <small ng-if="qtd===1" style="color:white;">Título,</small>
-                                <small ng-if="qtd>1" style="color:white;">Títulos,</small>
+                                <small ng-if="qtd===1">Título: </small>
+                                <small ng-if="qtd>1">Títulos: </small>
                                 <strong ng-bind="vlCompra | currency:'R$ '"></strong>
                             </span>
                         </button>
@@ -177,6 +183,7 @@
                 </div>
             </section>
 
+            <!--
             <section id="premios">
                 <div class="container p-0">
                     <article class="pt-20 pb-20 mb-0">
@@ -237,12 +244,13 @@
                     </article>
                 </div>
             </section>
+            -->
 
             <section>
                 <div class="container p-0 faq">
-                    <article class="pt-20 pb-20 mb-0">
-                        <hgroup class="mt-10">
-                            <h2>Perguntas Frequentes</h2>
+                    <article class="p-20 mb-0">
+                        <hgroup class="mt-0">
+                            <h2 class="mb-10">Perguntas Frequentes</h2>
                             <h3>
                                 Caso tenha qualquer dúvida, estamos à disposição para esclarecer.
                                 Basta entrar em contato conosco por meio do nosso WhatsApp.
@@ -275,15 +283,19 @@
 
         <footer class="text-center pt-0">
             <small>
-                <a href="#top">Resultados</a>
+                <a class="color-white" href="#top">Resultados</a>
                 •
-                <a class="link" ng-click="showRegulamento()">Regulamento</a>
+                <a class="color-white" class="link" ng-click="showRegulamento()">Regulamento</a>
                 •
-                <a href="#top">Sobre a Empresa</a>
+                <a class="color-white" href="#top">Sobre a Empresa</a>
                 •
-                <a href="#top">Contato</a>
-                •
-                <a href="#top">Topo</a>
+                <a class="color-white" href="#top">Contato</a>
+                <br />
+                <a class="color-white" href="#top">
+                    <i class="fas fa-angle-up"></i>
+                    Topo
+                    <i class="fas fa-angle-up"></i>
+                </a>
             </small>
             <p>
                 <small style="font-family:monospace;font-size:0.7em;margin-top:20px;display:block;">
@@ -331,13 +343,13 @@
             <form form="form" ng-controller="formClienteController" autocomplete="on" novalidate>
                 <div class="row">
                     <label class="col-md-6" for="nome">
-                        Nome *
-                        <input type="text" ng-model="compra.nome" name="name" autocomplete="name" placeholder="Nome completo">
+                        Nome Completo*
+                        <input type="text" ng-model="compra.nome" name="name" autocomplete="name">
                     </label>
 
                     <label class="col-md-6" for="email">
                         Email *
-                        <input type="text" ng-model="compra.email" name="email" autocomplete="email" placeholder="Seu melhor email">
+                        <input type="text" ng-model="compra.email" name="email" autocomplete="email">
                     </label>
                 </div>
 
@@ -370,12 +382,12 @@
 
     <script type="text/ng-template" version="{{version}}" id="compras-cliente.htm">
         <div
-            class="compras-cliente"
+            class="compras-cliente mt-0"
             ng-if="compras.length>0"
         >
-            <article class="pt-20 pb-20 mb-0">
-                <hgroup class="mt-10">
-                    <h2>Suas compras</h2>
+            <article class="p-20 mb-0 mt-0">
+                <hgroup class="mt-0">
+                    <h2 class="mb-10">Suas compras</h2>
                     <h3>Veja abaixo as suas compras solicitadas e já concluídas. Você pode realizar o pagamento de compras pendentes em até 24 horas.</h3>
                 </hgroup>
 
@@ -385,8 +397,8 @@
                     id-titulo-compra="[[c.id]]"
                     ng-class="{last:$last}"
                 >
-                    <summary>
-                        em
+                    <summary class="color-white">
+                        <small>em</small>
                         <strong ng-bind="::c.dtInclusao | ddmmhhmm"></strong>
                         <small>
                             ~
@@ -437,7 +449,7 @@
 
     <script type="text/ng-template" version="{{version}}" id="modal-pagar-compra.htm">
         <dialog ng-show="visible" id="pagar-compra">
-            <article class="pt-20" style="position: relative;">
+            <article class="pt-20 color-dark" style="position:relative;background:white;">
                 <div ng-show="compra.situacao === 'aguardando-pagamento'" class="block">
                     <img src="/assets/imgs/close.svg" ng-click="close()" class="close" />
 
@@ -564,6 +576,7 @@
                 </div>
 
                 <footer class="mt-0">
+                    <!--
                     <button ng-if="compra.situacao === 'pago' && compra.pronto" class="mb-10 outline" ng-click="enviarCertificado()" style="padding:10px;font-size:1rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-at" viewBox="0 0 16 16" style="margin-bottom:4px;margin-right:5px;">
                             <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2H2Zm3.708 6.208L1 11.105V5.383l4.708 2.825ZM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2-7-4.2Z"/>
@@ -571,6 +584,7 @@
                         </svg>
                         Enviar Certificado(s)...
                     </button>
+                    -->
 
                     <button ng-if="compra.situacao === 'pago' && compra.pronto" class="mb-0" ng-click="close()">
                         Fechar
@@ -592,7 +606,7 @@
             ng-show="visible"
             id="modal-regulamento"
         >
-            <article class="pt-20">
+            <article class="pt-20 color-dark" style="background:white;">
                 <h3 class="mb-20">Regulamento da Campanha</h3>
                 <div class=content>
                     {{{campanha.regulamento}}}
@@ -608,8 +622,10 @@
 
     <script type="text/ng-template" version="{{version}}" id="card-influencer.htm">
         <div class="card-influencer">
-            <div class="influencer-photo">
-                <img src="foto_do_usuario.jpg" alt="Foto do Usuário">
+            <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Foto do Usuário">
+            <div class="left">
+                <h4 class="m-0 color-white">Fulano de Tal</h4>
+                <small class="m-0">São Paulo/SP</small>
             </div>
         </div>
     </script>

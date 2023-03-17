@@ -1,7 +1,16 @@
-:root {
+[data-theme="light"],
+:root:not([data-theme="dark"]) {
     --spacing-company: 16rem;
     --font-weight: 400;
     --border-radius: 0;
+
+    --color: white;
+    --muted-color: white;
+    --background-color: transparent;
+
+    --h1-color: white;
+    --h2-color: white;
+    --h3-color: white;
 }
 
 html {
@@ -30,16 +39,31 @@ div.panel::before{
     z-index: -1;
 }
 
-div.panel strong{
-    
+[role=button]:is([aria-current],:hover,:active,:focus), button:is([aria-current],:hover,:active,:focus), input[type=button]:is([aria-current],:hover,:active,:focus), input[type=reset]:is([aria-current],:hover,:active,:focus), input[type=submit]:is([aria-current],:hover,:active,:focus) {
+    --background-color: #EFC832;
+    --border-color: initial;
+    --box-shadow: initial;
+    --color: #003a68;
+}
+
+.color-dark, .color-dark *{
+    color: #003a68 !important;
+}
+
+.color-white, .color-white *{
+    color: white;
+}
+
+.background-light-blue{
+    background-color: #1EA1D7;
 }
 
 div.panel .container{
-    padding: 0 0 0 15px;
+    padding: 0 0 0 25px;
     margin-top: 10px;
 }
 
-div.panel .container a.yellow{
+div.panel .container a.action{
     padding: 2px 15px;
     background: #EFC832;
     border-radius: 15px;
@@ -50,25 +74,31 @@ div.panel .container a.yellow{
     text-decoration: none;
 }
 
-div.panel .container a .strong{
+div.panel .container a.action .strong{
     font-size: 1.1em;
 }
 
-div.panel .color-yellow{
-    color: #EFC832;
+.background-default-color{
+    background: rgb(0,127,185);
+    background: linear-gradient(58deg, rgba(0,127,185,1) 0%, rgba(0,159,214,1) 20%, rgba(0,104,166,1) 60%);
 }
 
-div.panel .background-yellow{
-    background: #EFC832;
+div.panel .yellow{
+    color: #EFC832;
 }
 
 div.panel img.capa{
     position: absolute;
-    bottom: -55px;
-    right: -70px;
-    width: 120%;
-    max-width: 500px;
+    bottom: -8px;
+    right: -71px;
+    width: 88%;
+    max-width: 470px;
     pointer-events: none;
+    min-width: 365px;
+}
+
+div.container.influencer{
+    background: #003a68;
 }
 
 div.panel h1,
@@ -96,7 +126,7 @@ div.panel .title-1{
 }
 
 div.panel .title-2{
-    font-size: 1.6em;
+    font-size: 1.5em;
     font-weight: 900;
     line-height: 1.2em;
 }
@@ -106,6 +136,7 @@ div.panel .title-3{
     line-height: 1em;
     font-weight: 900;
     letter-spacing: 2px;
+    margin-top: 10px;
 }
 div.panel .title-4{
     font-size: 1.6em;
@@ -148,6 +179,20 @@ div.panel .subtitle-6{}
     background: linear-gradient(0deg, rgba(0, 64, 125, 1) 0%, rgba(1, 81, 154, 1) 38%, rgba(1, 81, 154, 1) 100%);
 }
 */
+
+div.container.faq{
+    border-radius: 20px;
+}
+
+div.container.faq, div.container.faq *{
+    background-color: white;
+    color: black;
+    border-radius: 20px;
+}
+
+details[open]>summary:not([role]):not(:focus) {
+    color: black;
+}
 
 #top .logo {
     height: 40px;
@@ -253,8 +298,9 @@ dialog#modal-regulamento .content h4 {
 }
 
 article.botao-compra{
-    border: 2px solid silver;
-    border-radius: 5px;
+    /* border: 2px solid silver; */
+    border-radius: 20px; 
+    background: white;
 }
 
 .full-width {
@@ -339,7 +385,7 @@ h2.valor small.cents {
     right: 5px;
     height: 36px;
     width: 36px;
-    top: 22px;
+    top: 30px;
 }
 
 #pagar-compra .id-compra{
@@ -410,7 +456,7 @@ aside p {
 }
 
 summary.hamburguer {
-    padding: 5px 10px 0 10px !important;
+    padding: 5px 25px 0 10px!important;
 }
 
 summary.hamburguer:after {
@@ -418,7 +464,7 @@ summary.hamburguer:after {
 }
 
 summary.hamburguer i.bi {
-    font-size: 1.4em;
+    font-size: 2em;
 }
 
 .text-center {
@@ -617,8 +663,11 @@ button,
 input[type=button],
 input[type=reset],
 input[type=submit] {
-    --background-color: green;
-    font-size: 1.2rem;
+    color: #003a68;
+    --background-color: #EFC832;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 24px;
 }
 
 .swal2-title {
@@ -627,6 +676,20 @@ input[type=submit] {
 }
 
 .card-influencer {
-    border-top: 2px solid white;
+    position: relative;
     background: #003a68;
+}
+
+.card-influencer img{
+    position: relative;
+    border-radius: 50%;
+    border: 3px solid #efc832;
+    height: 72px;
+    margin: 20px 10px;
+}
+
+.card-influencer div.left{
+    position: absolute;
+    top: 27px;
+    left: 100px;
 }

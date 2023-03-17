@@ -27,7 +27,7 @@ const ngModule = angular.module('services.premios-fans', [])
 
                 if(!attrs.data.idCampanha || !attrs.data.idInfluencer) throw new Error('')
 
-                toastrFactory.info('O template está gerado...');
+                toastrFactory.info('O template está sendo gerado. Aguarde alguns instantes...');
 
                 if (attrs.blockUi) blockUiFactory.start();
 
@@ -303,7 +303,7 @@ const ngModule = angular.module('services.premios-fans', [])
                 }
 
                 $http({
-                    url: getUrlEndPoint('/api/eeb/v1/add-influencer-to-campanha?async=true'),
+                    url: getUrlEndPoint('/api/eeb/v1/add-influencer-to-campanha?async=trues'),
                     method: 'post',
                     data: attrs.data,
                     headers: {

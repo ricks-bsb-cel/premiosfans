@@ -417,11 +417,11 @@ angular.module('app', [])
                         title: 'Confirme seus dados',
                         icon: 'info',
                         html: `
-                            <small style="display:block;margin-bottom:20px;">Verifique se os seus dados estão corretos antes de prosseguir com a compra</small>
-                            <h4 class="m-5" style="color:black;">${$scope.compra.nome}</h4>
-                            <p class="m-5" style="color:black;">${$scope.compra.email}</p>
-                            <p class="m-5" style="color:black;"><small>Celular: </small>${$scope.compra.celular}</p>
-                            <p class="m-5" style="color:black;"><small>CPF: </small>${$scope.compra.cpf}</p>
+                            <small class="color-dark" style="display:block;margin-bottom:20px;">Verifique se os seus dados estão corretos antes de prosseguir com a compra</small>
+                            <h4 class="m-5 color-dark">${$scope.compra.nome}</h4>
+                            <p class="m-5 color-dark">${$scope.compra.email}</p>
+                            <p class="m-5 color-dark"><small>Celular: </small>${$scope.compra.celular}</p>
+                            <p class="m-5 color-dark"><small>CPF: </small>${$scope.compra.cpf}</p>
                         `,
                         timer: 0,
                         showCancelButton: true,
@@ -561,7 +561,7 @@ angular.module('app', [])
                             .then(_ => {
                                 Swal.fire({
                                     icon: 'success',
-                                    html: `<h3 class="mb-10">Copiado!</h3>`,
+                                    html: `<h3 class="mb-10 color-dark">Copiado!</h3>`,
                                     width: '240px',
                                     timer: 1800,
                                     showConfirmButton: false
