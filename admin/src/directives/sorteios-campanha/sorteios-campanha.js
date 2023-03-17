@@ -7,6 +7,7 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
             $scope,
             globalFactory
         ) {
+			$scope.disabled = typeof $scope.disabled === 'boolean' ? $scope.disabled : false;
 
             $scope.add = _ => {
                 $scope.sorteios.push({
@@ -70,7 +71,8 @@ let ngModule = angular.module('directives.sorteios-campanha', [])
             templateUrl: 'sorteios-campanha/sorteios-campanha.html',
             controller: 'sorteiosCampanhaController',
             scope: {
-                sorteios: "="
+                sorteios: "=",
+                disabled: "=?"
             }
         };
     });

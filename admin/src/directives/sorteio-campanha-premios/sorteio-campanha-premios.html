@@ -10,13 +10,15 @@
             <input-date
                 model="sorteio"
                 field-name="dtSorteio"
+                disabled="disabled"
+
             ></input-date>
             
         </h3>
         <div class="card-tools">
 
             <button
-                ng-if="!campanha.ativo && permitirInclusaoPremios()"
+                ng-if="!campanha.ativo && !disabled && permitirInclusaoPremios()"
                 type="button"
                 ng-click="add()"
                 class="btn btn-tool"
@@ -27,6 +29,7 @@
             </button>
 
             <button
+                ng-if="!disabled"
                 type="button"
                 class="btn btn-tool"
                 uib-popover="Clonar o Sorteio"
@@ -37,6 +40,7 @@
             </button>
 
             <button
+                ng-if="!disabled"
                 type="button"
                 class="btn btn-tool"
                 uib-popover="Excluir o Sorteio"
@@ -61,11 +65,11 @@
                     <th class="center" style="width:50px;">#</th>
                     <th class="vl-liquido">Valor Líquido</th>
                     <th class="descricao">Descrição</th>
-                    <th class="actions right"></th>
+                    <th ng-if="!disabled" class="actions right"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="p in sorteio.premios | filter:{deleted:false} track by p.guidPremio">
+                <tr ng-repeat="p in sorteio.premios | filter:{deleted:false} track by p.id">
                     <td class="center pt-2">
                         {{$index + 1}}
                     </td>
@@ -77,6 +81,7 @@
                             class="form-control right"
                             money-mask
                             select-on-click
+                            ng-disabled="disabled"
                         >
                     </td>
 
@@ -85,11 +90,13 @@
                             ng-model="p.descricao"
                             class="form-control"
                             type="text"
+                            ng-disabled="disabled"
                         >
                     </td>
                     
-                    <td class="actions right">
+                    <td ng-if="!disabled" class="actions right">
                         <a 
+                            ng-if="!disabled"
                             href="#"
                             ng-click="up($index)"
                             uib-popover="Mover para cima"
@@ -103,6 +110,7 @@
                         </a>
 
                         <a
+                            ng-if="!disabled"
                             href="#"
                             ng-click="down($index)"
                             uib-popover="Mover para baixo"
@@ -116,6 +124,7 @@
                         </a>
 
                         <a
+                            ng-if="!disabled"
                             href="#"
                             ng-if="!campanha.ativo && permitirInclusaoPremios()"
                             ng-click="clonePremio($index)"
@@ -128,6 +137,7 @@
                         </a>
 
                         <a
+                            ng-if="!disabled"
                             href="#"
                             ng-if="!campanha.ativo"
                             ng-click="removerPremio(p)"

@@ -31,6 +31,7 @@ https://github.com/googleapis/nodejs-storage/blob/main/samples/listFiles.js
 
 const firestoreDAL = require('../../api/firestoreDAL');
 
+const collectionEmpresas = firestoreDAL.empresas();
 const collectionCampanhas = firestoreDAL.campanhas();
 const collectionCampanhasInfluencers = firestoreDAL.campanhasInfluencers();
 const collectionCampanhasSorteios = firestoreDAL.campanhasSorteios();
@@ -94,11 +95,25 @@ class Service extends eebService {
             collectionFaq.get()
         ]);
 
+        // Posso carregar diretamente o primeiro registro porque o get tem empty:false
+        result.campanhaInfluencer = result.campanhaInfluencer[0];
+
+        // Preciso dos dados do influencer, que na verdade são os dados da empresa
+        result.empresa = await collectionEmpresas.getDoc(result.campanhaInfluencer.idInfluencer);
+
+        // Adiciono os dados da empresa no influencer
+        result.campanhaInfluencer.nome = result.empresa.nome;
+        result.campanhaInfluencer.nomeExibicao = result.empresa.nomeExibicao;
+        result.campanhaInfluencer.celular_formatted = result.empresa.celular_formatted;
+        result.campanhaInfluencer.cpfcnpj_formatted = result.empresa.cpfcnpj_formatted;
+        result.campanhaInfluencer.email = result.empresa.email;
+        result.campanhaInfluencer.image = result.empresa.images && result.empresa.images.length ? result.empresa.images[0].secure_url : 'https://premios.fans/assets/imgs/user.png';
+
         result.version = version;
         result.versionDate = global.todayMoment().toString('DD/MM HH:mm:ss');
 
-        result.idTemplate = result.campanhaInfluencer.idTemplate ||
-            result.campanha.idTemplate ||
+        // Muda aqui para pegar o template individual por influencer
+        result.idTemplate = result.campanha.idTemplate ||
             result.campanha.template ||
             null;
 

@@ -80,7 +80,6 @@ const ngModule = angular.module('collection.empresas', [])
                 return {
                     bytes: i.bytes,
                     etag: i.etag,
-                    original_extension: i.original_extension,
                     original_filename: i.original_filename,
                     public_id: i.public_id,
                     resource_type: i.resource_type,

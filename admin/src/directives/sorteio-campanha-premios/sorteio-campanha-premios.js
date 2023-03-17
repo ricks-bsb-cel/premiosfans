@@ -8,6 +8,7 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
             globalFactory,
             alertFactory
         ) {
+			$scope.disabled = typeof $scope.disabled === 'boolean' ? $scope.disabled : false;
 
             $scope.add = _ => {
 
@@ -98,6 +99,7 @@ let ngModule = angular.module('directives.sorteio-campanha-premios', [])
             scope: {
                 sorteio: "=",
                 delegate: "=",
+                disabled: "=?",
                 posicao: "@"
             }
         };

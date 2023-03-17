@@ -12,6 +12,8 @@ const ngModule = angular.module('directives.input-date', [])
 			$scope.value = null;
 			$scope.diaSemana = null;
 
+			$scope.disabled = typeof $scope.disabled === 'boolean' ? $scope.disabled : false;
+
 			const diasSemana = ['Dom', '2ª', '3ª', '4ª', '5ª', '6ª', 'Sab'];
 
 			let disableWatchValue;
@@ -90,7 +92,8 @@ const ngModule = angular.module('directives.input-date', [])
 			replace: true,
 			scope: {
 				model: '=',
-				fieldName: '@'
+				fieldName: '@',
+				disabled: '=?'
 			}
 		};
 	});

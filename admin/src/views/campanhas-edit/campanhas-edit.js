@@ -84,15 +84,17 @@ const ngModule = angular.module('views.contratos-edit', [
 
 		const saveAndClose = _ => { save(true); }
 
+		/*
 		const generateTemplates = _ => {
 			premiosFansService.generateTemplates({
 				data: { idCampanha: $scope.campanha.id },
 				blockUi: false
 			});
 		}
+		*/
 
 		$scope.ativar = _ => {
-			alertFactory.yesno('Tem certeza que deseja ativar a Campanha?')
+			alertFactory.yesno('Tem certeza que deseja ativar a Campanha?', 'Depois de ativada, diversos dados da campanha não poderão mais serem alterados! Verifique os dados antes de ativar!')
 				.then(_ => {
 					premiosFansService.ativarCampanha({
 						idCampanha: $scope.campanha.id
@@ -204,7 +206,10 @@ const ngModule = angular.module('views.contratos-edit', [
 								required: true
 							},
 							type: 'ng-selector-pix-keys',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
+							expressionProperties: {
+								'templateOptions.disabled': "model.ativo"
+							}
 						},
 						{
 							key: 'vlTitulo',
@@ -214,7 +219,10 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							defaultValue: _vlTitulo,
 							type: 'reais',
-							className: 'col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6'
+							className: 'col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
+							expressionProperties: {
+								'templateOptions.disabled': "model.ativo"
+							}
 						},
 						{
 							key: 'qtdNumerosDaSortePorTitulo',
@@ -224,8 +232,11 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							defaultValue: _qtdNumerosDaSortePorTitulo,
 							type: 'integer',
-							className: 'col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6'
-						},
+							className: 'col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
+							expressionProperties: {
+								'templateOptions.disabled': "model.ativo"
+							}
+						}
 					],
 					form: null
 				},
@@ -239,7 +250,10 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							defaultValue: _qtdGrupos,
 							type: 'integer',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6'
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6',
+							expressionProperties: {
+								'templateOptions.disabled': "model.ativo"
+							}
 						},
 						{
 							key: 'qtdNumerosPorGrupo',
@@ -249,8 +263,11 @@ const ngModule = angular.module('views.contratos-edit', [
 							},
 							defaultValue: _qtdNumerosPorGrupo,
 							type: 'integer',
-							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6'
-						},
+							className: 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6',
+							expressionProperties: {
+								'templateOptions.disabled': "model.ativo"
+							}
+						}
 					],
 					form: null
 				},

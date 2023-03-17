@@ -1,6 +1,7 @@
 <sorteio-campanha-premios
-    ng-repeat="s in sorteios | filter:{deleted:false} track by s.guidSorteio"
+    ng-repeat="s in sorteios | filter:{deleted:false} track by s.id"
     sorteio="s"
+    disabled="disabled"
     posicao="{{$index + 1}}"
     delegate="delegate"
     class="col-12"
